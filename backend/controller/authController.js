@@ -48,6 +48,8 @@ exports.register = async (req, res) => {
           name: user.name,
           email: user.email,
           avatar: user.avatar,
+          profileCompleted: user.profileCompleted,
+          skills: user.skills,
         },
       });
     } else {
@@ -94,6 +96,8 @@ exports.login = async (req, res) => {
         name: user.name,
         email: user.email,
         avatar: user.avatar,
+        profileCompleted: user.profileCompleted,
+        skills: user.skills,
       },
     });
   } catch (error) {
@@ -151,6 +155,8 @@ exports.googleLogin = async (req, res) => {
         name: user.name,
         email: user.email,
         avatar: user.avatar,
+        profileCompleted: user.profileCompleted,
+        skills: user.skills,
       },
     });
   } catch (error) {
@@ -266,6 +272,8 @@ exports.githubLogin = async (req, res) => {
         name: user.name,
         email: user.email,
         avatar: user.avatar,
+        profileCompleted: user.profileCompleted,
+        skills: user.skills,
       },
     });
   } catch (error) {

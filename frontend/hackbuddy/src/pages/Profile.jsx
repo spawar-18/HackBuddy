@@ -3,62 +3,223 @@ import { useNavigate } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
 import api from '../services/api';
 import { 
-  LogOut, Bell, Settings, LayoutDashboard, Database, Cpu, 
-  Send, Users, BookOpen, AlertTriangle, CheckCircle, Flame, Clock, 
-  Terminal, ShieldCheck, UserCheck, RefreshCw, Zap
+  CheckCircle, AlertTriangle, Plus, X, Code, Database, 
+  Cpu, Wrench, Palette, Brain, RefreshCw, LogOut, Terminal, UploadCloud 
 } from 'lucide-react';
 
 const Profile = () => {
-  const { user, logout } = useAuth();
-  const [profileData, setProfileData] = useState(null);
-  const [loadingProfile, setLoadingProfile] = useState(true);
-  const [fixApplied, setFixApplied] = useState(false);
-  const [timeLeft, setTimeLeft] = useState({ hours: 34, minutes: 8, seconds: 58 });
+  const { user, logout, googleLogin } = useAuth();
   const navigate = useNavigate();
 
-  // Countdown timer simulation
-  useEffect(() => {
-    const timer = setInterval(() => {
-      setTimeLeft((prev) => {
-        if (prev.seconds > 0) {
-          return { ...prev, seconds: prev.seconds - 1 };
-        } else if (prev.minutes > 0) {
-          return { ...prev, minutes: prev.minutes - 1, seconds: 59 };
-        } else if (prev.hours > 0) {
-          return { hours: prev.hours - 1, minutes: 59, seconds: 59 };
-        }
-        return prev;
-      });
-    }, 1000);
+  const [selectedSkills, setSelectedSkills] = useState([]);
+  const [customSkill, setCustomSkill] = useState('');
+  const [loading, setLoading] = useState(false);
+  const [toast, setToast] = useState({ show: false, message: '', type: 'success' });
 
-    return () => clearInterval(timer);
-  }, []);
+  // Resume Upload & AI Extraction State
+  const [selectedFile, setSelectedFile] = useState(null);
+  const [extracting, setExtracting] = useState(false);
+  const [dragActive, setDragActive] = useState(false);
+  const [uploadProgress, setUploadProgress] = useState(0);
+  const [extractionProgress, setExtractionProgress] = useState('');
 
-  // Fetch updated profile data from protected endpoint on mount
-  useEffect(() => {
-    const fetchProfile = async () => {
-      try {
-        const response = await api.get('/user/profile');
-        setProfileData(response.data);
-      } catch (err) {
-        console.error('Error fetching profile data:', err);
-      } finally {
-        setLoadingProfile(false);
-      }
-    };
-
-    fetchProfile();
-  }, []);
-
-  const formatTime = (t) => {
-    return `${String(t.hours).padStart(2, '0')}:${String(t.minutes).padStart(2, '0')}:${String(t.seconds).padStart(2, '0')}`;
+  // Define categorized predefined skills
+  const predefinedSkills = {
+    Frontend: ['HTML', 'CSS', 'JavaScript', 'TypeScript', 'React', 'Next.js', 'Tailwind CSS'],
+    Backend: ['Node.js', 'Express.js', 'Spring Boot', 'Django', 'Flask'],
+    Database: ['MongoDB', 'MySQL', 'PostgreSQL', 'Firebase'],
+    AI_ML: ['Python', 'Machine Learning', 'Deep Learning', 'TensorFlow', 'PyTorch', 'NLP', 'Computer Vision'],
+    DevOps: ['Docker', 'Kubernetes', 'AWS', 'CI/CD'],
+    Design: ['UI/UX', 'Figma', 'Canva']
   };
 
-  const handleApplyFix = () => {
-    setFixApplied(true);
+  // Predefined category details for layout and icons
+  const categoryDetails = {
+    Frontend: { icon: <Code size={16} />, label: 'Frontend Architecture' },
+    Backend: { icon: <Wrench size={16} />, label: 'Backend & APIs' },
+    Database: { icon: <Database size={16} />, label: 'Databases & Storage' },
+    AI_ML: { icon: <Brain size={16} />, label: 'AI & Data Science' },
+    DevOps: { icon: <Cpu size={16} />, label: 'DevOps & Cloud' },
+    Design: { icon: <Palette size={16} />, label: 'UI/UX & Design' }
+  };
+
+  // Sync user's existing skills on mount
+  useEffect(() => {
+    if (user && user.skills) {
+      setSelectedSkills(user.skills);
+    }
+  }, [user]);
+
+  const handleFileChange = (e) => {
+    if (e.target.files && e.target.files[0]) {
+      const file = e.target.files[0];
+      if (file.type !== 'application/pdf') {
+        showNotification('Invalid file type. Only PDF resumes are allowed.', 'error');
+        return;
+      }
+      setSelectedFile(file);
+    }
+  };
+
+  const handleDrag = (e) => {
+    e.preventDefault();
+    e.stopPropagation();
+    if (e.type === "dragenter" || e.type === "dragover") {
+      setDragActive(true);
+    } else if (e.type === "dragleave") {
+      setDragActive(false);
+    }
+  };
+
+  const handleDrop = (e) => {
+    e.preventDefault();
+    e.stopPropagation();
+    setDragActive(false);
+
+    if (e.dataTransfer.files && e.dataTransfer.files[0]) {
+      const file = e.dataTransfer.files[0];
+      if (file.type !== 'application/pdf') {
+        showNotification('Invalid file type. Only PDF resumes are allowed.', 'error');
+        return;
+      }
+      setSelectedFile(file);
+    }
+  };
+
+  const handleResumeExtract = async (e) => {
+    e.preventDefault();
+    if (!selectedFile) {
+      showNotification('Please choose a PDF resume first.', 'error');
+      return;
+    }
+
+    setExtracting(true);
+    setExtractionProgress('Uploading PDF resume...');
+    
+    const formData = new FormData();
+    formData.append('resume', selectedFile);
+
+    try {
+      const response = await api.post('/profile/upload-resume', formData, {
+        headers: {
+          'Content-Type': 'multipart/form-data'
+        },
+        onUploadProgress: (progressEvent) => {
+          const progress = Math.round((progressEvent.loaded * 100) / progressEvent.total);
+          setUploadProgress(progress);
+          if (progress === 100) {
+            setExtractionProgress('Analyzing resume text with AI agent...');
+          }
+        }
+      });
+
+      const { extractedSkills, success } = response.data;
+      if (success && Array.isArray(extractedSkills)) {
+        // Merge with existing skills, preventing duplicates (case-insensitive)
+        const currentLower = selectedSkills.map(s => s.toLowerCase());
+        const newUnique = extractedSkills.filter(
+          skill => !currentLower.includes(skill.toLowerCase())
+        );
+
+        if (newUnique.length > 0) {
+          setSelectedSkills(prev => [...prev, ...newUnique]);
+          showNotification(`Successfully extracted and merged ${newUnique.length} new skills!`, 'success');
+        } else {
+          showNotification('Resume skills extracted successfully, but they were already in your profile.', 'success');
+        }
+      }
+      
+      // Reset file selection after successful extraction
+      setSelectedFile(null);
+      setUploadProgress(0);
+      setExtractionProgress('');
+    } catch (error) {
+      console.error('Resume extraction failed:', error);
+      const errorMsg = error.response?.data?.message || 'Failed to extract skills from resume.';
+      showNotification(errorMsg, 'error');
+    } finally {
+      setExtracting(false);
+    }
+  };
+
+  // Show toast notification
+  const showNotification = (message, type = 'success') => {
+    setToast({ show: true, message, type });
     setTimeout(() => {
-      alert('Hotfix Applied: LLM Response latency optimized to 120ms via Edge Streaming!');
-    }, 100);
+      setToast({ show: false, message: '', type: 'success' });
+    }, 4000);
+  };
+
+  // Toggle predefined skill selection
+  const handleToggleSkill = (skill) => {
+    if (selectedSkills.includes(skill)) {
+      setSelectedSkills(prev => prev.filter(s => s !== skill));
+    } else {
+      setSelectedSkills(prev => [...prev, skill]);
+    }
+  };
+
+  // Add custom skill
+  const handleAddCustomSkill = (e) => {
+    e.preventDefault();
+    const trimmed = customSkill.trim();
+    if (!trimmed) return;
+
+    // Validation: Prevent duplicates
+    const isDuplicate = selectedSkills.some(s => s.toLowerCase() === trimmed.toLowerCase());
+    if (isDuplicate) {
+      showNotification(`"${trimmed}" is already added to your skills.`, 'error');
+      return;
+    }
+
+    setSelectedSkills(prev => [...prev, trimmed]);
+    setCustomSkill('');
+    showNotification(`Added custom skill: ${trimmed}`, 'success');
+  };
+
+  // Remove skill chip
+  const handleRemoveSkill = (skillToRemove) => {
+    setSelectedSkills(prev => prev.filter(s => s !== skillToRemove));
+  };
+
+  // Submit / Save Profile
+  const handleSaveProfile = async () => {
+    // Validation: Require at least one skill to complete profile
+    if (selectedSkills.length === 0) {
+      showNotification('Please select or add at least one skill to save your profile.', 'error');
+      return;
+    }
+
+    setLoading(true);
+    try {
+      const response = await api.put('/profile', { skills: selectedSkills });
+      
+      // Update the user session in AuthContext by reloading profile
+      // If our AuthContext uses state, we want to reload or update the state.
+      // Wait, let's force route navigate to dashboard; ProtectedRoute will re-validate if needed.
+      showNotification('Profile updated successfully! Welcome to the HUD Dashboard.', 'success');
+      
+      // Trigger a redirect after toast is visible
+      setTimeout(() => {
+        // Force session refresh by reloading page or using auth context if we had a sync method.
+        // We'll update the local storage token and user object if needed.
+        const token = localStorage.getItem('token');
+        if (token && response.data) {
+          // Update cached user object in AuthContext by mutating or redirecting.
+          // Since AuthContext reads from state, let's check if we can update the state.
+          // In App.jsx, the user session will be fetched on verifyToken. Let's redirect to dashboard:
+          window.location.href = '/dashboard';
+        } else {
+          navigate('/dashboard');
+        }
+      }, 1500);
+    } catch (error) {
+      console.error('Save Profile failed:', error);
+      const errorMsg = error.response?.data?.message || 'Failed to update profile. Please try again.';
+      showNotification(errorMsg, 'error');
+    } finally {
+      setLoading(false);
+    }
   };
 
   const handleLogout = () => {
@@ -66,355 +227,701 @@ const Profile = () => {
     navigate('/login');
   };
 
-  const activeUser = profileData || user;
-
   return (
-    <div className="dashboard-container">
-      {/* Top Navigation Header */}
-      <header className="dashboard-header">
-        <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
-          <div className="logo-icon" style={{ width: '30px', height: '30px', fontSize: '1rem' }}>H</div>
-          <span style={{ fontWeight: 800, fontSize: '1.2rem', fontFamily: 'var(--font-sans)', letterSpacing: '-0.5px' }}>
-            Hack<span style={{ color: 'var(--primary-hover)' }}>OS</span>
-          </span>
-          <span className="status-badge badge-active" style={{ marginLeft: '10px', fontSize: '0.65rem' }}>
-            <span className="status-pulse"></span>
-            ACTIVE
-          </span>
+    <div className="profile-selection-page">
+      {/* Toast Notification */}
+      {toast.show && (
+        <div className={`toast-notification toast-${toast.type}`}>
+          {toast.type === 'success' ? <CheckCircle size={18} /> : <AlertTriangle size={18} />}
+          <span>{toast.message}</span>
         </div>
+      )}
 
-        {/* Sprint Countdown Display */}
-        <div style={{ display: 'flex', alignItems: 'center', gap: '8px', fontFamily: 'var(--font-mono)' }}>
-          <Clock size={14} style={{ color: 'var(--text-secondary)' }} />
-          <span style={{ fontSize: '0.8rem', color: 'var(--text-secondary)' }}>HUD CLOCK:</span>
-          <span style={{ fontSize: '0.95rem', fontWeight: 'bold', color: 'var(--text-primary)' }}>{formatTime(timeLeft)}</span>
-        </div>
+      {/* Styled Layout Styles */}
+      <style>{`
+        .profile-selection-page {
+          background-color: #f8fafc;
+          min-height: 100vh;
+          color: #334155;
+          font-family: 'Outfit', 'Inter', sans-serif;
+          display: flex;
+          justify-content: center;
+          align-items: center;
+          padding: 2.5rem 1rem;
+        }
 
-        {/* Action Widgets */}
-        <div className="header-actions">
-          <button className="header-btn">Submit Project</button>
-          <Bell size={18} style={{ color: 'var(--text-secondary)', cursor: 'pointer' }} />
-          <Settings size={18} style={{ color: 'var(--text-secondary)', cursor: 'pointer' }} />
-          
-          <div className="user-profile-widget">
-            {activeUser?.avatar ? (
-              <img src={activeUser.avatar} alt="Avatar" className="user-avatar" />
-            ) : (
-              <div className="user-avatar-placeholder">
-                {activeUser?.name?.charAt(0).toUpperCase() || 'U'}
-              </div>
-            )}
-            <span style={{ fontSize: '0.85rem', fontWeight: 600, color: 'var(--text-primary)' }}>{activeUser?.name}</span>
+        .profile-card {
+          width: 100%;
+          max-width: 900px;
+          background: #ffffff;
+          border: 1px solid #e2e8f0;
+          border-radius: 16px;
+          box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.05), 0 8px 10px -6px rgba(0, 0, 0, 0.05);
+          padding: 2.5rem;
+          display: flex;
+          flex-direction: column;
+          gap: 2rem;
+        }
+
+        .profile-header {
+          display: flex;
+          justify-content: space-between;
+          align-items: flex-start;
+          border-bottom: 1px solid #e2e8f0;
+          padding-bottom: 1.5rem;
+        }
+
+        .profile-brand-title {
+          font-size: 1.75rem;
+          font-weight: 800;
+          letter-spacing: -0.5px;
+          margin: 0;
+          color: #0f172a;
+          display: flex;
+          align-items: center;
+          gap: 10px;
+        }
+
+        .profile-tagline {
+          font-size: 0.9rem;
+          color: #64748b;
+          margin-top: 0.25rem;
+        }
+
+        .logout-btn-nav {
+          background: rgba(239, 68, 68, 0.08);
+          color: #ef4444;
+          border: 1px solid rgba(239, 68, 68, 0.15);
+          border-radius: 8px;
+          padding: 0.5rem 1rem;
+          font-size: 0.85rem;
+          font-weight: 600;
+          cursor: pointer;
+          display: flex;
+          align-items: center;
+          gap: 8px;
+          transition: all 0.2s ease;
+        }
+
+        .logout-btn-nav:hover {
+          background: rgba(239, 68, 68, 0.15);
+          transform: translateY(-1px);
+        }
+
+        .profile-section-title {
+          font-size: 1.1rem;
+          font-weight: 700;
+          text-transform: uppercase;
+          letter-spacing: 0.5px;
+          color: #2563eb;
+          margin-bottom: 1rem;
+          display: flex;
+          align-items: center;
+          gap: 8px;
+        }
+
+        .categories-grid {
+          display: grid;
+          grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+          gap: 1.5rem;
+        }
+
+        .category-card {
+          background: #ffffff;
+          border: 1px solid #e2e8f0;
+          border-radius: 12px;
+          padding: 1.25rem;
+          display: flex;
+          flex-direction: column;
+          gap: 0.75rem;
+          box-shadow: 0 1px 3px rgba(0,0,0,0.02);
+        }
+
+        .category-header {
+          display: flex;
+          align-items: center;
+          gap: 8px;
+          font-size: 0.9rem;
+          font-weight: 700;
+          color: #1e293b;
+          border-bottom: 1px solid #f1f5f9;
+          padding-bottom: 0.5rem;
+        }
+
+        .category-header svg {
+          color: #2563eb;
+        }
+
+        .skills-pills-container {
+          display: flex;
+          flex-wrap: wrap;
+          gap: 0.5rem;
+        }
+
+        .skill-pill {
+          background: #f8fafc;
+          border: 1px solid #e2e8f0;
+          color: #475569;
+          border-radius: 6px;
+          padding: 0.35rem 0.75rem;
+          font-size: 0.8rem;
+          font-weight: 500;
+          cursor: pointer;
+          transition: all 0.2s ease;
+        }
+
+        .skill-pill:hover {
+          background: #f1f5f9;
+          color: #0f172a;
+          border-color: #cbd5e1;
+        }
+
+        .skill-pill.selected {
+          background: #2563eb;
+          color: #ffffff;
+          border-color: #2563eb;
+          font-weight: 600;
+          box-shadow: 0 2px 4px rgba(37, 99, 235, 0.2);
+        }
+
+        .inventory-card {
+          background: #f8fafc;
+          border: 1px solid #e2e8f0;
+          border-radius: 12px;
+          padding: 1.5rem;
+          display: flex;
+          flex-direction: column;
+          gap: 1rem;
+        }
+
+        .inventory-placeholder {
+          font-size: 0.85rem;
+          color: #94a3b8;
+          font-style: italic;
+          text-align: center;
+          padding: 1.5rem 0;
+        }
+
+        .selected-chip {
+          background: #eff6ff;
+          border: 1px solid #bfdbfe;
+          color: #1e40af;
+          font-weight: 600;
+          border-radius: 20px;
+          padding: 0.4rem 0.9rem;
+          font-size: 0.8rem;
+          display: inline-flex;
+          align-items: center;
+          gap: 6px;
+          transition: all 0.15s ease;
+        }
+
+        .selected-chip:hover {
+          background: #dbeafe;
+          border-color: #3b82f6;
+        }
+
+        .selected-chip button {
+          background: none;
+          border: none;
+          color: #60a5fa;
+          cursor: pointer;
+          display: flex;
+          align-items: center;
+          padding: 0;
+          transition: color 0.15s ease;
+        }
+
+        .selected-chip button:hover {
+          color: #ef4444;
+        }
+
+        .custom-skill-form {
+          display: flex;
+          gap: 0.75rem;
+          margin-top: 0.5rem;
+          max-width: 450px;
+        }
+
+        .custom-skill-input {
+          flex: 1;
+          background-color: #ffffff;
+          border: 1px solid #cbd5e1;
+          color: #0f172a;
+          border-radius: 8px;
+          padding: 0.65rem 1rem;
+          font-size: 0.85rem;
+          font-family: inherit;
+          transition: all 0.2s ease;
+        }
+
+        .custom-skill-input:focus {
+          outline: none;
+          border-color: #2563eb;
+          box-shadow: 0 0 0 2px rgba(37, 99, 235, 0.1);
+        }
+
+        .btn-add-custom {
+          background: #ffffff;
+          border: 1px solid #cbd5e1;
+          color: #334155;
+          border-radius: 8px;
+          padding: 0 1.25rem;
+          font-size: 0.85rem;
+          font-weight: 600;
+          cursor: pointer;
+          display: flex;
+          align-items: center;
+          gap: 6px;
+          transition: all 0.2s ease;
+        }
+
+        .btn-add-custom:hover {
+          background: #f8fafc;
+          border-color: #94a3b8;
+        }
+
+        .action-footer {
+          display: flex;
+          justify-content: flex-end;
+          gap: 1rem;
+          border-top: 1px solid #e2e8f0;
+          padding-top: 1.5rem;
+        }
+
+        .btn-save-profile {
+          background: linear-gradient(135deg, #2563eb 0%, #1d4ed8 100%);
+          color: #fff;
+          border: none;
+          border-radius: 8px;
+          padding: 0.75rem 2rem;
+          font-size: 0.95rem;
+          font-weight: 700;
+          cursor: pointer;
+          display: flex;
+          align-items: center;
+          gap: 10px;
+          transition: all 0.2s ease;
+          box-shadow: 0 4px 12px rgba(37, 99, 235, 0.2);
+        }
+
+        .btn-save-profile:hover:not(:disabled) {
+          transform: translateY(-1px);
+          box-shadow: 0 6px 16px rgba(37, 99, 235, 0.3);
+        }
+
+        .btn-save-profile:disabled {
+          opacity: 0.6;
+          cursor: not-allowed;
+        }
+
+        .toast-notification {
+          position: fixed;
+          top: 20px;
+          right: 20px;
+          z-index: 9999;
+          display: flex;
+          align-items: center;
+          gap: 12px;
+          padding: 1rem 1.5rem;
+          border-radius: 8px;
+          font-size: 0.9rem;
+          font-weight: 600;
+          color: #1e293b;
+          box-shadow: 0 10px 25px rgba(0,0,0,0.08);
+          background: #ffffff;
+          animation: slideIn 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+        }
+
+        .toast-success {
+          border: 1px solid #10b981;
+          color: #065f46;
+        }
+
+        .toast-success svg {
+          color: #10b981;
+        }
+
+        .toast-error {
+          border: 1px solid #ef4444;
+          color: #991b1b;
+        }
+
+        .toast-error svg {
+          color: #ef4444;
+        }
+
+        @keyframes slideIn {
+          from {
+            transform: translateX(100%) translateY(-10px);
+            opacity: 0;
+          }
+          to {
+            transform: translateX(0) translateY(0);
+            opacity: 1;
+          }
+        }
+
+        .resume-section {
+          background: #ffffff;
+          border: 1px solid #e2e8f0;
+          border-radius: 12px;
+          padding: 1.5rem;
+          margin-bottom: 0.5rem;
+        }
+
+        .drag-drop-zone {
+          border: 2px dashed #cbd5e1;
+          border-radius: 10px;
+          background: #f8fafc;
+          padding: 2.25rem 1.5rem;
+          display: flex;
+          flex-direction: column;
+          align-items: center;
+          justify-content: center;
+          text-align: center;
+          cursor: pointer;
+          transition: all 0.2s ease;
+        }
+
+        .drag-drop-zone.drag-active {
+          border-color: #2563eb;
+          background: #eff6ff;
+        }
+
+        .drag-drop-zone.file-loaded {
+          border-color: #10b981;
+          background: #f0fdf4;
+          border-style: solid;
+        }
+
+        .file-input-label {
+          display: flex;
+          flex-direction: column;
+          align-items: center;
+          width: 100%;
+          cursor: pointer;
+        }
+
+        .upload-cloud-icon {
+          color: #94a3b8;
+          margin-bottom: 0.75rem;
+          transition: transform 0.2s ease;
+        }
+
+        .file-input-label:hover .upload-cloud-icon {
+          transform: translateY(-2px);
+          color: #2563eb;
+        }
+
+        .upload-title {
+          font-weight: 700;
+          font-size: 0.95rem;
+          color: #1e293b;
+        }
+
+        .upload-subtitle {
+          font-size: 0.8rem;
+          color: #64748b;
+          margin-top: 0.25rem;
+        }
+
+        .file-preview-info {
+          display: flex;
+          flex-direction: column;
+          align-items: center;
+          width: 100%;
+        }
+
+        .file-name-text {
+          font-weight: 700;
+          font-size: 0.9rem;
+          color: #0f172a;
+          word-break: break-all;
+        }
+
+        .file-preview-info svg {
+          color: #2563eb;
+        }
+
+        .file-size-text {
+          font-size: 0.8rem;
+          color: #64748b;
+          margin-top: 0.1rem;
+        }
+
+        .btn-extract-skills {
+          background: #10b981;
+          color: #fff;
+          border: none;
+          border-radius: 6px;
+          padding: 0.5rem 1.25rem;
+          font-size: 0.85rem;
+          font-weight: 700;
+          cursor: pointer;
+          transition: all 0.2s ease;
+          display: flex;
+          align-items: center;
+          gap: 6px;
+        }
+
+        .btn-extract-skills:hover:not(:disabled) {
+          background: #059669;
+          transform: translateY(-1px);
+        }
+
+        .btn-cancel-file {
+          background: #ffffff;
+          border: 1px solid #cbd5e1;
+          color: #475569;
+          border-radius: 6px;
+          padding: 0.5rem 1.25rem;
+          font-size: 0.85rem;
+          font-weight: 600;
+          cursor: pointer;
+          transition: all 0.2s ease;
+        }
+
+        .btn-cancel-file:hover {
+          background: #f8fafc;
+          border-color: #94a3b8;
+          color: #0f172a;
+        }
+
+        .extraction-status-bar {
+          margin-top: 1rem;
+          display: flex;
+          flex-direction: column;
+          gap: 0.35rem;
+        }
+
+        .progress-bar-container {
+          height: 6px;
+          background: #e2e8f0;
+          border-radius: 3px;
+          overflow: hidden;
+        }
+
+        .progress-bar-fill {
+          height: 100%;
+          background: #10b981;
+          border-radius: 3px;
+          transition: width 0.25s ease;
+        }
+
+        .progress-text {
+          font-size: 0.8rem;
+          color: #475569;
+          font-weight: 500;
+        }
+      `}</style>
+
+      <div className="profile-card">
+        {/* Header Block */}
+        <div className="profile-header">
+          <div>
+            <h1 className="profile-brand-title">
+              <Terminal size={24} style={{ color: 'var(--primary-hover)' }} />
+              {user?.profileCompleted ? 'Edit Skills Configuration' : 'Mission Profile Configuration'}
+            </h1>
+            <p className="profile-tagline">
+              {user?.profileCompleted 
+                ? 'Update your system core nodes and technical skills directory.'
+                : 'Establish your system core nodes. Pre-register your technical skills directory.'}
+            </p>
           </div>
-        </div>
-      </header>
-
-      {/* Main Layout Area */}
-      <div className="dashboard-body">
-        {/* Left Navigation Sidebar */}
-        <aside className="dashboard-sidebar">
-          <div className="sidebar-menu">
-            <a href="#dashboard" className="menu-item active">
-              <LayoutDashboard size={16} />
-              <span>Dashboard</span>
-            </a>
-            <a href="#tasks" className="menu-item">
-              <Database size={16} />
-              <span>ALLO Task Board</span>
-            </a>
-            <a href="#splitter" className="menu-item">
-              <Cpu size={16} />
-              <span>AI Task Splitter</span>
-            </a>
-            <a href="#submission" className="menu-item">
-              <Send size={16} />
-              <span>Submission Hub</span>
-            </a>
-            
-            <button className="btn-primary" style={{ marginTop: '1.5rem', background: 'linear-gradient(135deg, #10b981 0%, #059669 100%)', border: 'none', color: '#ffffff', padding: '0.6rem' }}>
-              <Users size={16} />
-              <span style={{ fontSize: '0.8rem', fontWeight: 600 }}>Invite Teammate</span>
-            </button>
-          </div>
-
-          <div className="sidebar-menu" style={{ borderTop: '1px solid var(--border)', paddingTop: '1rem' }}>
-            <a href="#docs" className="menu-item">
-              <BookOpen size={16} />
-              <span>Documentation</span>
-            </a>
+          {user?.profileCompleted ? (
             <button 
-              onClick={handleLogout} 
-              className="menu-item" 
-              style={{ background: 'none', border: 'none', width: '100%', cursor: 'pointer', textAlign: 'left' }}
+              className="logout-btn-nav" 
+              style={{ background: 'none', color: '#64748b', borderColor: '#cbd5e1' }}
+              onClick={() => navigate('/dashboard')}
             >
-              <LogOut size={16} />
-              <span>Log Out</span>
+              Cancel & Return
             </button>
+          ) : (
+            <button className="logout-btn-nav" onClick={handleLogout}>
+              <LogOut size={14} />
+              Abort & Log Out
+            </button>
+          )}
+        </div>
+
+        {/* Resume AI Autopilot Section */}
+        <div className="resume-section">
+          <div className="profile-section-title">
+            <Cpu size={18} style={{ color: 'var(--primary)' }} />
+            <span>AI Skills Autopilot (Resume Upload)</span>
           </div>
-        </aside>
+          <p className="profile-tagline" style={{ marginBottom: '1.25rem' }}>
+            Fast track your setup! Upload your PDF resume, and our AI Agent will extract and configure your developer skills node automatically.
+          </p>
 
-        {/* Dashboard Content Container */}
-        <main className="dashboard-content">
-          <div className="dashboard-grid">
-            
-            {/* Left Side Info Pane */}
-            <div style={{ display: 'flex', flexDirection: 'column', gap: '2rem' }}>
-              {/* Mission Status Header */}
-              <div className="glass dashboard-card glow-blue" style={{ borderLeft: '4px solid var(--primary)' }}>
-                <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '1.25rem' }}>
-                  <div>
-                    <span style={{ fontSize: '0.75rem', fontWeight: 600, color: 'var(--text-muted)' }}>MISSION STATUS</span>
-                    <h2 style={{ fontSize: '2rem', fontWeight: 800, fontFamily: 'var(--font-mono)', color: 'var(--text-primary)', marginTop: '0.25rem' }}>
-                      T-Minus {formatTime(timeLeft)}
-                    </h2>
-                  </div>
-                  <span className="status-badge badge-critical">Mission Critical</span>
-                </div>
+          <div 
+            className={`drag-drop-zone ${dragActive ? 'drag-active' : ''} ${selectedFile ? 'file-loaded' : ''}`}
+            onDragEnter={handleDrag}
+            onDragOver={handleDrag}
+            onDragLeave={handleDrag}
+            onDrop={handleDrop}
+          >
+            {selectedFile ? (
+              <div className="file-preview-info">
+                <Terminal size={32} style={{ color: 'var(--primary)', marginBottom: '0.5rem' }} />
+                <span className="file-name-text">{selectedFile.name}</span>
+                <span className="file-size-text">({(selectedFile.size / (1024 * 1024)).toFixed(2)} MB)</span>
                 
-                <div className="hud-grid">
-                  <div className="hud-item">
-                    <div className="hud-label">Current Sprint</div>
-                    <div className="hud-value" style={{ color: 'var(--text-primary)' }}>MVP Core</div>
-                  </div>
-                  <div className="hud-item">
-                    <div className="hud-label">Squad Velocity</div>
-                    <div className="hud-value" style={{ color: 'var(--success)' }}>14.2 pts/hr</div>
-                  </div>
+                <div style={{ display: 'flex', gap: '0.75rem', marginTop: '1rem' }}>
+                  <button 
+                    type="button" 
+                    className="btn-extract-skills" 
+                    onClick={handleResumeExtract}
+                    disabled={extracting}
+                  >
+                    {extracting ? (
+                      <>
+                        <RefreshCw className="spin" size={14} style={{ animation: 'spin 1.5s linear infinite' }} />
+                        Extracting ({uploadProgress}%)
+                      </>
+                    ) : (
+                      'Extract Skills'
+                    )}
+                  </button>
+                  <button 
+                    type="button" 
+                    className="btn-cancel-file"
+                    onClick={() => setSelectedFile(null)}
+                    disabled={extracting}
+                  >
+                    Remove
+                  </button>
                 </div>
               </div>
+            ) : (
+              <label htmlFor="resume-file-input" className="file-input-label">
+                <UploadCloud size={36} className="upload-cloud-icon" />
+                <span className="upload-title">Drag & Drop Resume PDF</span>
+                <span className="upload-subtitle">or click to browse local files (max 5MB)</span>
+                <input 
+                  type="file" 
+                  id="resume-file-input" 
+                  accept=".pdf"
+                  onChange={handleFileChange}
+                  style={{ display: 'none' }}
+                />
+              </label>
+            )}
+          </div>
 
-              {/* Velocity Burndown Tracker */}
-              <div className="glass dashboard-card">
-                <div className="card-title">
-                  <div>
-                    <span>Velocity Burndown</span>
-                    <p style={{ fontSize: '0.7rem', color: 'var(--text-muted)', textTransform: 'none', marginTop: '4px' }}>
-                      Track progress across core project tracks
-                    </p>
-                  </div>
-                  <span className="card-title-pill" style={{ background: 'rgba(255,255,255,0.05)', color: 'var(--text-secondary)' }}>
-                    LATEST PUSH: 4M AGO
-                  </span>
+          {extracting && (
+            <div className="extraction-status-bar">
+              <div className="progress-bar-container">
+                <div className="progress-bar-fill" style={{ width: `${uploadProgress}%` }}></div>
+              </div>
+              <span className="progress-text">{extractionProgress}</span>
+            </div>
+          )}
+        </div>
+
+        {/* Categories Section */}
+        <div>
+          <div className="profile-section-title">
+            <span>1. Predefined Skills Library</span>
+          </div>
+          <div className="categories-grid">
+            {Object.keys(predefinedSkills).map(category => (
+              <div key={category} className="category-card">
+                <div className="category-header">
+                  {categoryDetails[category].icon}
+                  <span>{categoryDetails[category].label}</span>
                 </div>
-
-                <div className="burndown-chart-sim">
-                  <div className="tracker-row">
-                    <div className="tracker-header">
-                      <span>FRONTEND ARCHITECTURE</span>
-                      <span>85%</span>
-                    </div>
-                    <div className="tracker-bar-bg">
-                      <div className="tracker-bar-fill" style={{ width: '85%', background: '#2563eb' }}></div>
-                    </div>
-                  </div>
-
-                  <div className="tracker-row">
-                    <div className="tracker-header">
-                      <span>BACKEND & API INFRA</span>
-                      <span>62%</span>
-                    </div>
-                    <div className="tracker-bar-bg">
-                      <div className="tracker-bar-fill" style={{ width: '62%', background: '#3b82f6' }}></div>
-                    </div>
-                  </div>
-
-                  <div className="tracker-row">
-                    <div className="tracker-header">
-                      <span>AI ENGINE (LLM PIPELINE)</span>
-                      <span>41%</span>
-                    </div>
-                    <div className="tracker-bar-bg">
-                      <div className="tracker-bar-fill" style={{ width: '41%', background: '#10b981' }}></div>
-                    </div>
-                  </div>
-
-                  <div className="tracker-row">
-                    <div className="tracker-header">
-                      <span>PITCH & PRESENTATION</span>
-                      <span>15%</span>
-                    </div>
-                    <div className="tracker-bar-bg">
-                      <div className="tracker-bar-fill" style={{ width: '15%', background: '#059669' }}></div>
-                    </div>
-                  </div>
+                <div className="skills-pills-container">
+                  {predefinedSkills[category].map(skill => {
+                    const isSelected = selectedSkills.includes(skill);
+                    return (
+                      <button
+                        key={skill}
+                        type="button"
+                        onClick={() => handleToggleSkill(skill)}
+                        className={`skill-pill ${isSelected ? 'selected' : ''}`}
+                      >
+                        {skill}
+                      </button>
+                    );
+                  })}
                 </div>
               </div>
+            ))}
+          </div>
+        </div>
 
-              {/* War Room Alert Card */}
-              <div className="glass dashboard-card war-room-card">
-                <div style={{ display: 'flex', gap: '15px', alignItems: 'flex-start' }}>
-                  <div style={{ 
-                    background: fixApplied ? 'var(--success-glow)' : 'rgba(239, 68, 68, 0.1)', 
-                    color: fixApplied ? 'var(--success)' : 'var(--danger)',
-                    padding: '10px', 
-                    borderRadius: '8px'
-                  }}>
-                    {fixApplied ? <CheckCircle size={24} /> : <Flame size={24} />}
-                  </div>
-                  <div style={{ flex: 1 }}>
-                    <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '4px' }}>
-                      <span style={{ fontSize: '0.75rem', fontWeight: 700, letterSpacing: '1px', color: fixApplied ? 'var(--success)' : 'var(--danger)' }}>
-                        {fixApplied ? 'HOTFIX COMPLETE' : 'AI WAR ROOM : BOTTLENECK DETECTED'}
-                      </span>
-                    </div>
-                    <h3 style={{ fontSize: '1.1rem', fontWeight: 800, color: '#fff', marginBottom: '0.5rem' }}>
-                      {fixApplied ? 'Edge Latency Resolved' : 'LLM Latency Bottleneck'}
-                    </h3>
-                    <p style={{ fontSize: '0.85rem', color: 'var(--text-secondary)', marginBottom: '1.25rem', lineHeight: '1.4' }}>
-                      {fixApplied 
-                        ? 'System response times are stabilized. API routes are using standard high-speed streaming protocols.' 
-                        : 'LLM response latency is averaging 2.4s. Recommending switching to streaming edge functions for better UX.'}
-                    </p>
-                    <button 
-                      onClick={handleApplyFix}
-                      disabled={fixApplied}
-                      className="btn-primary" 
-                      style={{ 
-                        width: 'auto', 
-                        padding: '0.5rem 1.25rem', 
-                        background: fixApplied ? 'var(--success)' : 'var(--primary)',
-                        fontSize: '0.8rem',
-                        gap: '6px'
-                      }}
-                    >
-                      <Zap size={14} />
-                      {fixApplied ? 'Fix Applied' : 'Apply Fix'}
+        {/* Custom Skill Section */}
+        <div>
+          <div className="profile-section-title">
+            <span>2. Custom Skills Expansion</span>
+          </div>
+          <p className="profile-tagline" style={{ marginBottom: '0.75rem' }}>
+            Inject custom capabilities and tech stacks not registered in the default database index.
+          </p>
+          <form onSubmit={handleAddCustomSkill} className="custom-skill-form">
+            <input
+              type="text"
+              className="custom-skill-input"
+              placeholder="e.g. GraphQL, Redis, WebRTC"
+              value={customSkill}
+              onChange={(e) => setCustomSkill(e.target.value)}
+              disabled={loading}
+            />
+            <button type="submit" className="btn-add-custom" disabled={loading}>
+              <Plus size={16} />
+              Add Node
+            </button>
+          </form>
+        </div>
+
+        {/* Selected Skills Inventory */}
+        <div>
+          <div className="profile-section-title">
+            <span>3. Current Skill Inventory ({selectedSkills.length})</span>
+          </div>
+          <div className="inventory-card">
+            {selectedSkills.length === 0 ? (
+              <div className="inventory-placeholder">
+                No active skills loaded. Toggle options in Category Panels or inject Custom Nodes above.
+              </div>
+            ) : (
+              <div className="skills-pills-container" style={{ gap: '0.75rem' }}>
+                {selectedSkills.map(skill => (
+                  <div key={skill} className="selected-chip">
+                    <span>{skill}</span>
+                    <button type="button" onClick={() => handleRemoveSkill(skill)} aria-label={`Remove ${skill}`}>
+                      <X size={12} />
                     </button>
                   </div>
-                </div>
+                ))}
               </div>
-            </div>
-
-            {/* Right Side Info Pane (Authenticated Profile Details & Logs) */}
-            <div style={{ display: 'flex', flexDirection: 'column', gap: '2rem' }}>
-              
-              {/* Profile Card */}
-              <div className="glass dashboard-card" style={{ borderTop: '3px solid var(--primary-hover)' }}>
-                <div className="card-title">
-                  <span>Developer Profile</span>
-                  <span className="status-badge badge-active">
-                    <UserCheck size={12} style={{ marginRight: '4px' }} />
-                    Verified
-                  </span>
-                </div>
-
-                {loadingProfile ? (
-                  <div style={{ display: 'flex', alignItems: 'center', gap: '8px', padding: '1rem 0' }}>
-                    <RefreshCw className="spin" size={16} style={{ animation: 'spin 1.5s linear infinite' }} />
-                    <span style={{ fontSize: '0.85rem', color: 'var(--text-secondary)' }}>Querying DB Node...</span>
-                  </div>
-                ) : (
-                  <div style={{ display: 'flex', flexDirection: 'column', gap: '1.25rem' }}>
-                    <div style={{ display: 'flex', alignItems: 'center', gap: '1rem', background: 'var(--bg-deep)', padding: '1rem', borderRadius: '8px', border: '1px solid var(--border)' }}>
-                      {activeUser?.avatar ? (
-                        <img src={activeUser.avatar} alt="Avatar" className="user-avatar" style={{ width: '48px', height: '48px', border: '2px solid var(--primary-hover)' }} />
-                      ) : (
-                        <div className="user-avatar-placeholder" style={{ width: '48px', height: '48px', fontSize: '1.2rem' }}>
-                          {activeUser?.name?.charAt(0).toUpperCase() || 'U'}
-                        </div>
-                      )}
-                      <div>
-                        <div style={{ fontWeight: 700, color: 'var(--text-primary)', fontSize: '1rem' }}>{activeUser?.name}</div>
-                        <div style={{ fontSize: '0.75rem', color: 'var(--text-muted)', fontFamily: 'var(--font-mono)' }}>ID: {activeUser?._id || activeUser?.id || 'N/A'}</div>
-                      </div>
-                    </div>
-
-                    <div style={{ display: 'flex', flexDirection: 'column', gap: '0.75rem', fontSize: '0.85rem' }}>
-                      <div style={{ display: 'flex', justifyContent: 'space-between', borderBottom: '1px solid var(--border)', paddingBottom: '0.5rem' }}>
-                        <span style={{ color: 'var(--text-secondary)' }}>EMAIL NODE:</span>
-                        <span style={{ color: 'var(--text-primary)', fontWeight: 500 }}>{activeUser?.email}</span>
-                      </div>
-                      <div style={{ display: 'flex', justifyContent: 'space-between', borderBottom: '1px solid var(--border)', paddingBottom: '0.5rem' }}>
-                        <span style={{ color: 'var(--text-secondary)' }}>AUTH SCHEME:</span>
-                        <span style={{ color: activeUser?.googleId ? 'var(--success)' : (activeUser?.githubId ? 'var(--success)' : 'var(--primary-hover)'), fontWeight: 600 }}>
-                          {activeUser?.googleId ? 'GOOGLE OAUTH' : (activeUser?.githubId ? 'GITHUB OAUTH' : 'STANDARD JWT')}
-                        </span>
-                      </div>
-                      <div style={{ display: 'flex', justifyContent: 'space-between', paddingBottom: '0.25rem' }}>
-                        <span style={{ color: 'var(--text-secondary)' }}>NODE CREATED:</span>
-                        <span style={{ color: 'var(--text-primary)', fontFamily: 'var(--font-mono)' }}>
-                          {activeUser?.createdAt ? new Date(activeUser.createdAt).toLocaleDateString() : new Date().toLocaleDateString()}
-                        </span>
-                      </div>
-                    </div>
-                  </div>
-                )}
-              </div>
-
-              {/* Live Activity Feed */}
-              <div className="glass dashboard-card">
-                <div className="card-title">
-                  <span>Live Feed</span>
-                  <span style={{ fontSize: '0.65rem', color: 'var(--success)', letterSpacing: '0.5px' }}>REAL-TIME LOG</span>
-                </div>
-
-                <div className="activity-feed">
-                  <div className="feed-item">
-                    <div className="feed-item-icon">
-                      <Terminal size={14} />
-                    </div>
-                    <div className="feed-item-details">
-                      <span className="feed-text">
-                        AI Agent generated 12 sub tasks for <strong>'Auth Integration'</strong>.
-                      </span>
-                      <span className="feed-time">2 MINUTES AGO</span>
-                    </div>
-                  </div>
-
-                  <div className="feed-item">
-                    <div className="feed-item-icon warning">
-                      <AlertTriangle size={14} />
-                    </div>
-                    <div className="feed-item-details">
-                      <span className="feed-text">
-                        Deployment Blocked: Failed to resolve dependency <strong>@hackos/ui-core</strong>.
-                      </span>
-                      <span className="feed-time">14 MINUTES AGO</span>
-                    </div>
-                  </div>
-
-                  <div className="feed-item">
-                    <div className="feed-item-icon success">
-                      <CheckCircle size={14} />
-                    </div>
-                    <div className="feed-item-details">
-                      <span className="feed-text">
-                        <strong>{activeUser?.name || 'Developer'}</strong> verified authentication system successfully.
-                      </span>
-                      <span className="feed-time">JUST NOW</span>
-                    </div>
-                  </div>
-
-                  <div className="feed-item">
-                    <div className="feed-item-icon">
-                      <Terminal size={14} />
-                    </div>
-                    <div className="feed-item-details">
-                      <span className="feed-text">
-                        System Standup scheduled for 09:00 UTC.
-                      </span>
-                      <span className="feed-time">1 HOUR AGO</span>
-                    </div>
-                  </div>
-
-                  <div className="feed-item">
-                    <div className="feed-item-icon success">
-                      <ShieldCheck size={14} />
-                    </div>
-                    <div className="feed-item-details">
-                      <span className="feed-text">
-                        Milestone Reached: <strong>MVP Infrastructure</strong> complete.
-                      </span>
-                      <span className="feed-time">3 HOURS AGO</span>
-                    </div>
-                  </div>
-                </div>
-              </div>
-
-            </div>
-            
+            )}
           </div>
-        </main>
+        </div>
+
+        {/* Footer Actions */}
+        <div className="action-footer">
+          <button 
+            type="button" 
+            className="btn-save-profile" 
+            onClick={handleSaveProfile}
+            disabled={loading}
+          >
+            {loading ? (
+              <>
+                <RefreshCw className="spin" size={16} style={{ animation: 'spin 1.5s linear infinite' }} />
+                {user?.profileCompleted ? 'Saving Changes...' : 'Initializing System...'}
+              </>
+            ) : (
+              <>
+                {user?.profileCompleted ? 'Save Changes' : 'Initialize Flight Deck'}
+              </>
+            )}
+          </button>
+        </div>
       </div>
     </div>
   );
