@@ -87,7 +87,7 @@ const Dashboard = () => {
         <div style={{ display: 'flex', alignItems: 'center', gap: '8px', fontFamily: 'var(--font-mono)' }}>
           <Clock size={14} style={{ color: 'var(--text-secondary)' }} />
           <span style={{ fontSize: '0.8rem', color: 'var(--text-secondary)' }}>HUD CLOCK:</span>
-          <span style={{ fontSize: '0.95rem', fontWeight: 'bold', color: '#fff' }}>{formatTime(timeLeft)}</span>
+          <span style={{ fontSize: '0.95rem', fontWeight: 'bold', color: 'var(--text-primary)' }}>{formatTime(timeLeft)}</span>
         </div>
 
         {/* Action Widgets */}
@@ -104,7 +104,7 @@ const Dashboard = () => {
                 {activeUser?.name?.charAt(0).toUpperCase() || 'U'}
               </div>
             )}
-            <span style={{ fontSize: '0.85rem', fontWeight: 600, color: '#fff' }}>{activeUser?.name}</span>
+            <span style={{ fontSize: '0.85rem', fontWeight: 600, color: 'var(--text-primary)' }}>{activeUser?.name}</span>
           </div>
         </div>
       </header>

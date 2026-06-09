@@ -87,7 +87,7 @@ const Profile = () => {
         <div style={{ display: 'flex', alignItems: 'center', gap: '8px', fontFamily: 'var(--font-mono)' }}>
           <Clock size={14} style={{ color: 'var(--text-secondary)' }} />
           <span style={{ fontSize: '0.8rem', color: 'var(--text-secondary)' }}>HUD CLOCK:</span>
-          <span style={{ fontSize: '0.95rem', fontWeight: 'bold', color: '#fff' }}>{formatTime(timeLeft)}</span>
+          <span style={{ fontSize: '0.95rem', fontWeight: 'bold', color: 'var(--text-primary)' }}>{formatTime(timeLeft)}</span>
         </div>
 
         {/* Action Widgets */}
@@ -104,7 +104,7 @@ const Profile = () => {
                 {activeUser?.name?.charAt(0).toUpperCase() || 'U'}
               </div>
             )}
-            <span style={{ fontSize: '0.85rem', fontWeight: 600, color: '#fff' }}>{activeUser?.name}</span>
+            <span style={{ fontSize: '0.85rem', fontWeight: 600, color: 'var(--text-primary)' }}>{activeUser?.name}</span>
           </div>
         </div>
       </header>
@@ -164,7 +164,7 @@ const Profile = () => {
                 <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '1.25rem' }}>
                   <div>
                     <span style={{ fontSize: '0.75rem', fontWeight: 600, color: 'var(--text-muted)' }}>MISSION STATUS</span>
-                    <h2 style={{ fontSize: '2rem', fontWeight: 800, fontFamily: 'var(--font-mono)', color: '#fff', marginTop: '0.25rem' }}>
+                    <h2 style={{ fontSize: '2rem', fontWeight: 800, fontFamily: 'var(--font-mono)', color: 'var(--text-primary)', marginTop: '0.25rem' }}>
                       T-Minus {formatTime(timeLeft)}
                     </h2>
                   </div>
@@ -174,7 +174,7 @@ const Profile = () => {
                 <div className="hud-grid">
                   <div className="hud-item">
                     <div className="hud-label">Current Sprint</div>
-                    <div className="hud-value" style={{ color: '#fff' }}>MVP Core</div>
+                    <div className="hud-value" style={{ color: 'var(--text-primary)' }}>MVP Core</div>
                   </div>
                   <div className="hud-item">
                     <div className="hud-label">Squad Velocity</div>
@@ -305,7 +305,7 @@ const Profile = () => {
                   </div>
                 ) : (
                   <div style={{ display: 'flex', flexDirection: 'column', gap: '1.25rem' }}>
-                    <div style={{ display: 'flex', alignItems: 'center', gap: '1rem', background: 'rgba(255,255,255,0.02)', padding: '1rem', borderRadius: '8px', border: '1px solid rgba(255,255,255,0.04)' }}>
+                    <div style={{ display: 'flex', alignItems: 'center', gap: '1rem', background: 'var(--bg-deep)', padding: '1rem', borderRadius: '8px', border: '1px solid var(--border)' }}>
                       {activeUser?.avatar ? (
                         <img src={activeUser.avatar} alt="Avatar" className="user-avatar" style={{ width: '48px', height: '48px', border: '2px solid var(--primary-hover)' }} />
                       ) : (
@@ -314,17 +314,17 @@ const Profile = () => {
                         </div>
                       )}
                       <div>
-                        <div style={{ fontWeight: 700, color: '#fff', fontSize: '1rem' }}>{activeUser?.name}</div>
+                        <div style={{ fontWeight: 700, color: 'var(--text-primary)', fontSize: '1rem' }}>{activeUser?.name}</div>
                         <div style={{ fontSize: '0.75rem', color: 'var(--text-muted)', fontFamily: 'var(--font-mono)' }}>ID: {activeUser?._id || activeUser?.id || 'N/A'}</div>
                       </div>
                     </div>
 
                     <div style={{ display: 'flex', flexDirection: 'column', gap: '0.75rem', fontSize: '0.85rem' }}>
-                      <div style={{ display: 'flex', justifyContent: 'space-between', borderBottom: '1px solid rgba(255,255,255,0.04)', paddingBottom: '0.5rem' }}>
+                      <div style={{ display: 'flex', justifyContent: 'space-between', borderBottom: '1px solid var(--border)', paddingBottom: '0.5rem' }}>
                         <span style={{ color: 'var(--text-secondary)' }}>EMAIL NODE:</span>
-                        <span style={{ color: '#fff', fontWeight: 500 }}>{activeUser?.email}</span>
+                        <span style={{ color: 'var(--text-primary)', fontWeight: 500 }}>{activeUser?.email}</span>
                       </div>
-                      <div style={{ display: 'flex', justifyContent: 'space-between', borderBottom: '1px solid rgba(255,255,255,0.04)', paddingBottom: '0.5rem' }}>
+                      <div style={{ display: 'flex', justifyContent: 'space-between', borderBottom: '1px solid var(--border)', paddingBottom: '0.5rem' }}>
                         <span style={{ color: 'var(--text-secondary)' }}>AUTH SCHEME:</span>
                         <span style={{ color: activeUser?.googleId ? 'var(--success)' : (activeUser?.githubId ? 'var(--success)' : 'var(--primary-hover)'), fontWeight: 600 }}>
                           {activeUser?.googleId ? 'GOOGLE OAUTH' : (activeUser?.githubId ? 'GITHUB OAUTH' : 'STANDARD JWT')}
@@ -332,7 +332,7 @@ const Profile = () => {
                       </div>
                       <div style={{ display: 'flex', justifyContent: 'space-between', paddingBottom: '0.25rem' }}>
                         <span style={{ color: 'var(--text-secondary)' }}>NODE CREATED:</span>
-                        <span style={{ color: '#fff', fontFamily: 'var(--font-mono)' }}>
+                        <span style={{ color: 'var(--text-primary)', fontFamily: 'var(--font-mono)' }}>
                           {activeUser?.createdAt ? new Date(activeUser.createdAt).toLocaleDateString() : new Date().toLocaleDateString()}
                         </span>
                       </div>

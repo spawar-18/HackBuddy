@@ -31,7 +31,7 @@ const AuthSidebar = () => {
       <div className="sidebar-logo">
         <div className="logo-icon">H</div>
         <div>
-          <span style={{ color: '#fff', fontSize: '1.25rem' }}>Project Alpha</span>
+          <span style={{ color: 'var(--text-primary)', fontSize: '1.25rem' }}>Project Alpha</span>
           <div style={{ fontSize: '0.65rem', color: 'var(--text-muted)', letterSpacing: '1px', textTransform: 'uppercase' }}>
             Hackathon 2026
           </div>
@@ -51,14 +51,14 @@ const AuthSidebar = () => {
           </div>
 
           <div style={{ fontSize: '0.8rem', color: 'var(--text-secondary)', marginBottom: '0.25rem' }}>CURRENT SPRINT TIME</div>
-          <div style={{ fontSize: '2.2rem', fontWeight: 800, fontFamily: 'var(--font-mono)', letterSpacing: '-1px', color: '#fff' }}>
+          <div style={{ fontSize: '2.2rem', fontWeight: 800, fontFamily: 'var(--font-mono)', letterSpacing: '-1px', color: 'var(--text-primary)' }}>
             T-Minus {formatTime(timeLeft)}
           </div>
 
           <div className="hud-grid" style={{ marginTop: '1.25rem' }}>
             <div className="hud-item">
               <div className="hud-label">Current Sprint</div>
-              <div className="hud-value" style={{ fontSize: '0.95rem', color: '#fff' }}>MVP Core</div>
+              <div className="hud-value" style={{ fontSize: '0.95rem', color: 'var(--text-primary)' }}>MVP Core</div>
             </div>
             <div className="hud-item">
               <div className="hud-label">Squad Velocity</div>
