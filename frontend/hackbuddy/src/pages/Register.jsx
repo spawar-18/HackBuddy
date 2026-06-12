@@ -29,7 +29,7 @@ const Register = () => {
         const result = await githubLogin(code);
         setLoading(false);
         if (result.success) {
-          navigate('/profile');
+          navigate('/dashboard');
         } else {
           setError(result.message);
         }
@@ -62,7 +62,7 @@ const Register = () => {
     setLoading(false);
 
     if (result.success) {
-      navigate('/profile');
+      navigate('/dashboard');
     } else {
       setError(result.message);
     }
@@ -75,7 +75,7 @@ const Register = () => {
     setLoading(false);
 
     if (result.success) {
-      navigate('/profile');
+      navigate('/dashboard');
     } else {
       setError(result.message);
     }
@@ -96,8 +96,8 @@ const Register = () => {
     <div className="hackos-auth-page">
       <div className="hackos-auth-card">
         {/* Inline small logo header at top of card */}
-        <div style={{ display: 'flex', alignItems: 'center', gap: '8px', marginBottom: '1.25rem', color: '#0052cc', fontWeight: 800, fontSize: '1.2rem', textDecoration: 'none' }}>
-          <div style={{ backgroundColor: '#0052cc', color: 'white', padding: '3px 5px', borderRadius: '4px', display: 'inline-flex', alignItems: 'center', justifyContent: 'center' }}>
+        <div style={{ display: 'flex', alignItems: 'center', gap: '8px', marginBottom: '1.25rem', color: 'var(--primary)', fontWeight: 800, fontSize: '1.2rem', textDecoration: 'none' }}>
+          <div style={{ backgroundColor: 'var(--primary)', color: 'white', padding: '3px 5px', borderRadius: 'var(--radius-default)', display: 'inline-flex', alignItems: 'center', justifyContent: 'center' }}>
             <svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
               <polyline points="4 17 10 11 4 5" />
               <line x1="12" y1="19" x2="20" y2="19" />
@@ -108,10 +108,10 @@ const Register = () => {
 
         {/* Inner Card Container */}
         <div className="hackos-inner-card">
-          <h1 style={{ fontSize: '1.75rem', fontWeight: 800, color: '#0f172a', margin: '0 0 0.25rem 0', letterSpacing: '-0.5px' }}>
+          <h1 style={{ fontSize: '1.75rem', fontWeight: 800, color: 'var(--text-primary)', margin: '0 0 0.25rem 0', letterSpacing: '-0.5px' }}>
             Create your account
           </h1>
-          <p style={{ color: '#64748b', fontSize: '0.9rem', fontWeight: 500, margin: '0 0 1.5rem 0', lineHeight: '1.4' }}>
+          <p style={{ color: 'var(--text-muted)', fontSize: '0.9rem', fontWeight: 500, margin: '0 0 1.5rem 0', lineHeight: '1.4' }}>
             Start your journey in the HackBuddy ecosystem today.
           </p>
 

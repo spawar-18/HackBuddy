@@ -5,7 +5,12 @@ import Login from './pages/Login';
 import Register from './pages/Register';
 import Profile from './pages/Profile';
 import Dashboard from './pages/Dashboard';
+import CreateTeam from './pages/CreateTeam';
+import JoinTeam from './pages/JoinTeam';
+import TeamDetails from './pages/TeamDetails';
+import JoinTeamByLink from './pages/JoinTeamByLink';
 import ProtectedRoute from './components/ProtectedRoute';
+import { Toaster } from 'react-hot-toast';
 
 function App() {
   const googleClientId = import.meta.env.VITE_GOOGLE_CLIENT_ID;
@@ -18,6 +23,7 @@ function App() {
     <GoogleOAuthProvider clientId={googleClientId || ''}>
       <AuthProvider>
         <Router>
+          <Toaster position="top-right" toastOptions={{ duration: 4000 }} />
           <Routes>
             {/* Public Routes */}
             <Route path="/login" element={<Login />} />
@@ -40,9 +46,34 @@ function App() {
                 </ProtectedRoute>
               } 
             />
+            <Route 
+              path="/team/create" 
+              element={
+                <ProtectedRoute>
+                  <CreateTeam />
+                </ProtectedRoute>
+              } 
+            />
+            <Route 
+              path="/team/join" 
+              element={
+                <ProtectedRoute>
+                  <JoinTeam />
+                </ProtectedRoute>
+              } 
+            />
+            <Route 
+              path="/team/:teamId" 
+              element={
+                <ProtectedRoute>
+                  <TeamDetails />
+                </ProtectedRoute>
+              } 
+            />
+            <Route path="/join/:inviteCode" element={<JoinTeamByLink />} />
 
             {/* Redirects */}
-            <Route path="*" element={<Navigate to="/profile" replace />} />
+            <Route path="*" element={<Navigate to="/dashboard" replace />} />
           </Routes>
         </Router>
       </AuthProvider>

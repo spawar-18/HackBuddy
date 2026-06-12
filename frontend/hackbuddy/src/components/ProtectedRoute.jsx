@@ -19,7 +19,7 @@ const ProtectedRoute = ({ children }) => {
   }
 
   // Redirect flows based on profileCompleted status
-  if (user.profileCompleted === false && location.pathname !== '/profile') {
+  if (!user.profileCompleted && location.pathname !== '/profile') {
     return <Navigate to="/profile" replace />;
   }
 

@@ -2,6 +2,7 @@ import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
 import api from '../services/api';
+import { getMyTeams } from '../services/teamService';
 import { 
   LogOut, Bell, Settings, LayoutDashboard, Database, Cpu, 
   Send, Users, BookOpen, AlertTriangle, CheckCircle, Flame, Clock, 
@@ -14,6 +15,8 @@ const Dashboard = () => {
   const [loadingProfile, setLoadingProfile] = useState(true);
   const [fixApplied, setFixApplied] = useState(false);
   const [timeLeft, setTimeLeft] = useState({ hours: 34, minutes: 8, seconds: 58 });
+  const [teams, setTeams] = useState([]);
+  const [loadingTeams, setLoadingTeams] = useState(true);
   const navigate = useNavigate();
 
   // Countdown timer simulation
@@ -50,6 +53,31 @@ const Dashboard = () => {
     fetchProfile();
   }, []);
 
+  // Fetch user teams on mount
+  useEffect(() => {
+    const fetchTeams = async () => {
+      try {
+        const data = await getMyTeams();
+        setTeams(data);
+      } catch (err) {
+        console.error('Error fetching teams:', err);
+      } finally {
+        setLoadingTeams(false);
+      }
+    };
+
+    fetchTeams();
+  }, []);
+
+  // Handle pending invite code check after login
+  useEffect(() => {
+    const pendingCode = localStorage.getItem('pendingInviteCode');
+    if (pendingCode && user && user.profileCompleted) {
+      localStorage.removeItem('pendingInviteCode');
+      navigate(`/join/${pendingCode}`);
+    }
+  }, [user, navigate]);
+
   const formatTime = (t) => {
     return `${String(t.hours).padStart(2, '0')}:${String(t.minutes).padStart(2, '0')}:${String(t.seconds).padStart(2, '0')}`;
   };
@@ -77,7 +105,7 @@ const Dashboard = () => {
           <span style={{ fontWeight: 800, fontSize: '1.2rem', fontFamily: 'var(--font-sans)', letterSpacing: '-0.5px' }}>
             Hack<span style={{ color: 'var(--primary-hover)' }}>OS</span>
           </span>
-          <span className="status-badge badge-active" style={{ marginLeft: '10px', fontSize: '0.65rem' }}>
+          <span className="status-badge badge-active" style={{ marginLeft: '10px', fontSize: '0.85rem' }}>
             <span className="status-pulse"></span>
             ACTIVE
           </span>
@@ -86,8 +114,8 @@ const Dashboard = () => {
         {/* Sprint Countdown Display */}
         <div style={{ display: 'flex', alignItems: 'center', gap: '8px', fontFamily: 'var(--font-mono)' }}>
           <Clock size={14} style={{ color: 'var(--text-secondary)' }} />
-          <span style={{ fontSize: '0.8rem', color: 'var(--text-secondary)' }}>HUD CLOCK:</span>
-          <span style={{ fontSize: '0.95rem', fontWeight: 'bold', color: 'var(--text-primary)' }}>{formatTime(timeLeft)}</span>
+          <span style={{ fontSize: '0.9rem', color: 'var(--text-secondary)' }}>HUD CLOCK:</span>
+          <span style={{ fontSize: '1rem', fontWeight: 'bold', color: 'var(--text-primary)' }}>{formatTime(timeLeft)}</span>
         </div>
 
         {/* Action Widgets */}
@@ -104,7 +132,7 @@ const Dashboard = () => {
                 {activeUser?.name?.charAt(0).toUpperCase() || 'U'}
               </div>
             )}
-            <span style={{ fontSize: '0.85rem', fontWeight: 600, color: 'var(--text-primary)' }}>{activeUser?.name}</span>
+            <span style={{ fontSize: '0.95rem', fontWeight: 600, color: 'var(--text-primary)' }}>{activeUser?.name}</span>
           </div>
         </div>
       </header>
@@ -131,9 +159,21 @@ const Dashboard = () => {
               <span>Submission Hub</span>
             </a>
             
-            <button className="btn-primary" style={{ marginTop: '1.5rem', background: 'linear-gradient(135deg, #10b981 0%, #059669 100%)', border: 'none', color: '#ffffff', padding: '0.6rem' }}>
+            <button 
+              onClick={() => navigate('/team/create')}
+              className="btn-primary" 
+              style={{ marginTop: '1.5rem', background: 'var(--primary)', border: 'none', color: '#ffffff', padding: '0.6rem', gap: '8px', borderRadius: 'var(--radius-default)' }}
+            >
               <Users size={16} />
-              <span style={{ fontSize: '0.8rem', fontWeight: 600 }}>Invite Teammate</span>
+              <span style={{ fontSize: '0.9rem', fontWeight: 600 }}>Create Team</span>
+            </button>
+            <button 
+              onClick={() => navigate('/team/join')}
+              className="btn-primary" 
+              style={{ marginTop: '0.5rem', background: 'var(--tertiary)', border: 'none', color: '#ffffff', padding: '0.6rem', gap: '8px', borderRadius: 'var(--radius-default)' }}
+            >
+              <Users size={16} />
+              <span style={{ fontSize: '0.9rem', fontWeight: 600 }}>Join Team</span>
             </button>
           </div>
 
@@ -163,7 +203,7 @@ const Dashboard = () => {
               <div className="glass dashboard-card glow-blue" style={{ borderLeft: '4px solid var(--primary)' }}>
                 <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '1.25rem' }}>
                   <div>
-                    <span style={{ fontSize: '0.75rem', fontWeight: 600, color: 'var(--text-muted)' }}>MISSION STATUS</span>
+                    <span style={{ fontSize: '0.85rem', fontWeight: 600, color: 'var(--text-muted)' }}>MISSION STATUS</span>
                     <h2 style={{ fontSize: '2rem', fontWeight: 800, fontFamily: 'var(--font-mono)', color: 'var(--text-primary)', marginTop: '0.25rem' }}>
                       T-Minus {formatTime(timeLeft)}
                     </h2>
@@ -183,12 +223,111 @@ const Dashboard = () => {
                 </div>
               </div>
 
+              {/* My Teams Section */}
+              <div className="glass dashboard-card glow-blue" style={{ borderLeft: '4px solid var(--success)' }}>
+                <div className="card-title">
+                  <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+                    <Users size={18} style={{ color: 'var(--success)' }} />
+                    <span style={{ color: 'var(--text-primary)' }}>My Squads</span>
+                  </div>
+                  <div style={{ display: 'flex', gap: '8px' }}>
+                    <button 
+                      onClick={() => navigate('/team/create')}
+                      className="header-btn" 
+                      style={{ padding: '0.4rem 0.8rem', fontSize: '0.85rem', background: 'var(--primary)', borderRadius: 'var(--radius-default)' }}
+                    >
+                      Create Team
+                    </button>
+                    <button 
+                      onClick={() => navigate('/team/join')}
+                      className="header-btn" 
+                      style={{ padding: '0.4rem 0.8rem', fontSize: '0.85rem', background: 'var(--tertiary)', borderRadius: 'var(--radius-default)' }}
+                    >
+                      Join Team
+                    </button>
+                  </div>
+                </div>
+
+                {loadingTeams ? (
+                   <div style={{ display: 'flex', alignItems: 'center', gap: '8px', padding: '1rem 0' }}>
+                    <RefreshCw className="spin" size={16} style={{ animation: 'spin 1.5s linear infinite' }} />
+                    <span style={{ fontSize: '0.95rem', color: 'var(--text-secondary)' }}>Scanning network for squads...</span>
+                  </div>
+                ) : teams.length === 0 ? (
+                  <div style={{ textAlign: 'center', padding: '1.5rem', background: 'var(--bg-deep)', borderRadius: 'var(--radius-lg)', border: '1px dashed var(--border)' }}>
+                    <div style={{ color: 'var(--text-muted)', marginBottom: '0.75rem' }}>
+                      <Users size={32} style={{ opacity: 0.5, margin: '0 auto' }} />
+                    </div>
+                    <h4 style={{ fontWeight: 700, color: 'var(--text-primary)', marginBottom: '0.25rem', fontSize: '1rem' }}>No Teams Yet</h4>
+                    <p style={{ fontSize: '0.9rem', color: 'var(--text-secondary)', marginBottom: '1rem' }}>
+                      You are not a member of any squad. Initiate a new team or enter an invite code to join.
+                    </p>
+                    <div style={{ display: 'flex', justifyContent: 'center', gap: '0.75rem' }}>
+                      <button 
+                        onClick={() => navigate('/team/create')}
+                        className="btn-primary" 
+                        style={{ width: 'auto', padding: '0.4rem 0.8rem', fontSize: '0.85rem', background: 'var(--primary)', height: '32px', borderRadius: 'var(--radius-default)' }}
+                      >
+                        Create
+                      </button>
+                      <button 
+                        onClick={() => navigate('/team/join')}
+                        className="btn-primary" 
+                        style={{ width: 'auto', padding: '0.4rem 0.8rem', fontSize: '0.85rem', background: 'var(--tertiary)', height: '32px', borderRadius: 'var(--radius-default)' }}
+                      >
+                        Join
+                      </button>
+                    </div>
+                  </div>
+                ) : (
+                  <div style={{ display: 'flex', flexDirection: 'column', gap: '0.75rem', marginTop: '0.5rem' }}>
+                    {teams.map((t) => (
+                      <div 
+                        key={t._id} 
+                        style={{ 
+                          background: 'var(--bg-deep)', 
+                          border: '1px solid var(--border)', 
+                          borderRadius: 'var(--radius-lg)', 
+                          padding: '1rem',
+                          display: 'flex',
+                          justifyContent: 'space-between',
+                          alignItems: 'center',
+                          gap: '1rem'
+                        }}
+                      >
+                        <div style={{ flex: 1, minWidth: 0 }}>
+                          <h4 style={{ fontWeight: 700, fontSize: '1.05rem', color: 'var(--text-primary)', margin: 0, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
+                            {t.teamName}
+                          </h4>
+                          <p style={{ fontSize: '0.9rem', color: 'var(--text-secondary)', marginTop: '2px', overflow: 'hidden', textOverflow: 'ellipsis', display: '-webkit-box', WebkitLineClamp: 2, WebkitBoxOrient: 'vertical', margin: '2px 0 0 0' }}>
+                            {t.description || 'No description provided.'}
+                          </p>
+                          <div style={{ display: 'flex', alignItems: 'center', gap: '4px', marginTop: '8px' }}>
+                            <Users size={12} style={{ color: 'var(--text-muted)' }} />
+                            <span style={{ fontSize: '0.85rem', color: 'var(--text-muted)', fontWeight: 600 }}>
+                              {t.members ? t.members.length : 0} {t.members && t.members.length === 1 ? 'member' : 'members'}
+                            </span>
+                          </div>
+                        </div>
+                        <button 
+                          onClick={() => navigate(`/team/${t._id}`)}
+                          className="btn-primary" 
+                          style={{ width: 'auto', padding: '0.4rem 0.8rem', fontSize: '0.85rem', flexShrink: 0, background: 'var(--primary)', borderRadius: 'var(--radius-default)' }}
+                        >
+                          Workspace
+                        </button>
+                      </div>
+                    ))}
+                  </div>
+                )}
+              </div>
+
               {/* Velocity Burndown Tracker */}
               <div className="glass dashboard-card">
                 <div className="card-title">
                   <div>
                     <span>Velocity Burndown</span>
-                    <p style={{ fontSize: '0.7rem', color: 'var(--text-muted)', textTransform: 'none', marginTop: '4px' }}>
+                    <p style={{ fontSize: '0.85rem', color: 'var(--text-muted)', textTransform: 'none', marginTop: '4px' }}>
                       Track progress across core project tracks
                     </p>
                   </div>
@@ -204,7 +343,7 @@ const Dashboard = () => {
                       <span>85%</span>
                     </div>
                     <div className="tracker-bar-bg">
-                      <div className="tracker-bar-fill" style={{ width: '85%', background: '#2563eb' }}></div>
+                      <div className="tracker-bar-fill" style={{ width: '85%', background: 'var(--primary)' }}></div>
                     </div>
                   </div>
 
@@ -214,7 +353,7 @@ const Dashboard = () => {
                       <span>62%</span>
                     </div>
                     <div className="tracker-bar-bg">
-                      <div className="tracker-bar-fill" style={{ width: '62%', background: '#3b82f6' }}></div>
+                      <div className="tracker-bar-fill" style={{ width: '62%', background: 'var(--primary)', opacity: 0.8 }}></div>
                     </div>
                   </div>
 
@@ -224,7 +363,7 @@ const Dashboard = () => {
                       <span>41%</span>
                     </div>
                     <div className="tracker-bar-bg">
-                      <div className="tracker-bar-fill" style={{ width: '41%', background: '#10b981' }}></div>
+                      <div className="tracker-bar-fill" style={{ width: '41%', background: 'var(--success)' }}></div>
                     </div>
                   </div>
 
@@ -234,33 +373,33 @@ const Dashboard = () => {
                       <span>15%</span>
                     </div>
                     <div className="tracker-bar-bg">
-                      <div className="tracker-bar-fill" style={{ width: '15%', background: '#059669' }}></div>
+                      <div className="tracker-bar-fill" style={{ width: '15%', background: 'var(--success)', opacity: 0.8 }}></div>
                     </div>
                   </div>
                 </div>
               </div>
 
               {/* War Room Alert Card */}
-              <div className="glass dashboard-card war-room-card">
+              <div className="glass dashboard-card war-room-card" style={{ borderRadius: 'var(--radius-lg)' }}>
                 <div style={{ display: 'flex', gap: '15px', alignItems: 'flex-start' }}>
                   <div style={{ 
-                    background: fixApplied ? 'var(--success-glow)' : 'rgba(239, 68, 68, 0.1)', 
+                    background: fixApplied ? 'var(--success-glow)' : 'var(--danger-glow)', 
                     color: fixApplied ? 'var(--success)' : 'var(--danger)',
                     padding: '10px', 
-                    borderRadius: '8px'
+                    borderRadius: 'var(--radius-default)'
                   }}>
                     {fixApplied ? <CheckCircle size={24} /> : <Flame size={24} />}
                   </div>
                   <div style={{ flex: 1 }}>
                     <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '4px' }}>
-                      <span style={{ fontSize: '0.75rem', fontWeight: 700, letterSpacing: '1px', color: fixApplied ? 'var(--success)' : 'var(--danger)' }}>
+                      <span style={{ fontSize: '0.85rem', fontWeight: 700, letterSpacing: '1px', color: fixApplied ? 'var(--success)' : 'var(--danger)' }}>
                         {fixApplied ? 'HOTFIX COMPLETE' : 'AI WAR ROOM : BOTTLENECK DETECTED'}
                       </span>
                     </div>
-                    <h3 style={{ fontSize: '1.1rem', fontWeight: 800, color: '#fff', marginBottom: '0.5rem' }}>
+                    <h3 style={{ fontSize: '1.25rem', fontWeight: 800, color: 'var(--text-primary)', marginBottom: '0.5rem' }}>
                       {fixApplied ? 'Edge Latency Resolved' : 'LLM Latency Bottleneck'}
                     </h3>
-                    <p style={{ fontSize: '0.85rem', color: 'var(--text-secondary)', marginBottom: '1.25rem', lineHeight: '1.4' }}>
+                    <p style={{ fontSize: '0.95rem', color: 'var(--text-secondary)', marginBottom: '1.25rem', lineHeight: '1.5' }}>
                       {fixApplied 
                         ? 'System response times are stabilized. API routes are using standard high-speed streaming protocols.' 
                         : 'LLM response latency is averaging 2.4s. Recommending switching to streaming edge functions for better UX.'}
@@ -273,8 +412,9 @@ const Dashboard = () => {
                         width: 'auto', 
                         padding: '0.5rem 1.25rem', 
                         background: fixApplied ? 'var(--success)' : 'var(--primary)',
-                        fontSize: '0.8rem',
-                        gap: '6px'
+                        fontSize: '0.9rem',
+                        gap: '6px',
+                        borderRadius: 'var(--radius-default)'
                       }}
                     >
                       <Zap size={14} />
@@ -301,25 +441,25 @@ const Dashboard = () => {
                 {loadingProfile ? (
                   <div style={{ display: 'flex', alignItems: 'center', gap: '8px', padding: '1rem 0' }}>
                     <RefreshCw className="spin" size={16} style={{ animation: 'spin 1.5s linear infinite' }} />
-                    <span style={{ fontSize: '0.85rem', color: 'var(--text-secondary)' }}>Querying DB Node...</span>
+                    <span style={{ fontSize: '0.95rem', color: 'var(--text-secondary)' }}>Querying DB Node...</span>
                   </div>
                 ) : (
                   <div style={{ display: 'flex', flexDirection: 'column', gap: '1.25rem' }}>
-                    <div style={{ display: 'flex', alignItems: 'center', gap: '1rem', background: 'var(--bg-deep)', padding: '1rem', borderRadius: '8px', border: '1px solid var(--border)' }}>
+                    <div style={{ display: 'flex', alignItems: 'center', gap: '1rem', background: 'var(--bg-deep)', padding: '1rem', borderRadius: 'var(--radius-lg)', border: '1px solid var(--border)' }}>
                       {activeUser?.avatar ? (
-                        <img src={activeUser.avatar} alt="Avatar" className="user-avatar" style={{ width: '48px', height: '48px', border: '2px solid var(--primary-hover)' }} />
+                        <img src={activeUser.avatar} alt="Avatar" className="user-avatar" style={{ width: '48px', height: '48px', border: '2px solid var(--primary)' }} />
                       ) : (
                         <div className="user-avatar-placeholder" style={{ width: '48px', height: '48px', fontSize: '1.2rem' }}>
                           {activeUser?.name?.charAt(0).toUpperCase() || 'U'}
                         </div>
                       )}
                       <div>
-                        <div style={{ fontWeight: 700, color: 'var(--text-primary)', fontSize: '1rem' }}>{activeUser?.name}</div>
-                        <div style={{ fontSize: '0.75rem', color: 'var(--text-muted)', fontFamily: 'var(--font-mono)' }}>ID: {activeUser?._id || activeUser?.id || 'N/A'}</div>
+                        <div style={{ fontWeight: 700, color: 'var(--text-primary)', fontSize: '1.1rem' }}>{activeUser?.name}</div>
+                        <div style={{ fontSize: '0.85rem', color: 'var(--text-muted)', fontFamily: 'var(--font-mono)' }}>ID: {activeUser?._id || activeUser?.id || 'N/A'}</div>
                       </div>
                     </div>
 
-                    <div style={{ display: 'flex', flexDirection: 'column', gap: '0.75rem', fontSize: '0.85rem' }}>
+                    <div style={{ display: 'flex', flexDirection: 'column', gap: '0.75rem', fontSize: '0.95rem' }}>
                       <div style={{ display: 'flex', justifyContent: 'space-between', borderBottom: '1px solid var(--border)', paddingBottom: '0.5rem' }}>
                         <span style={{ color: 'var(--text-secondary)' }}>EMAIL NODE:</span>
                         <span style={{ color: 'var(--text-primary)', fontWeight: 500 }}>{activeUser?.email}</span>
@@ -352,11 +492,11 @@ const Dashboard = () => {
                         background: 'none', 
                         border: '1px solid var(--border)',
                         color: 'var(--text-secondary)',
-                        fontSize: '0.8rem',
+                        fontSize: '0.9rem',
                         fontWeight: 600,
                         padding: '0.5rem',
                         width: '100%',
-                        borderRadius: '6px',
+                        borderRadius: 'var(--radius-default)',
                         cursor: 'pointer',
                         display: 'flex',
                         alignItems: 'center',
@@ -370,12 +510,12 @@ const Dashboard = () => {
                   </div>
                 )}
               </div>
-
+ 
               {/* Live Activity Feed */}
               <div className="glass dashboard-card">
                 <div className="card-title">
                   <span>Live Feed</span>
-                  <span style={{ fontSize: '0.65rem', color: 'var(--success)', letterSpacing: '0.5px' }}>REAL-TIME LOG</span>
+                  <span style={{ fontSize: '0.8rem', color: 'var(--success)', letterSpacing: '0.5px' }}>REAL-TIME LOG</span>
                 </div>
 
                 <div className="activity-feed">

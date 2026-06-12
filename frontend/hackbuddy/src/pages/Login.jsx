@@ -27,7 +27,7 @@ const Login = () => {
         const result = await githubLogin(code);
         setLoading(false);
         if (result.success) {
-          navigate('/profile');
+          navigate('/dashboard');
         } else {
           setError(result.message);
         }
@@ -50,7 +50,7 @@ const Login = () => {
     setLoading(false);
 
     if (result.success) {
-      navigate('/profile');
+      navigate('/dashboard');
     } else {
       setError(result.message);
     }
@@ -63,7 +63,7 @@ const Login = () => {
     setLoading(false);
 
     if (result.success) {
-      navigate('/profile');
+      navigate('/dashboard');
     } else {
       setError(result.message);
     }

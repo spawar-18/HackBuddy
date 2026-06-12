@@ -32,7 +32,7 @@ const AuthSidebar = () => {
         <div className="logo-icon">H</div>
         <div>
           <span style={{ color: 'var(--text-primary)', fontSize: '1.25rem' }}>Project Alpha</span>
-          <div style={{ fontSize: '0.65rem', color: 'var(--text-muted)', letterSpacing: '1px', textTransform: 'uppercase' }}>
+          <div style={{ fontSize: '0.8rem', color: 'var(--text-muted)', letterSpacing: '1px', textTransform: 'uppercase' }}>
             Hackathon 2026
           </div>
         </div>
@@ -43,14 +43,14 @@ const AuthSidebar = () => {
         {/* Mission Status Widget */}
         <div className="glass mission-card glow-blue">
           <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '1rem' }}>
-            <span style={{ fontSize: '0.75rem', fontWeight: 600, color: 'var(--text-muted)' }}>MISSION STATUS</span>
+            <span style={{ fontSize: '0.85rem', fontWeight: 600, color: 'var(--text-muted)' }}>MISSION STATUS</span>
             <span className="status-badge badge-critical">
               <span className="status-pulse"></span>
               Mission Critical
             </span>
           </div>
 
-          <div style={{ fontSize: '0.8rem', color: 'var(--text-secondary)', marginBottom: '0.25rem' }}>CURRENT SPRINT TIME</div>
+          <div style={{ fontSize: '0.9rem', color: 'var(--text-secondary)', marginBottom: '0.25rem' }}>CURRENT SPRINT TIME</div>
           <div style={{ fontSize: '2.2rem', fontWeight: 800, fontFamily: 'var(--font-mono)', letterSpacing: '-1px', color: 'var(--text-primary)' }}>
             T-Minus {formatTime(timeLeft)}
           </div>
@@ -58,11 +58,11 @@ const AuthSidebar = () => {
           <div className="hud-grid" style={{ marginTop: '1.25rem' }}>
             <div className="hud-item">
               <div className="hud-label">Current Sprint</div>
-              <div className="hud-value" style={{ fontSize: '0.95rem', color: 'var(--text-primary)' }}>MVP Core</div>
+              <div className="hud-value" style={{ fontSize: '1.05rem', color: 'var(--text-primary)' }}>MVP Core</div>
             </div>
             <div className="hud-item">
               <div className="hud-label">Squad Velocity</div>
-              <div className="hud-value" style={{ fontSize: '0.95rem', color: 'var(--success)' }}>14.2 pts/hr</div>
+              <div className="hud-value" style={{ fontSize: '1.05rem', color: 'var(--success)' }}>14.2 pts/hr</div>
             </div>
           </div>
         </div>
@@ -71,8 +71,8 @@ const AuthSidebar = () => {
         <div className="glass" style={{ padding: '1.5rem' }}>
           <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '1.25rem' }}>
             <div>
-              <h4 style={{ fontSize: '0.9rem', fontWeight: 700 }}>Velocity Burndown</h4>
-              <p style={{ fontSize: '0.7rem', color: 'var(--text-muted)' }}>Track progress across core tracks</p>
+              <h4 style={{ fontSize: '1.05rem', fontWeight: 700 }}>Velocity Burndown</h4>
+              <p style={{ fontSize: '0.85rem', color: 'var(--text-muted)' }}>Track progress across core tracks</p>
             </div>
             <TrendingUp size={16} style={{ color: 'var(--primary-hover)' }} />
           </div>
@@ -84,7 +84,7 @@ const AuthSidebar = () => {
                 <span>85%</span>
               </div>
               <div className="tracker-bar-bg">
-                <div className="tracker-bar-fill" style={{ width: '85%', background: '#3b82f6' }}></div>
+                <div className="tracker-bar-fill" style={{ width: '85%', background: 'var(--primary)' }}></div>
               </div>
             </div>
 
@@ -94,7 +94,7 @@ const AuthSidebar = () => {
                 <span>62%</span>
               </div>
               <div className="tracker-bar-bg">
-                <div className="tracker-bar-fill" style={{ width: '62%', background: '#60a5fa' }}></div>
+                <div className="tracker-bar-fill" style={{ width: '62%', background: 'var(--primary)', opacity: 0.8 }}></div>
               </div>
             </div>
 
@@ -104,7 +104,7 @@ const AuthSidebar = () => {
                 <span>41%</span>
               </div>
               <div className="tracker-bar-bg">
-                <div className="tracker-bar-fill" style={{ width: '41%', background: '#10b981' }}></div>
+                <div className="tracker-bar-fill" style={{ width: '41%', background: 'var(--success)' }}></div>
               </div>
             </div>
 
@@ -114,7 +114,7 @@ const AuthSidebar = () => {
                 <span>15%</span>
               </div>
               <div className="tracker-bar-bg">
-                <div className="tracker-bar-fill" style={{ width: '15%', background: '#34d399' }}></div>
+                <div className="tracker-bar-fill" style={{ width: '15%', background: 'var(--success)', opacity: 0.8 }}></div>
               </div>
             </div>
           </div>
@@ -122,7 +122,7 @@ const AuthSidebar = () => {
       </div>
 
       {/* Sidebar Footer */}
-      <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', fontSize: '0.75rem', color: 'var(--text-muted)' }}>
+      <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', fontSize: '0.85rem', color: 'var(--text-muted)' }}>
         <div style={{ display: 'flex', alignItems: 'center', gap: '4px' }}>
           <Shield size={12} />
           <span>Secured HUD Console</span>

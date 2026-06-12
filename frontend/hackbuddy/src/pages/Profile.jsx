@@ -50,6 +50,15 @@ const Profile = () => {
     }
   }, [user]);
 
+  // Handle pending invite code check
+  useEffect(() => {
+    const pendingCode = localStorage.getItem('pendingInviteCode');
+    if (pendingCode && user && user.profileCompleted) {
+      localStorage.removeItem('pendingInviteCode');
+      navigate(`/join/${pendingCode}`);
+    }
+  }, [user, navigate]);
+
   const handleFileChange = (e) => {
     if (e.target.files && e.target.files[0]) {
       const file = e.target.files[0];
@@ -240,10 +249,10 @@ const Profile = () => {
       {/* Styled Layout Styles */}
       <style>{`
         .profile-selection-page {
-          background-color: #f8fafc;
+          background-color: var(--bg-deep);
           min-height: 100vh;
-          color: #334155;
-          font-family: 'Outfit', 'Inter', sans-serif;
+          color: var(--text-secondary);
+          font-family: var(--font-sans);
           display: flex;
           justify-content: center;
           align-items: center;
@@ -253,9 +262,9 @@ const Profile = () => {
         .profile-card {
           width: 100%;
           max-width: 900px;
-          background: #ffffff;
-          border: 1px solid #e2e8f0;
-          border-radius: 16px;
+          background: var(--bg-card-solid);
+          border: 1px solid var(--border);
+          border-radius: var(--radius-lg);
           box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.05), 0 8px 10px -6px rgba(0, 0, 0, 0.05);
           padding: 2.5rem;
           display: flex;
@@ -267,7 +276,7 @@ const Profile = () => {
           display: flex;
           justify-content: space-between;
           align-items: flex-start;
-          border-bottom: 1px solid #e2e8f0;
+          border-bottom: 1px solid var(--border);
           padding-bottom: 1.5rem;
         }
 
@@ -276,7 +285,7 @@ const Profile = () => {
           font-weight: 800;
           letter-spacing: -0.5px;
           margin: 0;
-          color: #0f172a;
+          color: var(--text-primary);
           display: flex;
           align-items: center;
           gap: 10px;
@@ -284,15 +293,15 @@ const Profile = () => {
 
         .profile-tagline {
           font-size: 0.9rem;
-          color: #64748b;
+          color: var(--text-muted);
           margin-top: 0.25rem;
         }
 
         .logout-btn-nav {
-          background: rgba(239, 68, 68, 0.08);
-          color: #ef4444;
-          border: 1px solid rgba(239, 68, 68, 0.15);
-          border-radius: 8px;
+          background: var(--danger-glow);
+          color: var(--danger);
+          border: 1px solid var(--danger);
+          border-radius: var(--radius-default);
           padding: 0.5rem 1rem;
           font-size: 0.85rem;
           font-weight: 600;
@@ -304,7 +313,7 @@ const Profile = () => {
         }
 
         .logout-btn-nav:hover {
-          background: rgba(239, 68, 68, 0.15);
+          opacity: 0.9;
           transform: translateY(-1px);
         }
 
@@ -313,7 +322,7 @@ const Profile = () => {
           font-weight: 700;
           text-transform: uppercase;
           letter-spacing: 0.5px;
-          color: #2563eb;
+          color: var(--primary);
           margin-bottom: 1rem;
           display: flex;
           align-items: center;
@@ -327,9 +336,9 @@ const Profile = () => {
         }
 
         .category-card {
-          background: #ffffff;
-          border: 1px solid #e2e8f0;
-          border-radius: 12px;
+          background: var(--bg-card-solid);
+          border: 1px solid var(--border);
+          border-radius: var(--radius-lg);
           padding: 1.25rem;
           display: flex;
           flex-direction: column;
@@ -343,13 +352,13 @@ const Profile = () => {
           gap: 8px;
           font-size: 0.9rem;
           font-weight: 700;
-          color: #1e293b;
-          border-bottom: 1px solid #f1f5f9;
+          color: var(--text-primary);
+          border-bottom: 1px solid var(--border);
           padding-bottom: 0.5rem;
         }
 
         .category-header svg {
-          color: #2563eb;
+          color: var(--primary);
         }
 
         .skills-pills-container {
@@ -359,35 +368,34 @@ const Profile = () => {
         }
 
         .skill-pill {
-          background: #f8fafc;
-          border: 1px solid #e2e8f0;
-          color: #475569;
-          border-radius: 6px;
+          background: var(--bg-deep);
+          border: 1px solid var(--border);
+          color: var(--text-secondary);
+          border-radius: var(--radius-full);
           padding: 0.35rem 0.75rem;
-          font-size: 0.8rem;
+          font-size: 0.9rem;
           font-weight: 500;
           cursor: pointer;
           transition: all 0.2s ease;
         }
 
         .skill-pill:hover {
-          background: #f1f5f9;
-          color: #0f172a;
-          border-color: #cbd5e1;
+          border-color: var(--text-muted);
+          color: var(--text-primary);
         }
 
         .skill-pill.selected {
-          background: #2563eb;
+          background: var(--primary);
           color: #ffffff;
-          border-color: #2563eb;
+          border-color: var(--primary);
           font-weight: 600;
-          box-shadow: 0 2px 4px rgba(37, 99, 235, 0.2);
+          box-shadow: 0 2px 4px var(--primary-glow);
         }
 
         .inventory-card {
-          background: #f8fafc;
-          border: 1px solid #e2e8f0;
-          border-radius: 12px;
+          background: var(--bg-deep);
+          border: 1px solid var(--border);
+          border-radius: var(--radius-lg);
           padding: 1.5rem;
           display: flex;
           flex-direction: column;
@@ -396,20 +404,20 @@ const Profile = () => {
 
         .inventory-placeholder {
           font-size: 0.85rem;
-          color: #94a3b8;
+          color: var(--text-muted);
           font-style: italic;
           text-align: center;
           padding: 1.5rem 0;
         }
 
         .selected-chip {
-          background: #eff6ff;
-          border: 1px solid #bfdbfe;
-          color: #1e40af;
+          background: var(--primary-glow);
+          border: 1px solid var(--border);
+          color: var(--primary);
           font-weight: 600;
-          border-radius: 20px;
+          border-radius: var(--radius-full);
           padding: 0.4rem 0.9rem;
-          font-size: 0.8rem;
+          font-size: 0.9rem;
           display: inline-flex;
           align-items: center;
           gap: 6px;
@@ -417,23 +425,24 @@ const Profile = () => {
         }
 
         .selected-chip:hover {
-          background: #dbeafe;
-          border-color: #3b82f6;
+          border-color: var(--primary-hover);
         }
 
         .selected-chip button {
           background: none;
           border: none;
-          color: #60a5fa;
+          color: var(--primary);
           cursor: pointer;
           display: flex;
           align-items: center;
           padding: 0;
-          transition: color 0.15s ease;
+          opacity: 0.7;
+          transition: all 0.15s ease;
         }
 
         .selected-chip button:hover {
-          color: #ef4444;
+          color: var(--danger);
+          opacity: 1;
         }
 
         .custom-skill-form {
@@ -445,10 +454,10 @@ const Profile = () => {
 
         .custom-skill-input {
           flex: 1;
-          background-color: #ffffff;
-          border: 1px solid #cbd5e1;
-          color: #0f172a;
-          border-radius: 8px;
+          background-color: var(--bg-card-solid);
+          border: 1px solid var(--border);
+          color: var(--text-primary);
+          border-radius: var(--radius-default);
           padding: 0.65rem 1rem;
           font-size: 0.85rem;
           font-family: inherit;
@@ -457,15 +466,15 @@ const Profile = () => {
 
         .custom-skill-input:focus {
           outline: none;
-          border-color: #2563eb;
-          box-shadow: 0 0 0 2px rgba(37, 99, 235, 0.1);
+          border-color: var(--border-focus);
+          box-shadow: 0 0 0 2px var(--primary-glow);
         }
 
         .btn-add-custom {
-          background: #ffffff;
-          border: 1px solid #cbd5e1;
-          color: #334155;
-          border-radius: 8px;
+          background: var(--bg-card-solid);
+          border: 1px solid var(--border);
+          color: var(--text-secondary);
+          border-radius: var(--radius-default);
           padding: 0 1.25rem;
           font-size: 0.85rem;
           font-weight: 600;
@@ -477,23 +486,23 @@ const Profile = () => {
         }
 
         .btn-add-custom:hover {
-          background: #f8fafc;
-          border-color: #94a3b8;
+          background: var(--bg-deep);
+          border-color: var(--text-muted);
         }
 
         .action-footer {
           display: flex;
           justify-content: flex-end;
           gap: 1rem;
-          border-top: 1px solid #e2e8f0;
+          border-top: 1px solid var(--border);
           padding-top: 1.5rem;
         }
 
         .btn-save-profile {
-          background: linear-gradient(135deg, #2563eb 0%, #1d4ed8 100%);
+          background: var(--primary);
           color: #fff;
           border: none;
-          border-radius: 8px;
+          border-radius: var(--radius-default);
           padding: 0.75rem 2rem;
           font-size: 0.95rem;
           font-weight: 700;
@@ -502,12 +511,12 @@ const Profile = () => {
           align-items: center;
           gap: 10px;
           transition: all 0.2s ease;
-          box-shadow: 0 4px 12px rgba(37, 99, 235, 0.2);
+          box-shadow: 0 4px 12px var(--primary-glow);
         }
 
         .btn-save-profile:hover:not(:disabled) {
-          transform: translateY(-1px);
-          box-shadow: 0 6px 16px rgba(37, 99, 235, 0.3);
+          background: var(--primary-hover);
+          box-shadow: 0 6px 16px var(--primary-glow);
         }
 
         .btn-save-profile:disabled {
@@ -524,31 +533,31 @@ const Profile = () => {
           align-items: center;
           gap: 12px;
           padding: 1rem 1.5rem;
-          border-radius: 8px;
+          border-radius: var(--radius-default);
           font-size: 0.9rem;
           font-weight: 600;
-          color: #1e293b;
+          color: var(--text-primary);
           box-shadow: 0 10px 25px rgba(0,0,0,0.08);
-          background: #ffffff;
+          background: var(--bg-card-solid);
           animation: slideIn 0.3s cubic-bezier(0.16, 1, 0.3, 1);
         }
 
         .toast-success {
-          border: 1px solid #10b981;
-          color: #065f46;
+          border: 1px solid var(--success);
+          color: var(--success);
         }
 
         .toast-success svg {
-          color: #10b981;
+          color: var(--success);
         }
 
         .toast-error {
-          border: 1px solid #ef4444;
-          color: #991b1b;
+          border: 1px solid var(--danger);
+          color: var(--danger);
         }
 
         .toast-error svg {
-          color: #ef4444;
+          color: var(--danger);
         }
 
         @keyframes slideIn {
@@ -563,17 +572,17 @@ const Profile = () => {
         }
 
         .resume-section {
-          background: #ffffff;
-          border: 1px solid #e2e8f0;
-          border-radius: 12px;
+          background: var(--bg-card-solid);
+          border: 1px solid var(--border);
+          border-radius: var(--radius-lg);
           padding: 1.5rem;
           margin-bottom: 0.5rem;
         }
 
         .drag-drop-zone {
-          border: 2px dashed #cbd5e1;
-          border-radius: 10px;
-          background: #f8fafc;
+          border: 2px dashed var(--border);
+          border-radius: var(--radius-lg);
+          background: var(--bg-deep);
           padding: 2.25rem 1.5rem;
           display: flex;
           flex-direction: column;
@@ -585,13 +594,13 @@ const Profile = () => {
         }
 
         .drag-drop-zone.drag-active {
-          border-color: #2563eb;
-          background: #eff6ff;
+          border-color: var(--primary);
+          background: var(--primary-glow);
         }
 
         .drag-drop-zone.file-loaded {
-          border-color: #10b981;
-          background: #f0fdf4;
+          border-color: var(--success);
+          background: var(--success-glow);
           border-style: solid;
         }
 
@@ -604,25 +613,25 @@ const Profile = () => {
         }
 
         .upload-cloud-icon {
-          color: #94a3b8;
+          color: var(--text-muted);
           margin-bottom: 0.75rem;
           transition: transform 0.2s ease;
         }
 
         .file-input-label:hover .upload-cloud-icon {
           transform: translateY(-2px);
-          color: #2563eb;
+          color: var(--primary);
         }
 
         .upload-title {
           font-weight: 700;
           font-size: 0.95rem;
-          color: #1e293b;
+          color: var(--text-primary);
         }
 
         .upload-subtitle {
-          font-size: 0.8rem;
-          color: #64748b;
+          font-size: 0.9rem;
+          color: var(--text-muted);
           margin-top: 0.25rem;
         }
 
@@ -636,25 +645,25 @@ const Profile = () => {
         .file-name-text {
           font-weight: 700;
           font-size: 0.9rem;
-          color: #0f172a;
+          color: var(--text-primary);
           word-break: break-all;
         }
 
         .file-preview-info svg {
-          color: #2563eb;
+          color: var(--primary);
         }
 
         .file-size-text {
-          font-size: 0.8rem;
-          color: #64748b;
+          font-size: 0.9rem;
+          color: var(--text-muted);
           margin-top: 0.1rem;
         }
 
         .btn-extract-skills {
-          background: #10b981;
+          background: var(--success);
           color: #fff;
           border: none;
-          border-radius: 6px;
+          border-radius: var(--radius-default);
           padding: 0.5rem 1.25rem;
           font-size: 0.85rem;
           font-weight: 700;
@@ -666,15 +675,15 @@ const Profile = () => {
         }
 
         .btn-extract-skills:hover:not(:disabled) {
-          background: #059669;
+          opacity: 0.9;
           transform: translateY(-1px);
         }
 
         .btn-cancel-file {
-          background: #ffffff;
-          border: 1px solid #cbd5e1;
-          color: #475569;
-          border-radius: 6px;
+          background: var(--bg-card-solid);
+          border: 1px solid var(--border);
+          color: var(--text-secondary);
+          border-radius: var(--radius-default);
           padding: 0.5rem 1.25rem;
           font-size: 0.85rem;
           font-weight: 600;
@@ -683,9 +692,9 @@ const Profile = () => {
         }
 
         .btn-cancel-file:hover {
-          background: #f8fafc;
-          border-color: #94a3b8;
-          color: #0f172a;
+          background: var(--bg-deep);
+          border-color: var(--text-muted);
+          color: var(--text-primary);
         }
 
         .extraction-status-bar {
@@ -697,21 +706,21 @@ const Profile = () => {
 
         .progress-bar-container {
           height: 6px;
-          background: #e2e8f0;
-          border-radius: 3px;
+          background: var(--border);
+          border-radius: var(--radius-sm);
           overflow: hidden;
         }
 
         .progress-bar-fill {
           height: 100%;
-          background: #10b981;
-          border-radius: 3px;
+          background: var(--success);
+          border-radius: var(--radius-sm);
           transition: width 0.25s ease;
         }
 
         .progress-text {
-          font-size: 0.8rem;
-          color: #475569;
+          font-size: 0.9rem;
+          color: var(--text-secondary);
           font-weight: 500;
         }
       `}</style>
