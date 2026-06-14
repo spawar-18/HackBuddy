@@ -8,8 +8,8 @@ const projectSchema = new mongoose.Schema({
   },
   problemStatement: {
     type: String,
-    trim: true,
-    default: ''
+    required: [true, 'Problem statement is required'],
+    trim: true
   },
   description: {
     type: String,
@@ -48,6 +48,22 @@ const projectSchema = new mongoose.Schema({
   createdAt: {
     type: Date,
     default: Date.now
+  },
+  projectReview: {
+    feasibilityScore: Number,
+    problemSolutionAlignment: String,
+    projectRisks: [String],
+    missingSkills: [String],
+    mustBuildFeatures: [String],
+    optionalFeatures: [String],
+    featuresToRemove: [String],
+    improvementSuggestions: [String],
+    reasoning: String,
+    judgePerspective: String,
+    executionStrategy: [String]
+  },
+  projectReviewGeneratedAt: {
+    type: Date
   }
 });
 
@@ -69,6 +85,8 @@ const createMockProjectInstance = (data) => {
     createdBy: data.createdBy,
     status: data.status || 'Planning',
     createdAt: data.createdAt || new Date(),
+    projectReview: data.projectReview || null,
+    projectReviewGeneratedAt: data.projectReviewGeneratedAt || null,
     async save() {
       const index = memoryDB.findIndex(p => p._id === this._id);
       const serialized = {
@@ -82,7 +100,9 @@ const createMockProjectInstance = (data) => {
         teamId: this.teamId,
         createdBy: this.createdBy,
         status: this.status,
-        createdAt: this.createdAt
+        createdAt: this.createdAt,
+        projectReview: this.projectReview,
+        projectReviewGeneratedAt: this.projectReviewGeneratedAt
       };
       if (index !== -1) {
         memoryDB[index] = serialized;

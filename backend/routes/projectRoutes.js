@@ -6,7 +6,8 @@ const {
   getProjectByTeam,
   getProject,
   updateProject,
-  deleteProject
+  deleteProject,
+  analyzeProject
 } = require('../controller/projectController');
 
 // POST /api/project - Create a new project for a team
@@ -21,7 +22,13 @@ router.get('/:projectId', authMiddleware, getProject);
 // PUT /api/project/:projectId - Update project details
 router.put('/:projectId', authMiddleware, updateProject);
 
+// PATCH /api/project/:projectId - Update project details
+router.patch('/:projectId', authMiddleware, updateProject);
+
 // DELETE /api/project/:projectId - Delete project
 router.delete('/:projectId', authMiddleware, deleteProject);
+
+// POST /api/project/:projectId/analyze - Analyze project feasibility using Qwen AI
+router.post('/:projectId/analyze', authMiddleware, analyzeProject);
 
 module.exports = router;

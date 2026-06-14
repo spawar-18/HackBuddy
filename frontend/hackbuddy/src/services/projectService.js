@@ -50,3 +50,34 @@ export const deleteProject = async (projectId) => {
   const response = await api.delete(`/project/${projectId}`);
   return response.data;
 };
+
+/**
+ * Triggers AI project review analysis.
+ * @param {string} projectId - Project ID
+ * @returns {Promise<Object>} { success, projectReview, projectReviewGeneratedAt }
+ */
+export const analyzeProject = async (projectId) => {
+  const response = await api.post(`/project/${projectId}/analyze`);
+  return response.data;
+};
+
+/**
+ * Fetches previous project chat history.
+ * @param {string} projectId - Project ID
+ * @returns {Promise<Object>} { success, messages }
+ */
+export const getChatHistory = async (projectId) => {
+  const response = await api.get(`/project/${projectId}/chat`);
+  return response.data;
+};
+
+/**
+ * Sends a message to the AI Mentor.
+ * @param {string} projectId - Project ID
+ * @param {string} message - User question
+ * @returns {Promise<Object>} { success, userMessage, assistantMessage }
+ */
+export const sendChatMessage = async (projectId, message) => {
+  const response = await api.post(`/project/${projectId}/chat`, { message });
+  return response.data;
+};
