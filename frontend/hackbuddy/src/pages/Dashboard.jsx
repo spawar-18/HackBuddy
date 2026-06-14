@@ -3,10 +3,11 @@ import { useNavigate } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
 import api from '../services/api';
 import { getMyTeams } from '../services/teamService';
+import { getProjectByTeam } from '../services/projectService';
 import { 
   LogOut, Bell, Settings, LayoutDashboard, Database, Cpu, 
   Send, Users, BookOpen, AlertTriangle, CheckCircle, Flame, Clock, 
-  Terminal, ShieldCheck, UserCheck, RefreshCw, Zap
+  Terminal, ShieldCheck, UserCheck, RefreshCw, Zap, FolderGit2, Play
 } from 'lucide-react';
 
 const Dashboard = () => {
@@ -17,6 +18,8 @@ const Dashboard = () => {
   const [timeLeft, setTimeLeft] = useState({ hours: 34, minutes: 8, seconds: 58 });
   const [teams, setTeams] = useState([]);
   const [loadingTeams, setLoadingTeams] = useState(true);
+  const [projects, setProjects] = useState({});
+  const [loadingProjects, setLoadingProjects] = useState(true);
   const navigate = useNavigate();
 
   // Countdown timer simulation
@@ -53,20 +56,41 @@ const Dashboard = () => {
     fetchProfile();
   }, []);
 
-  // Fetch user teams on mount
+  // Fetch user teams and their projects on mount
   useEffect(() => {
-    const fetchTeams = async () => {
+    const fetchTeamsAndProjects = async () => {
       try {
+        setLoadingTeams(true);
+        setLoadingProjects(true);
         const data = await getMyTeams();
         setTeams(data);
+        
+        if (data && data.length > 0) {
+          const projectPromises = data.map(async (t) => {
+            try {
+              const res = await getProjectByTeam(t._id);
+              return { teamId: t._id, project: res?.project || null };
+            } catch (err) {
+              console.error(`Error fetching project for team ${t._id}:`, err);
+              return { teamId: t._id, project: null };
+            }
+          });
+          const results = await Promise.all(projectPromises);
+          const projectMap = {};
+          results.forEach(res => {
+            projectMap[res.teamId] = res.project;
+          });
+          setProjects(projectMap);
+        }
       } catch (err) {
         console.error('Error fetching teams:', err);
       } finally {
         setLoadingTeams(false);
+        setLoadingProjects(false);
       }
     };
 
-    fetchTeams();
+    fetchTeamsAndProjects();
   }, []);
 
   // Handle pending invite code check after login
@@ -80,6 +104,31 @@ const Dashboard = () => {
 
   const formatTime = (t) => {
     return `${String(t.hours).padStart(2, '0')}:${String(t.minutes).padStart(2, '0')}:${String(t.seconds).padStart(2, '0')}`;
+  };
+
+  const getStatusBadge = (statusVal) => {
+    switch (statusVal) {
+      case 'Planning':
+        return (
+          <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-xs font-bold bg-amber-50 border border-amber-200 text-amber-700">
+            <Clock size={10} /> Planning
+          </span>
+        );
+      case 'In Progress':
+        return (
+          <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-xs font-bold bg-blue-50 border border-blue-200 text-blue-700">
+            <Play size={10} /> In Progress
+          </span>
+        );
+      case 'Completed':
+        return (
+          <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-xs font-bold bg-emerald-50 border border-emerald-200 text-emerald-700">
+            <CheckCircle size={10} /> Completed
+          </span>
+        );
+      default:
+        return null;
+    }
   };
 
   const handleApplyFix = () => {
@@ -308,6 +357,55 @@ const Dashboard = () => {
                               {t.members ? t.members.length : 0} {t.members && t.members.length === 1 ? 'member' : 'members'}
                             </span>
                           </div>
+
+                          {/* Linked Project Summary */}
+                          {loadingProjects ? (
+                            <div style={{ fontSize: '0.8rem', color: 'var(--text-muted)', marginTop: '8px' }}>
+                              Loading project details...
+                            </div>
+                          ) : projects[t._id] ? (
+                            <div style={{ 
+                              marginTop: '8px', 
+                              padding: '6px 10px', 
+                              background: 'var(--bg-card)', 
+                              border: '1px solid var(--border)', 
+                              borderRadius: 'var(--radius-md)',
+                              display: 'flex',
+                              flexDirection: 'column',
+                              gap: '4px'
+                            }}>
+                              <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', gap: '8px', flexWrap: 'wrap' }}>
+                                <div style={{ display: 'flex', alignItems: 'center', gap: '6px', minWidth: 0 }}>
+                                  <FolderGit2 size={13} style={{ color: 'var(--primary)', flexShrink: 0 }} />
+                                  <span style={{ fontWeight: 600, fontSize: '0.85rem', color: 'var(--text-primary)', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
+                                    {projects[t._id].projectName}
+                                  </span>
+                                </div>
+                                {getStatusBadge(projects[t._id].status)}
+                              </div>
+                              {projects[t._id].track && (
+                                <span style={{ fontSize: '0.75rem', color: 'var(--text-muted)' }}>
+                                  Track: <strong style={{ color: 'var(--text-secondary)' }}>{projects[t._id].track}</strong>
+                                </span>
+                              )}
+                            </div>
+                          ) : (
+                            <div style={{ 
+                              marginTop: '8px', 
+                              padding: '4px 8px', 
+                              background: 'rgba(0,0,0,0.01)', 
+                              border: '1px dashed var(--border)', 
+                              borderRadius: 'var(--radius-md)',
+                              fontSize: '0.75rem',
+                              color: 'var(--text-muted)',
+                              display: 'inline-flex',
+                              alignItems: 'center',
+                              gap: '4px'
+                            }}>
+                              <FolderGit2 size={11} style={{ opacity: 0.5 }} />
+                              <span>No active project</span>
+                            </div>
+                          )}
                         </div>
                         <button 
                           onClick={() => navigate(`/team/${t._id}`)}
