@@ -149,39 +149,39 @@ const Dashboard = () => {
     <div className="dashboard-container">
       {/* Top Navigation Header */}
       <header className="dashboard-header">
-        <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
-          <div className="logo-icon" style={{ width: '30px', height: '30px', fontSize: '1rem' }}>H</div>
-          <span style={{ fontWeight: 800, fontSize: '1.2rem', fontFamily: 'var(--font-sans)', letterSpacing: '-0.5px' }}>
-            Hack<span style={{ color: 'var(--primary-hover)' }}>OS</span>
+        <div className="flex items-center gap-3">
+          <div className="w-8 h-8 rounded-lg bg-neutral-950 text-white flex items-center justify-center text-sm font-bold shadow-xs">H</div>
+          <span className="font-extrabold text-lg tracking-tight font-sans text-neutral-900">
+            Hack<span className="text-brand-500">OS</span>
           </span>
-          <span className="status-badge badge-active" style={{ marginLeft: '10px', fontSize: '0.85rem' }}>
-            <span className="status-pulse"></span>
+          <span className="status-badge badge-active ml-2.5 text-[10px] flex items-center gap-1">
+            <span className="status-pulse bg-emerald-500"></span>
             ACTIVE
           </span>
         </div>
 
         {/* Sprint Countdown Display */}
-        <div style={{ display: 'flex', alignItems: 'center', gap: '8px', fontFamily: 'var(--font-mono)' }}>
-          <Clock size={14} style={{ color: 'var(--text-secondary)' }} />
-          <span style={{ fontSize: '0.9rem', color: 'var(--text-secondary)' }}>HUD CLOCK:</span>
-          <span style={{ fontSize: '1rem', fontWeight: 'bold', color: 'var(--text-primary)' }}>{formatTime(timeLeft)}</span>
+        <div className="hidden sm:flex items-center gap-2.5 font-mono bg-neutral-50 border border-neutral-200/60 rounded-full px-3 py-1 text-xs shadow-2xs">
+          <Clock size={13} className="text-neutral-500" />
+          <span className="text-neutral-500 font-bold uppercase tracking-wider text-[10px]">HUD CLOCK:</span>
+          <span className="text-neutral-900 font-bold tracking-wider text-xs">{formatTime(timeLeft)}</span>
         </div>
 
         {/* Action Widgets */}
-        <div className="header-actions">
-          <button className="header-btn">Submit Project</button>
-          <Bell size={18} style={{ color: 'var(--text-secondary)', cursor: 'pointer' }} />
-          <Settings size={18} style={{ color: 'var(--text-secondary)', cursor: 'pointer' }} onClick={() => navigate('/profile')} />
+        <div className="flex items-center gap-4">
+          <button className="btn-secondary py-1 px-3 text-xs hidden md:inline-flex">Submit Project</button>
+          <Bell size={18} className="text-neutral-500 hover:text-neutral-800 cursor-pointer transition-colors" />
+          <Settings size={18} className="text-neutral-500 hover:text-neutral-800 cursor-pointer transition-colors" onClick={() => navigate('/profile')} />
           
-          <div className="user-profile-widget">
+          <div className="flex items-center gap-2 border-l border-neutral-200 pl-4 h-6">
             {activeUser?.avatar ? (
-              <img src={activeUser.avatar} alt="Avatar" className="user-avatar" />
+              <img src={activeUser.avatar} alt="Avatar" className="w-7 h-7 rounded-full border border-neutral-200 object-cover" />
             ) : (
-              <div className="user-avatar-placeholder">
+              <div className="w-7 h-7 rounded-full bg-neutral-950 text-white flex items-center justify-center text-xs font-bold shadow-xs">
                 {activeUser?.name?.charAt(0).toUpperCase() || 'U'}
               </div>
             )}
-            <span style={{ fontSize: '0.95rem', fontWeight: 600, color: 'var(--text-primary)' }}>{activeUser?.name}</span>
+            <span className="text-xs font-semibold text-neutral-800 hidden lg:block">{activeUser?.name}</span>
           </div>
         </div>
       </header>
@@ -190,7 +190,7 @@ const Dashboard = () => {
       <div className="dashboard-body">
         {/* Left Navigation Sidebar */}
         <aside className="dashboard-sidebar">
-          <div className="sidebar-menu">
+          <div className="sidebar-menu flex flex-col gap-1 w-full">
             <a href="#dashboard" className="menu-item active">
               <LayoutDashboard size={16} />
               <span>Dashboard</span>
@@ -210,31 +210,28 @@ const Dashboard = () => {
             
             <button 
               onClick={() => navigate('/team/create')}
-              className="btn-primary" 
-              style={{ marginTop: '1.5rem', background: 'var(--primary)', border: 'none', color: '#ffffff', padding: '0.6rem', gap: '8px', borderRadius: 'var(--radius-default)' }}
+              className="btn-primary mt-6 w-full flex items-center justify-center gap-2 text-xs py-2 shadow-xs cursor-pointer"
             >
-              <Users size={16} />
-              <span style={{ fontSize: '0.9rem', fontWeight: 600 }}>Create Team</span>
+              <Users size={14} />
+              <span>Create Team</span>
             </button>
             <button 
               onClick={() => navigate('/team/join')}
-              className="btn-primary" 
-              style={{ marginTop: '0.5rem', background: 'var(--tertiary)', border: 'none', color: '#ffffff', padding: '0.6rem', gap: '8px', borderRadius: 'var(--radius-default)' }}
+              className="btn-secondary mt-2 w-full flex items-center justify-center gap-2 text-xs py-2 cursor-pointer"
             >
-              <Users size={16} />
-              <span style={{ fontSize: '0.9rem', fontWeight: 600 }}>Join Team</span>
+              <Users size={14} />
+              <span>Join Team</span>
             </button>
           </div>
 
-          <div className="sidebar-menu" style={{ borderTop: '1px solid var(--border)', paddingTop: '1rem' }}>
+          <div className="sidebar-menu flex flex-col gap-1 w-full border-t border-neutral-200/80 pt-4 mt-auto">
             <a href="#docs" className="menu-item">
               <BookOpen size={16} />
               <span>Documentation</span>
             </a>
             <button 
               onClick={handleLogout} 
-              className="menu-item" 
-              style={{ background: 'none', border: 'none', width: '100%', cursor: 'pointer', textAlign: 'left' }}
+              className="menu-item w-full bg-transparent border-0 cursor-pointer text-left flex items-center gap-3 py-2 text-neutral-600 hover:text-neutral-900"
             >
               <LogOut size={16} />
               <span>Log Out</span>
@@ -246,171 +243,140 @@ const Dashboard = () => {
         <main className="dashboard-content">
           <div className="dashboard-grid">
             
-            {/* Left Side Info Pane */}
-            <div style={{ display: 'flex', flexDirection: 'column', gap: '2rem' }}>
+            {/* Left Side Info Pane (Spans 2 columns) */}
+            <div className="lg:col-span-2 flex flex-col gap-6">
+              
               {/* Mission Status Header */}
-              <div className="glass dashboard-card glow-blue" style={{ borderLeft: '4px solid var(--primary)' }}>
-                <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '1.25rem' }}>
+              <div className="dashboard-card border-l-4 border-l-brand-500 glow-blue">
+                <div className="flex justify-between items-start gap-4 mb-1">
                   <div>
-                    <span style={{ fontSize: '0.85rem', fontWeight: 600, color: 'var(--text-muted)' }}>MISSION STATUS</span>
-                    <h2 style={{ fontSize: '2rem', fontWeight: 800, fontFamily: 'var(--font-mono)', color: 'var(--text-primary)', marginTop: '0.25rem' }}>
+                    <span className="text-[10px] font-bold text-neutral-400 tracking-wider uppercase">MISSION STATUS</span>
+                    <h2 className="text-2xl md:text-3xl font-extrabold font-mono text-neutral-900 mt-1 tracking-tight">
                       T-Minus {formatTime(timeLeft)}
                     </h2>
                   </div>
                   <span className="status-badge badge-critical">Mission Critical</span>
                 </div>
                 
-                <div className="hud-grid">
-                  <div className="hud-item">
-                    <div className="hud-label">Current Sprint</div>
-                    <div className="hud-value" style={{ color: 'var(--text-primary)' }}>MVP Core</div>
+                <div className="grid grid-cols-2 gap-4 border-t border-neutral-100 pt-4">
+                  <div className="bg-neutral-50 border border-neutral-200/50 rounded-lg p-3 flex flex-col justify-center">
+                    <div className="text-[10px] font-bold text-neutral-400 tracking-wider uppercase">Current Sprint</div>
+                    <div className="text-xs font-bold text-neutral-900 mt-1">MVP Core</div>
                   </div>
-                  <div className="hud-item">
-                    <div className="hud-label">Squad Velocity</div>
-                    <div className="hud-value" style={{ color: 'var(--success)' }}>14.2 pts/hr</div>
+                  <div className="bg-neutral-50 border border-neutral-200/50 rounded-lg p-3 flex flex-col justify-center">
+                    <div className="text-[10px] font-bold text-neutral-400 tracking-wider uppercase">Squad Velocity</div>
+                    <div className="text-xs font-bold text-emerald-600 mt-1">14.2 pts/hr</div>
                   </div>
                 </div>
               </div>
 
               {/* My Teams Section */}
-              <div className="glass dashboard-card glow-blue" style={{ borderLeft: '4px solid var(--success)' }}>
-                <div className="card-title">
-                  <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
-                    <Users size={18} style={{ color: 'var(--success)' }} />
-                    <span style={{ color: 'var(--text-primary)' }}>My Squads</span>
+              <div className="dashboard-card border-l-4 border-l-emerald-500 glow-blue">
+                <div className="flex justify-between items-center mb-1">
+                  <div className="flex items-center gap-2">
+                    <Users size={18} className="text-emerald-600" />
+                    <span className="font-bold text-sm uppercase tracking-wider text-neutral-500">My Squads</span>
                   </div>
-                  <div style={{ display: 'flex', gap: '8px' }}>
+                  <div className="flex gap-2">
                     <button 
                       onClick={() => navigate('/team/create')}
-                      className="header-btn" 
-                      style={{ padding: '0.4rem 0.8rem', fontSize: '0.85rem', background: 'var(--primary)', borderRadius: 'var(--radius-default)' }}
+                      className="btn-primary text-xs py-1.5 px-3 cursor-pointer shadow-2xs"
                     >
-                      Create Team
+                      Create
                     </button>
                     <button 
                       onClick={() => navigate('/team/join')}
-                      className="header-btn" 
-                      style={{ padding: '0.4rem 0.8rem', fontSize: '0.85rem', background: 'var(--tertiary)', borderRadius: 'var(--radius-default)' }}
+                      className="btn-secondary text-xs py-1.5 px-3 cursor-pointer"
                     >
-                      Join Team
+                      Join
                     </button>
                   </div>
                 </div>
 
                 {loadingTeams ? (
-                   <div style={{ display: 'flex', alignItems: 'center', gap: '8px', padding: '1rem 0' }}>
-                    <RefreshCw className="spin" size={16} style={{ animation: 'spin 1.5s linear infinite' }} />
-                    <span style={{ fontSize: '0.95rem', color: 'var(--text-secondary)' }}>Scanning network for squads...</span>
+                  <div className="flex items-center gap-2.5 py-6 justify-center bg-neutral-50 border border-dashed border-neutral-200 rounded-xl text-neutral-500 text-xs">
+                    <RefreshCw className="animate-spin text-brand-500" size={14} />
+                    <span>Scanning network for squads...</span>
                   </div>
                 ) : teams.length === 0 ? (
-                  <div style={{ textAlign: 'center', padding: '1.5rem', background: 'var(--bg-deep)', borderRadius: 'var(--radius-lg)', border: '1px dashed var(--border)' }}>
-                    <div style={{ color: 'var(--text-muted)', marginBottom: '0.75rem' }}>
-                      <Users size={32} style={{ opacity: 0.5, margin: '0 auto' }} />
+                  <div className="text-center py-8 px-4 bg-neutral-50 border border-dashed border-neutral-200 rounded-xl flex flex-col items-center gap-3">
+                    <div className="w-10 h-10 rounded-full bg-neutral-100 flex items-center justify-center text-neutral-400">
+                      <Users size={20} />
                     </div>
-                    <h4 style={{ fontWeight: 700, color: 'var(--text-primary)', marginBottom: '0.25rem', fontSize: '1rem' }}>No Teams Yet</h4>
-                    <p style={{ fontSize: '0.9rem', color: 'var(--text-secondary)', marginBottom: '1rem' }}>
-                      You are not a member of any squad. Initiate a new team or enter an invite code to join.
-                    </p>
-                    <div style={{ display: 'flex', justifyContent: 'center', gap: '0.75rem' }}>
+                    <div>
+                      <h4 className="font-bold text-neutral-900 text-sm">No Squads Joined</h4>
+                      <p className="text-xs text-neutral-400 mt-1 max-w-[280px] leading-normal">
+                        You are not a member of any squad. Initiate a new team or enter an invite code to join.
+                      </p>
+                    </div>
+                    <div className="flex gap-2 mt-1">
                       <button 
                         onClick={() => navigate('/team/create')}
-                        className="btn-primary" 
-                        style={{ width: 'auto', padding: '0.4rem 0.8rem', fontSize: '0.85rem', background: 'var(--primary)', height: '32px', borderRadius: 'var(--radius-default)' }}
+                        className="btn-primary text-xs py-1.5 px-3"
                       >
-                        Create
+                        Create Team
                       </button>
                       <button 
                         onClick={() => navigate('/team/join')}
-                        className="btn-primary" 
-                        style={{ width: 'auto', padding: '0.4rem 0.8rem', fontSize: '0.85rem', background: 'var(--tertiary)', height: '32px', borderRadius: 'var(--radius-default)' }}
+                        className="btn-secondary text-xs py-1.5 px-3"
                       >
-                        Join
+                        Join Team
                       </button>
                     </div>
                   </div>
                 ) : (
-                  <div style={{ display: 'flex', flexDirection: 'column', gap: '0.75rem', marginTop: '0.5rem' }}>
+                  <div className="flex flex-col gap-3.5 mt-2">
                     {teams.map((t) => (
                       <div 
                         key={t._id} 
-                        style={{ 
-                          background: 'var(--bg-deep)', 
-                          border: '1px solid var(--border)', 
-                          borderRadius: 'var(--radius-lg)', 
-                          padding: '1rem',
-                          display: 'flex',
-                          justifyContent: 'space-between',
-                          alignItems: 'center',
-                          gap: '1rem'
-                        }}
+                        className="bg-neutral-50 border border-neutral-200/80 rounded-xl p-4 flex flex-col md:flex-row md:items-center justify-between gap-4 hover:border-neutral-300 transition-all shadow-2xs"
                       >
-                        <div style={{ flex: 1, minWidth: 0 }}>
-                          <h4 style={{ fontWeight: 700, fontSize: '1.05rem', color: 'var(--text-primary)', margin: 0, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
+                        <div className="flex-1 min-w-0 flex flex-col">
+                          <h4 className="font-bold text-sm text-neutral-900 truncate">
                             {t.teamName}
                           </h4>
-                          <p style={{ fontSize: '0.9rem', color: 'var(--text-secondary)', marginTop: '2px', overflow: 'hidden', textOverflow: 'ellipsis', display: '-webkit-box', WebkitLineClamp: 2, WebkitBoxOrient: 'vertical', margin: '2px 0 0 0' }}>
+                          <p className="text-xs text-neutral-500 mt-1 line-clamp-2 max-w-[500px]">
                             {t.description || 'No description provided.'}
                           </p>
-                          <div style={{ display: 'flex', alignItems: 'center', gap: '4px', marginTop: '8px' }}>
-                            <Users size={12} style={{ color: 'var(--text-muted)' }} />
-                            <span style={{ fontSize: '0.85rem', color: 'var(--text-muted)', fontWeight: 600 }}>
+                          <div className="flex items-center gap-1.5 mt-3 text-[10px] font-bold text-neutral-400 uppercase tracking-wider">
+                            <Users size={12} className="text-neutral-400" />
+                            <span>
                               {t.members ? t.members.length : 0} {t.members && t.members.length === 1 ? 'member' : 'members'}
                             </span>
                           </div>
 
                           {/* Linked Project Summary */}
                           {loadingProjects ? (
-                            <div style={{ fontSize: '0.8rem', color: 'var(--text-muted)', marginTop: '8px' }}>
+                            <div className="text-[10px] text-neutral-400 mt-2 italic">
                               Loading project details...
                             </div>
                           ) : projects[t._id] ? (
-                            <div style={{ 
-                              marginTop: '8px', 
-                              padding: '6px 10px', 
-                              background: 'var(--bg-card)', 
-                              border: '1px solid var(--border)', 
-                              borderRadius: 'var(--radius-md)',
-                              display: 'flex',
-                              flexDirection: 'column',
-                              gap: '4px'
-                            }}>
-                              <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', gap: '8px', flexWrap: 'wrap' }}>
-                                <div style={{ display: 'flex', alignItems: 'center', gap: '6px', minWidth: 0 }}>
-                                  <FolderGit2 size={13} style={{ color: 'var(--primary)', flexShrink: 0 }} />
-                                  <span style={{ fontWeight: 600, fontSize: '0.85rem', color: 'var(--text-primary)', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
+                            <div className="mt-3 p-3 bg-white border border-neutral-200 rounded-lg flex flex-col gap-2">
+                              <div className="flex justify-between items-center gap-2 flex-wrap">
+                                <div className="flex items-center gap-2 min-w-0">
+                                  <FolderGit2 size={13} className="text-brand-500 shrink-0" />
+                                  <span className="font-bold text-xs text-neutral-850 truncate">
                                     {projects[t._id].projectName}
                                   </span>
                                 </div>
                                 {getStatusBadge(projects[t._id].status)}
                               </div>
                               {projects[t._id].track && (
-                                <span style={{ fontSize: '0.75rem', color: 'var(--text-muted)' }}>
-                                  Track: <strong style={{ color: 'var(--text-secondary)' }}>{projects[t._id].track}</strong>
+                                <span className="text-[10px] text-neutral-400 font-medium">
+                                  Track: <strong className="text-neutral-600 font-semibold">{projects[t._id].track}</strong>
                                 </span>
                               )}
                             </div>
                           ) : (
-                            <div style={{ 
-                              marginTop: '8px', 
-                              padding: '4px 8px', 
-                              background: 'rgba(0,0,0,0.01)', 
-                              border: '1px dashed var(--border)', 
-                              borderRadius: 'var(--radius-md)',
-                              fontSize: '0.75rem',
-                              color: 'var(--text-muted)',
-                              display: 'inline-flex',
-                              alignItems: 'center',
-                              gap: '4px'
-                            }}>
-                              <FolderGit2 size={11} style={{ opacity: 0.5 }} />
-                              <span>No active project</span>
+                            <div className="mt-3 px-2.5 py-1.5 bg-neutral-100/40 border border-dashed border-neutral-200 rounded-lg text-[10px] text-neutral-400 inline-flex items-center gap-1.5 font-medium w-fit">
+                              <FolderGit2 size={11} className="opacity-50" />
+                              <span>No active project configured</span>
                             </div>
                           )}
                         </div>
                         <button 
                           onClick={() => navigate(`/team/${t._id}`)}
-                          className="btn-primary" 
-                          style={{ width: 'auto', padding: '0.4rem 0.8rem', fontSize: '0.85rem', flexShrink: 0, background: 'var(--primary)', borderRadius: 'var(--radius-default)' }}
+                          className="btn-primary text-xs py-1.5 px-3 shrink-0 self-end md:self-center"
                         >
                           Workspace
                         </button>
@@ -421,83 +387,84 @@ const Dashboard = () => {
               </div>
 
               {/* Velocity Burndown Tracker */}
-              <div className="glass dashboard-card">
-                <div className="card-title">
+              <div className="dashboard-card glow-blue">
+                <div className="flex justify-between items-center mb-1">
                   <div>
-                    <span>Velocity Burndown</span>
-                    <p style={{ fontSize: '0.85rem', color: 'var(--text-muted)', textTransform: 'none', marginTop: '4px' }}>
+                    <span className="font-bold text-sm uppercase tracking-wider text-neutral-500">Velocity Burndown</span>
+                    <p className="text-[11px] text-neutral-400 mt-0.5 normal-case">
                       Track progress across core project tracks
                     </p>
                   </div>
-                  <span className="card-title-pill" style={{ background: 'rgba(255,255,255,0.05)', color: 'var(--text-secondary)' }}>
+                  <span className="status-badge bg-neutral-50 border-neutral-200 text-neutral-500 text-[9px] font-mono">
                     LATEST PUSH: 4M AGO
                   </span>
                 </div>
 
-                <div className="burndown-chart-sim">
-                  <div className="tracker-row">
-                    <div className="tracker-header">
+                <div className="flex flex-col gap-4 mt-2">
+                  <div className="flex flex-col gap-1.5">
+                    <div className="flex justify-between items-center text-[10px] font-bold text-neutral-400 uppercase tracking-wider">
                       <span>FRONTEND ARCHITECTURE</span>
-                      <span>85%</span>
+                      <span className="text-neutral-700 font-mono">85%</span>
                     </div>
-                    <div className="tracker-bar-bg">
-                      <div className="tracker-bar-fill" style={{ width: '85%', background: 'var(--primary)' }}></div>
+                    <div className="h-1.5 bg-neutral-100 rounded-full overflow-hidden border border-neutral-200/20">
+                      <div className="h-full bg-brand-500 rounded-full transition-all duration-500" style={{ width: '85%' }}></div>
                     </div>
                   </div>
 
-                  <div className="tracker-row">
-                    <div className="tracker-header">
+                  <div className="flex flex-col gap-1.5">
+                    <div className="flex justify-between items-center text-[10px] font-bold text-neutral-400 uppercase tracking-wider">
                       <span>BACKEND & API INFRA</span>
-                      <span>62%</span>
+                      <span className="text-neutral-700 font-mono">62%</span>
                     </div>
-                    <div className="tracker-bar-bg">
-                      <div className="tracker-bar-fill" style={{ width: '62%', background: 'var(--primary)', opacity: 0.8 }}></div>
+                    <div className="h-1.5 bg-neutral-100 rounded-full overflow-hidden border border-neutral-200/20">
+                      <div className="h-full bg-brand-500/80 rounded-full transition-all duration-500" style={{ width: '62%' }}></div>
                     </div>
                   </div>
 
-                  <div className="tracker-row">
-                    <div className="tracker-header">
+                  <div className="flex flex-col gap-1.5">
+                    <div className="flex justify-between items-center text-[10px] font-bold text-neutral-400 uppercase tracking-wider">
                       <span>AI ENGINE (LLM PIPELINE)</span>
-                      <span>41%</span>
+                      <span className="text-neutral-700 font-mono">41%</span>
                     </div>
-                    <div className="tracker-bar-bg">
-                      <div className="tracker-bar-fill" style={{ width: '41%', background: 'var(--success)' }}></div>
+                    <div className="h-1.5 bg-neutral-100 rounded-full overflow-hidden border border-neutral-200/20">
+                      <div className="h-full bg-emerald-500 rounded-full transition-all duration-500" style={{ width: '41%' }}></div>
                     </div>
                   </div>
 
-                  <div className="tracker-row">
-                    <div className="tracker-header">
+                  <div className="flex flex-col gap-1.5">
+                    <div className="flex justify-between items-center text-[10px] font-bold text-neutral-400 uppercase tracking-wider">
                       <span>PITCH & PRESENTATION</span>
-                      <span>15%</span>
+                      <span className="text-neutral-700 font-mono">15%</span>
                     </div>
-                    <div className="tracker-bar-bg">
-                      <div className="tracker-bar-fill" style={{ width: '15%', background: 'var(--success)', opacity: 0.8 }}></div>
+                    <div className="h-1.5 bg-neutral-100 rounded-full overflow-hidden border border-neutral-200/20">
+                      <div className="h-full bg-emerald-500/80 rounded-full transition-all duration-500" style={{ width: '15%' }}></div>
                     </div>
                   </div>
                 </div>
               </div>
 
               {/* War Room Alert Card */}
-              <div className="glass dashboard-card war-room-card" style={{ borderRadius: 'var(--radius-lg)' }}>
-                <div style={{ display: 'flex', gap: '15px', alignItems: 'flex-start' }}>
-                  <div style={{ 
-                    background: fixApplied ? 'var(--success-glow)' : 'var(--danger-glow)', 
-                    color: fixApplied ? 'var(--success)' : 'var(--danger)',
-                    padding: '10px', 
-                    borderRadius: 'var(--radius-default)'
-                  }}>
-                    {fixApplied ? <CheckCircle size={24} /> : <Flame size={24} />}
+              <div className={`dashboard-card border ${
+                fixApplied ? 'border-emerald-250 bg-emerald-50/15' : 'border-red-250 bg-red-50/15'
+              } shadow-2xs`}>
+                <div className="flex gap-4 items-start">
+                  <div className={`p-2.5 rounded-lg shrink-0 ${
+                    fixApplied ? 'bg-emerald-100 text-emerald-700' : 'bg-red-100 text-red-700'
+                  }`}>
+                    {fixApplied ? <CheckCircle size={22} /> : <Flame size={22} />}
                   </div>
-                  <div style={{ flex: 1 }}>
-                    <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '4px' }}>
-                      <span style={{ fontSize: '0.85rem', fontWeight: 700, letterSpacing: '1px', color: fixApplied ? 'var(--success)' : 'var(--danger)' }}>
+                  <div className="flex-1 min-w-0">
+                    <div className="flex justify-between items-center">
+                      <span className={`text-[10px] font-bold tracking-wider uppercase ${
+                        fixApplied ? 'text-emerald-700' : 'text-red-700'
+                      }`}>
                         {fixApplied ? 'HOTFIX COMPLETE' : 'AI WAR ROOM : BOTTLENECK DETECTED'}
                       </span>
                     </div>
-                    <h3 style={{ fontSize: '1.25rem', fontWeight: 800, color: 'var(--text-primary)', marginBottom: '0.5rem' }}>
+                    <h3 className="text-sm font-bold text-neutral-900 mt-1 mb-1">
                       {fixApplied ? 'Edge Latency Resolved' : 'LLM Latency Bottleneck'}
                     </h3>
-                    <p style={{ fontSize: '0.95rem', color: 'var(--text-secondary)', marginBottom: '1.25rem', lineHeight: '1.5' }}>
+                    <p className="text-xs text-neutral-500 leading-relaxed mb-4">
                       {fixApplied 
                         ? 'System response times are stabilized. API routes are using standard high-speed streaming protocols.' 
                         : 'LLM response latency is averaging 2.4s. Recommending switching to streaming edge functions for better UX.'}
@@ -505,17 +472,11 @@ const Dashboard = () => {
                     <button 
                       onClick={handleApplyFix}
                       disabled={fixApplied}
-                      className="btn-primary" 
-                      style={{ 
-                        width: 'auto', 
-                        padding: '0.5rem 1.25rem', 
-                        background: fixApplied ? 'var(--success)' : 'var(--primary)',
-                        fontSize: '0.9rem',
-                        gap: '6px',
-                        borderRadius: 'var(--radius-default)'
-                      }}
+                      className={`btn-primary text-xs flex items-center gap-1.5 w-fit ${
+                        fixApplied ? 'bg-emerald-600 hover:bg-emerald-700 active:bg-emerald-800' : 'bg-neutral-950'
+                      }`}
                     >
-                      <Zap size={14} />
+                      <Zap size={13} />
                       {fixApplied ? 'Fix Applied' : 'Apply Fix'}
                     </button>
                   </div>
@@ -523,60 +484,62 @@ const Dashboard = () => {
               </div>
             </div>
 
-            {/* Right Side Info Pane (Authenticated Profile Details & Logs) */}
-            <div style={{ display: 'flex', flexDirection: 'column', gap: '2rem' }}>
+            {/* Right Side Info Pane (Developer Profile & Logs) */}
+            <div className="flex flex-col gap-6 lg:col-span-1">
               
               {/* Profile Card */}
-              <div className="glass dashboard-card" style={{ borderTop: '3px solid var(--primary-hover)' }}>
-                <div className="card-title">
-                  <span>Developer Profile</span>
-                  <span className="status-badge badge-active">
-                    <UserCheck size={12} style={{ marginRight: '4px' }} />
+              <div className="dashboard-card border-t-4 border-t-brand-500 glow-blue">
+                <div className="flex justify-between items-center mb-1">
+                  <span className="font-bold text-sm uppercase tracking-wider text-neutral-500">Developer Profile</span>
+                  <span className="status-badge badge-active flex items-center gap-1 text-[9px]">
+                    <UserCheck size={11} />
                     Verified
                   </span>
                 </div>
 
                 {loadingProfile ? (
-                  <div style={{ display: 'flex', alignItems: 'center', gap: '8px', padding: '1rem 0' }}>
-                    <RefreshCw className="spin" size={16} style={{ animation: 'spin 1.5s linear infinite' }} />
-                    <span style={{ fontSize: '0.95rem', color: 'var(--text-secondary)' }}>Querying DB Node...</span>
+                  <div className="flex items-center gap-2 py-4 text-neutral-500 text-xs font-semibold justify-center">
+                    <RefreshCw className="animate-spin text-brand-500" size={14} />
+                    <span>Querying DB Node...</span>
                   </div>
                 ) : (
-                  <div style={{ display: 'flex', flexDirection: 'column', gap: '1.25rem' }}>
-                    <div style={{ display: 'flex', alignItems: 'center', gap: '1rem', background: 'var(--bg-deep)', padding: '1rem', borderRadius: 'var(--radius-lg)', border: '1px solid var(--border)' }}>
+                  <div className="flex flex-col gap-4">
+                    <div className="flex items-center gap-3 bg-neutral-50 border border-neutral-200/60 p-4 rounded-xl">
                       {activeUser?.avatar ? (
-                        <img src={activeUser.avatar} alt="Avatar" className="user-avatar" style={{ width: '48px', height: '48px', border: '2px solid var(--primary)' }} />
+                        <img src={activeUser.avatar} alt="Avatar" className="w-12 h-12 rounded-full border-2 border-brand-500 object-cover" />
                       ) : (
-                        <div className="user-avatar-placeholder" style={{ width: '48px', height: '48px', fontSize: '1.2rem' }}>
+                        <div className="w-12 h-12 rounded-full bg-neutral-950 text-white flex items-center justify-center text-lg font-bold shadow-xs">
                           {activeUser?.name?.charAt(0).toUpperCase() || 'U'}
                         </div>
                       )}
-                      <div>
-                        <div style={{ fontWeight: 700, color: 'var(--text-primary)', fontSize: '1.1rem' }}>{activeUser?.name}</div>
-                        <div style={{ fontSize: '0.85rem', color: 'var(--text-muted)', fontFamily: 'var(--font-mono)' }}>ID: {activeUser?._id || activeUser?.id || 'N/A'}</div>
+                      <div className="flex-1 min-w-0">
+                        <div className="font-bold text-neutral-900 text-sm truncate">{activeUser?.name}</div>
+                        <div className="text-[10px] text-neutral-400 font-mono mt-0.5 truncate">ID: {activeUser?._id || activeUser?.id || 'N/A'}</div>
                       </div>
                     </div>
 
-                    <div style={{ display: 'flex', flexDirection: 'column', gap: '0.75rem', fontSize: '0.95rem' }}>
-                      <div style={{ display: 'flex', justifyContent: 'space-between', borderBottom: '1px solid var(--border)', paddingBottom: '0.5rem' }}>
-                        <span style={{ color: 'var(--text-secondary)' }}>EMAIL NODE:</span>
-                        <span style={{ color: 'var(--text-primary)', fontWeight: 500 }}>{activeUser?.email}</span>
+                    <div className="flex flex-col gap-3 text-xs mt-1">
+                      <div className="flex justify-between items-center border-b border-neutral-200/60 pb-2.5">
+                        <span className="text-neutral-500 font-bold uppercase tracking-wider text-[10px]">EMAIL ADDRESS:</span>
+                        <span className="text-neutral-900 font-semibold truncate max-w-[170px]" title={activeUser?.email}>{activeUser?.email}</span>
                       </div>
-                      <div style={{ display: 'flex', justifyContent: 'space-between', borderBottom: '1px solid var(--border)', paddingBottom: '0.5rem' }}>
-                        <span style={{ color: 'var(--text-secondary)' }}>AUTH SCHEME:</span>
-                        <span style={{ color: activeUser?.googleId ? 'var(--success)' : (activeUser?.githubId ? 'var(--success)' : 'var(--primary-hover)'), fontWeight: 600 }}>
+                      <div className="flex justify-between items-center border-b border-neutral-200/60 pb-2.5">
+                        <span className="text-neutral-500 font-bold uppercase tracking-wider text-[10px]">AUTH SCHEME:</span>
+                        <span className={`font-bold tracking-tight text-[10px] ${
+                          activeUser?.googleId ? 'text-emerald-700' : (activeUser?.githubId ? 'text-neutral-800' : 'text-brand-600')
+                        }`}>
                           {activeUser?.googleId ? 'GOOGLE OAUTH' : (activeUser?.githubId ? 'GITHUB OAUTH' : 'STANDARD JWT')}
                         </span>
                       </div>
-                      <div style={{ display: 'flex', justifyContent: 'space-between', borderBottom: '1px solid var(--border)', paddingBottom: '0.5rem' }}>
-                        <span style={{ color: 'var(--text-secondary)' }}>DEVELOPER SKILLS:</span>
-                        <span style={{ color: 'var(--text-primary)', fontWeight: 500 }}>
+                      <div className="flex justify-between items-center border-b border-neutral-200/60 pb-2.5">
+                        <span className="text-neutral-500 font-bold uppercase tracking-wider text-[10px]">SKILLS DIRECTORY:</span>
+                        <span className="text-neutral-900 font-semibold truncate max-w-[150px]" title={activeUser?.skills ? activeUser.skills.join(', ') : 'None'}>
                           {activeUser?.skills && activeUser.skills.length > 0 ? activeUser.skills.join(', ') : 'None configured'}
                         </span>
                       </div>
-                      <div style={{ display: 'flex', justifyContent: 'space-between', paddingBottom: '0.25rem' }}>
-                        <span style={{ color: 'var(--text-secondary)' }}>NODE CREATED:</span>
-                        <span style={{ color: 'var(--text-primary)', fontFamily: 'var(--font-mono)' }}>
+                      <div className="flex justify-between items-center">
+                        <span className="text-neutral-500 font-bold uppercase tracking-wider text-[10px]">CREATED AT:</span>
+                        <span className="text-neutral-900 font-semibold font-mono text-[10px]">
                           {activeUser?.createdAt ? new Date(activeUser.createdAt).toLocaleDateString() : new Date().toLocaleDateString()}
                         </span>
                       </div>
@@ -584,96 +547,80 @@ const Dashboard = () => {
 
                     <button 
                       onClick={() => navigate('/profile')}
-                      className="btn-primary" 
-                      style={{ 
-                        marginTop: '0.5rem', 
-                        background: 'none', 
-                        border: '1px solid var(--border)',
-                        color: 'var(--text-secondary)',
-                        fontSize: '0.9rem',
-                        fontWeight: 600,
-                        padding: '0.5rem',
-                        width: '100%',
-                        borderRadius: 'var(--radius-default)',
-                        cursor: 'pointer',
-                        display: 'flex',
-                        alignItems: 'center',
-                        justifyContent: 'center',
-                        gap: '6px'
-                      }}
+                      className="btn-secondary text-xs w-full py-2 flex items-center justify-center gap-1.5 shadow-2xs mt-2"
                     >
-                      <Settings size={14} />
-                      Edit Skills Node
+                      <Settings size={13} />
+                      Edit Developer Profile
                     </button>
                   </div>
                 )}
               </div>
  
               {/* Live Activity Feed */}
-              <div className="glass dashboard-card">
-                <div className="card-title">
-                  <span>Live Feed</span>
-                  <span style={{ fontSize: '0.8rem', color: 'var(--success)', letterSpacing: '0.5px' }}>REAL-TIME LOG</span>
+              <div className="dashboard-card glow-blue">
+                <div className="flex justify-between items-center mb-1">
+                  <span className="font-bold text-sm uppercase tracking-wider text-neutral-500">Live Feed</span>
+                  <span className="text-[10px] font-bold text-emerald-600 tracking-wider uppercase">REAL-TIME LOG</span>
                 </div>
 
-                <div className="activity-feed">
-                  <div className="feed-item">
-                    <div className="feed-item-icon">
+                <div className="flex flex-col gap-4 mt-2">
+                  <div className="flex gap-3 items-start">
+                    <div className="p-1.5 rounded-md bg-neutral-100 text-neutral-500 shrink-0">
                       <Terminal size={14} />
                     </div>
-                    <div className="feed-item-details">
-                      <span className="feed-text">
+                    <div className="flex-1 min-w-0 flex flex-col gap-0.5">
+                      <span className="text-xs text-neutral-600 leading-normal">
                         AI Agent generated 12 sub tasks for <strong>'Auth Integration'</strong>.
                       </span>
-                      <span className="feed-time">2 MINUTES AGO</span>
+                      <span className="text-[9px] font-bold text-neutral-400 tracking-wider uppercase">2 MINUTES AGO</span>
                     </div>
                   </div>
 
-                  <div className="feed-item">
-                    <div className="feed-item-icon warning">
+                  <div className="flex gap-3 items-start">
+                    <div className="p-1.5 rounded-md bg-amber-50 text-amber-600 border border-amber-100 shrink-0">
                       <AlertTriangle size={14} />
                     </div>
-                    <div className="feed-item-details">
-                      <span className="feed-text">
+                    <div className="flex-1 min-w-0 flex flex-col gap-0.5">
+                      <span className="text-xs text-neutral-600 leading-normal">
                         Deployment Blocked: Failed to resolve dependency <strong>@hackos/ui-core</strong>.
                       </span>
-                      <span className="feed-time">14 MINUTES AGO</span>
+                      <span className="text-[9px] font-bold text-neutral-400 tracking-wider uppercase">14 MINUTES AGO</span>
                     </div>
                   </div>
 
-                  <div className="feed-item">
-                    <div className="feed-item-icon success">
+                  <div className="flex gap-3 items-start">
+                    <div className="p-1.5 rounded-md bg-emerald-50 text-emerald-600 border border-emerald-100 shrink-0">
                       <CheckCircle size={14} />
                     </div>
-                    <div className="feed-item-details">
-                      <span className="feed-text">
+                    <div className="flex-1 min-w-0 flex flex-col gap-0.5">
+                      <span className="text-xs text-neutral-600 leading-normal">
                         <strong>{activeUser?.name || 'Developer'}</strong> verified authentication system successfully.
                       </span>
-                      <span className="feed-time">JUST NOW</span>
+                      <span className="text-[9px] font-bold text-neutral-400 tracking-wider uppercase">JUST NOW</span>
                     </div>
                   </div>
 
-                  <div className="feed-item">
-                    <div className="feed-item-icon">
+                  <div className="flex gap-3 items-start">
+                    <div className="p-1.5 rounded-md bg-neutral-100 text-neutral-500 shrink-0">
                       <Terminal size={14} />
                     </div>
-                    <div className="feed-item-details">
-                      <span className="feed-text">
+                    <div className="flex-1 min-w-0 flex flex-col gap-0.5">
+                      <span className="text-xs text-neutral-600 leading-normal">
                         System Standup scheduled for 09:00 UTC.
                       </span>
-                      <span className="feed-time">1 HOUR AGO</span>
+                      <span className="text-[9px] font-bold text-neutral-400 tracking-wider uppercase">1 HOUR AGO</span>
                     </div>
                   </div>
 
-                  <div className="feed-item">
-                    <div className="feed-item-icon success">
+                  <div className="flex gap-3 items-start">
+                    <div className="p-1.5 rounded-md bg-emerald-50 text-emerald-600 border border-emerald-100 shrink-0">
                       <ShieldCheck size={14} />
                     </div>
-                    <div className="feed-item-details">
-                      <span className="feed-text">
+                    <div className="flex-1 min-w-0 flex flex-col gap-0.5">
+                      <span className="text-xs text-neutral-600 leading-normal">
                         Milestone Reached: <strong>MVP Infrastructure</strong> complete.
                       </span>
-                      <span className="feed-time">3 HOURS AGO</span>
+                      <span className="text-[9px] font-bold text-neutral-400 tracking-wider uppercase">3 HOURS AGO</span>
                     </div>
                   </div>
                 </div>

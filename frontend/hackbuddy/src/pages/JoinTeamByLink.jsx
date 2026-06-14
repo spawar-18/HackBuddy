@@ -61,161 +61,35 @@ const JoinTeamByLink = () => {
   }, [user, loading, inviteCode, navigate]);
 
   return (
-    <div className="invite-page-container">
-      <style>{`
-        .invite-page-container {
-          background-color: var(--bg-deep);
-          min-height: 100vh;
-          width: 100%;
-          color: var(--text-secondary);
-          font-family: var(--font-sans);
-          display: flex;
-          justify-content: center;
-          align-items: center;
-          padding: 2.5rem 1rem;
-        }
-
-        .invite-card {
-          width: 100%;
-          max-width: 480px;
-          background: var(--bg-card-solid);
-          border: 1px solid var(--border);
-          border-radius: var(--radius-lg);
-          box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.05), 0 8px 10px -6px rgba(0, 0, 0, 0.05);
-          padding: 2.5rem;
-          text-align: center;
-          display: flex;
-          flex-direction: column;
-          align-items: center;
-          gap: 1.5rem;
-        }
-
-        .invite-icon-box {
-          background: var(--primary-glow);
-          color: var(--primary);
-          width: 64px;
-          height: 64px;
-          border-radius: var(--radius-default);
-          display: flex;
-          align-items: center;
-          justify-content: center;
-          margin-bottom: 0.5rem;
-        }
-
-        .invite-title {
-          font-size: 1.5rem;
-          font-weight: 800;
-          color: var(--text-primary);
-          margin: 0;
-        }
-
-        .invite-subtitle {
-          font-size: 0.95rem;
-          color: var(--text-muted);
-          margin: 0;
-        }
-
-        .invite-code-badge {
-          font-family: var(--font-mono);
-          font-weight: 700;
-          color: var(--primary);
-          background: var(--primary-glow);
-          border: 1px solid var(--border);
-          padding: 2px 8px;
-          border-radius: var(--radius-sm);
-          font-size: 0.85rem;
-          margin-left: 4px;
-        }
-
-        .status-container {
-          display: flex;
-          align-items: center;
-          justify-content: center;
-          gap: 10px;
-          font-size: 0.95rem;
-          color: var(--text-secondary);
-          font-weight: 500;
-        }
-
-        .status-spinner {
-          color: var(--primary);
-          animation: spin 1.5s linear infinite;
-        }
-
-        .info-alert {
-          width: 100%;
-          padding: 0.75rem 1rem;
-          border-radius: var(--radius-default);
-          font-size: 0.95rem;
-          font-weight: 500;
-          display: flex;
-          align-items: flex-start;
-          gap: 10px;
-          text-align: left;
-        }
-
-        .info-alert.error {
-          background: var(--danger-glow);
-          border: 1px solid var(--danger);
-          color: var(--danger);
-        }
-
-        .action-btn {
-          width: 100%;
-          padding: 0.75rem;
-          background: var(--primary);
-          border: none;
-          border-radius: var(--radius-default);
-          color: #ffffff;
-          font-weight: 700;
-          font-size: 1.05rem;
-          cursor: pointer;
-          transition: all 0.2s ease;
-          display: flex;
-          align-items: center;
-          justify-content: center;
-          gap: 8px;
-          margin-top: 0.5rem;
-        }
-
-        .action-btn:hover {
-          background: var(--primary-hover);
-          box-shadow: 0 4px 12px var(--primary-glow);
-        }
-
-        @keyframes spin {
-          to { transform: rotate(360deg); }
-        }
-      `}</style>
-
-      <div className="invite-card">
-        <div className="invite-icon-box">
-          <Users size={32} />
+    <div className="flex min-h-screen w-full items-center justify-center p-4 bg-neutral-50">
+      <div className="w-full max-w-[460px] bg-white border border-neutral-200 rounded-xl p-6 md:p-8 shadow-xs flex flex-col items-center text-center gap-5 animate-slide-up">
+        <div className="w-14 h-14 bg-brand-50 text-brand-600 rounded-lg flex items-center justify-center mb-1">
+          <Users size={28} />
         </div>
         <div>
-          <h2 className="invite-title">HackBuddy Invitation</h2>
-          <p className="invite-subtitle" style={{ marginTop: '0.25rem' }}>
+          <h2 className="text-lg font-bold text-neutral-900 tracking-tight">HackBuddy Invitation</h2>
+          <p className="text-xs text-neutral-500 mt-1">
             Processing invitation code 
-            <span className="invite-code-badge">{inviteCode}</span>
+            <span className="font-mono font-bold text-brand-600 bg-brand-50 border border-brand-100 px-1.5 py-0.5 rounded text-xs ml-1">{inviteCode}</span>
           </p>
         </div>
         
         {status && (
-          <div className="status-container">
-            <RefreshCw className="status-spinner" size={18} />
+          <div className="flex items-center justify-center gap-2 text-sm text-neutral-600 font-semibold mt-2">
+            <RefreshCw className="text-brand-500 animate-spin" size={16} />
             <span>{status}</span>
           </div>
         )}
 
         {error && (
-          <div style={{ width: '100%', display: 'flex', flexDirection: 'column', gap: '1rem' }}>
-            <div className="info-alert error">
-              <AlertTriangle className="shrink-0" size={18} style={{ marginTop: '2px' }} />
+          <div className="w-full flex flex-col gap-3">
+            <div className="error-alert">
+              <AlertTriangle className="shrink-0" size={18} />
               <span>{error}</span>
             </div>
             <button 
               onClick={() => navigate('/dashboard')}
-              className="action-btn"
+              className="btn-primary w-full mt-2"
             >
               Go to Dashboard
             </button>

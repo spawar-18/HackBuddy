@@ -447,321 +447,16 @@ const ProjectHub = ({ teamId }) => {
   }
 
   return (
-    <div className="details-card project-hub-card">
-      <style>{`
-        /* Tailwind CSS polyfills — scoped to ProjectHub only */
-        .project-hub-card .flex { display: flex; }
-        .project-hub-card .flex-col { flex-direction: column; }
-        .project-hub-card .flex-1 { flex: 1 1 0%; min-height: 0; }
-        .project-hub-card .flex-wrap { flex-wrap: wrap; }
-        .project-hub-card .items-center { align-items: center; }
-        .project-hub-card .justify-between { justify-content: space-between; }
-        .project-hub-card .justify-start { justify-content: flex-start; }
-        .project-hub-card .justify-end { justify-content: flex-end; }
-        .project-hub-card .justify-center { justify-content: center; }
-        .project-hub-card .gap-1 { gap: 0.25rem; }
-        .project-hub-card .gap-1\.5 { gap: 0.375rem; }
-        .project-hub-card .gap-2 { gap: 0.5rem; }
-        .project-hub-card .gap-3 { gap: 0.75rem; }
-        .project-hub-card .gap-4 { gap: 1rem; }
-        .project-hub-card .gap-6 { gap: 1.5rem; }
-        .project-hub-card .gap-8 { gap: 2rem; }
-        .project-hub-card .overflow-hidden { overflow: hidden; }
-        .project-hub-card .overflow-y-auto { overflow-y: auto; }
-        .project-hub-card .overflow-x-auto { overflow-x: auto; }
-        .project-hub-card .grid { display: grid; }
-        .project-hub-card .grid-cols-1 { grid-template-columns: repeat(1, minmax(0, 1fr)); }
-        @media (min-width: 768px) {
-          .project-hub-card .md\:grid-cols-2 { grid-template-columns: repeat(2, minmax(0, 1fr)); }
-        }
-        .project-hub-card .mb-1 { margin-bottom: 0.25rem; }
-        .project-hub-card .mb-2 { margin-bottom: 0.5rem; }
-        .project-hub-card .mt-2 { margin-top: 0.5rem; }
-        .project-hub-card .mt-4 { margin-top: 1rem; }
-        .project-hub-card .pt-4 { padding-top: 1rem; }
-        .project-hub-card .pb-2 { padding-bottom: 0.5rem; }
-        .project-hub-card .w-auto { width: auto; }
-        .project-hub-card .h-full { height: 100%; }
-        .project-hub-card .px-4 { padding-left: 1rem; padding-right: 1rem; }
-        .project-hub-card .py-3 { padding-top: 0.75rem; padding-bottom: 0.75rem; }
-        .project-hub-card .p-4 { padding: 1rem; }
-        .project-hub-card .py-2 { padding-top: 0.5rem; padding-bottom: 0.5rem; }
-        .project-hub-card .p-3 { padding: 0.75rem; }
-        .project-hub-card .px-2\.5 { padding-left: 0.625rem; padding-right: 0.625rem; }
-        .project-hub-card .py-1 { padding-top: 0.25rem; padding-bottom: 0.25rem; }
-        .project-hub-card .py-8 { padding-top: 2rem; padding-bottom: 2rem; }
-        .project-hub-card .px-6 { padding-left: 1.5rem; padding-right: 1.5rem; }
-        .project-hub-card .py-4 { padding-top: 1rem; padding-bottom: 1rem; }
-        .project-hub-card .px-3 { padding-left: 0.75rem; padding-right: 0.75rem; }
-        .project-hub-card .border-b { border-bottom: 1px solid var(--border); }
-        .project-hub-card .border-t { border-top: 1px solid var(--border); }
-        .project-hub-card .border-slate-200 { border-color: var(--border); }
-        .project-hub-card .border-slate-300 { border-color: #cbd5e1; }
-        .project-hub-card .border { border: 1px solid var(--border); }
-        
-        /* Font and text */
-        .project-hub-card .text-xs { font-size: 0.75rem; }
-        .project-hub-card .text-sm { font-size: 0.875rem; }
-        .project-hub-card .font-bold { font-weight: 700; }
-        .project-hub-card .font-semibold { font-weight: 600; }
-        .project-hub-card .italic { font-style: italic; }
-        .project-hub-card .text-center { text-align: center; }
-        .project-hub-card .rounded-full { border-radius: 9999px; }
-        .project-hub-card .rounded { border-radius: 0.25rem; }
-        
-        /* Colors */
-        .project-hub-card .text-slate-400 { color: var(--text-muted); }
-        .project-hub-card .text-slate-500 { color: var(--text-muted); }
-        .project-hub-card .text-slate-700 { color: var(--text-secondary); }
-        .project-hub-card .text-primary { color: var(--primary); }
-        
-        /* Status badges */
-        .project-hub-card .bg-amber-50 { background-color: rgba(245, 158, 11, 0.05); }
-        .project-hub-card .border-amber-200 { border-color: rgba(245, 158, 11, 0.2); }
-        .project-hub-card .text-amber-700 { color: #b45309; }
-        .project-hub-card .bg-blue-50 { background-color: rgba(0, 74, 198, 0.05); }
-        .project-hub-card .border-blue-200 { border-color: rgba(0, 74, 198, 0.2); }
-        .project-hub-card .text-blue-700 { color: var(--primary); }
-        .project-hub-card .bg-emerald-50 { background-color: rgba(0, 108, 73, 0.05); }
-        .project-hub-card .border-emerald-200 { border-color: rgba(0, 108, 73, 0.2); }
-        .project-hub-card .text-emerald-700 { color: var(--success); }
-        .project-hub-card .bg-slate-200 { background-color: var(--bg-deep); }
-        .project-hub-card .hover\:bg-slate-300:hover { background-color: var(--border); }
-        .project-hub-card .hover\:bg-slate-100:hover { background-color: rgba(0, 74, 198, 0.05); }
-        .project-hub-card .hover\:border-slate-400:hover { border-color: var(--primary); }
-        .project-hub-card .hover\:text-slate-700:hover { color: var(--text-secondary); }
-        
-        .project-hub-card .animate-spin {
-          animation: spin 1s linear infinite;
-        }
-
-        .project-hub-card {
-          position: relative;
-          overflow: visible;
-          transition: all 0.3s ease;
-        }
-
-        .hub-header {
-          display: flex;
-          align-items: center;
-          justify-content: space-between;
-          border-bottom: 1px solid var(--border);
-          padding-bottom: 1rem;
-          margin-bottom: 1.25rem;
-        }
-
-        .hub-title-container {
-          display: flex;
-          align-items: center;
-          gap: 12px;
-        }
-
-        .project-grid {
-          display: flex;
-          flex-direction: column;
-          gap: 1.25rem;
-        }
-
-        .project-title {
-          font-size: 1.35rem;
-          font-weight: 800;
-          color: var(--text-primary);
-          margin: 0;
-        }
-
-        .project-section-title {
-          font-size: 0.8rem;
-          font-weight: 700;
-          color: var(--text-muted);
-          letter-spacing: 0.5px;
-          text-transform: uppercase;
-          margin-bottom: 0.5rem;
-          display: block;
-        }
-
-        .info-block {
-          background: var(--bg-deep);
-          border: 1px solid var(--border);
-          border-radius: var(--radius-lg);
-          padding: 1rem;
-        }
-
-        .info-value {
-          font-size: 0.95rem;
-          color: var(--text-secondary);
-          line-height: 1.5;
-        }
-
-        .features-list {
-          display: flex;
-          flex-direction: column;
-          gap: 0.5rem;
-        }
-
-        .feature-item {
-          display: flex;
-          align-items: center;
-          gap: 8px;
-          font-size: 0.9rem;
-          color: var(--text-secondary);
-          background: var(--bg-deep);
-          border: 1px solid var(--border);
-          border-radius: var(--radius-default);
-          padding: 0.5rem 0.75rem;
-        }
-
-        .btn-edit {
-          background: var(--primary-glow);
-          color: var(--primary);
-          border: 1px solid var(--primary);
-          border-radius: var(--radius-default);
-          padding: 0.5rem 1rem;
-          font-size: 0.85rem;
-          font-weight: 700;
-          cursor: pointer;
-          transition: all 0.2s;
-          display: flex;
-          align-items: center;
-          gap: 6px;
-        }
-
-        .btn-edit:hover {
-          background: var(--primary);
-          color: #ffffff;
-        }
-
-        .btn-delete {
-          background: var(--danger-glow);
-          color: var(--danger);
-          border: 1px solid var(--danger);
-          border-radius: var(--radius-default);
-          padding: 0.5rem 1rem;
-          font-size: 0.85rem;
-          font-weight: 700;
-          cursor: pointer;
-          transition: all 0.2s;
-          display: flex;
-          align-items: center;
-          gap: 6px;
-          margin-top: 10px;
-        }
-
-        .btn-delete:hover {
-          background: var(--danger);
-          color: #ffffff;
-        }
-
-        .btn-action-primary {
-          background: var(--primary);
-          color: #ffffff;
-          border: none;
-          border-radius: var(--radius-default);
-          padding: 0.65rem 1.25rem;
-          font-size: 0.9rem;
-          font-weight: 700;
-          cursor: pointer;
-          transition: all 0.2s;
-          display: flex;
-          align-items: center;
-          justify-content: center;
-          gap: 8px;
-          width: fit-content;
-        }
-
-        .btn-action-primary:hover:not(:disabled) {
-          background: var(--primary-hover);
-          box-shadow: 0 0 15px var(--primary-glow);
-        }
-
-        .form-group-project {
-          display: flex;
-          flex-direction: column;
-          gap: 0.35rem;
-          margin-bottom: 1rem;
-        }
-
-        .form-label-project {
-          font-size: 0.85rem;
-          font-weight: 700;
-          color: var(--text-muted);
-        }
-
-        .form-input-project {
-          background: var(--bg-deep);
-          border: 1px solid var(--border);
-          color: var(--text-primary);
-          border-radius: var(--radius-default);
-          padding: 0.65rem 0.85rem;
-          font-size: 0.9rem;
-          outline: none;
-          transition: border-color 0.2s;
-          width: 100%;
-        }
-
-        .form-input-project:focus {
-          border-color: var(--border-focus);
-        }
-
-        .dynamic-features-box {
-          border: 1px solid var(--border);
-          border-radius: var(--radius-lg);
-          padding: 1rem;
-          background: var(--bg-deep);
-        }
-
-        .feature-badge {
-          display: flex;
-          align-items: center;
-          gap: 6px;
-          background: var(--bg-card-solid);
-          border: 1px solid var(--border);
-          padding: 4px 10px;
-          border-radius: var(--radius-full);
-          font-size: 0.8rem;
-          font-weight: 600;
-          color: var(--text-secondary);
-        }
-
-        .delete-btn-feature {
-          background: none;
-          border: none;
-          color: var(--danger);
-          cursor: pointer;
-          padding: 0;
-          display: flex;
-          align-items: center;
-        }
-
-        .delete-btn-feature:hover {
-          opacity: 0.8;
-        }
-
-        .prompt-container {
-          display: flex;
-          flex-direction: column;
-          align-items: center;
-          text-align: center;
-          padding: 2rem 1rem;
-          gap: 1rem;
-        }
-
-        .prompt-icon-container {
-          background: var(--primary-glow);
-          color: var(--primary);
-          padding: 1rem;
-          border-radius: 50%;
-        }
-      `}</style>
-
+    <div className="bg-white border border-neutral-200 rounded-xl p-6 shadow-xs flex flex-col gap-5">
       {/* Header */}
-      <div className="hub-header">
-        <div className="hub-title-container">
-          <div className="icon-box" style={{ background: 'var(--primary-glow)', color: 'var(--primary)' }}>
+      <div className="flex justify-between items-center border-b border-neutral-100 pb-4">
+        <div className="flex items-center gap-3">
+          <div className="w-10 h-10 bg-brand-50 text-brand-600 rounded-lg flex items-center justify-center shrink-0">
             <FolderGit2 size={20} />
           </div>
           <div>
-            <h2 style={{ fontSize: '1.1rem', fontWeight: 700, margin: 0, textTransform: 'uppercase' }}>Project Hub</h2>
-            <p style={{ fontSize: '0.85rem', color: 'var(--text-muted)', margin: 0 }}>Manage project details, tracks, and features</p>
+            <h2 className="text-xs font-bold text-neutral-500 tracking-wider uppercase">Project Hub</h2>
+            <p className="text-xs text-neutral-400 mt-0.5">Manage project details, tracks, and features</p>
           </div>
         </div>
         {view === 'dashboard' && project && getStatusBadge(project.status)}
@@ -769,84 +464,77 @@ const ProjectHub = ({ teamId }) => {
 
       {/* Dashboard View */}
       {view === 'dashboard' && project && (
-        <div className="project-grid">
+        <div className="flex flex-col gap-5">
           <div>
-            <h1 className="project-title mb-1">{project.projectName}</h1>
-            <div className="flex gap-4 text-xs font-semibold text-slate-500">
-              {project.track && <span>Track: <b className="text-primary">{project.track}</b></span>}
-              {project.duration && <span>Duration: <b className="text-primary">{project.duration}</b></span>}
+            <h1 className="text-xl font-extrabold text-neutral-900 tracking-tight">{project.projectName}</h1>
+            <div className="flex gap-4 text-[10px] font-bold text-neutral-400 uppercase tracking-wider mt-1.5">
+              {project.track && <span>Track: <b className="text-brand-600">{project.track}</b></span>}
+              {project.duration && <span>Duration: <b className="text-brand-600">{project.duration}</b></span>}
             </div>
           </div>
 
           {/* Problem Statement */}
-          <div>
-            <span className="project-section-title">Problem Statement</span>
-            <div className="info-block" style={{ borderLeft: '4px solid var(--danger)' }}>
-              <p className="info-value" style={{ fontWeight: 500, color: 'var(--text-primary)' }}>
+          <div className="flex flex-col gap-1.5">
+            <span className="text-[10px] font-bold text-neutral-400 tracking-wider uppercase">Problem Statement</span>
+            <div className="bg-neutral-50 border border-neutral-200 border-l-4 border-l-red-500 rounded-lg p-4">
+              <p className="text-xs font-semibold text-neutral-800 leading-relaxed">
                 {project.problemStatement}
               </p>
             </div>
           </div>
 
           {project.description && (
-            <div>
-              <span className="project-section-title">Description</span>
-              <div className="info-block">
-                <p className="info-value">{project.description}</p>
+            <div className="flex flex-col gap-1.5">
+              <span className="text-[10px] font-bold text-neutral-400 tracking-wider uppercase">Description</span>
+              <div className="bg-neutral-50 border border-neutral-200 rounded-lg p-4">
+                <p className="text-xs text-neutral-600 leading-relaxed">{project.description}</p>
               </div>
             </div>
           )}
 
-          <div>
-            <span className="project-section-title">Features Checklist</span>
-            <div className="features-list">
+          {/* Features Checklist */}
+          <div className="flex flex-col gap-2">
+            <span className="text-[10px] font-bold text-neutral-400 tracking-wider uppercase">Features Checklist</span>
+            <div className="flex flex-col gap-2">
               {project.featuresToBuild && project.featuresToBuild.length > 0 ? (
                 project.featuresToBuild.map((feature, idx) => (
-                  <div key={idx} className="feature-item">
-                    <ListTodo size={14} style={{ color: 'var(--primary)', flexShrink: 0 }} />
+                  <div key={idx} className="flex items-center gap-2.5 bg-neutral-50 border border-neutral-200/60 rounded-lg px-3 py-2 text-xs font-medium text-neutral-700">
+                    <ListTodo size={14} className="text-brand-500 shrink-0" />
                     <span>{feature}</span>
                   </div>
                 ))
               ) : (
-                <p style={{ fontSize: '0.85rem', color: 'var(--text-muted)', fontStyle: 'italic' }}>
+                <p className="text-xs text-neutral-400 italic">
                   No features configured yet. Click Edit Project to add features.
                 </p>
               )}
             </div>
           </div>
 
-          {/* AI Project Review Card */}
-          <div className="glass" style={{
-            background: 'var(--bg-deep)',
-            border: '1px solid var(--border)',
-            borderRadius: 'var(--radius-lg)',
-            padding: '1.25rem',
-            marginTop: '0.5rem',
-            borderLeft: '4px solid var(--primary)'
-          }}>
-            <div style={{ display: 'flex', alignItems: 'center', gap: '8px', marginBottom: '0.5rem' }}>
-              <Cpu size={16} style={{ color: 'var(--primary)' }} />
-              <h3 style={{ fontSize: '0.95rem', fontWeight: 700, color: 'var(--text-primary)', margin: 0 }}>
+          {/* AI Project Review Trigger Block */}
+          <div className="bg-neutral-50 border border-neutral-200 rounded-xl p-5 border-l-4 border-l-brand-500 flex flex-col gap-3 mt-2 shadow-2xs">
+            <div className="flex items-center gap-2">
+              <Cpu size={16} className="text-brand-500" />
+              <h3 className="text-xs font-bold text-neutral-700 uppercase tracking-wider">
                 AI Project Review
               </h3>
             </div>
-            <p style={{ fontSize: '0.85rem', color: 'var(--text-muted)', marginBottom: '1rem', lineHeight: '1.4' }}>
+            <p className="text-xs text-neutral-500 leading-relaxed">
               Analyze the project's feasibility, risks, scope, missing skills, and improvement opportunities.
             </p>
             
             {reviewLoading ? (
-              <div style={{ display: 'flex', alignItems: 'center', gap: '8px', fontSize: '0.85rem', color: 'var(--text-secondary)' }}>
-                <RefreshCw className="spin animate-spin" size={14} style={{ color: 'var(--primary)' }} />
+              <div className="flex items-center gap-2.5 py-1 text-neutral-500 text-xs">
+                <RefreshCw className="animate-spin text-brand-500" size={14} />
                 <span>Analyzing Project...</span>
               </div>
             ) : (
-              <div style={{ display: 'flex', gap: '8px', flexWrap: 'wrap' }}>
+              <div className="flex gap-2 flex-wrap mt-1">
                 {!project.projectReview ? (
                   <button
                     type="button"
                     onClick={handleRunAnalysis}
-                    className="btn-action-primary"
-                    style={{ padding: '0.4rem 1rem', fontSize: '0.85rem', borderRadius: 'var(--radius-default)', width: 'auto' }}
+                    className="btn-primary text-xs py-1.5 px-3 cursor-pointer shadow-2xs w-fit"
                   >
                     Analyze Project
                   </button>
@@ -855,30 +543,21 @@ const ProjectHub = ({ teamId }) => {
                     <button
                       type="button"
                       onClick={() => setView('review-report')}
-                      className="btn-action-primary"
-                      style={{ padding: '0.4rem 1rem', fontSize: '0.85rem', borderRadius: 'var(--radius-default)', width: 'auto' }}
+                      className="btn-primary text-xs py-1.5 px-3 cursor-pointer shadow-2xs w-fit"
                     >
                       View Review
                     </button>
                     <button
                       type="button"
                       onClick={openMentorChat}
-                      className="btn-action-primary"
-                      style={{ 
-                        padding: '0.4rem 1rem', 
-                        fontSize: '0.85rem', 
-                        borderRadius: 'var(--radius-default)', 
-                        width: 'auto',
-                        background: 'var(--tertiary)' 
-                      }}
+                      className="btn-secondary text-xs py-1.5 px-3 cursor-pointer w-fit border-brand-200 bg-brand-50/20 text-brand-700 hover:bg-brand-50/40"
                     >
                       Open AI Mentor
                     </button>
                     <button
                       type="button"
                       onClick={handleRunAnalysis}
-                      className="btn-edit"
-                      style={{ padding: '0.4rem 1rem', fontSize: '0.85rem', borderRadius: 'var(--radius-default)', height: 'auto' }}
+                      className="btn-secondary text-xs py-1.5 px-3 cursor-pointer w-fit"
                     >
                       Regenerate Review
                     </button>
@@ -888,17 +567,17 @@ const ProjectHub = ({ teamId }) => {
             )}
           </div>
 
-          <div className="flex justify-between items-center border-t border-slate-200 pt-4 mt-2">
+          <div className="flex justify-between items-center border-t border-neutral-100 pt-4 mt-2">
             <button 
               onClick={enterEditMode}
-              className="btn-edit"
+              className="btn-secondary text-xs flex items-center gap-1.5 py-1.5 px-3 cursor-pointer"
               disabled={actionLoading}
             >
               <Edit3 size={14} /> Edit Project
             </button>
             <button 
               onClick={handleDeleteProject}
-              className="btn-delete"
+              className="btn-danger text-xs flex items-center gap-1.5 py-1.5 px-3 cursor-pointer"
               disabled={actionLoading}
             >
               <Trash2 size={14} /> Delete Project
@@ -909,171 +588,156 @@ const ProjectHub = ({ teamId }) => {
 
       {/* AI Project Review Report View */}
       {view === 'review-report' && project && project.projectReview && (
-        <div className="project-grid">
-          <div className="flex justify-between items-center border-b border-slate-200 pb-2 mb-2" style={{ borderBottom: '1px solid var(--border)' }}>
-            <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
-              <Cpu size={18} style={{ color: 'var(--primary)' }} />
-              <span style={{ fontSize: '0.95rem', fontWeight: 800, color: 'var(--text-primary)' }}>
+        <div className="flex flex-col gap-5">
+          <div className="flex justify-between items-center border-b border-neutral-100 pb-2 mb-2">
+            <div className="flex items-center gap-2">
+              <Cpu size={16} className="text-brand-500" />
+              <span className="text-xs font-bold text-neutral-800 uppercase tracking-wider">
                 AI Project Review Report
               </span>
             </div>
             <button 
               type="button" 
               onClick={() => setView('dashboard')}
-              className="flex items-center gap-1 text-slate-500 hover:text-slate-700 text-xs font-semibold"
-              style={{ background: 'none', border: 'none', cursor: 'pointer' }}
+              className="flex items-center gap-1 text-neutral-500 hover:text-neutral-900 text-xs font-semibold cursor-pointer border-0 bg-transparent"
             >
-              <ArrowLeft size={12} /> Back to Dashboard
+              <ArrowLeft size={12} /> Back
             </button>
           </div>
 
-          {/* Report generated timestamp */}
           {project.projectReviewGeneratedAt && (
-            <div style={{ fontSize: '0.75rem', color: 'var(--text-muted)', fontStyle: 'italic', marginTop: '-0.5rem' }}>
-              Generated on: {new Date(project.projectReviewGeneratedAt).toLocaleString()}
+            <div className="text-[10px] text-neutral-400 font-semibold uppercase tracking-wider mt-[-8px]">
+              Generated: {new Date(project.projectReviewGeneratedAt).toLocaleString()}
             </div>
           )}
 
           {/* 1. Feasibility Score */}
-          <div>
-            <span className="project-section-title">Feasibility Score</span>
-            <div style={{ 
-              background: 'var(--bg-deep)', 
-              border: '1px solid var(--border)', 
-              borderRadius: 'var(--radius-lg)', 
-              padding: '1.25rem',
-              display: 'flex',
-              alignItems: 'center',
-              justifyContent: 'space-between'
-            }}>
+          <div className="flex flex-col gap-1.5">
+            <span className="text-[10px] font-bold text-neutral-400 tracking-wider uppercase">Feasibility Score</span>
+            <div className="bg-neutral-50 border border-neutral-200 rounded-xl p-4 flex items-center justify-between gap-4">
               <div>
-                <div style={{ fontSize: '2.5rem', fontWeight: 800, color: 'var(--primary)', fontFamily: 'var(--font-mono)' }}>
-                  {project.projectReview.feasibilityScore?.toFixed(1) || 'N/A'}<span style={{ fontSize: '1.2rem', color: 'var(--text-muted)' }}> / 10</span>
+                <div className="text-3xl font-extrabold text-brand-500 font-mono">
+                  {project.projectReview.feasibilityScore?.toFixed(1) || 'N/A'}<span className="text-sm text-neutral-400 font-normal"> / 10</span>
                 </div>
-                <div style={{ fontSize: '0.8rem', color: 'var(--text-secondary)', fontWeight: 600, marginTop: '4px' }}>
+                <div className="text-[10px] font-bold text-neutral-400 tracking-wider uppercase mt-1">
                   PROTOTYPE BUILD READINESS
                 </div>
               </div>
               
-              {/* Micro-meter visual */}
-              <div style={{ 
-                width: '120px', 
-                height: '8px', 
-                background: 'var(--border)', 
-                borderRadius: '4px',
-                position: 'relative',
-                overflow: 'hidden'
-              }}>
-                <div style={{ 
-                  width: `${(project.projectReview.feasibilityScore || 5) * 10}%`, 
-                  height: '100%', 
-                  background: (project.projectReview.feasibilityScore || 5) >= 8 ? 'var(--success)' : ((project.projectReview.feasibilityScore || 5) >= 5 ? 'var(--primary)' : 'var(--danger)')
-                }}></div>
+              <div className="w-32 h-2 bg-neutral-200 rounded-full relative overflow-hidden border border-neutral-200/20">
+                <div 
+                  className={`h-full rounded-full transition-all duration-500 ${
+                    (project.projectReview.feasibilityScore || 5) >= 8 
+                      ? 'bg-emerald-500' 
+                      : (project.projectReview.feasibilityScore || 5) >= 5 
+                        ? 'bg-brand-500' 
+                        : 'bg-red-500'
+                  }`}
+                  style={{ width: `${(project.projectReview.feasibilityScore || 5) * 10}%` }}
+                ></div>
               </div>
             </div>
           </div>
 
           {/* 2. Problem-Solution Alignment */}
-          <div>
-            <span className="project-section-title">Problem-Solution Alignment</span>
-            <div className="info-block" style={{ borderLeft: '4px solid var(--success)' }}>
-              <p className="info-value">{project.projectReview.problemSolutionAlignment}</p>
+          <div className="flex flex-col gap-1.5">
+            <span className="text-[10px] font-bold text-neutral-400 tracking-wider uppercase">Problem-Solution Alignment</span>
+            <div className="bg-neutral-50 border border-neutral-200 border-l-4 border-l-emerald-500 rounded-xl p-4">
+              <p className="text-xs text-neutral-600 leading-relaxed">{project.projectReview.problemSolutionAlignment}</p>
             </div>
           </div>
 
           {/* 3. Project Risks */}
-          <div>
-            <span className="project-section-title">Project Risks</span>
-            <div className="info-block" style={{ borderLeft: '4px solid var(--danger)' }}>
-              <ul style={{ paddingLeft: '1.2rem', margin: 0, display: 'flex', flexDirection: 'column', gap: '0.4rem' }}>
+          <div className="flex flex-col gap-1.5">
+            <span className="text-[10px] font-bold text-neutral-400 tracking-wider uppercase">Project Risks</span>
+            <div className="bg-neutral-50 border border-neutral-200 border-l-4 border-l-red-500 rounded-xl p-4">
+              <ul className="list-disc pl-4 flex flex-col gap-2">
                 {project.projectReview.projectRisks?.map((risk, idx) => (
-                  <li key={idx} className="info-value">{risk}</li>
+                  <li key={idx} className="text-xs text-neutral-600 leading-relaxed">{risk}</li>
                 ))}
               </ul>
             </div>
           </div>
 
           {/* 4. Missing Skills */}
-          <div>
-            <span className="project-section-title">Missing Skills</span>
-            <div className="info-block" style={{ borderLeft: '4px solid var(--text-muted)' }}>
-              <ul style={{ paddingLeft: '1.2rem', margin: 0, display: 'flex', flexDirection: 'column', gap: '0.4rem' }}>
+          <div className="flex flex-col gap-1.5">
+            <span className="text-[10px] font-bold text-neutral-400 tracking-wider uppercase">Missing Skills</span>
+            <div className="bg-neutral-50 border border-neutral-200 border-l-4 border-l-neutral-400 rounded-xl p-4">
+              <ul className="list-disc pl-4 flex flex-col gap-2">
                 {project.projectReview.missingSkills?.map((skill, idx) => (
-                  <li key={idx} className="info-value">{skill}</li>
+                  <li key={idx} className="text-xs text-neutral-600 leading-relaxed">{skill}</li>
                 ))}
               </ul>
             </div>
           </div>
 
           {/* 5. Must Build Features */}
-          <div>
-            <span className="project-section-title">Must Build Features (High Priority)</span>
-            <div className="info-block" style={{ borderLeft: '4px solid var(--primary)' }}>
-              <ul style={{ paddingLeft: '1.2rem', margin: 0, display: 'flex', flexDirection: 'column', gap: '0.4rem' }}>
+          <div className="flex flex-col gap-1.5">
+            <span className="text-[10px] font-bold text-neutral-400 tracking-wider uppercase">Must Build Features (High Priority)</span>
+            <div className="bg-neutral-50 border border-neutral-200 border-l-4 border-l-brand-500 rounded-xl p-4">
+              <ul className="list-disc pl-4 flex flex-col gap-2">
                 {project.projectReview.mustBuildFeatures?.map((feat, idx) => (
-                  <li key={idx} className="info-value" style={{ fontWeight: 600 }}>{feat}</li>
+                  <li key={idx} className="text-xs font-semibold text-neutral-850 leading-relaxed">{feat}</li>
                 ))}
               </ul>
             </div>
           </div>
 
           {/* 6. Optional Features */}
-          <div>
-            <span className="project-section-title">Optional Features (Nice to Have)</span>
-            <div className="info-block">
-              <ul style={{ paddingLeft: '1.2rem', margin: 0, display: 'flex', flexDirection: 'column', gap: '0.4rem' }}>
+          <div className="flex flex-col gap-1.5">
+            <span className="text-[10px] font-bold text-neutral-400 tracking-wider uppercase">Optional Features (Nice to Have)</span>
+            <div className="bg-neutral-50 border border-neutral-200 rounded-xl p-4">
+              <ul className="list-disc pl-4 flex flex-col gap-2">
                 {project.projectReview.optionalFeatures?.map((feat, idx) => (
-                  <li key={idx} className="info-value">{feat}</li>
+                  <li key={idx} className="text-xs text-neutral-600 leading-relaxed">{feat}</li>
                 ))}
               </ul>
             </div>
           </div>
 
           {/* 7. Features To Remove */}
-          <div>
-            <span className="project-section-title">Features To Remove (Increases Complexity)</span>
-            <div className="info-block" style={{ borderLeft: '4px solid rgba(220, 38, 38, 0.3)' }}>
+          <div className="flex flex-col gap-1.5">
+            <span className="text-[10px] font-bold text-neutral-400 tracking-wider uppercase">Features To Remove (Increases Complexity)</span>
+            <div className="bg-neutral-50 border border-neutral-200 border-l-4 border-l-red-350 rounded-xl p-4">
               {project.projectReview.featuresToRemove && project.projectReview.featuresToRemove.length > 0 ? (
-                <ul style={{ paddingLeft: '1.2rem', margin: 0, display: 'flex', flexDirection: 'column', gap: '0.4rem' }}>
+                <ul className="list-disc pl-4 flex flex-col gap-2">
                   {project.projectReview.featuresToRemove.map((feat, idx) => (
-                    <li key={idx} className="info-value" style={{ color: 'var(--danger)' }}>{feat}</li>
+                    <li key={idx} className="text-xs text-red-650 leading-relaxed">{feat}</li>
                   ))}
                 </ul>
               ) : (
-                <p style={{ fontSize: '0.85rem', color: 'var(--text-muted)', margin: 0, fontStyle: 'italic' }}>
-                  No features recommended for removal.
-                </p>
+                <p className="text-xs text-neutral-400 italic">No features recommended for removal.</p>
               )}
             </div>
           </div>
 
           {/* 8. Improvement Suggestions */}
-          <div>
-            <span className="project-section-title">Improvement Suggestions</span>
-            <div className="info-block">
-              <ul style={{ paddingLeft: '1.2rem', margin: 0, display: 'flex', flexDirection: 'column', gap: '0.4rem' }}>
+          <div className="flex flex-col gap-1.5">
+            <span className="text-[10px] font-bold text-neutral-400 tracking-wider uppercase">Improvement Suggestions</span>
+            <div className="bg-neutral-50 border border-neutral-200 rounded-xl p-4">
+              <ul className="list-disc pl-4 flex flex-col gap-2">
                 {project.projectReview.improvementSuggestions?.map((suggestion, idx) => (
-                  <li key={idx} className="info-value">{suggestion}</li>
+                  <li key={idx} className="text-xs text-neutral-600 leading-relaxed">{suggestion}</li>
                 ))}
               </ul>
             </div>
           </div>
 
           {/* 9. Judge Perspective */}
-          <div>
-            <span className="project-section-title">Judge Perspective</span>
-            <div className="info-block" style={{ background: 'rgba(0, 74, 198, 0.02)', border: '1px solid var(--primary)' }}>
-              <p className="info-value" style={{ fontStyle: 'italic' }}>{project.projectReview.judgePerspective}</p>
+          <div className="flex flex-col gap-1.5">
+            <span className="text-[10px] font-bold text-neutral-400 tracking-wider uppercase">Judge Perspective</span>
+            <div className="bg-brand-50/10 border border-brand-500/30 border-l-4 border-l-brand-500 rounded-xl p-4">
+              <p className="text-xs text-neutral-600 leading-relaxed italic">{project.projectReview.judgePerspective}</p>
             </div>
           </div>
 
           {/* 10. Execution Strategy */}
-          <div>
-            <span className="project-section-title">Execution Strategy</span>
-            <div className="info-block">
-              <ol style={{ paddingLeft: '1.2rem', margin: 0, display: 'flex', flexDirection: 'column', gap: '0.4rem' }}>
+          <div className="flex flex-col gap-1.5">
+            <span className="text-[10px] font-bold text-neutral-400 tracking-wider uppercase">Execution Strategy</span>
+            <div className="bg-neutral-50 border border-neutral-200 rounded-xl p-4">
+              <ol className="list-decimal pl-4 flex flex-col gap-2">
                 {project.projectReview.executionStrategy?.map((step, idx) => (
-                  <li key={idx} className="info-value" style={{ fontWeight: 500 }}>{step}</li>
+                  <li key={idx} className="text-xs font-semibold text-neutral-700 leading-relaxed">{step}</li>
                 ))}
               </ol>
             </div>
@@ -1081,29 +745,27 @@ const ProjectHub = ({ teamId }) => {
 
           {/* Reasoning */}
           {project.projectReview.reasoning && (
-            <div>
-              <span className="project-section-title">Architect Reasoning</span>
-              <div className="info-block">
-                <p className="info-value">{project.projectReview.reasoning}</p>
+            <div className="flex flex-col gap-1.5">
+              <span className="text-[10px] font-bold text-neutral-400 tracking-wider uppercase">Architect Reasoning</span>
+              <div className="bg-neutral-50 border border-neutral-200 rounded-xl p-4">
+                <p className="text-xs text-neutral-600 leading-relaxed">{project.projectReview.reasoning}</p>
               </div>
             </div>
           )}
 
-          <div className="flex gap-3 justify-end mt-4 pt-4 border-t border-slate-200">
+          <div className="flex gap-3 justify-end mt-4 pt-4 border-t border-neutral-100">
             <button
               type="button"
               onClick={handleRunAnalysis}
               disabled={reviewLoading}
-              className="btn-action-primary"
-              style={{ fontSize: '0.85rem', borderRadius: 'var(--radius-default)', padding: '0.5rem 1rem', width: 'auto' }}
+              className="btn-primary text-xs py-1.5 px-3 cursor-pointer shadow-2xs"
             >
               Regenerate Review
             </button>
             <button
               type="button"
               onClick={() => setView('dashboard')}
-              className="btn-edit"
-              style={{ fontSize: '0.85rem', borderRadius: 'var(--radius-default)', padding: '0.5rem 1rem', height: 'auto' }}
+              className="btn-secondary text-xs py-1.5 px-3 cursor-pointer"
             >
               Back
             </button>
@@ -1113,62 +775,49 @@ const ProjectHub = ({ teamId }) => {
 
       {/* AI Mentor Chat View */}
       {view === 'mentor-chat' && project && (
-        <div className="flex flex-col overflow-hidden" style={{
-          background: 'var(--bg-card-solid)',
-          border: '1px solid var(--border)',
-          borderRadius: 'var(--radius-lg)',
-          color: 'var(--text-primary)',
-          height: '550px'
-        }}>
+        <div className="flex flex-col overflow-hidden bg-white border border-neutral-200 rounded-xl h-[550px] shadow-xs w-full">
           {/* Header */}
-          <div className="flex justify-between items-center px-4 py-3 border-b" style={{ borderBottom: '1px solid var(--border)' }}>
-            <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
-              <div style={{ 
-                background: 'var(--primary-glow)', 
-                color: 'var(--primary)',
-                padding: '6px',
-                borderRadius: '50%'
-              }}>
-                <Cpu size={20} />
+          <div className="flex justify-between items-center px-4 py-3 border-b border-neutral-100 bg-white sticky top-0 z-10 shrink-0">
+            <div className="flex items-center gap-2.5">
+              <div className="w-8 h-8 rounded-full bg-brand-50 text-brand-600 flex items-center justify-center shrink-0">
+                <Cpu size={16} />
               </div>
               <div>
-                <h2 style={{ fontSize: '1.05rem', fontWeight: 700, margin: 0 }}>AI Mentor</h2>
-                <p style={{ fontSize: '0.8rem', color: 'var(--text-muted)', margin: 0 }}>
-                  Ask questions about your project, scope, risks, judging, and execution.
+                <h2 className="text-sm font-bold text-neutral-900 leading-tight">AI Mentor</h2>
+                <p className="text-[10px] text-neutral-400 leading-none mt-0.5">
+                  Ask questions about your project scope, risks, pitch, and execution.
                 </p>
               </div>
             </div>
             <button 
               type="button" 
               onClick={() => setView('dashboard')}
-              className="flex items-center gap-1 text-slate-500 hover:text-slate-700 text-xs font-semibold"
-              style={{ background: 'none', border: 'none', cursor: 'pointer' }}
+              className="flex items-center gap-1 text-neutral-500 hover:text-neutral-900 text-xs font-semibold cursor-pointer border-0 bg-transparent"
             >
-              <ArrowLeft size={12} /> Back to Dashboard
+              <ArrowLeft size={12} /> Back
             </button>
           </div>
 
           {/* Messages Window */}
           <div 
             ref={messagesContainerRef}
-            className="flex-1 overflow-y-auto p-4 flex flex-col gap-3" 
-            style={{ background: 'var(--bg-deep)', minHeight: 0 }}
+            className="flex-1 overflow-y-auto p-4 flex flex-col gap-3.5 bg-neutral-50/50 min-h-0"
           >
             {historyLoading ? (
-              <div className="flex flex-col items-center justify-center h-full text-slate-400">
-                <RefreshCw className="spin animate-spin mb-2" size={24} style={{ color: 'var(--primary)' }} />
+              <div className="flex flex-col items-center justify-center h-full text-neutral-400">
+                <RefreshCw className="animate-spin text-brand-500 mb-2" size={20} />
                 <span className="text-xs font-semibold">Loading conversation history...</span>
               </div>
             ) : chatMessages.length === 0 ? (
               <div className="flex flex-col items-center justify-center h-full text-center px-6 py-4">
-                <div style={{ background: 'var(--primary-glow)', color: 'var(--primary)', padding: '12px', borderRadius: '50%', marginBottom: '12px' }}>
-                  <Cpu size={28} />
+                <div className="w-12 h-12 rounded-full bg-brand-50 text-brand-600 flex items-center justify-center mb-3">
+                  <Cpu size={24} />
                 </div>
-                <h4 style={{ fontWeight: 700, color: 'var(--text-primary)', marginBottom: '4px' }}>Ask the AI Mentor anything</h4>
-                <p style={{ fontSize: '0.85rem', color: 'var(--text-secondary)', maxWidth: '340px', lineHeight: '1.4', margin: '0 auto 12px auto' }}>
-                  The AI already understands your Problem Statement, Features, Team Skills, and Project Review, and can provide project-specific guidance.
+                <h4 className="font-bold text-neutral-900 text-sm">Ask the AI Mentor anything</h4>
+                <p className="text-xs text-neutral-500 max-w-[340px] leading-relaxed mt-1 mb-3 mx-auto">
+                  The AI mentor is fully context-aware of your problem statement, deliverables, team profile, and review report.
                 </p>
-                <div style={{ fontSize: '0.75rem', color: 'var(--text-muted)', fontStyle: 'italic' }}>
+                <div className="text-[10px] text-neutral-400 font-medium italic">
                   Try clicking one of the suggested questions below to start.
                 </div>
               </div>
@@ -1178,25 +827,13 @@ const ProjectHub = ({ teamId }) => {
                   key={msg._id} 
                   className={`flex ${msg.role === 'user' ? 'justify-end' : 'justify-start'}`}
                 >
-                  <div style={{ 
-                    maxWidth: '85%', 
-                    padding: '10px 14px', 
-                    borderRadius: 'var(--radius-lg)',
-                    fontSize: '0.9rem',
-                    lineHeight: '1.4',
-                    background: msg.role === 'user' ? 'var(--primary)' : 'rgba(0, 74, 198, 0.03)',
-                    color: msg.role === 'user' ? '#ffffff' : 'var(--text-primary)',
-                    border: msg.role === 'user' ? 'none' : '1px solid var(--border)',
-                    boxShadow: msg.role === 'user' ? 'none' : '0 2px 5px rgba(0,0,0,0.02)',
-                    whiteSpace: 'pre-wrap'
-                  }}>
+                  <div className={`max-w-[80%] p-3.5 rounded-2xl text-xs md:text-sm leading-relaxed shadow-3xs ${
+                    msg.role === 'user' 
+                      ? 'bg-neutral-900 text-white rounded-tr-xs' 
+                      : 'bg-white border border-neutral-200/80 text-neutral-800 rounded-tl-xs'
+                  }`}>
                     {msg.role === 'user' ? msg.message : renderMarkdown(msg.message)}
-                    <div style={{ 
-                      fontSize: '0.7rem', 
-                      marginTop: '4px', 
-                      textAlign: 'right', 
-                      color: msg.role === 'user' ? 'rgba(255,255,255,0.7)' : 'var(--text-muted)' 
-                    }}>
+                    <div className={`text-[9px] mt-1.5 text-right ${msg.role === 'user' ? 'text-white/60' : 'text-neutral-400'}`}>
                       {msg.createdAt ? new Date(msg.createdAt).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }) : 'Just now'}
                     </div>
                   </div>
@@ -1206,47 +843,24 @@ const ProjectHub = ({ teamId }) => {
             
             {/* Thinking / Typing indicator */}
             {chatLoading && (
-              <div className="flex justify-start">
-                <div style={{ 
-                  background: 'var(--bg-card-solid)', 
-                  border: '1px solid var(--border)',
-                  color: 'var(--text-primary)',
-                  padding: '10px 14px',
-                  borderRadius: 'var(--radius-lg)',
-                  fontSize: '0.85rem',
-                  display: 'flex',
-                  alignItems: 'center',
-                  gap: '8px'
-                }}>
-                  <RefreshCw className="spin animate-spin" size={12} style={{ color: 'var(--primary)' }} />
-                  <span style={{ fontWeight: 600 }}>AI Mentor is thinking...</span>
+              <div className="flex justify-start animate-pulse">
+                <div className="bg-white border border-neutral-200 text-neutral-800 p-3 rounded-2xl rounded-tl-xs text-xs flex items-center gap-2">
+                  <RefreshCw className="animate-spin text-brand-500" size={12} />
+                  <span className="font-semibold text-neutral-500">AI Mentor is drafting response...</span>
                 </div>
               </div>
             )}
 
             {/* Error Display */}
             {chatError && (
-              <div style={{ 
-                background: 'var(--danger-glow)', 
-                color: 'var(--danger)',
-                border: '1px solid var(--danger)',
-                padding: '8px 12px',
-                borderRadius: 'var(--radius-default)',
-                fontSize: '0.85rem',
-                textAlign: 'center'
-              }}>
+              <div className="bg-red-50 border border-red-200 text-red-800 px-3 py-2 rounded-lg text-xs text-center">
                 {chatError}
               </div>
             )}
           </div>
 
           {/* Quick Action Suggested Chips */}
-          <div className="px-4 py-2 flex gap-2 overflow-x-auto border-t" style={{ 
-            borderTop: '1px solid var(--border)',
-            background: 'var(--bg-card-solid)',
-            scrollbarWidth: 'none',
-            msOverflowStyle: 'none'
-          }}>
+          <div className="px-4 py-2 flex gap-2 overflow-x-auto border-t border-neutral-200 bg-white shrink-0 scrollbar-none">
             {[
               'Why is my score low?',
               'How can we improve?',
@@ -1262,19 +876,7 @@ const ProjectHub = ({ teamId }) => {
                 type="button"
                 disabled={chatLoading}
                 onClick={() => handleSendChatMessage(suggested)}
-                style={{ 
-                  whiteSpace: 'nowrap',
-                  fontSize: '0.75rem',
-                  fontWeight: 600,
-                  background: 'var(--bg-deep)',
-                  border: '1px solid var(--border)',
-                  color: 'var(--text-secondary)',
-                  padding: '4px 10px',
-                  borderRadius: '16px',
-                  cursor: 'pointer',
-                  transition: 'all 0.2s'
-                }}
-                className="hover:bg-slate-100 hover:border-slate-400"
+                className="px-3 py-1.5 bg-neutral-50 hover:bg-neutral-100 border border-neutral-200 text-xs font-semibold text-neutral-600 hover:text-neutral-900 rounded-full cursor-pointer transition-all shadow-3xs whitespace-nowrap"
               >
                 {suggested}
               </button>
@@ -1282,7 +884,7 @@ const ProjectHub = ({ teamId }) => {
           </div>
 
           {/* Text input area */}
-          <div className="p-3 border-t flex gap-2 items-center" style={{ borderTop: '1px solid var(--border)', background: 'var(--bg-card-solid)' }}>
+          <div className="p-3 bg-white border-t border-neutral-200 flex gap-2 items-center sticky bottom-0 z-10 shrink-0">
             <textarea
               rows={1}
               disabled={chatLoading}
@@ -1295,27 +897,14 @@ const ProjectHub = ({ teamId }) => {
                 }
               }}
               placeholder="Ask about your project..."
-              className="flex-1 form-input-project"
-              style={{ 
-                resize: 'none', 
-                borderRadius: 'var(--radius-default)',
-                padding: '8px 12px',
-                fontSize: '0.9rem',
-                maxHeight: '60px'
-              }}
+              className="flex-1 form-input"
+              style={{ resize: 'none', maxHeight: '42px' }}
             />
             <button
               type="button"
               disabled={chatLoading || !chatInput.trim()}
               onClick={() => handleSendChatMessage()}
-              className="btn-action-primary"
-              style={{ 
-                width: 'auto', 
-                padding: '0.5rem 1rem', 
-                fontSize: '0.85rem', 
-                borderRadius: 'var(--radius-default)',
-                flexShrink: 0
-              }}
+              className="btn-primary text-xs py-2 px-4 shadow-xs shrink-0 cursor-pointer"
             >
               Send
             </button>
@@ -1325,47 +914,47 @@ const ProjectHub = ({ teamId }) => {
 
       {/* Prompt Create View */}
       {view === 'create-prompt' && (
-        <div className="prompt-container">
-          <div className="prompt-icon-container">
-            <FolderGit2 size={32} />
+        <div className="flex flex-col items-center text-center py-8 px-4 gap-4 w-full">
+          <div className="w-12 h-12 rounded-full bg-brand-50 text-brand-600 flex items-center justify-center shadow-xs">
+            <FolderGit2 size={24} />
           </div>
           <div>
-            <h3 style={{ fontSize: '1.15rem', color: 'var(--text-primary)', fontWeight: 700, marginBottom: '0.5rem' }}>No Active Project</h3>
-            <p style={{ fontSize: '0.9rem', color: 'var(--text-muted)', maxWidth: '320px', margin: '0 auto' }}>
+            <h3 className="text-sm font-semibold text-neutral-900">No Active Project</h3>
+            <p className="text-xs text-neutral-400 mt-1 max-w-[280px] mx-auto leading-relaxed">
               Your team hasn't registered a project. Define your hackathon idea, select tracks, and manage development deliverables.
             </p>
           </div>
           <button 
-            className="btn-action-primary" 
+            className="btn-primary w-full flex items-center justify-center gap-1.5 cursor-pointer" 
             onClick={enterCreateMode}
           >
-            <Plus size={16} /> Define Team Project
+            <Plus size={15} /> Define Team Project
           </button>
         </div>
       )}
 
       {/* Create / Edit Form View */}
       {(view === 'create' || view === 'edit') && (
-        <form onSubmit={view === 'create' ? handleCreateProject : handleUpdateProject} className="flex flex-col gap-3">
-          <div className="flex justify-between items-center border-b border-slate-200 pb-2 mb-2">
-            <span style={{ fontSize: '0.95rem', fontWeight: 800, color: 'var(--text-primary)' }}>
+        <form onSubmit={view === 'create' ? handleCreateProject : handleUpdateProject} className="flex flex-col gap-4">
+          <div className="flex justify-between items-center border-b border-neutral-100 pb-2 mb-2">
+            <span className="text-xs font-bold text-neutral-800 uppercase tracking-wider">
               {view === 'create' ? 'Define Hackathon Project' : 'Edit Project Details'}
             </span>
             <button 
               type="button" 
               onClick={() => setView(project ? 'dashboard' : 'create-prompt')}
-              className="flex items-center gap-1 text-slate-500 hover:text-slate-700 text-xs font-semibold"
+              className="flex items-center gap-1 text-neutral-500 hover:text-neutral-900 text-xs font-semibold cursor-pointer border-0 bg-transparent"
             >
               <ArrowLeft size={12} /> Back
             </button>
           </div>
 
           {/* Project Name */}
-          <div className="form-group-project">
-            <label className="form-label-project">Project Name *</label>
+          <div className="form-group">
+            <label className="input-label">Project Name *</label>
             <input 
               type="text" 
-              className="form-input-project" 
+              className="form-input" 
               placeholder="e.g. HackBuddy Copilot" 
               value={projectName}
               onChange={(e) => setProjectName(e.target.value)}
@@ -1374,23 +963,23 @@ const ProjectHub = ({ teamId }) => {
           </div>
 
           {/* Track and Duration */}
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-2">
-            <div className="form-group-project">
-              <label className="form-label-project">Track (e.g. AI/ML, Web3)</label>
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+            <div className="form-group">
+              <label className="input-label">Track (e.g. AI/ML, Web3)</label>
               <input 
                 type="text" 
-                className="form-input-project" 
+                className="form-input" 
                 placeholder="e.g. AI/ML" 
                 value={track}
                 onChange={(e) => setTrack(e.target.value)}
               />
             </div>
 
-            <div className="form-group-project">
-              <label className="form-label-project">Hackathon Duration (e.g. 24h, 3 days)</label>
+            <div className="form-group">
+              <label className="input-label">Hackathon Duration (e.g. 24h, 3 days)</label>
               <input 
                 type="text" 
-                className="form-input-project" 
+                className="form-input" 
                 placeholder="e.g. 36 hours" 
                 value={duration}
                 onChange={(e) => setDuration(e.target.value)}
@@ -1399,27 +988,27 @@ const ProjectHub = ({ teamId }) => {
           </div>
 
           {/* Problem Statement */}
-          <div className="form-group-project">
-            <label className="form-label-project">Problem Statement *</label>
+          <div className="form-group">
+            <label className="input-label">Problem Statement *</label>
             <textarea 
               rows={3}
-              className="form-input-project" 
+              className="form-input resize-none" 
               placeholder="Describe the problem your project is solving."
               value={problemStatement}
               onChange={(e) => setProblemStatement(e.target.value)}
               required
             />
-            <span style={{ fontSize: '0.75rem', color: 'var(--text-muted)' }}>
+            <span className="text-[10px] text-neutral-400 font-semibold uppercase tracking-wider">
               Minimum 20 characters
             </span>
           </div>
 
           {/* Project Description */}
-          <div className="form-group-project">
-            <label className="form-label-project">Project Description</label>
+          <div className="form-group">
+            <label className="input-label">Project Description</label>
             <textarea 
               rows={3}
-              className="form-input-project" 
+              className="form-input resize-none" 
               placeholder="Provide a detailed description of your hackathon project..."
               value={description}
               onChange={(e) => setDescription(e.target.value)}
@@ -1428,10 +1017,10 @@ const ProjectHub = ({ teamId }) => {
 
           {/* Status (Edit only) */}
           {view === 'edit' && (
-            <div className="form-group-project">
-              <label className="form-label-project">Project Status</label>
+            <div className="form-group">
+              <label className="input-label">Project Status</label>
               <select
-                className="form-input-project"
+                className="form-input cursor-pointer"
                 value={status}
                 onChange={(e) => setStatus(e.target.value)}
               >
@@ -1443,26 +1032,26 @@ const ProjectHub = ({ teamId }) => {
           )}
 
           {/* Dynamic Features Manager */}
-          <div className="form-group-project">
-            <label className="form-label-project">Configure Deliverables / Features</label>
-            <div className="dynamic-features-box flex flex-col gap-3">
+          <div className="form-group">
+            <label className="input-label">Configure Deliverables / Features</label>
+            <div className="bg-neutral-50 border border-neutral-200 rounded-xl p-4 flex flex-col gap-3 mt-1">
               {/* Added Features Row */}
               <div className="flex flex-wrap gap-2">
                 {features.length > 0 ? (
                   features.map((feature, index) => (
-                    <div key={index} className="feature-badge">
-                      <span>{feature}</span>
+                    <div key={index} className="inline-flex items-center gap-1.5 px-2.5 py-1 bg-brand-50 border border-brand-100 text-brand-700 text-xs font-semibold rounded-lg hover:border-brand-200 transition-all">
+                      <span className="max-w-[200px] truncate">{feature}</span>
                       <button 
                         type="button" 
                         onClick={() => handleRemoveFeature(index)} 
-                        className="delete-btn-feature"
+                        className="p-0.5 text-brand-500 hover:text-red-650 cursor-pointer"
                       >
                         <Trash2 size={12} />
                       </button>
                     </div>
                   ))
                 ) : (
-                  <span className="text-xs text-slate-400 font-semibold italic">No features defined yet. Add features below.</span>
+                  <span className="text-xs text-neutral-400 italic font-semibold">No features defined yet. Add features below.</span>
                 )}
               </div>
 
@@ -1470,7 +1059,7 @@ const ProjectHub = ({ teamId }) => {
               <div className="flex gap-2">
                 <input 
                   type="text" 
-                  className="form-input-project flex-1" 
+                  className="form-input flex-1" 
                   placeholder="e.g. Build backend API auth gateway"
                   value={newFeature}
                   onChange={(e) => setNewFeature(e.target.value)}
@@ -1484,7 +1073,7 @@ const ProjectHub = ({ teamId }) => {
                 <button 
                   type="button" 
                   onClick={handleAddFeature}
-                  className="flex items-center gap-1.5 px-3 py-2 bg-slate-200 border border-slate-300 rounded text-slate-700 hover:bg-slate-300 text-xs font-bold"
+                  className="btn-secondary text-xs px-3 cursor-pointer"
                 >
                   <Plus size={14} /> Add
                 </button>
@@ -1494,10 +1083,10 @@ const ProjectHub = ({ teamId }) => {
 
           <button 
             type="submit" 
-            className="generate-btn mt-2"
+            className="btn-primary w-full mt-4 flex items-center justify-center gap-1.5 cursor-pointer"
             disabled={actionLoading}
           >
-            <Save size={16} /> {view === 'create' ? 'Create Project Profile' : 'Save Modifications'}
+            <Save size={15} /> {view === 'create' ? 'Create Project Profile' : 'Save Modifications'}
           </button>
         </form>
       )}

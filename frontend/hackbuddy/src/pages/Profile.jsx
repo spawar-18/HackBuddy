@@ -247,493 +247,16 @@ const Profile = () => {
       )}
 
       {/* Styled Layout Styles */}
-      <style>{`
-        .profile-selection-page {
-          background-color: var(--bg-deep);
-          min-height: 100vh;
-          color: var(--text-secondary);
-          font-family: var(--font-sans);
-          display: flex;
-          justify-content: center;
-          align-items: center;
-          padding: 2.5rem 1rem;
-        }
-
-        .profile-card {
-          width: 100%;
-          max-width: 900px;
-          background: var(--bg-card-solid);
-          border: 1px solid var(--border);
-          border-radius: var(--radius-lg);
-          box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.05), 0 8px 10px -6px rgba(0, 0, 0, 0.05);
-          padding: 2.5rem;
-          display: flex;
-          flex-direction: column;
-          gap: 2rem;
-        }
-
-        .profile-header {
-          display: flex;
-          justify-content: space-between;
-          align-items: flex-start;
-          border-bottom: 1px solid var(--border);
-          padding-bottom: 1.5rem;
-        }
-
-        .profile-brand-title {
-          font-size: 1.75rem;
-          font-weight: 800;
-          letter-spacing: -0.5px;
-          margin: 0;
-          color: var(--text-primary);
-          display: flex;
-          align-items: center;
-          gap: 10px;
-        }
-
-        .profile-tagline {
-          font-size: 0.9rem;
-          color: var(--text-muted);
-          margin-top: 0.25rem;
-        }
-
-        .logout-btn-nav {
-          background: var(--danger-glow);
-          color: var(--danger);
-          border: 1px solid var(--danger);
-          border-radius: var(--radius-default);
-          padding: 0.5rem 1rem;
-          font-size: 0.85rem;
-          font-weight: 600;
-          cursor: pointer;
-          display: flex;
-          align-items: center;
-          gap: 8px;
-          transition: all 0.2s ease;
-        }
-
-        .logout-btn-nav:hover {
-          opacity: 0.9;
-          transform: translateY(-1px);
-        }
-
-        .profile-section-title {
-          font-size: 1.1rem;
-          font-weight: 700;
-          text-transform: uppercase;
-          letter-spacing: 0.5px;
-          color: var(--primary);
-          margin-bottom: 1rem;
-          display: flex;
-          align-items: center;
-          gap: 8px;
-        }
-
-        .categories-grid {
-          display: grid;
-          grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
-          gap: 1.5rem;
-        }
-
-        .category-card {
-          background: var(--bg-card-solid);
-          border: 1px solid var(--border);
-          border-radius: var(--radius-lg);
-          padding: 1.25rem;
-          display: flex;
-          flex-direction: column;
-          gap: 0.75rem;
-          box-shadow: 0 1px 3px rgba(0,0,0,0.02);
-        }
-
-        .category-header {
-          display: flex;
-          align-items: center;
-          gap: 8px;
-          font-size: 0.9rem;
-          font-weight: 700;
-          color: var(--text-primary);
-          border-bottom: 1px solid var(--border);
-          padding-bottom: 0.5rem;
-        }
-
-        .category-header svg {
-          color: var(--primary);
-        }
-
-        .skills-pills-container {
-          display: flex;
-          flex-wrap: wrap;
-          gap: 0.5rem;
-        }
-
-        .skill-pill {
-          background: var(--bg-deep);
-          border: 1px solid var(--border);
-          color: var(--text-secondary);
-          border-radius: var(--radius-full);
-          padding: 0.35rem 0.75rem;
-          font-size: 0.9rem;
-          font-weight: 500;
-          cursor: pointer;
-          transition: all 0.2s ease;
-        }
-
-        .skill-pill:hover {
-          border-color: var(--text-muted);
-          color: var(--text-primary);
-        }
-
-        .skill-pill.selected {
-          background: var(--primary);
-          color: #ffffff;
-          border-color: var(--primary);
-          font-weight: 600;
-          box-shadow: 0 2px 4px var(--primary-glow);
-        }
-
-        .inventory-card {
-          background: var(--bg-deep);
-          border: 1px solid var(--border);
-          border-radius: var(--radius-lg);
-          padding: 1.5rem;
-          display: flex;
-          flex-direction: column;
-          gap: 1rem;
-        }
-
-        .inventory-placeholder {
-          font-size: 0.85rem;
-          color: var(--text-muted);
-          font-style: italic;
-          text-align: center;
-          padding: 1.5rem 0;
-        }
-
-        .selected-chip {
-          background: var(--primary-glow);
-          border: 1px solid var(--border);
-          color: var(--primary);
-          font-weight: 600;
-          border-radius: var(--radius-full);
-          padding: 0.4rem 0.9rem;
-          font-size: 0.9rem;
-          display: inline-flex;
-          align-items: center;
-          gap: 6px;
-          transition: all 0.15s ease;
-        }
-
-        .selected-chip:hover {
-          border-color: var(--primary-hover);
-        }
-
-        .selected-chip button {
-          background: none;
-          border: none;
-          color: var(--primary);
-          cursor: pointer;
-          display: flex;
-          align-items: center;
-          padding: 0;
-          opacity: 0.7;
-          transition: all 0.15s ease;
-        }
-
-        .selected-chip button:hover {
-          color: var(--danger);
-          opacity: 1;
-        }
-
-        .custom-skill-form {
-          display: flex;
-          gap: 0.75rem;
-          margin-top: 0.5rem;
-          max-width: 450px;
-        }
-
-        .custom-skill-input {
-          flex: 1;
-          background-color: var(--bg-card-solid);
-          border: 1px solid var(--border);
-          color: var(--text-primary);
-          border-radius: var(--radius-default);
-          padding: 0.65rem 1rem;
-          font-size: 0.85rem;
-          font-family: inherit;
-          transition: all 0.2s ease;
-        }
-
-        .custom-skill-input:focus {
-          outline: none;
-          border-color: var(--border-focus);
-          box-shadow: 0 0 0 2px var(--primary-glow);
-        }
-
-        .btn-add-custom {
-          background: var(--bg-card-solid);
-          border: 1px solid var(--border);
-          color: var(--text-secondary);
-          border-radius: var(--radius-default);
-          padding: 0 1.25rem;
-          font-size: 0.85rem;
-          font-weight: 600;
-          cursor: pointer;
-          display: flex;
-          align-items: center;
-          gap: 6px;
-          transition: all 0.2s ease;
-        }
-
-        .btn-add-custom:hover {
-          background: var(--bg-deep);
-          border-color: var(--text-muted);
-        }
-
-        .action-footer {
-          display: flex;
-          justify-content: flex-end;
-          gap: 1rem;
-          border-top: 1px solid var(--border);
-          padding-top: 1.5rem;
-        }
-
-        .btn-save-profile {
-          background: var(--primary);
-          color: #fff;
-          border: none;
-          border-radius: var(--radius-default);
-          padding: 0.75rem 2rem;
-          font-size: 0.95rem;
-          font-weight: 700;
-          cursor: pointer;
-          display: flex;
-          align-items: center;
-          gap: 10px;
-          transition: all 0.2s ease;
-          box-shadow: 0 4px 12px var(--primary-glow);
-        }
-
-        .btn-save-profile:hover:not(:disabled) {
-          background: var(--primary-hover);
-          box-shadow: 0 6px 16px var(--primary-glow);
-        }
-
-        .btn-save-profile:disabled {
-          opacity: 0.6;
-          cursor: not-allowed;
-        }
-
-        .toast-notification {
-          position: fixed;
-          top: 20px;
-          right: 20px;
-          z-index: 9999;
-          display: flex;
-          align-items: center;
-          gap: 12px;
-          padding: 1rem 1.5rem;
-          border-radius: var(--radius-default);
-          font-size: 0.9rem;
-          font-weight: 600;
-          color: var(--text-primary);
-          box-shadow: 0 10px 25px rgba(0,0,0,0.08);
-          background: var(--bg-card-solid);
-          animation: slideIn 0.3s cubic-bezier(0.16, 1, 0.3, 1);
-        }
-
-        .toast-success {
-          border: 1px solid var(--success);
-          color: var(--success);
-        }
-
-        .toast-success svg {
-          color: var(--success);
-        }
-
-        .toast-error {
-          border: 1px solid var(--danger);
-          color: var(--danger);
-        }
-
-        .toast-error svg {
-          color: var(--danger);
-        }
-
-        @keyframes slideIn {
-          from {
-            transform: translateX(100%) translateY(-10px);
-            opacity: 0;
-          }
-          to {
-            transform: translateX(0) translateY(0);
-            opacity: 1;
-          }
-        }
-
-        .resume-section {
-          background: var(--bg-card-solid);
-          border: 1px solid var(--border);
-          border-radius: var(--radius-lg);
-          padding: 1.5rem;
-          margin-bottom: 0.5rem;
-        }
-
-        .drag-drop-zone {
-          border: 2px dashed var(--border);
-          border-radius: var(--radius-lg);
-          background: var(--bg-deep);
-          padding: 2.25rem 1.5rem;
-          display: flex;
-          flex-direction: column;
-          align-items: center;
-          justify-content: center;
-          text-align: center;
-          cursor: pointer;
-          transition: all 0.2s ease;
-        }
-
-        .drag-drop-zone.drag-active {
-          border-color: var(--primary);
-          background: var(--primary-glow);
-        }
-
-        .drag-drop-zone.file-loaded {
-          border-color: var(--success);
-          background: var(--success-glow);
-          border-style: solid;
-        }
-
-        .file-input-label {
-          display: flex;
-          flex-direction: column;
-          align-items: center;
-          width: 100%;
-          cursor: pointer;
-        }
-
-        .upload-cloud-icon {
-          color: var(--text-muted);
-          margin-bottom: 0.75rem;
-          transition: transform 0.2s ease;
-        }
-
-        .file-input-label:hover .upload-cloud-icon {
-          transform: translateY(-2px);
-          color: var(--primary);
-        }
-
-        .upload-title {
-          font-weight: 700;
-          font-size: 0.95rem;
-          color: var(--text-primary);
-        }
-
-        .upload-subtitle {
-          font-size: 0.9rem;
-          color: var(--text-muted);
-          margin-top: 0.25rem;
-        }
-
-        .file-preview-info {
-          display: flex;
-          flex-direction: column;
-          align-items: center;
-          width: 100%;
-        }
-
-        .file-name-text {
-          font-weight: 700;
-          font-size: 0.9rem;
-          color: var(--text-primary);
-          word-break: break-all;
-        }
-
-        .file-preview-info svg {
-          color: var(--primary);
-        }
-
-        .file-size-text {
-          font-size: 0.9rem;
-          color: var(--text-muted);
-          margin-top: 0.1rem;
-        }
-
-        .btn-extract-skills {
-          background: var(--success);
-          color: #fff;
-          border: none;
-          border-radius: var(--radius-default);
-          padding: 0.5rem 1.25rem;
-          font-size: 0.85rem;
-          font-weight: 700;
-          cursor: pointer;
-          transition: all 0.2s ease;
-          display: flex;
-          align-items: center;
-          gap: 6px;
-        }
-
-        .btn-extract-skills:hover:not(:disabled) {
-          opacity: 0.9;
-          transform: translateY(-1px);
-        }
-
-        .btn-cancel-file {
-          background: var(--bg-card-solid);
-          border: 1px solid var(--border);
-          color: var(--text-secondary);
-          border-radius: var(--radius-default);
-          padding: 0.5rem 1.25rem;
-          font-size: 0.85rem;
-          font-weight: 600;
-          cursor: pointer;
-          transition: all 0.2s ease;
-        }
-
-        .btn-cancel-file:hover {
-          background: var(--bg-deep);
-          border-color: var(--text-muted);
-          color: var(--text-primary);
-        }
-
-        .extraction-status-bar {
-          margin-top: 1rem;
-          display: flex;
-          flex-direction: column;
-          gap: 0.35rem;
-        }
-
-        .progress-bar-container {
-          height: 6px;
-          background: var(--border);
-          border-radius: var(--radius-sm);
-          overflow: hidden;
-        }
-
-        .progress-bar-fill {
-          height: 100%;
-          background: var(--success);
-          border-radius: var(--radius-sm);
-          transition: width 0.25s ease;
-        }
-
-        .progress-text {
-          font-size: 0.9rem;
-          color: var(--text-secondary);
-          font-weight: 500;
-        }
-      `}</style>
-
-      <div className="profile-card">
+      <div className="min-h-screen bg-neutral-50 flex items-center justify-center py-10 px-4">
+      <div className="w-full max-w-4xl bg-white border border-neutral-200 rounded-xl p-6 md:p-8 shadow-xs flex flex-col gap-6 animate-slide-up">
         {/* Header Block */}
-        <div className="profile-header">
+        <div className="flex flex-col sm:flex-row justify-between items-start gap-4 border-b border-neutral-100 pb-5">
           <div>
-            <h1 className="profile-brand-title">
-              <Terminal size={24} style={{ color: 'var(--primary-hover)' }} />
+            <h1 className="text-xl font-bold text-neutral-900 flex items-center gap-2.5">
+              <Terminal size={22} className="text-brand-500" />
               {user?.profileCompleted ? 'Edit Skills Configuration' : 'Mission Profile Configuration'}
             </h1>
-            <p className="profile-tagline">
+            <p className="text-xs text-neutral-500 mt-1">
               {user?.profileCompleted 
                 ? 'Update your system core nodes and technical skills directory.'
                 : 'Establish your system core nodes. Pre-register your technical skills directory.'}
@@ -741,14 +264,13 @@ const Profile = () => {
           </div>
           {user?.profileCompleted ? (
             <button 
-              className="logout-btn-nav" 
-              style={{ background: 'none', color: '#64748b', borderColor: '#cbd5e1' }}
+              className="btn-secondary text-xs" 
               onClick={() => navigate('/dashboard')}
             >
               Cancel & Return
             </button>
           ) : (
-            <button className="logout-btn-nav" onClick={handleLogout}>
+            <button className="btn-danger text-xs flex items-center gap-1.5" onClick={handleLogout}>
               <LogOut size={14} />
               Abort & Log Out
             </button>
@@ -756,38 +278,44 @@ const Profile = () => {
         </div>
 
         {/* Resume AI Autopilot Section */}
-        <div className="resume-section">
-          <div className="profile-section-title">
-            <Cpu size={18} style={{ color: 'var(--primary)' }} />
+        <div className="bg-neutral-50/50 border border-neutral-200/80 rounded-xl p-5 md:p-6 flex flex-col gap-4">
+          <div className="text-xs font-bold text-neutral-500 tracking-wider uppercase flex items-center gap-2">
+            <Cpu size={16} className="text-brand-500" />
             <span>AI Skills Autopilot (Resume Upload)</span>
           </div>
-          <p className="profile-tagline" style={{ marginBottom: '1.25rem' }}>
+          <p className="text-xs text-neutral-500">
             Fast track your setup! Upload your PDF resume, and our AI Agent will extract and configure your developer skills node automatically.
           </p>
 
           <div 
-            className={`drag-drop-zone ${dragActive ? 'drag-active' : ''} ${selectedFile ? 'file-loaded' : ''}`}
+            className={`border-2 border-dashed rounded-xl p-8 flex flex-col items-center justify-center text-center cursor-pointer transition-all duration-200 ${
+              dragActive 
+                ? 'border-brand-500 bg-brand-50/20' 
+                : selectedFile 
+                  ? 'border-emerald-300 bg-emerald-50/20' 
+                  : 'border-neutral-200 bg-white hover:bg-neutral-50/40'
+            }`}
             onDragEnter={handleDrag}
             onDragOver={handleDrag}
             onDragLeave={handleDrag}
             onDrop={handleDrop}
           >
             {selectedFile ? (
-              <div className="file-preview-info">
-                <Terminal size={32} style={{ color: 'var(--primary)', marginBottom: '0.5rem' }} />
-                <span className="file-name-text">{selectedFile.name}</span>
-                <span className="file-size-text">({(selectedFile.size / (1024 * 1024)).toFixed(2)} MB)</span>
+              <div className="flex flex-col items-center">
+                <Terminal size={32} className="text-brand-500 mb-2" />
+                <span className="text-sm font-semibold text-neutral-900 break-all">{selectedFile.name}</span>
+                <span className="text-xs text-neutral-400 mt-0.5">({(selectedFile.size / (1024 * 1024)).toFixed(2)} MB)</span>
                 
-                <div style={{ display: 'flex', gap: '0.75rem', marginTop: '1rem' }}>
+                <div className="flex gap-2 mt-4">
                   <button 
                     type="button" 
-                    className="btn-extract-skills" 
+                    className="btn-primary text-xs bg-emerald-600 hover:bg-emerald-700 active:bg-emerald-800" 
                     onClick={handleResumeExtract}
                     disabled={extracting}
                   >
                     {extracting ? (
                       <>
-                        <RefreshCw className="spin" size={14} style={{ animation: 'spin 1.5s linear infinite' }} />
+                        <RefreshCw className="animate-spin" size={14} />
                         Extracting ({uploadProgress}%)
                       </>
                     ) : (
@@ -796,7 +324,7 @@ const Profile = () => {
                   </button>
                   <button 
                     type="button" 
-                    className="btn-cancel-file"
+                    className="btn-secondary text-xs"
                     onClick={() => setSelectedFile(null)}
                     disabled={extracting}
                   >
@@ -805,44 +333,44 @@ const Profile = () => {
                 </div>
               </div>
             ) : (
-              <label htmlFor="resume-file-input" className="file-input-label">
-                <UploadCloud size={36} className="upload-cloud-icon" />
-                <span className="upload-title">Drag & Drop Resume PDF</span>
-                <span className="upload-subtitle">or click to browse local files (max 5MB)</span>
+              <label htmlFor="resume-file-input" className="w-full flex flex-col items-center cursor-pointer">
+                <UploadCloud size={32} className="text-neutral-400 mb-2 hover:text-brand-500 transition-colors" />
+                <span className="text-sm font-semibold text-neutral-800">Drag & Drop Resume PDF</span>
+                <span className="text-xs text-neutral-400 mt-0.5">or click to browse local files (max 5MB)</span>
                 <input 
                   type="file" 
                   id="resume-file-input" 
                   accept=".pdf"
                   onChange={handleFileChange}
-                  style={{ display: 'none' }}
+                  className="hidden"
                 />
               </label>
             )}
           </div>
 
           {extracting && (
-            <div className="extraction-status-bar">
-              <div className="progress-bar-container">
-                <div className="progress-bar-fill" style={{ width: `${uploadProgress}%` }}></div>
+            <div className="flex flex-col gap-1.5 mt-2">
+              <div className="h-1.5 bg-neutral-200 rounded-full overflow-hidden">
+                <div className="h-full bg-emerald-500 rounded-full transition-all duration-200" style={{ width: `${uploadProgress}%` }}></div>
               </div>
-              <span className="progress-text">{extractionProgress}</span>
+              <span className="text-xs text-neutral-500 font-medium">{extractionProgress}</span>
             </div>
           )}
         </div>
 
         {/* Categories Section */}
-        <div>
-          <div className="profile-section-title">
+        <div className="flex flex-col gap-3">
+          <div className="text-xs font-bold text-neutral-500 tracking-wider uppercase">
             <span>1. Predefined Skills Library</span>
           </div>
-          <div className="categories-grid">
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
             {Object.keys(predefinedSkills).map(category => (
-              <div key={category} className="category-card">
-                <div className="category-header">
-                  {categoryDetails[category].icon}
+              <div key={category} className="bg-white border border-neutral-200 rounded-xl p-4 flex flex-col gap-3 shadow-2xs">
+                <div className="flex items-center gap-2 text-xs font-bold text-neutral-800 border-b border-neutral-100 pb-2">
+                  <span className="text-brand-500">{categoryDetails[category].icon}</span>
                   <span>{categoryDetails[category].label}</span>
                 </div>
-                <div className="skills-pills-container">
+                <div className="flex flex-wrap gap-1.5">
                   {predefinedSkills[category].map(skill => {
                     const isSelected = selectedSkills.includes(skill);
                     return (
@@ -850,7 +378,11 @@ const Profile = () => {
                         key={skill}
                         type="button"
                         onClick={() => handleToggleSkill(skill)}
-                        className={`skill-pill ${isSelected ? 'selected' : ''}`}
+                        className={`px-2.5 py-1 text-xs rounded-lg border font-medium transition-all cursor-pointer ${
+                          isSelected 
+                            ? 'bg-brand-500 border-brand-500 text-white font-semibold shadow-xs' 
+                            : 'bg-neutral-50 border-neutral-200 text-neutral-600 hover:border-neutral-300 hover:text-neutral-800'
+                        }`}
                       >
                         {skill}
                       </button>
@@ -863,45 +395,45 @@ const Profile = () => {
         </div>
 
         {/* Custom Skill Section */}
-        <div>
-          <div className="profile-section-title">
+        <div className="flex flex-col gap-3">
+          <div className="text-xs font-bold text-neutral-500 tracking-wider uppercase">
             <span>2. Custom Skills Expansion</span>
           </div>
-          <p className="profile-tagline" style={{ marginBottom: '0.75rem' }}>
+          <p className="text-xs text-neutral-500">
             Inject custom capabilities and tech stacks not registered in the default database index.
           </p>
-          <form onSubmit={handleAddCustomSkill} className="custom-skill-form">
+          <form onSubmit={handleAddCustomSkill} className="flex gap-2 w-full max-w-md mt-1">
             <input
               type="text"
-              className="custom-skill-input"
+              className="input-field"
               placeholder="e.g. GraphQL, Redis, WebRTC"
               value={customSkill}
               onChange={(e) => setCustomSkill(e.target.value)}
               disabled={loading}
             />
-            <button type="submit" className="btn-add-custom" disabled={loading}>
-              <Plus size={16} />
+            <button type="submit" className="btn-secondary shrink-0 text-xs py-2" disabled={loading}>
+              <Plus size={14} />
               Add Node
             </button>
           </form>
         </div>
 
         {/* Selected Skills Inventory */}
-        <div>
-          <div className="profile-section-title">
+        <div className="flex flex-col gap-3">
+          <div className="text-xs font-bold text-neutral-500 tracking-wider uppercase">
             <span>3. Current Skill Inventory ({selectedSkills.length})</span>
           </div>
-          <div className="inventory-card">
+          <div className="bg-neutral-50 border border-neutral-200 rounded-xl p-5 flex flex-col gap-3">
             {selectedSkills.length === 0 ? (
-              <div className="inventory-placeholder">
+              <div className="text-xs text-neutral-400 italic text-center py-4">
                 No active skills loaded. Toggle options in Category Panels or inject Custom Nodes above.
               </div>
             ) : (
-              <div className="skills-pills-container" style={{ gap: '0.75rem' }}>
+              <div className="flex flex-wrap gap-2">
                 {selectedSkills.map(skill => (
-                  <div key={skill} className="selected-chip">
+                  <div key={skill} className="inline-flex items-center gap-1.5 px-3 py-1 bg-brand-50 border border-brand-100 text-brand-700 text-xs font-semibold rounded-lg hover:border-brand-200 transition-all">
                     <span>{skill}</span>
-                    <button type="button" onClick={() => handleRemoveSkill(skill)} aria-label={`Remove ${skill}`}>
+                    <button type="button" onClick={() => handleRemoveSkill(skill)} aria-label={`Remove ${skill}`} className="p-0.5 text-brand-500 hover:text-red-600 transition-colors cursor-pointer">
                       <X size={12} />
                     </button>
                   </div>
@@ -912,16 +444,16 @@ const Profile = () => {
         </div>
 
         {/* Footer Actions */}
-        <div className="action-footer">
+        <div className="flex justify-end gap-3 border-t border-neutral-100 pt-5 mt-2">
           <button 
             type="button" 
-            className="btn-save-profile" 
+            className="btn-primary px-6 py-2.5 shadow-sm" 
             onClick={handleSaveProfile}
             disabled={loading}
           >
             {loading ? (
               <>
-                <RefreshCw className="spin" size={16} style={{ animation: 'spin 1.5s linear infinite' }} />
+                <RefreshCw className="animate-spin" size={16} />
                 {user?.profileCompleted ? 'Saving Changes...' : 'Initializing System...'}
               </>
             ) : (
@@ -932,6 +464,7 @@ const Profile = () => {
           </button>
         </div>
       </div>
+    </div>
     </div>
   );
 };
