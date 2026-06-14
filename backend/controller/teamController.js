@@ -68,6 +68,12 @@ exports.joinTeam = async (req, res) => {
 
     // Add user to members array
     team.members.push(req.user.id);
+    
+    // Invalidate existing team analysis
+    team.analysis = null;
+    team.analysisGeneratedAt = null;
+    team.analysisVersion = (team.analysisVersion || 0) + 1;
+    
     await team.save();
 
     res.status(200).json({
@@ -167,6 +173,12 @@ exports.leaveTeam = async (req, res) => {
 
     // Remove user from members
     team.members = team.members.filter(member => !isSameUser(member, req.user.id));
+    
+    // Invalidate existing team analysis
+    team.analysis = null;
+    team.analysisGeneratedAt = null;
+    team.analysisVersion = (team.analysisVersion || 0) + 1;
+    
     await team.save();
 
     res.status(200).json({
@@ -210,6 +222,12 @@ exports.removeMember = async (req, res) => {
 
     // Remove member
     team.members = team.members.filter(member => !isSameUser(member, memberId));
+    
+    // Invalidate existing team analysis
+    team.analysis = null;
+    team.analysisGeneratedAt = null;
+    team.analysisVersion = (team.analysisVersion || 0) + 1;
+    
     await team.save();
 
     res.status(200).json({
@@ -253,6 +271,12 @@ exports.transferOwnership = async (req, res) => {
 
     // Update owner
     team.createdBy = newOwnerId;
+    
+    // Invalidate existing team analysis
+    team.analysis = null;
+    team.analysisGeneratedAt = null;
+    team.analysisVersion = (team.analysisVersion || 0) + 1;
+    
     await team.save();
 
     res.status(200).json({

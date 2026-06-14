@@ -10,6 +10,7 @@ import {
 import { useAuth } from '../context/AuthContext';
 import { toast } from 'react-hot-toast';
 import ConfirmationModal from '../components/ConfirmationModal';
+import TeamAnalysis from '../components/TeamAnalysis';
 import { 
   ArrowLeft, Copy, Check, Users, Shield, Mail, Code, 
   Terminal, AlertTriangle, RefreshCw, LogOut, Trash2 
@@ -957,6 +958,7 @@ const TeamDetails = () => {
                 })}
               </div>
             </div>
+            <TeamAnalysis teamId={teamId} />
           </div>
         </div>
       </div>

@@ -76,3 +76,34 @@ export const deleteTeam = async (teamId) => {
   return response.data;
 };
 
+/**
+ * Generates AI-powered team analysis.
+ * @param {string} teamId - Team ID
+ * @returns {Promise<Object>} { success, analysis, analysisGeneratedAt, analysisVersion }
+ */
+export const analyzeTeam = async (teamId) => {
+  const response = await api.post(`/team/${teamId}/analyze`);
+  return response.data;
+};
+
+/**
+ * Fetches cached team analysis.
+ * @param {string} teamId - Team ID
+ * @returns {Promise<Object>} { success, analysis, analysisGeneratedAt, analysisVersion }
+ */
+export const getTeamAnalysis = async (teamId) => {
+  const response = await api.get(`/team/${teamId}/analysis`);
+  return response.data;
+};
+
+/**
+ * Force regenerates AI-powered team analysis.
+ * @param {string} teamId - Team ID
+ * @returns {Promise<Object>} { success, analysis, analysisGeneratedAt, analysisVersion }
+ */
+export const regenerateTeamAnalysis = async (teamId) => {
+  const response = await api.post(`/team/${teamId}/regenerate-analysis`);
+  return response.data;
+};
+
+

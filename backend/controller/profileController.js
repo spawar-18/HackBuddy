@@ -47,6 +47,20 @@ exports.updateProfile = async (req, res) => {
     
     await user.save();
 
+    // Auto-invalidate team analysis for all teams this user belongs to
+    try {
+      const Team = require('../models/Team');
+      const userTeams = await Team.find({ members: user._id });
+      for (const team of userTeams) {
+        team.analysis = null;
+        team.analysisGeneratedAt = null;
+        team.analysisVersion = (team.analysisVersion || 0) + 1;
+        await team.save();
+      }
+    } catch (teamErr) {
+      console.error('Failed to invalidate team analysis on skill update:', teamErr);
+    }
+
     // Remove password field before returning response
     const userResponse = JSON.parse(JSON.stringify(user));
     delete userResponse.password;

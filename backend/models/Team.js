@@ -31,6 +31,25 @@ const teamSchema = new mongoose.Schema({
   createdAt: {
     type: Date,
     default: Date.now
+  },
+  analysis: {
+    readinessScore: Number,
+    strengths: [String],
+    skillGaps: [String],
+    recommendedRoles: [
+      {
+        member: String,
+        role: String
+      }
+    ]
+  },
+  analysisGeneratedAt: {
+    type: Date,
+    default: null
+  },
+  analysisVersion: {
+    type: Number,
+    default: 0
   }
 });
 
@@ -48,6 +67,9 @@ const createMockTeamInstance = (data) => {
     createdBy: data.createdBy,
     members: data.members || [],
     createdAt: data.createdAt || new Date(),
+    analysis: data.analysis || null,
+    analysisGeneratedAt: data.analysisGeneratedAt || null,
+    analysisVersion: data.analysisVersion || 0,
     async save() {
       const index = memoryDB.findIndex(t => t._id === this._id);
       const serialized = {
@@ -57,7 +79,10 @@ const createMockTeamInstance = (data) => {
         inviteCode: this.inviteCode,
         createdBy: this.createdBy,
         members: this.members,
-        createdAt: this.createdAt
+        createdAt: this.createdAt,
+        analysis: this.analysis,
+        analysisGeneratedAt: this.analysisGeneratedAt,
+        analysisVersion: this.analysisVersion
       };
       if (index !== -1) {
         memoryDB[index] = serialized;

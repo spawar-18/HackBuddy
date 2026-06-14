@@ -8,6 +8,7 @@ const authRoutes = require('./routes/authRoutes');
 const userRoutes = require('./routes/userRoutes');
 const profileRoutes = require('./routes/profileRoutes');
 const teamRoutes = require('./routes/teamRoutes');
+const teamAnalysisRoutes = require('./routes/teamAnalysisRoutes');
 
 const app = express();
 const port = process.env.PORT || 5000;
@@ -22,6 +23,7 @@ app.use('/api/auth', authRoutes);
 app.use('/api/user', userRoutes);
 app.use('/api/profile', profileRoutes);
 app.use('/api/team', teamRoutes);
+app.use('/api/team', teamAnalysisRoutes);
 
 // Root Route (Welcome message/status)
 app.get('/', (req, res) => {
