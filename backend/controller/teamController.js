@@ -1,5 +1,6 @@
 const Team = require('../models/Team');
 const User = require('../models/User');
+const Project = require('../models/Project');
 const { generateInviteCode } = require('../utils/inviteCode');
 
 // @desc    Create a new team
@@ -75,6 +76,16 @@ exports.joinTeam = async (req, res) => {
     team.analysisVersion = (team.analysisVersion || 0) + 1;
     
     await team.save();
+
+    // Invalidate project task plan as team membership changed
+    try {
+      await Project.updateMany(
+        { teamId: team._id },
+        { $set: { taskPlan: null, taskPlanGeneratedAt: null } }
+      );
+    } catch (projErr) {
+      console.error('Failed to invalidate project task plan on joinTeam:', projErr);
+    }
 
     res.status(200).json({
       success: true,
@@ -181,6 +192,16 @@ exports.leaveTeam = async (req, res) => {
     
     await team.save();
 
+    // Invalidate project task plan as team membership changed
+    try {
+      await Project.updateMany(
+        { teamId: team._id },
+        { $set: { taskPlan: null, taskPlanGeneratedAt: null } }
+      );
+    } catch (projErr) {
+      console.error('Failed to invalidate project task plan on leaveTeam:', projErr);
+    }
+
     res.status(200).json({
       success: true,
       message: 'Left team successfully'
@@ -229,6 +250,16 @@ exports.removeMember = async (req, res) => {
     team.analysisVersion = (team.analysisVersion || 0) + 1;
     
     await team.save();
+
+    // Invalidate project task plan as team membership changed
+    try {
+      await Project.updateMany(
+        { teamId: team._id },
+        { $set: { taskPlan: null, taskPlanGeneratedAt: null } }
+      );
+    } catch (projErr) {
+      console.error('Failed to invalidate project task plan on removeMember:', projErr);
+    }
 
     res.status(200).json({
       success: true,

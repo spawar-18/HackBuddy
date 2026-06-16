@@ -6,12 +6,16 @@ import {
   deleteProject,
   analyzeProject,
   getChatHistory,
-  sendChatMessage
+  sendChatMessage,
+  generateTaskPlan,
+  regenerateTaskPlan,
+  updateTaskStatus
 } from '../services/projectService';
 import { toast } from 'react-hot-toast';
 import { 
   FolderGit2, Plus, Trash2, Edit3, ListTodo, 
-  Play, CheckCircle, Clock, ArrowLeft, Save, AlertTriangle, RefreshCw, Cpu
+  Play, CheckCircle, Clock, ArrowLeft, Save, AlertTriangle, RefreshCw, Cpu,
+  Layers, Users, Activity, Zap, BarChart3, GitBranch, Target, Star, ShieldAlert
 } from 'lucide-react';
 
 const parseInlineMarkdown = (text) => {
@@ -118,6 +122,8 @@ const ProjectHub = ({ teamId }) => {
   const [loading, setLoading] = useState(true);
   const [actionLoading, setActionLoading] = useState(false);
   const [reviewLoading, setReviewLoading] = useState(false);
+  const [splitterLoading, setSplitterLoading] = useState(false);
+  const [splitterStatus, setSplitterStatus] = useState('');
   const [chatMessages, setChatMessages] = useState([]);
   const [chatLoading, setChatLoading] = useState(false);
   const [chatInput, setChatInput] = useState('');
@@ -251,6 +257,116 @@ const ProjectHub = ({ teamId }) => {
       toast.error(err.response?.data?.message || 'Failed to analyze project.');
     } finally {
       setReviewLoading(false);
+    }
+  };
+
+  const handleGenerateTaskPlan = async () => {
+    if (!project) return;
+    if (!project.featuresToBuild || project.featuresToBuild.length === 0) {
+      toast.error('Please configure at least one feature before generating a task plan.');
+      return;
+    }
+
+    let interval;
+    try {
+      setSplitterLoading(true);
+      const statuses = [
+        'Analyzing Project...',
+        'Generating Task Plan...',
+        'Assigning Tasks...',
+        'Building Execution Strategy...'
+      ];
+      let index = 0;
+      setSplitterStatus(statuses[0]);
+      interval = setInterval(() => {
+        index++;
+        if (index < statuses.length) {
+          setSplitterStatus(statuses[index]);
+        }
+      }, 1000);
+
+      const res = await generateTaskPlan(project._id);
+      if (res.success) {
+        setProject(prev => ({
+          ...prev,
+          taskPlan: res.taskPlan,
+          taskPlanGeneratedAt: res.taskPlanGeneratedAt
+        }));
+        toast.success('Task plan generated successfully!');
+        setView('task-plan');
+      }
+    } catch (err) {
+      console.error(err);
+      toast.error(err.response?.data?.message || 'Failed to generate task plan.');
+    } finally {
+      clearInterval(interval);
+      setSplitterLoading(false);
+      setSplitterStatus('');
+    }
+  };
+
+  const handleRegenerateTaskPlan = async () => {
+    if (!project) return;
+    if (!project.featuresToBuild || project.featuresToBuild.length === 0) {
+      toast.error('Please configure at least one feature before regenerating the task plan.');
+      return;
+    }
+
+    let interval;
+    try {
+      setSplitterLoading(true);
+      const statuses = [
+        'Analyzing Project...',
+        'Generating Task Plan...',
+        'Assigning Tasks...',
+        'Building Execution Strategy...'
+      ];
+      let index = 0;
+      setSplitterStatus(statuses[0]);
+      interval = setInterval(() => {
+        index++;
+        if (index < statuses.length) {
+          setSplitterStatus(statuses[index]);
+        }
+      }, 1000);
+
+      const res = await regenerateTaskPlan(project._id);
+      if (res.success) {
+        setProject(prev => ({
+          ...prev,
+          taskPlan: res.taskPlan,
+          taskPlanGeneratedAt: res.taskPlanGeneratedAt
+        }));
+        toast.success('Task plan regenerated successfully!');
+        setView('task-plan');
+      }
+    } catch (err) {
+      console.error(err);
+      toast.error(err.response?.data?.message || 'Failed to regenerate task plan.');
+    } finally {
+      clearInterval(interval);
+      setSplitterLoading(false);
+      setSplitterStatus('');
+    }
+  };
+
+  const handleUpdateTaskStatus = async (memberName, taskName, newStatus) => {
+    if (!project) return;
+    try {
+      const res = await updateTaskStatus(project._id, {
+        memberName,
+        taskName,
+        status: newStatus
+      });
+      if (res.success) {
+        setProject(prev => ({
+          ...prev,
+          taskPlan: res.taskPlan
+        }));
+      }
+    } catch (err) {
+      console.error(err);
+      toast.error(err.response?.data?.message || 'Failed to update task status.');
     }
   };
 
@@ -567,6 +683,69 @@ const ProjectHub = ({ teamId }) => {
             )}
           </div>
 
+          {/* AI Task Splitter Trigger Block */}
+          <div className="bg-neutral-50 border border-neutral-200 rounded-xl p-5 border-l-4 border-l-purple-500 flex flex-col gap-3 mt-2 shadow-2xs">
+            <div className="flex items-center gap-2">
+              <Cpu size={16} className="text-purple-500" />
+              <h3 className="text-xs font-bold text-neutral-700 uppercase tracking-wider">
+                AI Task Splitter
+              </h3>
+            </div>
+            <p className="text-xs text-neutral-500 leading-relaxed">
+              Decompose your project features, infer missing technical tasks, map roles to members, and generate a step-by-step roadmap.
+            </p>
+            
+            {splitterLoading ? (
+              <div className="flex flex-col gap-3 py-2">
+                <div className="flex items-center gap-3">
+                  <div className="relative w-9 h-9 shrink-0">
+                    <div className="absolute inset-0 rounded-full border-2 border-purple-100"></div>
+                    <div className="absolute inset-0 rounded-full border-2 border-purple-500 border-t-transparent animate-spin"></div>
+                    <div className="absolute inset-[6px] rounded-full bg-purple-50 flex items-center justify-center">
+                      <Cpu size={12} className="text-purple-500" />
+                    </div>
+                  </div>
+                  <div>
+                    <p className="text-xs font-bold text-purple-700">{splitterStatus}</p>
+                    <p className="text-[10px] text-neutral-400 mt-0.5">This may take up to 2 minutes</p>
+                  </div>
+                </div>
+                <div className="h-1.5 bg-neutral-100 rounded-full overflow-hidden">
+                  <div className="h-full w-3/5 bg-gradient-to-r from-purple-500 to-violet-400 rounded-full animate-pulse"></div>
+                </div>
+              </div>
+            ) : (
+              <div className="flex gap-2 flex-wrap mt-1">
+                {!project.taskPlan ? (
+                  <button
+                    type="button"
+                    onClick={handleGenerateTaskPlan}
+                    className="btn-primary text-xs py-1.5 px-3 cursor-pointer shadow-2xs w-fit bg-purple-600 hover:bg-purple-700 border-purple-600"
+                  >
+                    Generate Task Plan
+                  </button>
+                ) : (
+                  <>
+                    <button
+                      type="button"
+                      onClick={() => setView('task-plan')}
+                      className="btn-primary text-xs py-1.5 px-3 cursor-pointer shadow-2xs w-fit bg-purple-600 hover:bg-purple-700 border-purple-600"
+                    >
+                      View Task Plan
+                    </button>
+                    <button
+                      type="button"
+                      onClick={handleRegenerateTaskPlan}
+                      className="btn-secondary text-xs py-1.5 px-3 cursor-pointer w-fit"
+                    >
+                      Regenerate Task Plan
+                    </button>
+                  </>
+                )}
+              </div>
+            )}
+          </div>
+
           <div className="flex justify-between items-center border-t border-neutral-100 pt-4 mt-2">
             <button 
               onClick={enterEditMode}
@@ -772,6 +951,366 @@ const ProjectHub = ({ teamId }) => {
           </div>
         </div>
       )}
+
+      {/* AI Task Splitter Results View */}
+      {view === 'task-plan' && project && project.taskPlan && (() => {
+        const plan = project.taskPlan;
+        const coreCount = plan.projectTasks?.coreFeatures?.length || 0;
+        const techCount = plan.projectTasks?.technicalTasks?.length || 0;
+        const deployCount = plan.projectTasks?.deploymentTasks?.length || 0;
+        const totalTasks = coreCount + techCount + deployCount;
+        const allAssigned = (plan.assignments || []).flatMap(a => a.assignedTasks || []);
+        const completedCount = allAssigned.filter(t => t.status === 'Completed').length;
+        const inProgressCount = allAssigned.filter(t => t.status === 'In Progress').length;
+        const completionPct = allAssigned.length > 0 ? Math.round((completedCount / allAssigned.length) * 100) : 0;
+        const memberGradients = ['from-violet-500 to-purple-600','from-blue-500 to-cyan-500','from-emerald-500 to-teal-500','from-amber-500 to-orange-500','from-rose-500 to-pink-500'];
+        const memberBgColors = ['bg-violet-50 text-violet-600 border-violet-200','bg-blue-50 text-blue-600 border-blue-200','bg-emerald-50 text-emerald-600 border-emerald-200','bg-amber-50 text-amber-600 border-amber-200','bg-rose-50 text-rose-600 border-rose-200'];
+        const barFills = ['bg-gradient-to-r from-violet-500 to-purple-500','bg-gradient-to-r from-blue-500 to-cyan-500','bg-gradient-to-r from-emerald-500 to-teal-500','bg-gradient-to-r from-amber-500 to-orange-500','bg-gradient-to-r from-rose-500 to-pink-500'];
+
+        return (
+          <div className="flex flex-col gap-7 animate-slide-up">
+            {/* ═══ Header Banner ═══ */}
+            <div className="relative overflow-hidden rounded-2xl bg-gradient-to-br from-violet-600 via-purple-600 to-indigo-700 p-6 shadow-lg">
+              <div className="absolute inset-0 opacity-[0.07]" style={{ backgroundImage: 'radial-gradient(circle, white 1px, transparent 1px)', backgroundSize: '18px 18px' }}></div>
+              <div className="absolute -top-10 -right-10 w-40 h-40 bg-white/10 rounded-full blur-2xl"></div>
+              <div className="absolute -bottom-10 -left-10 w-32 h-32 bg-purple-400/20 rounded-full blur-2xl"></div>
+              <div className="relative z-10 flex flex-col md:flex-row justify-between items-start gap-4">
+                <div>
+                  <div className="flex items-center gap-2 mb-2">
+                    <div className="w-8 h-8 rounded-lg bg-white/15 backdrop-blur-sm flex items-center justify-center">
+                      <Layers size={16} className="text-white" />
+                    </div>
+                    <span className="text-[10px] font-bold uppercase tracking-[0.2em] text-white/60">AI Task Splitter & Project Roadmap</span>
+                  </div>
+                  <h2 className="text-xl md:text-2xl font-extrabold text-white tracking-tight">{project.projectName}</h2>
+                  {project.taskPlanGeneratedAt && (
+                    <p className="text-[11px] text-white/50 mt-1.5 flex items-center gap-1.5">
+                      <Clock size={11} /> Generated {new Date(project.taskPlanGeneratedAt).toLocaleString()}
+                    </p>
+                  )}
+                </div>
+                <div className="flex items-center gap-2 shrink-0">
+                  <button type="button" onClick={handleRegenerateTaskPlan} disabled={splitterLoading}
+                    className="flex items-center gap-1.5 px-3.5 py-2 rounded-lg bg-white/15 hover:bg-white/25 backdrop-blur-sm text-white text-xs font-semibold cursor-pointer border border-white/20 transition-all duration-200">
+                    {splitterLoading ? <RefreshCw className="animate-spin" size={13} /> : <RefreshCw size={13} />} Regenerate
+                  </button>
+                  <button type="button" onClick={() => setView('dashboard')}
+                    className="flex items-center gap-1 px-3.5 py-2 rounded-lg bg-white/10 hover:bg-white/20 text-white/80 hover:text-white text-xs font-semibold cursor-pointer border border-white/10 transition-all duration-200">
+                    <ArrowLeft size={13} /> Back
+                  </button>
+                </div>
+              </div>
+              {/* Overall progress strip */}
+              <div className="relative z-10 mt-5 flex items-center gap-3">
+                <div className="flex-1 h-2 bg-white/15 rounded-full overflow-hidden backdrop-blur-sm">
+                  <div className="h-full bg-white/80 rounded-full transition-all duration-700 ease-out" style={{ width: `${completionPct}%` }}></div>
+                </div>
+                <span className="text-xs font-bold text-white font-mono">{completionPct}%</span>
+              </div>
+            </div>
+
+            {/* ═══ Stats Overview ═══ */}
+            <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
+              <div className="bg-white border border-neutral-200 rounded-xl p-4 flex items-center gap-3 shadow-xs hover:shadow-md hover:border-purple-200 transition-all duration-200">
+                <div className="w-10 h-10 rounded-xl bg-purple-50 text-purple-600 flex items-center justify-center shrink-0"><Layers size={18} /></div>
+                <div>
+                  <div className="text-xl font-extrabold text-neutral-900 font-mono leading-none">{totalTasks}</div>
+                  <div className="text-[10px] font-bold text-neutral-400 uppercase tracking-wider mt-0.5">Total Tasks</div>
+                </div>
+              </div>
+              <div className="bg-white border border-neutral-200 rounded-xl p-4 flex items-center gap-3 shadow-xs hover:shadow-md hover:border-blue-200 transition-all duration-200">
+                <div className="w-10 h-10 rounded-xl bg-blue-50 text-blue-600 flex items-center justify-center shrink-0"><Users size={18} /></div>
+                <div>
+                  <div className="text-xl font-extrabold text-neutral-900 font-mono leading-none">{plan.assignments?.length || 0}</div>
+                  <div className="text-[10px] font-bold text-neutral-400 uppercase tracking-wider mt-0.5">Team Members</div>
+                </div>
+              </div>
+              <div className="bg-white border border-neutral-200 rounded-xl p-4 flex items-center gap-3 shadow-xs hover:shadow-md hover:border-emerald-200 transition-all duration-200">
+                <div className="w-10 h-10 rounded-xl bg-emerald-50 text-emerald-600 flex items-center justify-center shrink-0"><Activity size={18} /></div>
+                <div>
+                  <div className="text-xl font-extrabold text-neutral-900 font-mono leading-none">{completedCount}<span className="text-sm text-neutral-400 font-normal">/{allAssigned.length}</span></div>
+                  <div className="text-[10px] font-bold text-neutral-400 uppercase tracking-wider mt-0.5">Completed</div>
+                </div>
+              </div>
+              <div className="bg-white border border-neutral-200 rounded-xl p-4 flex items-center gap-3 shadow-xs hover:shadow-md hover:border-amber-200 transition-all duration-200">
+                <div className="w-10 h-10 rounded-xl bg-amber-50 text-amber-600 flex items-center justify-center shrink-0"><Zap size={18} /></div>
+                <div>
+                  <div className="text-xl font-extrabold text-neutral-900 font-mono leading-none">{plan.criticalTasks?.length || 0}</div>
+                  <div className="text-[10px] font-bold text-neutral-400 uppercase tracking-wider mt-0.5">Critical Tasks</div>
+                </div>
+              </div>
+            </div>
+
+            {/* ═══ Project Tasks Breakdown ═══ */}
+            <div className="flex flex-col gap-3">
+              <div className="flex items-center gap-2">
+                <ListTodo size={15} className="text-neutral-500" />
+                <h3 className="text-xs font-bold text-neutral-500 uppercase tracking-wider">Project Task Breakdown</h3>
+              </div>
+              <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+                {/* Core Features */}
+                <div className="bg-white border border-neutral-200 rounded-xl overflow-hidden shadow-xs hover:shadow-md transition-all duration-200">
+                  <div className="h-1 bg-gradient-to-r from-violet-500 to-purple-500"></div>
+                  <div className="p-4 flex flex-col gap-3">
+                    <div className="flex items-center justify-between">
+                      <h4 className="text-xs font-bold text-neutral-700 uppercase tracking-wider">Core Features</h4>
+                      <span className="px-2 py-0.5 rounded-full bg-purple-50 text-purple-600 text-[10px] font-extrabold">{coreCount}</span>
+                    </div>
+                    <div className="flex flex-col gap-2">
+                      {plan.projectTasks?.coreFeatures?.map((task, idx) => (
+                        <div key={idx} className="flex items-start gap-2.5 p-2.5 bg-neutral-50 hover:bg-purple-50/50 border border-neutral-100 rounded-lg transition-colors duration-150 group">
+                          <span className="w-1.5 h-1.5 bg-purple-400 rounded-full mt-1.5 shrink-0 group-hover:bg-purple-500"></span>
+                          <span className="text-xs font-medium text-neutral-700 leading-relaxed">{task}</span>
+                        </div>
+                      )) || <span className="text-xs text-neutral-400 italic">None</span>}
+                    </div>
+                  </div>
+                </div>
+                {/* Technical Tasks */}
+                <div className="bg-white border border-neutral-200 rounded-xl overflow-hidden shadow-xs hover:shadow-md transition-all duration-200">
+                  <div className="h-1 bg-gradient-to-r from-blue-500 to-cyan-500"></div>
+                  <div className="p-4 flex flex-col gap-3">
+                    <div className="flex items-center justify-between">
+                      <h4 className="text-xs font-bold text-neutral-700 uppercase tracking-wider">Technical Tasks</h4>
+                      <span className="px-2 py-0.5 rounded-full bg-blue-50 text-blue-600 text-[10px] font-extrabold">{techCount}</span>
+                    </div>
+                    <div className="flex flex-col gap-2">
+                      {plan.projectTasks?.technicalTasks?.map((task, idx) => (
+                        <div key={idx} className="flex items-start gap-2.5 p-2.5 bg-neutral-50 hover:bg-blue-50/50 border border-neutral-100 rounded-lg transition-colors duration-150 group">
+                          <span className="w-1.5 h-1.5 bg-blue-400 rounded-full mt-1.5 shrink-0 group-hover:bg-blue-500"></span>
+                          <span className="text-xs font-medium text-neutral-700 leading-relaxed">{task}</span>
+                        </div>
+                      )) || <span className="text-xs text-neutral-400 italic">None</span>}
+                    </div>
+                  </div>
+                </div>
+                {/* Deployment Tasks */}
+                <div className="bg-white border border-neutral-200 rounded-xl overflow-hidden shadow-xs hover:shadow-md transition-all duration-200">
+                  <div className="h-1 bg-gradient-to-r from-emerald-500 to-teal-500"></div>
+                  <div className="p-4 flex flex-col gap-3">
+                    <div className="flex items-center justify-between">
+                      <h4 className="text-xs font-bold text-neutral-700 uppercase tracking-wider">Deployment Tasks</h4>
+                      <span className="px-2 py-0.5 rounded-full bg-emerald-50 text-emerald-600 text-[10px] font-extrabold">{deployCount}</span>
+                    </div>
+                    <div className="flex flex-col gap-2">
+                      {plan.projectTasks?.deploymentTasks?.map((task, idx) => (
+                        <div key={idx} className="flex items-start gap-2.5 p-2.5 bg-neutral-50 hover:bg-emerald-50/50 border border-neutral-100 rounded-lg transition-colors duration-150 group">
+                          <span className="w-1.5 h-1.5 bg-emerald-400 rounded-full mt-1.5 shrink-0 group-hover:bg-emerald-500"></span>
+                          <span className="text-xs font-medium text-neutral-700 leading-relaxed">{task}</span>
+                        </div>
+                      )) || <span className="text-xs text-neutral-400 italic">None</span>}
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            {/* ═══ Team Assignments ═══ */}
+            <div className="flex flex-col gap-3">
+              <div className="flex items-center gap-2">
+                <Users size={15} className="text-neutral-500" />
+                <h3 className="text-xs font-bold text-neutral-500 uppercase tracking-wider">Team Assignments & Task Tracking</h3>
+              </div>
+              <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
+                {plan.assignments?.map((assign, idx) => {
+                  const memberTasks = assign.assignedTasks || [];
+                  const memberCompleted = memberTasks.filter(t => t.status === 'Completed').length;
+                  const memberProgress = memberTasks.length > 0 ? Math.round((memberCompleted / memberTasks.length) * 100) : 0;
+                  const colorIdx = idx % memberGradients.length;
+                  return (
+                    <div key={idx} className="bg-white border border-neutral-200 rounded-xl overflow-hidden shadow-xs hover:shadow-md transition-all duration-200">
+                      {/* Member Header */}
+                      <div className="p-4 pb-3 border-b border-neutral-100">
+                        <div className="flex items-center gap-3">
+                          <div className={`w-10 h-10 rounded-xl bg-gradient-to-br ${memberGradients[colorIdx]} flex items-center justify-center text-white font-bold text-sm shrink-0 shadow-sm`}>
+                            {assign.member.charAt(0).toUpperCase()}
+                          </div>
+                          <div className="flex-1 min-w-0">
+                            <h4 className="text-sm font-bold text-neutral-900 truncate">{assign.member}</h4>
+                            <div className="flex flex-wrap gap-1 mt-1">
+                              {assign.skills.map((s, sIdx) => (
+                                <span key={sIdx} className={`px-1.5 py-0.5 text-[9px] font-bold rounded-md border ${memberBgColors[colorIdx]}`}>{s}</span>
+                              ))}
+                            </div>
+                          </div>
+                          <div className="text-right shrink-0">
+                            <div className="text-lg font-extrabold text-neutral-900 font-mono leading-none">{memberCompleted}<span className="text-xs text-neutral-400 font-normal">/{memberTasks.length}</span></div>
+                            <div className="text-[9px] font-bold text-neutral-400 uppercase tracking-wider">Done</div>
+                          </div>
+                        </div>
+                        <div className="mt-3 h-1.5 bg-neutral-100 rounded-full overflow-hidden">
+                          <div className={`h-full rounded-full transition-all duration-700 ease-out ${barFills[colorIdx]}`} style={{ width: `${memberProgress}%` }}></div>
+                        </div>
+                      </div>
+                      {/* Task List */}
+                      <div className="p-4 flex flex-col gap-2 max-h-[340px] overflow-y-auto">
+                        {memberTasks.map((t, tIdx) => {
+                          const sc = { 'Not Started': { dot: 'bg-neutral-300', bg: 'bg-neutral-50/50', tx: 'text-neutral-500' }, 'In Progress': { dot: 'bg-amber-400 animate-pulse', bg: 'bg-amber-50/40', tx: 'text-amber-700' }, 'Completed': { dot: 'bg-emerald-500', bg: 'bg-emerald-50/40', tx: 'text-emerald-700' } };
+                          const cfg = sc[t.status] || sc['Not Started'];
+                          return (
+                            <div key={tIdx} className={`flex items-center gap-3 p-2.5 rounded-lg border border-neutral-100 ${cfg.bg} transition-all duration-150 hover:border-neutral-200`}>
+                              <span className={`w-2 h-2 rounded-full shrink-0 ${cfg.dot}`}></span>
+                              <span className="text-xs font-medium text-neutral-700 flex-1 leading-relaxed">{t.task}</span>
+                              <select value={t.status} onChange={(e) => handleUpdateTaskStatus(assign.member, t.task, e.target.value)}
+                                className={`text-[10px] font-bold border border-neutral-200 rounded-lg px-2 py-1 bg-white cursor-pointer hover:border-neutral-300 focus:outline-none ${cfg.tx}`}
+                                style={{ minWidth: '100px' }}>
+                                <option value="Not Started">⏳ Not Started</option>
+                                <option value="In Progress">🔄 In Progress</option>
+                                <option value="Completed">✅ Completed</option>
+                              </select>
+                            </div>
+                          );
+                        })}
+                      </div>
+                      {/* AI Rationale */}
+                      {assign.reason && (
+                        <div className="px-4 pb-4">
+                          <div className="bg-neutral-50 border border-neutral-100 rounded-lg p-3">
+                            <p className="text-[11px] text-neutral-500 leading-relaxed"><span className="font-bold text-neutral-600">AI Rationale: </span>{assign.reason}</p>
+                          </div>
+                        </div>
+                      )}
+                    </div>
+                  );
+                })}
+              </div>
+            </div>
+
+            {/* ═══ Workload Distribution ═══ */}
+            <div className="flex flex-col gap-3">
+              <div className="flex items-center gap-2">
+                <BarChart3 size={15} className="text-neutral-500" />
+                <h3 className="text-xs font-bold text-neutral-500 uppercase tracking-wider">Workload Distribution</h3>
+              </div>
+              <div className="bg-white border border-neutral-200 rounded-xl p-5 shadow-xs flex flex-col gap-4">
+                {plan.workloadDistribution?.map((dist, idx) => {
+                  const colorIdx = idx % barFills.length;
+                  return (
+                    <div key={idx} className="flex flex-col gap-2">
+                      <div className="flex justify-between items-center">
+                        <div className="flex items-center gap-2.5">
+                          <div className={`w-7 h-7 rounded-lg bg-gradient-to-br ${memberGradients[colorIdx]} flex items-center justify-center text-white font-bold text-[10px] shrink-0`}>
+                            {dist.member.charAt(0).toUpperCase()}
+                          </div>
+                          <span className="text-xs font-bold text-neutral-800">{dist.member}</span>
+                        </div>
+                        <span className="text-sm font-extrabold text-neutral-900 font-mono">{dist.percentage}%</span>
+                      </div>
+                      <div className="h-3 bg-neutral-100 rounded-full overflow-hidden">
+                        <div className={`h-full rounded-full ${barFills[colorIdx]} transition-all duration-1000 ease-out`} style={{ width: `${dist.percentage}%` }}></div>
+                      </div>
+                    </div>
+                  );
+                })}
+              </div>
+            </div>
+
+            {/* ═══ Execution Roadmap ═══ */}
+            <div className="flex flex-col gap-3">
+              <div className="flex items-center gap-2">
+                <GitBranch size={15} className="text-neutral-500" />
+                <h3 className="text-xs font-bold text-neutral-500 uppercase tracking-wider">Execution Roadmap</h3>
+              </div>
+              <div className="bg-white border border-neutral-200 rounded-xl p-5 shadow-xs">
+                <div className="relative">
+                  <div className="absolute left-[19px] top-5 bottom-5 w-[2px] bg-gradient-to-b from-purple-300 via-blue-300 to-emerald-300"></div>
+                  <div className="flex flex-col gap-1">
+                    {plan.executionOrder?.map((step, idx) => {
+                      const isFirst = idx === 0;
+                      const isLast = idx === (plan.executionOrder.length - 1);
+                      return (
+                        <div key={idx} className="flex gap-4 items-center relative group">
+                          <div className={`w-10 h-10 rounded-full flex items-center justify-center text-xs font-extrabold shrink-0 z-10 transition-all duration-200 ${
+                            isFirst ? 'bg-gradient-to-br from-violet-500 to-purple-600 text-white shadow-md shadow-purple-200' :
+                            isLast ? 'bg-gradient-to-br from-emerald-500 to-teal-600 text-white shadow-md shadow-emerald-200' :
+                            'bg-white border-2 border-neutral-200 text-neutral-500 group-hover:border-purple-300 group-hover:text-purple-600'
+                          }`}>
+                            {idx + 1}
+                          </div>
+                          <div className={`flex-1 py-2.5 px-4 rounded-xl text-xs font-semibold transition-all duration-200 ${
+                            isFirst ? 'bg-purple-50 text-purple-800 border border-purple-100' :
+                            isLast ? 'bg-emerald-50 text-emerald-800 border border-emerald-100' :
+                            'bg-neutral-50 text-neutral-700 border border-neutral-100 group-hover:bg-purple-50/30 group-hover:border-purple-100'
+                          }`}>
+                            {step.replace(/^\d+\.\s*/, '')}
+                          </div>
+                        </div>
+                      );
+                    })}
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            {/* ═══ Critical | Focus | Warnings ═══ */}
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+              {/* Critical Tasks */}
+              <div className="bg-white border border-amber-200 rounded-xl overflow-hidden shadow-xs">
+                <div className="h-1 bg-gradient-to-r from-amber-400 to-orange-500"></div>
+                <div className="p-5 flex flex-col gap-3">
+                  <div className="flex items-center gap-2">
+                    <div className="w-8 h-8 rounded-lg bg-amber-50 text-amber-600 flex items-center justify-center"><Zap size={16} /></div>
+                    <div>
+                      <h3 className="text-xs font-bold text-amber-800 uppercase tracking-wider">Critical for Demo</h3>
+                      <p className="text-[10px] text-amber-600/70">Must complete for MVP</p>
+                    </div>
+                  </div>
+                  <div className="flex flex-col gap-2">
+                    {plan.criticalTasks?.map((task, idx) => (
+                      <div key={idx} className="flex items-start gap-2 p-2.5 bg-amber-50/50 border border-amber-100 rounded-lg">
+                        <AlertTriangle size={12} className="text-amber-500 mt-0.5 shrink-0" />
+                        <span className="text-xs font-semibold text-amber-800 leading-relaxed">{task}</span>
+                      </div>
+                    )) || <p className="text-xs text-neutral-400 italic">None identified</p>}
+                  </div>
+                </div>
+              </div>
+              {/* Recommended Focus */}
+              <div className="bg-white border border-purple-200 rounded-xl overflow-hidden shadow-xs">
+                <div className="h-1 bg-gradient-to-r from-purple-400 to-violet-500"></div>
+                <div className="p-5 flex flex-col gap-3">
+                  <div className="flex items-center gap-2">
+                    <div className="w-8 h-8 rounded-lg bg-purple-50 text-purple-600 flex items-center justify-center"><Target size={16} /></div>
+                    <div>
+                      <h3 className="text-xs font-bold text-purple-800 uppercase tracking-wider">Judging Impact</h3>
+                      <p className="text-[10px] text-purple-600/70">Maximize your score</p>
+                    </div>
+                  </div>
+                  <div className="flex flex-col gap-2">
+                    {plan.recommendedFocus?.map((focus, idx) => (
+                      <div key={idx} className="flex items-start gap-2 p-2.5 bg-purple-50/50 border border-purple-100 rounded-lg">
+                        <Star size={12} className="text-purple-500 mt-0.5 shrink-0" />
+                        <span className="text-xs font-semibold text-purple-800 leading-relaxed">{focus}</span>
+                      </div>
+                    )) || <p className="text-xs text-neutral-400 italic">None identified</p>}
+                  </div>
+                </div>
+              </div>
+              {/* Risk Alerts */}
+              <div className="bg-white border border-red-200 rounded-xl overflow-hidden shadow-xs">
+                <div className="h-1 bg-gradient-to-r from-red-400 to-rose-500"></div>
+                <div className="p-5 flex flex-col gap-3">
+                  <div className="flex items-center gap-2">
+                    <div className="w-8 h-8 rounded-lg bg-red-50 text-red-600 flex items-center justify-center"><ShieldAlert size={16} /></div>
+                    <div>
+                      <h3 className="text-xs font-bold text-red-800 uppercase tracking-wider">Risk Alerts</h3>
+                      <p className="text-[10px] text-red-600/70">Watch out for these</p>
+                    </div>
+                  </div>
+                  <div className="flex flex-col gap-2">
+                    {plan.warnings?.map((warning, idx) => (
+                      <div key={idx} className="flex items-start gap-2 p-2.5 bg-red-50/50 border border-red-100 rounded-lg">
+                        <AlertTriangle size={12} className="text-red-500 mt-0.5 shrink-0" />
+                        <span className="text-xs font-semibold text-red-800 leading-relaxed">{warning}</span>
+                      </div>
+                    )) || <p className="text-xs text-neutral-400 italic">None identified</p>}
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        );
+      })()}
 
       {/* AI Mentor Chat View */}
       {view === 'mentor-chat' && project && (

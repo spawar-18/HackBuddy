@@ -64,6 +64,37 @@ const projectSchema = new mongoose.Schema({
   },
   projectReviewGeneratedAt: {
     type: Date
+  },
+  taskPlan: {
+    projectTasks: {
+      coreFeatures: [String],
+      technicalTasks: [String],
+      deploymentTasks: [String]
+    },
+    assignments: [{
+      member: String,
+      skills: [String],
+      assignedTasks: [{
+        task: String,
+        status: {
+          type: String,
+          enum: ['Not Started', 'In Progress', 'Completed'],
+          default: 'Not Started'
+        }
+      }],
+      reason: String
+    }],
+    workloadDistribution: [{
+      member: String,
+      percentage: Number
+    }],
+    executionOrder: [String],
+    criticalTasks: [String],
+    recommendedFocus: [String],
+    warnings: [String]
+  },
+  taskPlanGeneratedAt: {
+    type: Date
   }
 });
 
@@ -87,6 +118,11 @@ const createMockProjectInstance = (data) => {
     createdAt: data.createdAt || new Date(),
     projectReview: data.projectReview || null,
     projectReviewGeneratedAt: data.projectReviewGeneratedAt || null,
+    taskPlan: data.taskPlan || null,
+    taskPlanGeneratedAt: data.taskPlanGeneratedAt || null,
+    markModified(path) {
+      // dummy function for in-memory database fallback
+    },
     async save() {
       const index = memoryDB.findIndex(p => p._id === this._id);
       const serialized = {
@@ -102,7 +138,9 @@ const createMockProjectInstance = (data) => {
         status: this.status,
         createdAt: this.createdAt,
         projectReview: this.projectReview,
-        projectReviewGeneratedAt: this.projectReviewGeneratedAt
+        projectReviewGeneratedAt: this.projectReviewGeneratedAt,
+        taskPlan: this.taskPlan,
+        taskPlanGeneratedAt: this.taskPlanGeneratedAt
       };
       if (index !== -1) {
         memoryDB[index] = serialized;

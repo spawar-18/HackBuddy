@@ -81,3 +81,35 @@ export const sendChatMessage = async (projectId, message) => {
   const response = await api.post(`/project/${projectId}/chat`, { message });
   return response.data;
 };
+
+/**
+ * Generates project task plan.
+ * @param {string} projectId - Project ID
+ * @returns {Promise<Object>} { success, taskPlan, taskPlanGeneratedAt }
+ */
+export const generateTaskPlan = async (projectId) => {
+  const response = await api.post(`/project/${projectId}/generate-task-plan`);
+  return response.data;
+};
+
+/**
+ * Regenerates project task plan.
+ * @param {string} projectId - Project ID
+ * @returns {Promise<Object>} { success, taskPlan, taskPlanGeneratedAt }
+ */
+export const regenerateTaskPlan = async (projectId) => {
+  const response = await api.post(`/project/${projectId}/regenerate-task-plan`);
+  return response.data;
+};
+
+/**
+ * Updates status of a task.
+ * @param {string} projectId - Project ID
+ * @param {Object} data - { memberName, taskName, status }
+ * @returns {Promise<Object>} { success, taskPlan }
+ */
+export const updateTaskStatus = async (projectId, data) => {
+  const response = await api.patch(`/project/${projectId}/task-plan/task-status`, data);
+  return response.data;
+};
+

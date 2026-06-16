@@ -228,6 +228,9 @@ exports.updateProject = async (req, res) => {
     if (hasChanged) {
       project.projectReview = null;
       project.projectReviewGeneratedAt = null;
+      // Auto-invalidate task plan when critical fields change
+      project.taskPlan = null;
+      project.taskPlanGeneratedAt = null;
     }
 
     if (status !== undefined) {

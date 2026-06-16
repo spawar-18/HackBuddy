@@ -1,16 +1,69 @@
 const { OpenAI } = require('openai');
 
 /**
+ * Strip Qwen3 <think>...</think> reasoning blocks from AI response text.
+ * Qwen3 models often wrap their output in <think> tags before the actual content.
+ * @param {string} text - Raw AI response text
+ * @returns {string} Text with think blocks removed
+ */
+const stripThinkTags = (text) => {
+  if (!text) return '';
+  // Remove all <think>...</think> blocks (including multiline)
+  let cleaned = text.replace(/<think>[\s\S]*?<\/think>/gi, '').trim();
+  // Also handle unclosed <think> tags (model cut off before closing)
+  cleaned = cleaned.replace(/<think>[\s\S]*/gi, '').trim();
+  return cleaned;
+};
+
+/**
+ * Attempt to repair truncated JSON by balancing braces and brackets.
+ * Useful when max_tokens cuts the response mid-JSON.
+ * @param {string} jsonStr - Potentially truncated JSON string
+ * @returns {string} Repaired JSON string
+ */
+const repairTruncatedJson = (jsonStr) => {
+  let openBraces = 0;
+  let openBrackets = 0;
+  let inString = false;
+  let escape = false;
+
+  for (let i = 0; i < jsonStr.length; i++) {
+    const ch = jsonStr[i];
+    if (escape) { escape = false; continue; }
+    if (ch === '\\') { escape = true; continue; }
+    if (ch === '"') { inString = !inString; continue; }
+    if (inString) continue;
+    if (ch === '{') openBraces++;
+    else if (ch === '}') openBraces--;
+    else if (ch === '[') openBrackets++;
+    else if (ch === ']') openBrackets--;
+  }
+
+  // If we're inside a string, close it
+  let repaired = jsonStr;
+  if (inString) repaired += '"';
+
+  // Close any unclosed brackets/braces
+  while (openBrackets > 0) { repaired += ']'; openBrackets--; }
+  while (openBraces > 0) { repaired += '}'; openBraces--; }
+
+  return repaired;
+};
+
+/**
  * Clean up and parse the AI response text as JSON
  * @param {string} responseText - Text returned by the model
  * @returns {object} Parsed JSON analysis
  */
 const cleanAndParseResponse = (responseText) => {
-  // Clean up potential markdown formatting (e.g. ```json ... ```)
-  const cleanText = responseText
-    .replace(/```json/gi, '')
-    .replace(/```/g, '')
-    .trim();
+  const stripped = stripThinkTags(responseText);
+  const firstBrace = stripped.indexOf('{');
+  const lastBrace = stripped.lastIndexOf('}');
+  if (firstBrace === -1 || lastBrace === -1 || lastBrace < firstBrace) {
+    console.error('Failed to parse AI response: No JSON object found. Response:', responseText.substring(0, 500));
+    throw new Error('Invalid AI JSON response: No JSON object found in response');
+  }
+  const cleanText = stripped.substring(firstBrace, lastBrace + 1).trim();
 
   let parsed;
   try {
@@ -20,16 +73,14 @@ const cleanAndParseResponse = (responseText) => {
     throw new Error('Invalid AI JSON response: The response could not be parsed as JSON');
   }
 
-  // Validate response structure (excluding suggestedProjects and recommendations)
   const requiredKeys = ['readinessScore', 'strengths', 'skillGaps', 'recommendedRoles'];
   const missingKeys = requiredKeys.filter(key => !(key in parsed));
   if (missingKeys.length > 0) {
     throw new Error(`Invalid AI JSON response: Missing required fields: ${missingKeys.join(', ')}`);
   }
 
-  // Validate types and constraints
   if (typeof parsed.readinessScore !== 'number' || parsed.readinessScore < 1 || parsed.readinessScore > 10) {
-    parsed.readinessScore = 5.0; // Fail-safe default
+    parsed.readinessScore = 5.0;
   }
 
   if (!Array.isArray(parsed.strengths)) parsed.strengths = [];
@@ -41,12 +92,7 @@ const cleanAndParseResponse = (responseText) => {
 
 /**
  * Analyzes team readiness and skills using Qwen/Qwen3.6-35B-A3B.
- * First, it attempts to use QWEN_API with QWEN_BASE_URL (Featherless.ai gateway).
- * If that fails (due to key/network issues), it automatically falls back
- * to using OPENROUTER_API_KEY with OpenRouter.
- * 
- * Uses deterministic settings (temperature: 0, top_p: 0.1) to ensure stability.
- * 
+ * Falls back to OpenRouter or Mock.
  * @param {string} teamDataString - Context representation of the team and its members
  * @returns {Promise<object>} Parsed structured analysis JSON
  */
@@ -98,7 +144,6 @@ Team:
 
 ${teamDataString}`;
 
-  // 1. Attempt Qwen via Featherless API using QWEN_API & QWEN_BASE_URL
   if (qwenKey) {
     try {
       console.log(`Attempting deterministic Qwen team analysis via ${qwenBaseUrl} (QWEN_API)...`);
@@ -114,21 +159,16 @@ ${teamDataString}`;
 
       const response = await qwenClient.chat.completions.create({
         model: 'Qwen/Qwen3.6-35B-A3B',
-        messages: [
-          {
-            role: 'user',
-            content: prompt
-          }
-        ],
+        messages: [{ role: 'user', content: prompt }],
         temperature: 0,
         top_p: 0.1,
+        max_tokens: 1500,
       });
 
       const responseText = response.choices[0]?.message?.content || '';
       return cleanAndParseResponse(responseText);
     } catch (qwenError) {
       console.error('Qwen API call failed:', qwenError.message || qwenError);
-      
       if (!openRouterKey) {
         throw new Error(`Qwen API error: ${qwenError.message || 'Unknown error'}`);
       }
@@ -136,7 +176,6 @@ ${teamDataString}`;
     }
   }
 
-  // 2. Fallback: Attempt OpenRouter using OPENROUTER_API_KEY
   if (openRouterKey) {
     try {
       console.log('Attempting deterministic Qwen team analysis via OpenRouter (OPENROUTER_API_KEY)...');
@@ -151,14 +190,10 @@ ${teamDataString}`;
 
       const response = await openrouter.chat.completions.create({
         model: 'qwen/qwen3.6-35b-a3b',
-        messages: [
-          {
-            role: 'user',
-            content: prompt
-          }
-        ],
+        messages: [{ role: 'user', content: prompt }],
         temperature: 0,
         top_p: 0.1,
+        max_tokens: 1500,
       });
 
       const responseText = response.choices[0]?.message?.content || '';
@@ -169,12 +204,11 @@ ${teamDataString}`;
     }
   }
 
-  // Fallback mock (failsafe)
   return generateMockAnalysis(teamDataString);
 };
 
 /**
- * Generates mock team analysis for testing/fallback (excluding suggestedProjects & recommendations)
+ * Generates mock team analysis for testing/fallback
  * @param {string} teamDataString - Context of the team
  * @returns {object} Mock analysis
  */
@@ -200,11 +234,10 @@ const generateMockAnalysis = (teamDataString) => {
 
   const finalMembers = members.length > 0 ? members : ['Sahil'];
   
-  // Custom mock mapping roles based on rules
   const recommendedRoles = finalMembers.map((member) => {
     return {
       member,
-      role: 'Full Stack Developer' // Default mock role matching Guidelines
+      role: 'Full Stack Developer'
     };
   });
 
@@ -229,10 +262,14 @@ const generateMockAnalysis = (teamDataString) => {
  * @returns {object} Parsed JSON project review
  */
 const cleanAndParseProjectReview = (responseText) => {
-  const cleanText = responseText
-    .replace(/```json/gi, '')
-    .replace(/```/g, '')
-    .trim();
+  const stripped = stripThinkTags(responseText);
+  const firstBrace = stripped.indexOf('{');
+  const lastBrace = stripped.lastIndexOf('}');
+  if (firstBrace === -1 || lastBrace === -1 || lastBrace < firstBrace) {
+    console.error('Failed to parse AI project review: No JSON object found. Response:', responseText.substring(0, 500));
+    throw new Error('Invalid AI JSON response: No JSON object found in response');
+  }
+  const cleanText = stripped.substring(firstBrace, lastBrace + 1).trim();
 
   let parsed;
   try {
@@ -242,7 +279,6 @@ const cleanAndParseProjectReview = (responseText) => {
     throw new Error('Invalid AI JSON response: The response could not be parsed as JSON');
   }
 
-  // Set default fallbacks if missing or of invalid type
   if (typeof parsed.feasibilityScore !== 'number') parsed.feasibilityScore = 5.0;
   if (typeof parsed.problemSolutionAlignment !== 'string') parsed.problemSolutionAlignment = '';
   if (!Array.isArray(parsed.projectRisks)) parsed.projectRisks = [];
@@ -304,10 +340,8 @@ const generateMockProjectReview = (projectContextString) => {
 };
 
 /**
- * Analyzes project feasibility, risks, features alignment, missing skills, etc.,
- * using Qwen/Qwen3.6-35B-A3B.
+ * Analyzes project feasibility, risks, features alignment, missing skills, etc.
  * Falls back to OpenRouter or Mock if needed.
- * 
  * @param {string} projectContextString - Context representation of the project and team skills
  * @returns {Promise<object>} Parsed structured review JSON
  */
@@ -368,7 +402,6 @@ Required Format:
 Project context:
 ${projectContextString}`;
 
-  // 1. Attempt Qwen via Featherless API using QWEN_API & QWEN_BASE_URL
   if (qwenKey) {
     try {
       console.log(`Attempting deterministic Qwen project review via ${qwenBaseUrl} (QWEN_API)...`);
@@ -384,21 +417,16 @@ ${projectContextString}`;
 
       const response = await qwenClient.chat.completions.create({
         model: 'Qwen/Qwen3.6-35B-A3B',
-        messages: [
-          {
-            role: 'user',
-            content: prompt
-          }
-        ],
+        messages: [{ role: 'user', content: prompt }],
         temperature: 0,
         top_p: 0.1,
+        max_tokens: 2500,
       });
 
       const responseText = response.choices[0]?.message?.content || '';
       return cleanAndParseProjectReview(responseText);
     } catch (qwenError) {
       console.error('Qwen API call for project review failed:', qwenError.message || qwenError);
-      
       if (!openRouterKey) {
         throw new Error(`Qwen API error: ${qwenError.message || 'Unknown error'}`);
       }
@@ -406,7 +434,6 @@ ${projectContextString}`;
     }
   }
 
-  // 2. Fallback: Attempt OpenRouter using OPENROUTER_API_KEY
   if (openRouterKey) {
     try {
       console.log('Attempting deterministic Qwen project review via OpenRouter (OPENROUTER_API_KEY)...');
@@ -421,14 +448,10 @@ ${projectContextString}`;
 
       const response = await openrouter.chat.completions.create({
         model: 'qwen/qwen3.6-35b-a3b',
-        messages: [
-          {
-            role: 'user',
-            content: prompt
-          }
-        ],
+        messages: [{ role: 'user', content: prompt }],
         temperature: 0,
         top_p: 0.1,
+        max_tokens: 2500,
       });
 
       const responseText = response.choices[0]?.message?.content || '';
@@ -477,8 +500,6 @@ const generateMockChatResponse = (currentQuestion, projectContextString) => {
 
 /**
  * Interacts with HackVerse AI Mentor using Qwen/Qwen3.6-35B-A3B.
- * Supports OpenAI/Featherless client with OpenRouter fallback.
- * 
  * @param {string} projectContextString - Formatted project context details
  * @param {Array<object>} history - Recent message history [{role, message}]
  * @param {string} currentQuestion - User's question
@@ -524,14 +545,8 @@ Rules:
 Answer in a conversational format.
 Do not return JSON. Use Markdown for list and formatting if appropriate.`;
 
-  const messages = [
-    {
-      role: 'system',
-      content: systemPrompt
-    }
-  ];
+  const messages = [{ role: 'system', content: systemPrompt }];
 
-  // Map history (role can be 'user' or 'assistant')
   history.forEach(h => {
     messages.push({
       role: h.role === 'user' ? 'user' : 'assistant',
@@ -539,12 +554,8 @@ Do not return JSON. Use Markdown for list and formatting if appropriate.`;
     });
   });
 
-  messages.push({
-    role: 'user',
-    content: currentQuestion
-  });
+  messages.push({ role: 'user', content: currentQuestion });
 
-  // 1. Attempt Qwen via Featherless API using QWEN_API & QWEN_BASE_URL
   if (qwenKey) {
     try {
       console.log(`Attempting deterministic Qwen mentor chat via ${qwenBaseUrl} (QWEN_API)...`);
@@ -561,14 +572,14 @@ Do not return JSON. Use Markdown for list and formatting if appropriate.`;
       const response = await qwenClient.chat.completions.create({
         model: 'Qwen/Qwen3.6-35B-A3B',
         messages: messages,
-        temperature: 0.2, // slightly higher temperature for conversational flow
+        temperature: 0.2,
         top_p: 0.9,
+        max_tokens: 1500,
       });
 
       return response.choices[0]?.message?.content || 'No response from mentor AI.';
     } catch (qwenError) {
       console.error('Qwen API call for mentor chat failed:', qwenError.message || qwenError);
-      
       if (!openRouterKey) {
         throw new Error(`Qwen API error: ${qwenError.message || 'Unknown error'}`);
       }
@@ -576,7 +587,6 @@ Do not return JSON. Use Markdown for list and formatting if appropriate.`;
     }
   }
 
-  // 2. Fallback: Attempt OpenRouter using OPENROUTER_API_KEY
   if (openRouterKey) {
     try {
       console.log('Attempting deterministic Qwen mentor chat via OpenRouter (OPENROUTER_API_KEY)...');
@@ -594,6 +604,7 @@ Do not return JSON. Use Markdown for list and formatting if appropriate.`;
         messages: messages,
         temperature: 0.2,
         top_p: 0.9,
+        max_tokens: 1500,
       });
 
       return response.choices[0]?.message?.content || 'No response from mentor AI.';
@@ -606,8 +617,348 @@ Do not return JSON. Use Markdown for list and formatting if appropriate.`;
   return generateMockChatResponse(currentQuestion, projectContextString);
 };
 
+// ============================================================
+// AI TASK SPLITTER
+// ============================================================
+
+/**
+ * Clean and parse AI task plan response
+ * @param {string} responseText - Raw AI output
+ * @returns {object} Validated task plan object
+ */
+const cleanAndParseTaskPlan = (responseText) => {
+  const stripped = stripThinkTags(responseText);
+  console.log('Task plan response after stripping think tags (first 300 chars):', stripped.substring(0, 300));
+  const firstBrace = stripped.indexOf('{');
+  const lastBrace = stripped.lastIndexOf('}');
+  if (firstBrace === -1) {
+    console.error('Failed to parse AI task plan: No JSON object found. Raw response (first 500):', responseText.substring(0, 500));
+    throw new Error('Invalid AI JSON response: No JSON object found in response');
+  }
+
+  let cleanText;
+  if (lastBrace === -1 || lastBrace < firstBrace) {
+    // JSON was truncated by max_tokens — attempt repair
+    console.warn('Task plan JSON appears truncated, attempting repair...');
+    cleanText = repairTruncatedJson(stripped.substring(firstBrace));
+  } else {
+    cleanText = stripped.substring(firstBrace, lastBrace + 1).trim();
+  }
+
+  let parsed;
+  try {
+    parsed = JSON.parse(cleanText);
+  } catch (parseErr) {
+    // Try repair on parse failure too (e.g. truncated inside the last brace range)
+    try {
+      console.warn('Initial parse failed, attempting JSON repair...');
+      const repaired = repairTruncatedJson(stripped.substring(firstBrace));
+      parsed = JSON.parse(repaired);
+    } catch (repairErr) {
+      console.error('Failed to parse AI task plan response as JSON (even after repair):', stripped.substring(0, 500));
+      throw new Error('Invalid AI JSON response: The task plan response could not be parsed as JSON');
+    }
+  }
+
+  if (!parsed.projectTasks || typeof parsed.projectTasks !== 'object') parsed.projectTasks = {};
+  if (!Array.isArray(parsed.projectTasks.coreFeatures)) parsed.projectTasks.coreFeatures = [];
+  if (!Array.isArray(parsed.projectTasks.technicalTasks)) parsed.projectTasks.technicalTasks = [];
+  if (!Array.isArray(parsed.projectTasks.deploymentTasks)) parsed.projectTasks.deploymentTasks = [];
+  if (!Array.isArray(parsed.assignments)) parsed.assignments = [];
+  if (!Array.isArray(parsed.workloadDistribution)) parsed.workloadDistribution = [];
+  if (!Array.isArray(parsed.executionOrder)) parsed.executionOrder = [];
+  if (!Array.isArray(parsed.criticalTasks)) parsed.criticalTasks = [];
+  if (!Array.isArray(parsed.recommendedFocus)) parsed.recommendedFocus = [];
+  if (!Array.isArray(parsed.warnings)) parsed.warnings = [];
+
+  // Normalize assignedTasks: can come as strings or objects
+  parsed.assignments = parsed.assignments.map(a => ({
+    member: a.member || '',
+    skills: Array.isArray(a.skills) ? a.skills : [],
+    assignedTasks: Array.isArray(a.assignedTasks)
+      ? a.assignedTasks.map(t =>
+          typeof t === 'string'
+            ? { task: t, status: 'Not Started' }
+            : { task: t.task || String(t), status: t.status || 'Not Started' }
+        )
+      : [],
+    reason: a.reason || ''
+  }));
+
+  return parsed;
+};
+
+/**
+ * Validate that a parsed task plan has meaningful content (not truncated)
+ * @param {object} plan - Parsed task plan
+ * @param {Array} members - Expected team members
+ * @throws {Error} If the plan appears truncated or incomplete
+ */
+const validateTaskPlanCompleteness = (plan, members) => {
+  if (!plan.assignments || plan.assignments.length === 0) {
+    throw new Error('AI response was truncated: assignments are missing');
+  }
+  if (!plan.executionOrder || plan.executionOrder.length === 0) {
+    throw new Error('AI response was truncated: executionOrder is missing');
+  }
+  // Check that at least some members got assignments
+  const assignedMembers = plan.assignments.map(a => a.member.toLowerCase());
+  const expectedMembers = members.map(m => m.name.toLowerCase());
+  const matched = expectedMembers.filter(m => assignedMembers.some(a => a.includes(m) || m.includes(a)));
+  if (matched.length === 0 && members.length > 0) {
+    console.warn('Warning: No team members matched in assignments. Assigned:', assignedMembers, 'Expected:', expectedMembers);
+  }
+};
+
+/**
+ * Generates a mock task plan for testing / fallback
+ * @param {string} contextString - Project context
+ * @param {Array} members - Array of { name, skills }
+ * @returns {object} Mock task plan
+ */
+const generateMockTaskPlan = (contextString, members) => {
+  const count = members.length || 1;
+
+  const allTasks = [
+    'Project Architecture & Database Schema Design',
+    'Authentication & Authorization (JWT)',
+    'User Management & Profile API',
+    'Frontend Routing & Navigation Setup',
+    'Core Feature Backend API Endpoints',
+    'Frontend UI Components & Pages',
+    'State Management & API Integration',
+    'AI Feature Integration',
+    'Input Validation & Error Handling',
+    'Testing & Bug Fixes',
+    'Environment Configuration',
+    'Production Deployment & Demo Preparation'
+  ];
+
+  const assignments = members.map((m, idx) => {
+    const start = Math.floor((idx / count) * allTasks.length);
+    const end = Math.floor(((idx + 1) / count) * allTasks.length);
+    const tasks = allTasks.slice(start, end);
+    return {
+      member: m.name,
+      skills: m.skills && m.skills.length > 0 ? m.skills : ['Full Stack Development'],
+      assignedTasks: tasks.map(t => ({ task: t, status: 'Not Started' })),
+      reason: `Balanced task allocation across ${count} team member(s) based on available skills.`
+    };
+  });
+
+  const basePct = Math.floor(100 / count);
+  const workloadDistribution = members.map((m, idx) => ({
+    member: m.name,
+    percentage: idx === members.length - 1 ? 100 - basePct * (count - 1) : basePct
+  }));
+
+  return {
+    projectTasks: {
+      coreFeatures: ['Core Feature Development', 'User Interface', 'API Integration'],
+      technicalTasks: ['Authentication & Authorization', 'Database Schema Design', 'State Management', 'Error Handling & Validation', 'Security'],
+      deploymentTasks: ['Environment Configuration', 'Production Deployment', 'Demo Preparation']
+    },
+    assignments,
+    workloadDistribution,
+    executionOrder: [
+      '1. Environment Setup & Database Schema Design',
+      '2. Authentication & Authorization',
+      '3. User Management & Profile',
+      '4. Core Feature Backend APIs',
+      '5. Frontend Pages & UI Components',
+      '6. AI Feature Integration',
+      '7. State Management & API Wiring',
+      '8. Testing & Bug Fixes',
+      '9. Production Deployment & Demo Preparation'
+    ],
+    criticalTasks: [
+      'Authentication & Authorization (JWT)',
+      'Core Feature Backend API Endpoints',
+      'Frontend UI Components & Pages',
+      'Production Deployment & Demo Preparation'
+    ],
+    recommendedFocus: [
+      'End-to-end working demo loop',
+      'Clean, polished UI for judge presentation',
+      'AI integration as the key differentiator'
+    ],
+    warnings: [
+      'Ensure all team members agree on the architecture before coding begins.',
+      'Prioritize a working demo over feature completeness.',
+      'AI integration may take longer than estimated — build a mock fallback.'
+    ]
+  };
+};
+
+/**
+ * Generates a complete AI Task Plan using Qwen AI.
+ * Behaves as Technical Architect + Engineering Manager + Hackathon Mentor.
+ * Falls back to OpenRouter or Mock if needed.
+ *
+ * @param {string} contextString - Full project + team context string
+ * @param {Array} members - Array of { name, skills } objects
+ * @returns {Promise<object>} Parsed structured task plan JSON
+ */
+const generateTaskPlanWithAI = async (contextString, members) => {
+  const qwenKey = process.env.QWEN_API;
+  const qwenBaseUrl = process.env.QWEN_BASE_URL || 'https://api.featherless.ai/v1';
+  const openRouterKey = process.env.OPENROUTER_API_KEY;
+
+  if (!qwenKey && !openRouterKey) {
+    console.warn('WARNING: Neither QWEN_API nor OPENROUTER_API_KEY is defined. Using mock task plan.');
+    return generateMockTaskPlan(contextString, members);
+  }
+
+  const memberList = members.map(m =>
+    `- ${m.name}: ${(m.skills || []).join(', ') || 'No skills specified'}`
+  ).join('\n');
+
+  const prompt = `/no_think
+You are an experienced Technical Architect, Engineering Manager, Hackathon Mentor, and Startup CTO.
+
+You are helping a hackathon team break down their project into actionable tasks and assign them intelligently.
+
+Your responsibilities:
+1. Understand the FULL project scope — what is being built, what problem it solves.
+2. Identify ALL implementation work required — including tasks NOT mentioned by the team (authentication, DB design, error handling, validation, deployment, env config, security, state management, testing, etc.).
+3. Break tasks into: coreFeatures (user-facing features), technicalTasks (infrastructure/backend/frontend), deploymentTasks.
+4. Assign each task to the most suitable team member based on their skills.
+5. Balance workload fairly — no single person should get most tasks.
+6. Create a realistic dependency-aware execution order.
+7. Identify critical tasks that MUST be done for a successful demo.
+8. Recommend high-impact features that will maximize judging score.
+9. Warn about scope risks, missing skills, or timeline issues.
+
+Skill Mapping:
+- React / Vue / Angular -> Frontend tasks
+- Node.js / Express / FastAPI -> Backend tasks
+- MongoDB / PostgreSQL / MySQL -> Database tasks
+- Python / TensorFlow / PyTorch / ML -> AI/ML tasks
+- Figma / UI/UX Design -> Design tasks
+- DevOps / Docker / AWS / CI/CD -> Deployment tasks
+- Full Stack -> Frontend + Backend tasks
+
+CRITICAL RULES:
+- NEVER assign tasks based only on what the user explicitly listed as features.
+- ALWAYS infer missing technical tasks: auth, routing, schema design, state management, error handling, validation, security, testing, deployment, etc.
+- Every task is assigned to exactly ONE person.
+- workloadDistribution percentages MUST sum to exactly 100.
+- assignedTasks must be an array of plain strings (task names only).
+- Return ONLY valid JSON. No markdown fences. No explanations. No thinking. Only raw JSON starting with {.
+
+Required JSON format:
+{
+  "projectTasks": {
+    "coreFeatures": ["string"],
+    "technicalTasks": ["string"],
+    "deploymentTasks": ["string"]
+  },
+  "assignments": [
+    {
+      "member": "string",
+      "skills": ["string"],
+      "assignedTasks": ["string"],
+      "reason": "string"
+    }
+  ],
+  "workloadDistribution": [
+    {
+      "member": "string",
+      "percentage": number
+    }
+  ],
+  "executionOrder": ["string"],
+  "criticalTasks": ["string"],
+  "recommendedFocus": ["string"],
+  "warnings": ["string"]
+}
+
+Project Context:
+${contextString}
+
+Team Members and Skills:
+${memberList}`;
+
+  // 1. Try Qwen via Featherless
+  if (qwenKey) {
+    try {
+      console.log(`Attempting AI task plan generation via ${qwenBaseUrl} (QWEN_API)...`);
+      const qwenClient = new OpenAI({
+        baseURL: qwenBaseUrl,
+        apiKey: qwenKey,
+        timeout: 60000,
+        defaultHeaders: {
+          'HTTP-Referer': 'http://localhost:3000',
+          'X-Title': 'HackBuddy',
+        }
+      });
+
+      const response = await qwenClient.chat.completions.create({
+        model: 'Qwen/Qwen3.6-35B-A3B',
+        messages: [
+          { role: 'system', content: 'You are a JSON-only API. Respond with raw JSON only. No explanations, no markdown, no thinking.' },
+          { role: 'user', content: prompt }
+        ],
+        temperature: 0,
+        top_p: 0.1,
+        max_tokens: 8000,
+      });
+
+      const responseText = response.choices[0]?.message?.content || '';
+      console.log(`Qwen task plan raw response length: ${responseText.length} chars`);
+      const plan = cleanAndParseTaskPlan(responseText);
+      validateTaskPlanCompleteness(plan, members);
+      return plan;
+    } catch (qwenError) {
+      console.error('Qwen API call for task plan failed:', qwenError.message || qwenError);
+      if (!openRouterKey) {
+        throw new Error(`Qwen API error: ${qwenError.message || 'Unknown error'}`);
+      }
+      console.log('Falling back to OpenRouter for task plan...');
+    }
+  }
+
+  // 2. Fallback: OpenRouter
+  if (openRouterKey) {
+    try {
+      console.log('Attempting AI task plan generation via OpenRouter (OPENROUTER_API_KEY)...');
+      const openrouter = new OpenAI({
+        baseURL: 'https://openrouter.ai/api/v1',
+        apiKey: openRouterKey,
+        defaultHeaders: {
+          'HTTP-Referer': 'http://localhost:3000',
+          'X-Title': 'HackBuddy',
+        }
+      });
+
+      const response = await openrouter.chat.completions.create({
+        model: 'qwen/qwen3.6-35b-a3b',
+        messages: [
+          { role: 'system', content: 'You are a JSON-only API. Respond with raw JSON only. No explanations, no markdown, no thinking.' },
+          { role: 'user', content: prompt }
+        ],
+        temperature: 0,
+        top_p: 0.1,
+        max_tokens: 8000,
+      });
+
+      const responseText = response.choices[0]?.message?.content || '';
+      console.log(`OpenRouter task plan raw response length: ${responseText.length} chars`);
+      const plan = cleanAndParseTaskPlan(responseText);
+      validateTaskPlanCompleteness(plan, members);
+      return plan;
+    } catch (openRouterError) {
+      console.error('OpenRouter API call for task plan failed:', openRouterError.message || openRouterError);
+      throw new Error(`AI API failure: ${openRouterError.message || 'Failed to communicate with AI endpoint'}`);
+    }
+  }
+
+  return generateMockTaskPlan(contextString, members);
+};
+
 module.exports = {
   analyzeTeamWithAI,
   analyzeProjectWithAI,
-  chatWithMentorAI
+  chatWithMentorAI,
+  generateTaskPlanWithAI
 };

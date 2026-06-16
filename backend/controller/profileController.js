@@ -50,6 +50,7 @@ exports.updateProfile = async (req, res) => {
     // Auto-invalidate team analysis for all teams this user belongs to
     try {
       const Team = require('../models/Team');
+      const Project = require('../models/Project');
       const userTeams = await Team.find({ members: user._id });
       for (const team of userTeams) {
         team.analysis = null;
@@ -57,6 +58,10 @@ exports.updateProfile = async (req, res) => {
         team.analysisVersion = (team.analysisVersion || 0) + 1;
         await team.save();
       }
+      await Project.updateMany(
+        { teamId: { $in: userTeams.map(t => t._id) } },
+        { $set: { taskPlan: null, taskPlanGeneratedAt: null } }
+      );
     } catch (teamErr) {
       console.error('Failed to invalidate team analysis on skill update:', teamErr);
     }
