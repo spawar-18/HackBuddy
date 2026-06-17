@@ -113,3 +113,85 @@ export const updateTaskStatus = async (projectId, data) => {
   return response.data;
 };
 
+/**
+ * Request task reassignment.
+ * @param {string} projectId 
+ * @param {string} taskId 
+ * @param {string} reason 
+ * @returns {Promise<Object>}
+ */
+export const requestReassignment = async (projectId, taskId, reason) => {
+  const response = await api.post('/tasks/request-reassignment', { projectId, taskId, reason });
+  return response.data;
+};
+
+/**
+ * Request task swap.
+ * @param {string} projectId 
+ * @param {string} taskId 
+ * @param {string} targetUser 
+ * @param {string} targetTaskId 
+ * @param {string} reason 
+ * @returns {Promise<Object>}
+ */
+export const requestSwap = async (projectId, taskId, targetUser, targetTaskId, reason) => {
+  const response = await api.post('/tasks/request-swap', { projectId, taskId, targetUser, targetTaskId, reason });
+  return response.data;
+};
+
+/**
+ * Request collaborator.
+ * @param {string} projectId 
+ * @param {string} taskId 
+ * @param {string} targetUser 
+ * @param {string} reason 
+ * @returns {Promise<Object>}
+ */
+export const requestCollaborator = async (projectId, taskId, targetUser, reason) => {
+  const response = await api.post('/tasks/request-collaborator', { projectId, taskId, targetUser, reason });
+  return response.data;
+};
+
+/**
+ * Claim available task.
+ * @param {string} projectId 
+ * @param {string} taskId 
+ * @param {string} reason 
+ * @returns {Promise<Object>}
+ */
+export const claimTask = async (projectId, taskId, reason) => {
+  const response = await api.post('/tasks/claim-task', { projectId, taskId, reason });
+  return response.data;
+};
+
+/**
+ * Get project marketplace requests and available tasks.
+ * @param {string} projectId 
+ * @returns {Promise<Object>}
+ */
+export const getMarketplace = async (projectId) => {
+  const response = await api.get(`/projects/${projectId}/marketplace`);
+  return response.data;
+};
+
+/**
+ * Approve a marketplace request (owner only).
+ * @param {string} requestId 
+ * @returns {Promise<Object>}
+ */
+export const approveMarketplaceRequest = async (requestId) => {
+  const response = await api.patch(`/marketplace/${requestId}/approve`);
+  return response.data;
+};
+
+/**
+ * Reject a marketplace request (owner only).
+ * @param {string} requestId 
+ * @returns {Promise<Object>}
+ */
+export const rejectMarketplaceRequest = async (requestId) => {
+  const response = await api.patch(`/marketplace/${requestId}/reject`);
+  return response.data;
+};
+
+

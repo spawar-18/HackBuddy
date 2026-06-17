@@ -80,6 +80,19 @@ const projectSchema = new mongoose.Schema({
           type: String,
           enum: ['Not Started', 'In Progress', 'Completed'],
           default: 'Not Started'
+        },
+        assignedTo: {
+          type: String,
+          default: ''
+        },
+        collaborators: {
+          type: [String],
+          default: []
+        },
+        marketplaceStatus: {
+          type: String,
+          enum: ['Locked', 'Available', 'SwapRequested', 'ClaimRequested', 'ReassignmentRequested'],
+          default: 'Locked'
         }
       }],
       reason: String

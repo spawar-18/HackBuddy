@@ -15,8 +15,12 @@ import { toast } from 'react-hot-toast';
 import { 
   FolderGit2, Plus, Trash2, Edit3, ListTodo, 
   Play, CheckCircle, Clock, ArrowLeft, Save, AlertTriangle, RefreshCw, Cpu,
-  Layers, Users, Activity, Zap, BarChart3, GitBranch, Target, Star, ShieldAlert
+  Layers, Users, Activity, Zap, BarChart3, GitBranch, Target, Star, ShieldAlert,
+  ShoppingBag
 } from 'lucide-react';
+import TaskMarketplace from './TaskMarketplace';
+import { useAuth } from '../context/AuthContext';
+
 
 const parseInlineMarkdown = (text) => {
   if (!text) return '';
@@ -1051,6 +1055,7 @@ const ProjectHub = ({ teamId }) => {
                 { id: 'team', label: 'Team Workload', icon: Users, color: 'text-blue-600 bg-blue-50/80' },
                 { id: 'tasks', label: 'Task Checklist', icon: ListTodo, color: 'text-emerald-600 bg-emerald-50/80' },
                 { id: 'insights', label: 'MVP Focus & Risks', icon: Target, color: 'text-amber-600 bg-amber-50/80' },
+                { id: 'marketplace', label: 'Task Marketplace', icon: ShoppingBag, color: 'text-indigo-600 bg-indigo-50/80' },
               ].map((tab) => {
                 const Icon = tab.icon;
                 const isActive = activeTaskPlanTab === tab.id;
@@ -1062,7 +1067,7 @@ const ProjectHub = ({ teamId }) => {
                     className={`flex items-center gap-2 px-4 py-2 text-xs font-bold uppercase tracking-wider rounded-lg transition-all duration-200 cursor-pointer shrink-0 ${
                       isActive 
                         ? 'bg-white text-neutral-900 shadow-xs border border-neutral-200/60 font-black' 
-                        : 'text-neutral-500 hover:text-neutral-850 hover:bg-white/40'
+                        : 'text-neutral-550 hover:text-neutral-800'
                     }`}
                   >
                     <Icon size={13} className={isActive ? tab.color.split(' ')[0] : 'text-neutral-450'} />
@@ -1564,6 +1569,24 @@ const ProjectHub = ({ teamId }) => {
                   </div>
                 </div>
               </div>
+            )}
+
+            {/* Tab 5: Task Marketplace */}
+            {activeTaskPlanTab === 'marketplace' && (
+              <TaskMarketplace 
+                projectId={project._id}
+                teamId={teamId}
+                onRefreshProject={async () => {
+                  try {
+                    const res = await getProjectByTeam(teamId);
+                    if (res.success && res.project) {
+                      setProject(res.project);
+                    }
+                  } catch (err) {
+                    console.error('Error refreshing project details:', err);
+                  }
+                }}
+              />
             )}
           </div>
         );

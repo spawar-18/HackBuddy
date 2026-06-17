@@ -11,6 +11,7 @@ const teamRoutes = require('./routes/teamRoutes');
 const teamAnalysisRoutes = require('./routes/teamAnalysisRoutes');
 const projectRoutes = require('./routes/projectRoutes');
 const chatRoutes = require('./routes/chatRoutes');
+const marketplaceRoutes = require('./routes/marketplaceRoutes');
 
 const app = express();
 const port = process.env.PORT || 5000;
@@ -30,6 +31,7 @@ app.use('/api/project', projectRoutes);
 app.use('/api/projects', projectRoutes);
 app.use('/api/project', chatRoutes);
 app.use('/api/projects', chatRoutes);
+app.use('/api', marketplaceRoutes);
 
 // Root Route (Welcome message/status)
 app.get('/', (req, res) => {

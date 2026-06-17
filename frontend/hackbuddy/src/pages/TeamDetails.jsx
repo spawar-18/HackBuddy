@@ -314,14 +314,15 @@ const TeamDetails = () => {
         </button>
 
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
-          {/* Left Panel: Team Info */}
+          {/* Left Panel: Team Info, Settings & Members (1 Column) */}
           <div className="lg:col-span-1 flex flex-col gap-6">
+            {/* Team Profile Card */}
             <div className="bg-white border border-neutral-200 rounded-xl p-6 shadow-xs flex flex-col gap-5">
               <div className="flex items-center gap-3 border-b border-neutral-100 pb-3">
                 <div className="w-10 h-10 bg-brand-50 text-brand-600 rounded-lg flex items-center justify-center shrink-0">
                   <Users size={20} />
                 </div>
-                <h2 className="text-xs font-bold text-neutral-500 tracking-wider uppercase">Team Profile</h2>
+                <h2 className="text-xs font-bold text-neutral-505 tracking-wider uppercase">Team Profile</h2>
               </div>
 
               <div>
@@ -372,8 +373,6 @@ const TeamDetails = () => {
                 </div>
               </div>
             </div>
-
-            <ProjectHub teamId={teamId} />
 
             {/* Team Settings Section */}
             <div className="bg-white border border-neutral-200 rounded-xl p-6 shadow-xs flex flex-col gap-5">
@@ -483,10 +482,8 @@ const TeamDetails = () => {
                 </div>
               )}
             </div>
-          </div>
 
-          {/* Right Panel: Members List */}
-          <div className="lg:col-span-2 flex flex-col gap-6">
+            {/* Squad Members Directory Card */}
             <div className="bg-white border border-neutral-200 rounded-xl p-6 shadow-xs flex flex-col gap-5">
               <div className="flex items-center justify-between border-b border-neutral-100 pb-3">
                 <div className="flex items-center gap-3">
@@ -526,7 +523,7 @@ const TeamDetails = () => {
                                 <span className="inline-flex items-center px-2 py-0.5 rounded-full text-[9px] font-bold bg-brand-50 border border-brand-100 text-brand-700 uppercase tracking-wider">Lead</span>
                               )}
                             </div>
-                            <div className="text-xs text-neutral-400 flex items-center gap-1.5 mt-0.5">
+                            <div className="text-xs text-neutral-450 flex items-center gap-1.5 mt-0.5">
                               <Mail size={12} />
                               {member.email}
                             </div>
@@ -571,7 +568,14 @@ const TeamDetails = () => {
                 })}
               </div>
             </div>
+
+            {/* Team Skills Analysis */}
             <TeamAnalysis teamId={teamId} />
+          </div>
+
+          {/* Right Panel: Project Workspace (2 Columns) */}
+          <div className="lg:col-span-2 flex flex-col gap-6">
+            <ProjectHub teamId={teamId} />
           </div>
         </div>
       </div>

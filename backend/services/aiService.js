@@ -58,25 +58,39 @@ const repairTruncatedJson = (jsonStr) => {
 const cleanAndParseResponse = (responseText) => {
   const stripped = stripThinkTags(responseText);
   const firstBrace = stripped.indexOf('{');
-  const lastBrace = stripped.lastIndexOf('}');
-  if (firstBrace === -1 || lastBrace === -1 || lastBrace < firstBrace) {
+  if (firstBrace === -1) {
     console.error('Failed to parse AI response: No JSON object found. Response:', responseText.substring(0, 500));
     throw new Error('Invalid AI JSON response: No JSON object found in response');
   }
-  const cleanText = stripped.substring(firstBrace, lastBrace + 1).trim();
+  
+  let cleanText = stripped.substring(firstBrace);
+  const lastBrace = cleanText.lastIndexOf('}');
+  if (lastBrace !== -1) {
+    cleanText = cleanText.substring(0, lastBrace + 1);
+  }
 
   let parsed;
   try {
-    parsed = JSON.parse(cleanText);
+    parsed = JSON.parse(cleanText.trim());
   } catch (parseErr) {
-    console.error('Failed to parse AI response as JSON:', responseText);
-    throw new Error('Invalid AI JSON response: The response could not be parsed as JSON');
+    try {
+      console.log('Failed to parse team analysis response directly. Trying to repair truncated JSON...');
+      const repaired = repairTruncatedJson(cleanText.trim());
+      parsed = JSON.parse(repaired);
+    } catch (repairErr) {
+      console.error('Failed to parse AI response as JSON even after repair attempt. Raw response:', responseText);
+      throw new Error('Invalid AI JSON response: The response could not be parsed as JSON');
+    }
   }
 
   const requiredKeys = ['readinessScore', 'strengths', 'skillGaps', 'recommendedRoles'];
   const missingKeys = requiredKeys.filter(key => !(key in parsed));
   if (missingKeys.length > 0) {
-    throw new Error(`Invalid AI JSON response: Missing required fields: ${missingKeys.join(', ')}`);
+    console.warn(`Warning: Missing required fields: ${missingKeys.join(', ')}. Supplying defaults.`);
+    if (!('readinessScore' in parsed)) parsed.readinessScore = 5.0;
+    if (!('strengths' in parsed)) parsed.strengths = [];
+    if (!('skillGaps' in parsed)) parsed.skillGaps = [];
+    if (!('recommendedRoles' in parsed)) parsed.recommendedRoles = [];
   }
 
   if (typeof parsed.readinessScore !== 'number' || parsed.readinessScore < 1 || parsed.readinessScore > 10) {
@@ -150,7 +164,7 @@ ${teamDataString}`;
       const qwenClient = new OpenAI({
         baseURL: qwenBaseUrl,
         apiKey: qwenKey,
-        timeout: 20000,
+        timeout: 60000,
         defaultHeaders: {
           'HTTP-Referer': 'http://localhost:3000',
           'X-Title': 'HackBuddy',
@@ -159,10 +173,13 @@ ${teamDataString}`;
 
       const response = await qwenClient.chat.completions.create({
         model: 'Qwen/Qwen3.6-35B-A3B',
-        messages: [{ role: 'user', content: prompt }],
+        messages: [
+          { role: 'system', content: 'You are a JSON-only API. Respond with raw JSON only. No explanations, no markdown, no thinking.' },
+          { role: 'user', content: prompt }
+        ],
         temperature: 0,
         top_p: 0.1,
-        max_tokens: 1500,
+        max_tokens: 6000,
       });
 
       const responseText = response.choices[0]?.message?.content || '';
@@ -190,10 +207,13 @@ ${teamDataString}`;
 
       const response = await openrouter.chat.completions.create({
         model: 'qwen/qwen3.6-35b-a3b',
-        messages: [{ role: 'user', content: prompt }],
+        messages: [
+          { role: 'system', content: 'You are a JSON-only API. Respond with raw JSON only. No explanations, no markdown, no thinking.' },
+          { role: 'user', content: prompt }
+        ],
         temperature: 0,
         top_p: 0.1,
-        max_tokens: 1500,
+        max_tokens: 6000,
       });
 
       const responseText = response.choices[0]?.message?.content || '';
@@ -264,19 +284,29 @@ const generateMockAnalysis = (teamDataString) => {
 const cleanAndParseProjectReview = (responseText) => {
   const stripped = stripThinkTags(responseText);
   const firstBrace = stripped.indexOf('{');
-  const lastBrace = stripped.lastIndexOf('}');
-  if (firstBrace === -1 || lastBrace === -1 || lastBrace < firstBrace) {
+  if (firstBrace === -1) {
     console.error('Failed to parse AI project review: No JSON object found. Response:', responseText.substring(0, 500));
     throw new Error('Invalid AI JSON response: No JSON object found in response');
   }
-  const cleanText = stripped.substring(firstBrace, lastBrace + 1).trim();
+  
+  let cleanText = stripped.substring(firstBrace);
+  const lastBrace = cleanText.lastIndexOf('}');
+  if (lastBrace !== -1) {
+    cleanText = cleanText.substring(0, lastBrace + 1);
+  }
 
   let parsed;
   try {
-    parsed = JSON.parse(cleanText);
+    parsed = JSON.parse(cleanText.trim());
   } catch (parseErr) {
-    console.error('Failed to parse AI project review response as JSON:', responseText);
-    throw new Error('Invalid AI JSON response: The response could not be parsed as JSON');
+    try {
+      console.log('Failed to parse project review directly. Trying to repair truncated JSON...');
+      const repaired = repairTruncatedJson(cleanText.trim());
+      parsed = JSON.parse(repaired);
+    } catch (repairErr) {
+      console.error('Failed to parse AI project review response as JSON even after repair attempt. Raw response:', responseText);
+      throw new Error('Invalid AI JSON response: The response could not be parsed as JSON');
+    }
   }
 
   if (typeof parsed.feasibilityScore !== 'number') parsed.feasibilityScore = 5.0;
@@ -408,7 +438,7 @@ ${projectContextString}`;
       const qwenClient = new OpenAI({
         baseURL: qwenBaseUrl,
         apiKey: qwenKey,
-        timeout: 25000,
+        timeout: 60000,
         defaultHeaders: {
           'HTTP-Referer': 'http://localhost:3000',
           'X-Title': 'HackBuddy',
@@ -417,10 +447,13 @@ ${projectContextString}`;
 
       const response = await qwenClient.chat.completions.create({
         model: 'Qwen/Qwen3.6-35B-A3B',
-        messages: [{ role: 'user', content: prompt }],
+        messages: [
+          { role: 'system', content: 'You are a JSON-only API. Respond with raw JSON only. No explanations, no markdown, no thinking.' },
+          { role: 'user', content: prompt }
+        ],
         temperature: 0,
         top_p: 0.1,
-        max_tokens: 2500,
+        max_tokens: 6000,
       });
 
       const responseText = response.choices[0]?.message?.content || '';
@@ -448,10 +481,13 @@ ${projectContextString}`;
 
       const response = await openrouter.chat.completions.create({
         model: 'qwen/qwen3.6-35b-a3b',
-        messages: [{ role: 'user', content: prompt }],
+        messages: [
+          { role: 'system', content: 'You are a JSON-only API. Respond with raw JSON only. No explanations, no markdown, no thinking.' },
+          { role: 'user', content: prompt }
+        ],
         temperature: 0,
         top_p: 0.1,
-        max_tokens: 2500,
+        max_tokens: 6000,
       });
 
       const responseText = response.choices[0]?.message?.content || '';
@@ -562,7 +598,7 @@ Do not return JSON. Use Markdown for list and formatting if appropriate.`;
       const qwenClient = new OpenAI({
         baseURL: qwenBaseUrl,
         apiKey: qwenKey,
-        timeout: 25000,
+        timeout: 60000,
         defaultHeaders: {
           'HTTP-Referer': 'http://localhost:3000',
           'X-Title': 'HackBuddy',
@@ -574,7 +610,7 @@ Do not return JSON. Use Markdown for list and formatting if appropriate.`;
         messages: messages,
         temperature: 0.2,
         top_p: 0.9,
-        max_tokens: 1500,
+        max_tokens: 4000,
       });
 
       return response.choices[0]?.message?.content || 'No response from mentor AI.';
@@ -604,7 +640,7 @@ Do not return JSON. Use Markdown for list and formatting if appropriate.`;
         messages: messages,
         temperature: 0.2,
         top_p: 0.9,
-        max_tokens: 1500,
+        max_tokens: 4000,
       });
 
       return response.choices[0]?.message?.content || 'No response from mentor AI.';
@@ -956,9 +992,161 @@ ${memberList}`;
   return generateMockTaskPlan(contextString, members);
 };
 
+const generateMockMarketplaceRecommendation = (requestDetails) => {
+  const { requestType, requestedBy, targetUser, reason } = requestDetails;
+  let recommendation = 'Approve';
+  let confidenceScore = 85;
+  let aiReason = `The requested ${requestType.toLowerCase()} seems reasonable to support team productivity.`;
+
+  if (requestType === 'SWAP') {
+    aiReason = `${requestedBy} and ${targetUser} are swapping tasks. This alignment matches skills profile and keeps workload balanced at equal shares.`;
+    confidenceScore = 90;
+  } else if (requestType === 'REASSIGNMENT') {
+    aiReason = `Reassignment requested by ${requestedBy} due to: "${reason}". Task is marked as Available for other members to claim.`;
+    confidenceScore = 80;
+  } else if (requestType === 'COLLABORATOR') {
+    aiReason = `Adding ${targetUser} as a collaborator to assist ${requestedBy} reduces delivery risk for critical MVP milestones.`;
+    confidenceScore = 95;
+  } else if (requestType === 'CLAIM') {
+    aiReason = `${requestedBy} volunteered to claim this available task, increasing overall progress velocity.`;
+    confidenceScore = 88;
+  }
+
+  return {
+    recommendation,
+    confidenceScore,
+    reason: aiReason
+  };
+};
+
+const getMarketplaceRecommendation = async (requestDetails) => {
+  const qwenKey = process.env.QWEN_API;
+  const qwenBaseUrl = process.env.QWEN_BASE_URL || 'https://api.featherless.ai/v1';
+  const openRouterKey = process.env.OPENROUTER_API_KEY;
+
+  const {
+    task,
+    requestType,
+    requestedBy,
+    targetUser = '',
+    reason = '',
+    teamSkills = {},
+    currentWorkload = {},
+    taskPriority = 'Medium',
+    taskComplexity = 'Medium'
+  } = requestDetails;
+
+  const prompt = `Act as an AI Technical Manager, Engineering Lead, and Hackathon Mentor.
+Evaluate this Task Marketplace request from a team member.
+
+Your task is to analyze the request and provide a recommendation.
+Evaluate the request based on:
+1. Skill alignment of the requested/target users with the task.
+2. Workload balance of the team.
+3. Project completion risk.
+
+Request Details:
+- Request Type: ${requestType}
+- Task in Question: "${task}"
+- Requested By (Current Owner or Requester): ${requestedBy}
+- Target Teammate (if swap/collaborator): ${targetUser}
+- Requester Reason: "${reason}"
+- Task Priority: ${taskPriority}
+- Task Complexity: ${taskComplexity}
+
+Team Context:
+- Skills & Profiles:
+${JSON.stringify(teamSkills, null, 2)}
+- Current Workload Distribution:
+${JSON.stringify(currentWorkload, null, 2)}
+
+You MUST respond ONLY with a valid JSON object in this exact format, with no other text, markdown wrapper, or think tags:
+{
+  "recommendation": "Approve" or "Reject",
+  "confidenceScore": number (between 0 and 100),
+  "reason": "Clear explanation of your choice, referencing workload balance and skill matching"
+}`;
+
+  if (!qwenKey && !openRouterKey) {
+    console.log('Using mock AI recommendation...');
+    return generateMockMarketplaceRecommendation(requestDetails);
+  }
+
+  const parseResponse = (responseText) => {
+    const stripped = stripThinkTags(responseText);
+    const firstBrace = stripped.indexOf('{');
+    const lastBrace = stripped.lastIndexOf('}');
+    if (firstBrace === -1 || lastBrace === -1 || lastBrace < firstBrace) {
+      throw new Error('No JSON object found in AI response');
+    }
+    const cleanText = stripped.substring(firstBrace, lastBrace + 1).trim();
+    const parsed = JSON.parse(cleanText);
+    if (!parsed.recommendation || typeof parsed.confidenceScore !== 'number' || !parsed.reason) {
+      throw new Error('Invalid JSON format from AI recommendation');
+    }
+    return parsed;
+  };
+
+  if (qwenKey) {
+    try {
+      console.log('Attempting AI marketplace recommendation via Qwen API...');
+      const qwenClient = new OpenAI({
+        baseURL: qwenBaseUrl,
+        apiKey: qwenKey,
+        timeout: 60000,
+        defaultHeaders: {
+          'HTTP-Referer': 'http://localhost:3000',
+          'X-Title': 'HackBuddy',
+        }
+      });
+      const response = await qwenClient.chat.completions.create({
+        model: 'Qwen/Qwen3.6-35B-A3B',
+        messages: [{ role: 'user', content: prompt }],
+        temperature: 0,
+        top_p: 0.1,
+        max_tokens: 3000,
+      });
+      return parseResponse(response.choices[0]?.message?.content || '');
+    } catch (err) {
+      console.error('Qwen API recommendation failed:', err);
+      if (!openRouterKey) {
+        return generateMockMarketplaceRecommendation(requestDetails);
+      }
+    }
+  }
+
+  if (openRouterKey) {
+    try {
+      console.log('Attempting AI marketplace recommendation via OpenRouter...');
+      const openrouter = new OpenAI({
+        baseURL: 'https://openrouter.ai/api/v1',
+        apiKey: openRouterKey,
+        defaultHeaders: {
+          'HTTP-Referer': 'http://localhost:3000',
+          'X-Title': 'HackBuddy',
+        }
+      });
+      const response = await openrouter.chat.completions.create({
+        model: 'qwen/qwen3.6-35b-a3b',
+        messages: [{ role: 'user', content: prompt }],
+        temperature: 0,
+        top_p: 0.1,
+        max_tokens: 3000,
+      });
+      return parseResponse(response.choices[0]?.message?.content || '');
+    } catch (err) {
+      console.error('OpenRouter recommendation failed:', err);
+      return generateMockMarketplaceRecommendation(requestDetails);
+    }
+  }
+
+  return generateMockMarketplaceRecommendation(requestDetails);
+};
+
 module.exports = {
   analyzeTeamWithAI,
   analyzeProjectWithAI,
   chatWithMentorAI,
-  generateTaskPlanWithAI
+  generateTaskPlanWithAI,
+  getMarketplaceRecommendation
 };
