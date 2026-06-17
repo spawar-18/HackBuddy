@@ -23,6 +23,17 @@ ${(project.featuresToBuild || []).map(f => `- ${f}`).join('\n') || '- None speci
 
 `;
 
+  if (project.finalTechStack && project.finalTechStack.frontend) {
+    ctx += `Final Tech Stack:
+- Frontend: ${project.finalTechStack.frontend}
+- Backend: ${project.finalTechStack.backend}
+- Database: ${project.finalTechStack.database}
+- AI/ML: ${project.finalTechStack.ai}
+- Deployment: ${project.finalTechStack.deployment}
+
+`;
+  }
+
   if (project.projectReview) {
     ctx += `AI Project Review Summary:
 - Feasibility Score: ${project.projectReview.feasibilityScore || 'N/A'}

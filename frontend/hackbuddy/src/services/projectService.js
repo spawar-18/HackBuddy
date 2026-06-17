@@ -192,6 +192,60 @@ export const approveMarketplaceRequest = async (requestId) => {
 export const rejectMarketplaceRequest = async (requestId) => {
   const response = await api.patch(`/marketplace/${requestId}/reject`);
   return response.data;
+};/**
+ * Get tech stack details (proposal, votes, analysis, final stack)
+ * @param {string} projectId 
+ */
+export const getTechStackDetails = async (projectId) => {
+  const response = await api.get(`/projects/${projectId}/tech-stack`);
+  return response.data;
 };
 
+/**
+ * Propose a tech stack
+ * @param {string} projectId 
+ * @param {Object} data - { frontend, backend, database, ai, deployment }
+ */
+export const proposeTechStack = async (projectId, data) => {
+  const response = await api.post(`/projects/${projectId}/tech-stack/proposal`, data);
+  return response.data;
+};
 
+/**
+ * Submit vote on the proposed stack
+ * @param {string} projectId 
+ * @param {Object} data - { voteType, confidenceScores, reason, suggestedAlternatives }
+ */
+export const submitTechStackVote = async (projectId, data) => {
+  const response = await api.post(`/projects/${projectId}/tech-stack/vote`, data);
+  return response.data;
+};
+
+/**
+ * Add tech stack category-specific comment
+ * @param {string} projectId 
+ * @param {Object} data - { category, comment }
+ */
+export const addTechStackComment = async (projectId, data) => {
+  const response = await api.post(`/projects/${projectId}/tech-stack/comment`, data);
+  return response.data;
+};
+
+/**
+ * Generate AI tech stack consensus analysis
+ * @param {string} projectId 
+ */
+export const analyzeTechStack = async (projectId) => {
+  const response = await api.post(`/projects/${projectId}/tech-stack/analyze`);
+  return response.data;
+};
+
+/**
+ * Finalize the tech stack (owner only)
+ * @param {string} projectId 
+ * @param {Object} data - { action, modifiedStack }
+ */
+export const finalizeTechStack = async (projectId, data) => {
+  const response = await api.post(`/projects/${projectId}/tech-stack/finalize`, data);
+  return response.data;
+};

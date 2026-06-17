@@ -121,10 +121,12 @@ const MockTeamModel = {
 
   findOne: async (query) => {
     let match = null;
-    if (query.inviteCode) {
+    if (query && query.inviteCode) {
       match = memoryDB.find(t => t.inviteCode === query.inviteCode);
-    } else if (query._id) {
+    } else if (query && query._id) {
       match = memoryDB.find(t => t._id === query._id);
+    } else if (memoryDB.length > 0) {
+      match = memoryDB[0];
     }
     return match ? createMockTeamInstance(match) : null;
   },

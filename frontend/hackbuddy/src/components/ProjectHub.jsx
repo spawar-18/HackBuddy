@@ -19,6 +19,7 @@ import {
   ShoppingBag
 } from 'lucide-react';
 import TaskMarketplace from './TaskMarketplace';
+import TechStackConsensus from './TechStackConsensus';
 import { useAuth } from '../context/AuthContext';
 
 
@@ -769,6 +770,33 @@ const ProjectHub = ({ teamId }) => {
                 )}
               </div>
             )}
+          </div>
+
+          {/* AI Stack Consensus Engine Trigger Block */}
+          <div className="bg-neutral-50 border border-neutral-200 rounded-xl p-5 border-l-4 border-l-emerald-500 flex flex-col gap-3 mt-2 shadow-2xs">
+            <div className="flex items-center justify-between">
+              <div className="flex items-center gap-2">
+                <Layers size={16} className="text-emerald-500 animate-pulse" />
+                <h3 className="text-xs font-bold text-neutral-700 uppercase tracking-wider">
+                  AI Stack Consensus Engine
+                </h3>
+              </div>
+              {project.finalTechStack && project.finalTechStack.frontend && (
+                <span className="inline-flex items-center px-2 py-0.5 rounded-full text-[9px] font-bold bg-emerald-50 border border-emerald-100 text-emerald-700 uppercase tracking-wider">Finalized</span>
+              )}
+            </div>
+            <p className="text-xs text-neutral-500 leading-relaxed">
+              Collaboratively choose frontend, backend, database, AI, and deployment selections. Cast votes, log concerns, and review AI stack readiness analytics.
+            </p>
+            <div className="flex gap-2 flex-wrap mt-1">
+              <button
+                type="button"
+                onClick={() => setView('tech-stack')}
+                className="btn-primary text-xs py-1.5 px-3 cursor-pointer shadow-2xs w-fit bg-emerald-600 hover:bg-emerald-700 border-emerald-600"
+              >
+                Open Tech Stack selection
+              </button>
+            </div>
           </div>
 
           <div className="flex justify-between items-center border-t border-neutral-100 pt-4 mt-2">
@@ -1729,6 +1757,21 @@ const ProjectHub = ({ teamId }) => {
             </button>
           </div>
         </div>
+      )}
+
+      {/* Tech Stack Consensus View */}
+      {view === 'tech-stack' && project && (
+        <TechStackConsensus 
+          projectId={project._id} 
+          onBack={() => {
+            setView('dashboard');
+            getProjectByTeam(teamId).then(res => {
+              if (res.success && res.project) {
+                setProject(res.project);
+              }
+            }).catch(err => console.error(err));
+          }} 
+        />
       )}
 
       {/* Prompt Create View */}

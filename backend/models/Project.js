@@ -108,6 +108,13 @@ const projectSchema = new mongoose.Schema({
   },
   taskPlanGeneratedAt: {
     type: Date
+  },
+  finalTechStack: {
+    frontend: { type: String, default: '' },
+    backend: { type: String, default: '' },
+    database: { type: String, default: '' },
+    ai: { type: String, default: '' },
+    deployment: { type: String, default: '' }
   }
 });
 
@@ -133,6 +140,13 @@ const createMockProjectInstance = (data) => {
     projectReviewGeneratedAt: data.projectReviewGeneratedAt || null,
     taskPlan: data.taskPlan || null,
     taskPlanGeneratedAt: data.taskPlanGeneratedAt || null,
+    finalTechStack: data.finalTechStack || {
+      frontend: '',
+      backend: '',
+      database: '',
+      ai: '',
+      deployment: ''
+    },
     markModified(path) {
       // dummy function for in-memory database fallback
     },
@@ -153,7 +167,8 @@ const createMockProjectInstance = (data) => {
         projectReview: this.projectReview,
         projectReviewGeneratedAt: this.projectReviewGeneratedAt,
         taskPlan: this.taskPlan,
-        taskPlanGeneratedAt: this.taskPlanGeneratedAt
+        taskPlanGeneratedAt: this.taskPlanGeneratedAt,
+        finalTechStack: this.finalTechStack
       };
       if (index !== -1) {
         memoryDB[index] = serialized;
@@ -190,10 +205,12 @@ const MockProjectModel = {
   },
   findOne: async (query) => {
     let match = null;
-    if (query.teamId) {
+    if (query && query.teamId) {
       match = memoryDB.find(p => p.teamId.toString() === query.teamId.toString());
-    } else if (query._id) {
+    } else if (query && query._id) {
       match = memoryDB.find(p => p._id === query._id);
+    } else if (memoryDB.length > 0) {
+      match = memoryDB[0];
     }
     return match ? createMockProjectInstance(match) : null;
   },

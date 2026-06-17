@@ -1,5 +1,7 @@
 const { OpenAI } = require('openai');
 
+const OPENROUTER_MODEL = process.env.OPENROUTER_MODEL || 'qwen/qwen-2.5-coder-32b-instruct';
+
 /**
  * Strip Qwen3 <think>...</think> reasoning blocks from AI response text.
  * Qwen3 models often wrap their output in <think> tags before the actual content.
@@ -115,11 +117,6 @@ const analyzeTeamWithAI = async (teamDataString) => {
   const qwenBaseUrl = process.env.QWEN_BASE_URL || 'https://api.featherless.ai/v1';
   const openRouterKey = process.env.OPENROUTER_API_KEY;
 
-  if (!qwenKey && !openRouterKey) {
-    console.warn('WARNING: Neither QWEN_API nor OPENROUTER_API_KEY is defined. Using mock analysis.');
-    return generateMockAnalysis(teamDataString);
-  }
-
   const prompt = `Analyze this hackathon team.
 
 Evaluate the team based on the members and their skills.
@@ -158,13 +155,48 @@ Team:
 
 ${teamDataString}`;
 
+  // 1. Prioritize OpenRouter
+  if (openRouterKey) {
+    try {
+      console.log('Attempting deterministic Qwen team analysis via OpenRouter (OPENROUTER_API_KEY)...');
+      const openrouter = new OpenAI({
+        baseURL: 'https://openrouter.ai/api/v1',
+        apiKey: openRouterKey,
+        timeout: 30000,
+        defaultHeaders: {
+          'HTTP-Referer': 'http://localhost:3000',
+          'X-Title': 'HackBuddy',
+        }
+      });
+
+      const response = await openrouter.chat.completions.create({
+        model: OPENROUTER_MODEL,
+        messages: [
+          { role: 'system', content: 'You are a JSON-only API. Respond with raw JSON only. No explanations, no markdown, no thinking.' },
+          { role: 'user', content: prompt }
+        ],
+        temperature: 0,
+        top_p: 0.1,
+        max_tokens: 6000,
+      });
+
+      const responseText = response.choices[0]?.message?.content || '';
+      return cleanAndParseResponse(responseText);
+    } catch (openRouterError) {
+      console.error('OpenRouter API call failed:', openRouterError.message || openRouterError);
+      console.log('Falling back to Mock team analysis...');
+      return generateMockAnalysis(teamDataString);
+    }
+  }
+
+  // 2. Try Qwen via Featherless (with lower timeout of 10s to prevent browser hangs)
   if (qwenKey) {
     try {
       console.log(`Attempting deterministic Qwen team analysis via ${qwenBaseUrl} (QWEN_API)...`);
       const qwenClient = new OpenAI({
         baseURL: qwenBaseUrl,
         apiKey: qwenKey,
-        timeout: 60000,
+        timeout: 10000,
         defaultHeaders: {
           'HTTP-Referer': 'http://localhost:3000',
           'X-Title': 'HackBuddy',
@@ -186,44 +218,12 @@ ${teamDataString}`;
       return cleanAndParseResponse(responseText);
     } catch (qwenError) {
       console.error('Qwen API call failed:', qwenError.message || qwenError);
-      if (!openRouterKey) {
-        throw new Error(`Qwen API error: ${qwenError.message || 'Unknown error'}`);
-      }
-      console.log('Automatically falling back to OpenRouter...');
+      console.log('Falling back to Mock team analysis...');
+      return generateMockAnalysis(teamDataString);
     }
   }
 
-  if (openRouterKey) {
-    try {
-      console.log('Attempting deterministic Qwen team analysis via OpenRouter (OPENROUTER_API_KEY)...');
-      const openrouter = new OpenAI({
-        baseURL: 'https://openrouter.ai/api/v1',
-        apiKey: openRouterKey,
-        defaultHeaders: {
-          'HTTP-Referer': 'http://localhost:3000',
-          'X-Title': 'HackBuddy',
-        }
-      });
-
-      const response = await openrouter.chat.completions.create({
-        model: 'qwen/qwen3.6-35b-a3b',
-        messages: [
-          { role: 'system', content: 'You are a JSON-only API. Respond with raw JSON only. No explanations, no markdown, no thinking.' },
-          { role: 'user', content: prompt }
-        ],
-        temperature: 0,
-        top_p: 0.1,
-        max_tokens: 6000,
-      });
-
-      const responseText = response.choices[0]?.message?.content || '';
-      return cleanAndParseResponse(responseText);
-    } catch (openRouterError) {
-      console.error('OpenRouter API call failed:', openRouterError.message || openRouterError);
-      throw new Error(`AI API failure: ${openRouterError.message || 'Failed to communicate with AI endpoint'}`);
-    }
-  }
-
+  console.warn('WARNING: Neither QWEN_API nor OPENROUTER_API_KEY is defined. Using mock analysis.');
   return generateMockAnalysis(teamDataString);
 };
 
@@ -380,11 +380,6 @@ const analyzeProjectWithAI = async (projectContextString) => {
   const qwenBaseUrl = process.env.QWEN_BASE_URL || 'https://api.featherless.ai/v1';
   const openRouterKey = process.env.OPENROUTER_API_KEY;
 
-  if (!qwenKey && !openRouterKey) {
-    console.warn('WARNING: Neither QWEN_API nor OPENROUTER_API_KEY is defined. Using mock project review.');
-    return generateMockProjectReview(projectContextString);
-  }
-
   const prompt = `You are an experienced hackathon mentor, software architect, startup advisor, and hackathon judge.
 
 Analyze the project using:
@@ -432,13 +427,48 @@ Required Format:
 Project context:
 ${projectContextString}`;
 
+  // 1. Prioritize OpenRouter
+  if (openRouterKey) {
+    try {
+      console.log('Attempting deterministic Qwen project review via OpenRouter (OPENROUTER_API_KEY)...');
+      const openrouter = new OpenAI({
+        baseURL: 'https://openrouter.ai/api/v1',
+        apiKey: openRouterKey,
+        timeout: 30000,
+        defaultHeaders: {
+          'HTTP-Referer': 'http://localhost:3000',
+          'X-Title': 'HackBuddy',
+        }
+      });
+
+      const response = await openrouter.chat.completions.create({
+        model: OPENROUTER_MODEL,
+        messages: [
+          { role: 'system', content: 'You are a JSON-only API. Respond with raw JSON only. No explanations, no markdown, no thinking.' },
+          { role: 'user', content: prompt }
+        ],
+        temperature: 0,
+        top_p: 0.1,
+        max_tokens: 6000,
+      });
+
+      const responseText = response.choices[0]?.message?.content || '';
+      return cleanAndParseProjectReview(responseText);
+    } catch (openRouterError) {
+      console.error('OpenRouter API call for project review failed:', openRouterError.message || openRouterError);
+      console.log('Falling back to Mock project review...');
+      return generateMockProjectReview(projectContextString);
+    }
+  }
+
+  // 2. Try Qwen via Featherless
   if (qwenKey) {
     try {
       console.log(`Attempting deterministic Qwen project review via ${qwenBaseUrl} (QWEN_API)...`);
       const qwenClient = new OpenAI({
         baseURL: qwenBaseUrl,
         apiKey: qwenKey,
-        timeout: 60000,
+        timeout: 10000,
         defaultHeaders: {
           'HTTP-Referer': 'http://localhost:3000',
           'X-Title': 'HackBuddy',
@@ -460,44 +490,12 @@ ${projectContextString}`;
       return cleanAndParseProjectReview(responseText);
     } catch (qwenError) {
       console.error('Qwen API call for project review failed:', qwenError.message || qwenError);
-      if (!openRouterKey) {
-        throw new Error(`Qwen API error: ${qwenError.message || 'Unknown error'}`);
-      }
-      console.log('Automatically falling back to OpenRouter for project review...');
+      console.log('Falling back to Mock project review...');
+      return generateMockProjectReview(projectContextString);
     }
   }
 
-  if (openRouterKey) {
-    try {
-      console.log('Attempting deterministic Qwen project review via OpenRouter (OPENROUTER_API_KEY)...');
-      const openrouter = new OpenAI({
-        baseURL: 'https://openrouter.ai/api/v1',
-        apiKey: openRouterKey,
-        defaultHeaders: {
-          'HTTP-Referer': 'http://localhost:3000',
-          'X-Title': 'HackBuddy',
-        }
-      });
-
-      const response = await openrouter.chat.completions.create({
-        model: 'qwen/qwen3.6-35b-a3b',
-        messages: [
-          { role: 'system', content: 'You are a JSON-only API. Respond with raw JSON only. No explanations, no markdown, no thinking.' },
-          { role: 'user', content: prompt }
-        ],
-        temperature: 0,
-        top_p: 0.1,
-        max_tokens: 6000,
-      });
-
-      const responseText = response.choices[0]?.message?.content || '';
-      return cleanAndParseProjectReview(responseText);
-    } catch (openRouterError) {
-      console.error('OpenRouter API call for project review failed:', openRouterError.message || openRouterError);
-      throw new Error(`AI API failure: ${openRouterError.message || 'Failed to communicate with AI endpoint'}`);
-    }
-  }
-
+  console.warn('WARNING: Neither QWEN_API nor OPENROUTER_API_KEY is defined. Using mock project review.');
   return generateMockProjectReview(projectContextString);
 };
 
@@ -546,11 +544,6 @@ const chatWithMentorAI = async (projectContextString, history, currentQuestion) 
   const qwenBaseUrl = process.env.QWEN_BASE_URL || 'https://api.featherless.ai/v1';
   const openRouterKey = process.env.OPENROUTER_API_KEY;
 
-  if (!qwenKey && !openRouterKey) {
-    console.warn('WARNING: Neither QWEN_API nor OPENROUTER_API_KEY is defined. Using mock chat.');
-    return generateMockChatResponse(currentQuestion, projectContextString);
-  }
-
   const systemPrompt = `You are HackVerse AI Mentor.
 You are:
 * Hackathon Mentor
@@ -592,13 +585,44 @@ Do not return JSON. Use Markdown for list and formatting if appropriate.`;
 
   messages.push({ role: 'user', content: currentQuestion });
 
+  // 1. Prioritize OpenRouter
+  if (openRouterKey) {
+    try {
+      console.log('Attempting deterministic Qwen mentor chat via OpenRouter (OPENROUTER_API_KEY)...');
+      const openrouter = new OpenAI({
+        baseURL: 'https://openrouter.ai/api/v1',
+        apiKey: openRouterKey,
+        timeout: 30000,
+        defaultHeaders: {
+          'HTTP-Referer': 'http://localhost:3000',
+          'X-Title': 'HackBuddy',
+        }
+      });
+
+      const response = await openrouter.chat.completions.create({
+        model: OPENROUTER_MODEL,
+        messages: messages,
+        temperature: 0.2,
+        top_p: 0.9,
+        max_tokens: 4000,
+      });
+
+      return response.choices[0]?.message?.content || 'No response from mentor AI.';
+    } catch (openRouterError) {
+      console.error('OpenRouter API call for mentor chat failed:', openRouterError.message || openRouterError);
+      console.log('Falling back to Mock mentor chat response...');
+      return generateMockChatResponse(currentQuestion, projectContextString);
+    }
+  }
+
+  // 2. Try Qwen via Featherless
   if (qwenKey) {
     try {
       console.log(`Attempting deterministic Qwen mentor chat via ${qwenBaseUrl} (QWEN_API)...`);
       const qwenClient = new OpenAI({
         baseURL: qwenBaseUrl,
         apiKey: qwenKey,
-        timeout: 60000,
+        timeout: 10000,
         defaultHeaders: {
           'HTTP-Referer': 'http://localhost:3000',
           'X-Title': 'HackBuddy',
@@ -616,40 +640,12 @@ Do not return JSON. Use Markdown for list and formatting if appropriate.`;
       return response.choices[0]?.message?.content || 'No response from mentor AI.';
     } catch (qwenError) {
       console.error('Qwen API call for mentor chat failed:', qwenError.message || qwenError);
-      if (!openRouterKey) {
-        throw new Error(`Qwen API error: ${qwenError.message || 'Unknown error'}`);
-      }
-      console.log('Automatically falling back to OpenRouter for mentor chat...');
+      console.log('Falling back to Mock mentor chat response...');
+      return generateMockChatResponse(currentQuestion, projectContextString);
     }
   }
 
-  if (openRouterKey) {
-    try {
-      console.log('Attempting deterministic Qwen mentor chat via OpenRouter (OPENROUTER_API_KEY)...');
-      const openrouter = new OpenAI({
-        baseURL: 'https://openrouter.ai/api/v1',
-        apiKey: openRouterKey,
-        defaultHeaders: {
-          'HTTP-Referer': 'http://localhost:3000',
-          'X-Title': 'HackBuddy',
-        }
-      });
-
-      const response = await openrouter.chat.completions.create({
-        model: 'qwen/qwen3.6-35b-a3b',
-        messages: messages,
-        temperature: 0.2,
-        top_p: 0.9,
-        max_tokens: 4000,
-      });
-
-      return response.choices[0]?.message?.content || 'No response from mentor AI.';
-    } catch (openRouterError) {
-      console.error('OpenRouter API call for mentor chat failed:', openRouterError.message || openRouterError);
-      throw new Error(`AI API failure: ${openRouterError.message || 'Failed to communicate with AI endpoint'}`);
-    }
-  }
-
+  console.warn('WARNING: Neither QWEN_API nor OPENROUTER_API_KEY is defined. Using mock chat.');
   return generateMockChatResponse(currentQuestion, projectContextString);
 };
 
@@ -840,11 +836,6 @@ const generateTaskPlanWithAI = async (contextString, members) => {
   const qwenBaseUrl = process.env.QWEN_BASE_URL || 'https://api.featherless.ai/v1';
   const openRouterKey = process.env.OPENROUTER_API_KEY;
 
-  if (!qwenKey && !openRouterKey) {
-    console.warn('WARNING: Neither QWEN_API nor OPENROUTER_API_KEY is defined. Using mock task plan.');
-    return generateMockTaskPlan(contextString, members);
-  }
-
   const memberList = members.map(m =>
     `- ${m.name}: ${(m.skills || []).join(', ') || 'No skills specified'}`
   ).join('\n');
@@ -915,14 +906,51 @@ ${contextString}
 Team Members and Skills:
 ${memberList}`;
 
-  // 1. Try Qwen via Featherless
+  // 1. Prioritize OpenRouter
+  if (openRouterKey) {
+    try {
+      console.log('Attempting AI task plan generation via OpenRouter (OPENROUTER_API_KEY)...');
+      const openrouter = new OpenAI({
+        baseURL: 'https://openrouter.ai/api/v1',
+        apiKey: openRouterKey,
+        timeout: 30000,
+        defaultHeaders: {
+          'HTTP-Referer': 'http://localhost:3000',
+          'X-Title': 'HackBuddy',
+        }
+      });
+
+      const response = await openrouter.chat.completions.create({
+        model: OPENROUTER_MODEL,
+        messages: [
+          { role: 'system', content: 'You are a JSON-only API. Respond with raw JSON only. No explanations, no markdown, no thinking.' },
+          { role: 'user', content: prompt }
+        ],
+        temperature: 0,
+        top_p: 0.1,
+        max_tokens: 8000,
+      });
+
+      const responseText = response.choices[0]?.message?.content || '';
+      console.log(`OpenRouter task plan raw response length: ${responseText.length} chars`);
+      const plan = cleanAndParseTaskPlan(responseText);
+      validateTaskPlanCompleteness(plan, members);
+      return plan;
+    } catch (openRouterError) {
+      console.error('OpenRouter API call for task plan failed:', openRouterError.message || openRouterError);
+      console.log('Falling back to Mock task plan...');
+      return generateMockTaskPlan(contextString, members);
+    }
+  }
+
+  // 2. Try Qwen via Featherless
   if (qwenKey) {
     try {
       console.log(`Attempting AI task plan generation via ${qwenBaseUrl} (QWEN_API)...`);
       const qwenClient = new OpenAI({
         baseURL: qwenBaseUrl,
         apiKey: qwenKey,
-        timeout: 60000,
+        timeout: 10000,
         defaultHeaders: {
           'HTTP-Referer': 'http://localhost:3000',
           'X-Title': 'HackBuddy',
@@ -947,48 +975,12 @@ ${memberList}`;
       return plan;
     } catch (qwenError) {
       console.error('Qwen API call for task plan failed:', qwenError.message || qwenError);
-      if (!openRouterKey) {
-        throw new Error(`Qwen API error: ${qwenError.message || 'Unknown error'}`);
-      }
-      console.log('Falling back to OpenRouter for task plan...');
+      console.log('Falling back to Mock task plan...');
+      return generateMockTaskPlan(contextString, members);
     }
   }
 
-  // 2. Fallback: OpenRouter
-  if (openRouterKey) {
-    try {
-      console.log('Attempting AI task plan generation via OpenRouter (OPENROUTER_API_KEY)...');
-      const openrouter = new OpenAI({
-        baseURL: 'https://openrouter.ai/api/v1',
-        apiKey: openRouterKey,
-        defaultHeaders: {
-          'HTTP-Referer': 'http://localhost:3000',
-          'X-Title': 'HackBuddy',
-        }
-      });
-
-      const response = await openrouter.chat.completions.create({
-        model: 'qwen/qwen3.6-35b-a3b',
-        messages: [
-          { role: 'system', content: 'You are a JSON-only API. Respond with raw JSON only. No explanations, no markdown, no thinking.' },
-          { role: 'user', content: prompt }
-        ],
-        temperature: 0,
-        top_p: 0.1,
-        max_tokens: 8000,
-      });
-
-      const responseText = response.choices[0]?.message?.content || '';
-      console.log(`OpenRouter task plan raw response length: ${responseText.length} chars`);
-      const plan = cleanAndParseTaskPlan(responseText);
-      validateTaskPlanCompleteness(plan, members);
-      return plan;
-    } catch (openRouterError) {
-      console.error('OpenRouter API call for task plan failed:', openRouterError.message || openRouterError);
-      throw new Error(`AI API failure: ${openRouterError.message || 'Failed to communicate with AI endpoint'}`);
-    }
-  }
-
+  console.warn('WARNING: Neither QWEN_API nor OPENROUTER_API_KEY is defined. Using mock task plan.');
   return generateMockTaskPlan(contextString, members);
 };
 
@@ -1067,11 +1059,6 @@ You MUST respond ONLY with a valid JSON object in this exact format, with no oth
   "reason": "Clear explanation of your choice, referencing workload balance and skill matching"
 }`;
 
-  if (!qwenKey && !openRouterKey) {
-    console.log('Using mock AI recommendation...');
-    return generateMockMarketplaceRecommendation(requestDetails);
-  }
-
   const parseResponse = (responseText) => {
     const stripped = stripThinkTags(responseText);
     const firstBrace = stripped.indexOf('{');
@@ -1087,48 +1074,25 @@ You MUST respond ONLY with a valid JSON object in this exact format, with no oth
     return parsed;
   };
 
-  if (qwenKey) {
-    try {
-      console.log('Attempting AI marketplace recommendation via Qwen API...');
-      const qwenClient = new OpenAI({
-        baseURL: qwenBaseUrl,
-        apiKey: qwenKey,
-        timeout: 60000,
-        defaultHeaders: {
-          'HTTP-Referer': 'http://localhost:3000',
-          'X-Title': 'HackBuddy',
-        }
-      });
-      const response = await qwenClient.chat.completions.create({
-        model: 'Qwen/Qwen3.6-35B-A3B',
-        messages: [{ role: 'user', content: prompt }],
-        temperature: 0,
-        top_p: 0.1,
-        max_tokens: 3000,
-      });
-      return parseResponse(response.choices[0]?.message?.content || '');
-    } catch (err) {
-      console.error('Qwen API recommendation failed:', err);
-      if (!openRouterKey) {
-        return generateMockMarketplaceRecommendation(requestDetails);
-      }
-    }
-  }
-
+  // 1. Prioritize OpenRouter
   if (openRouterKey) {
     try {
       console.log('Attempting AI marketplace recommendation via OpenRouter...');
       const openrouter = new OpenAI({
         baseURL: 'https://openrouter.ai/api/v1',
         apiKey: openRouterKey,
+        timeout: 30000,
         defaultHeaders: {
           'HTTP-Referer': 'http://localhost:3000',
           'X-Title': 'HackBuddy',
         }
       });
       const response = await openrouter.chat.completions.create({
-        model: 'qwen/qwen3.6-35b-a3b',
-        messages: [{ role: 'user', content: prompt }],
+        model: OPENROUTER_MODEL,
+        messages: [
+          { role: 'system', content: 'You are a JSON-only API. Respond with raw JSON only. No explanations, no markdown, no thinking.' },
+          { role: 'user', content: prompt }
+        ],
         temperature: 0,
         top_p: 0.1,
         max_tokens: 3000,
@@ -1136,11 +1100,274 @@ You MUST respond ONLY with a valid JSON object in this exact format, with no oth
       return parseResponse(response.choices[0]?.message?.content || '');
     } catch (err) {
       console.error('OpenRouter recommendation failed:', err);
+      console.log('Falling back to Mock marketplace recommendation...');
       return generateMockMarketplaceRecommendation(requestDetails);
     }
   }
 
+  // 2. Try Qwen via Featherless
+  if (qwenKey) {
+    try {
+      console.log('Attempting AI marketplace recommendation via Qwen API...');
+      const qwenClient = new OpenAI({
+        baseURL: qwenBaseUrl,
+        apiKey: qwenKey,
+        timeout: 10000,
+        defaultHeaders: {
+          'HTTP-Referer': 'http://localhost:3000',
+          'X-Title': 'HackBuddy',
+        }
+      });
+      const response = await qwenClient.chat.completions.create({
+        model: 'Qwen/Qwen3.6-35B-A3B',
+        messages: [
+          { role: 'system', content: 'You are a JSON-only API. Respond with raw JSON only. No explanations, no markdown, no thinking.' },
+          { role: 'user', content: prompt }
+        ],
+        temperature: 0,
+        top_p: 0.1,
+        max_tokens: 3000,
+      });
+      return parseResponse(response.choices[0]?.message?.content || '');
+    } catch (err) {
+      console.error('Qwen API recommendation failed:', err);
+      console.log('Falling back to Mock marketplace recommendation...');
+      return generateMockMarketplaceRecommendation(requestDetails);
+    }
+  }
+
+  console.log('Using mock AI recommendation...');
   return generateMockMarketplaceRecommendation(requestDetails);
+};
+
+/**
+ * Generates a mock tech stack consensus analysis for fallback
+ */
+const generateMockTechStackAnalysis = (proposal, votes, members) => {
+  let approveCount = 0;
+  let totalVotes = votes.length;
+  let totalConfidence = 0;
+  let techCount = 0;
+  
+  votes.forEach(v => {
+    if (v.voteType === 'Approve') approveCount += 1.0;
+    else if (v.voteType === 'Approve With Concerns') approveCount += 0.7;
+    else approveCount += 0.1;
+    
+    if (v.confidenceScores) {
+      const scores = v.confidenceScores instanceof Map ? Object.fromEntries(v.confidenceScores) : v.confidenceScores;
+      Object.values(scores).forEach(score => {
+        totalConfidence += Number(score);
+        techCount++;
+      });
+    }
+  });
+  
+  const consensusScore = totalVotes > 0 ? Math.round((approveCount / totalVotes) * 100) : 100;
+  const avgConfidence = techCount > 0 ? (totalConfidence / techCount) : 8;
+  const readinessScore = Math.round(avgConfidence * 10);
+  
+  return {
+    readinessScore: readinessScore,
+    consensusScore: consensusScore,
+    strengths: [
+      `Frontend choice of "${proposal.frontend || 'React'}" matches the general team skillset.`,
+      `Vercel is selected for deployment, allowing rapid iterative updates during the hackathon.`
+    ],
+    risks: votes.some(v => v.voteType === 'Reject' || v.voteType === 'Approve With Concerns') ? [
+      `Some team members raised concerns or rejects due to lack of experience with proposed backend/database.`
+    ] : [
+      `Learning curves for some selected tools might eat into actual feature development time.`
+    ],
+    recommendedChanges: votes.some(v => v.voteType === 'Reject') ? [
+      `Switch database / backend technologies with low confidence to proposed alternatives.`
+    ] : [
+      `Ensure team initializes boilerplate configurations before the hackathon begins.`
+    ],
+    recommendedStack: {
+      frontend: [proposal.frontend || 'React'],
+      backend: [proposal.backend || 'Node.js'],
+      database: [proposal.database || 'MongoDB'],
+      ai: [proposal.ai || 'Featherless AI'],
+      deployment: [proposal.deployment || 'Vercel']
+    },
+    reasoning: `The team has an average technology confidence of ${avgConfidence.toFixed(1)}/10. Consensus score is ${consensusScore}%. Team is mostly prepared, but low confidence on backend should be addressed.`,
+    finalRecommendation: `Accept the stack but consider switching backend to Node.js / Express for speed.`
+  };
+};
+
+/**
+ * Clean and parse tech stack analysis response
+ */
+const cleanAndParseTechStackAnalysis = (responseText) => {
+  const stripped = stripThinkTags(responseText);
+  const firstBrace = stripped.indexOf('{');
+  if (firstBrace === -1) {
+    throw new Error('No JSON object found in AI response');
+  }
+  let cleanText = stripped.substring(firstBrace);
+  const lastBrace = cleanText.lastIndexOf('}');
+  if (lastBrace !== -1) {
+    cleanText = cleanText.substring(0, lastBrace + 1);
+  }
+
+  let parsed;
+  try {
+    parsed = JSON.parse(cleanText.trim());
+  } catch (parseErr) {
+    try {
+      console.warn('Failed to parse tech stack analysis response directly. Trying to repair...');
+      const repaired = repairTruncatedJson(cleanText.trim());
+      parsed = JSON.parse(repaired);
+    } catch (repairErr) {
+      console.error('Failed to parse AI tech stack analysis response as JSON even after repair. Raw response:', responseText);
+      throw new Error('Invalid AI JSON response: The response could not be parsed as JSON');
+    }
+  }
+
+  // Validate format
+  if (typeof parsed.readinessScore !== 'number') parsed.readinessScore = 50;
+  if (typeof parsed.consensusScore !== 'number') parsed.consensusScore = 50;
+  if (!Array.isArray(parsed.strengths)) parsed.strengths = [];
+  if (!Array.isArray(parsed.risks)) parsed.risks = [];
+  if (!Array.isArray(parsed.recommendedChanges)) parsed.recommendedChanges = [];
+  if (!parsed.recommendedStack || typeof parsed.recommendedStack !== 'object') {
+    parsed.recommendedStack = { frontend: [], backend: [], database: [], ai: [], deployment: [] };
+  } else {
+    ['frontend', 'backend', 'database', 'ai', 'deployment'].forEach(k => {
+      if (!Array.isArray(parsed.recommendedStack[k])) {
+        parsed.recommendedStack[k] = parsed.recommendedStack[k] ? [String(parsed.recommendedStack[k])] : [];
+      }
+    });
+  }
+  if (typeof parsed.reasoning !== 'string') parsed.reasoning = '';
+  if (typeof parsed.finalRecommendation !== 'string') parsed.finalRecommendation = '';
+
+  return parsed;
+};
+
+/**
+ * Analyzes tech stack options, votes, and skills with AI
+ */
+const analyzeTechStackWithAI = async (proposalContext, teamContext, hackathonDuration, projectComplexity) => {
+  const qwenKey = process.env.QWEN_API;
+  const qwenBaseUrl = process.env.QWEN_BASE_URL || 'https://api.featherless.ai/v1';
+  const openRouterKey = process.env.OPENROUTER_API_KEY;
+
+  const prompt = `You are a Technical Architect, Hackathon Mentor, Engineering Manager, and Startup CTO.
+Your goal is to perform a detailed Tech Stack Consensus Analysis for a hackathon team project.
+
+Inputs:
+1. Proposed Tech Stack:
+- Frontend: ${proposalContext.proposal.frontend}
+- Backend: ${proposalContext.proposal.backend}
+- Database: ${proposalContext.proposal.database}
+- AI/ML: ${proposalContext.proposal.ai}
+- Deployment: ${proposalContext.proposal.deployment}
+
+2. Team Members & Skills:
+${teamContext}
+
+3. Team Votes, Confidence Scores (1-10, where 1-3 is Beginner, 4-6 Intermediate, 7-8 Comfortable, 9-10 Expert), & Concerns/Suggested Alternatives:
+${JSON.stringify(proposalContext.votes, null, 2)}
+
+4. Project Context:
+- Hackathon Duration: ${hackathonDuration}
+- Project Complexity: ${projectComplexity}
+
+Evaluation Criteria:
+- Team Familiarity & Learning Curve (based on confidence scores & listed skills)
+- Hackathon Time Constraints (is the stack too heavy for ${hackathonDuration}?)
+- Skill Availability & Gaps
+- Project Complexity vs execution speed
+- Deployment Difficulty (e.g. AWS vs Vercel for this team)
+
+Calculate:
+- readinessScore: 0-100 (representing how capable the team is of building the project using the selected stack)
+- consensusScore: 0-100 (overall team agreement. 0-50 high disagreement, 51-75 moderate, 76-100 strong agreement)
+
+You MUST respond ONLY with a valid JSON object in this exact format, with no other text, markdown wrapper, or think tags:
+{
+  "readinessScore": number,
+  "consensusScore": number,
+  "strengths": ["string"],
+  "risks": ["string"],
+  "recommendedChanges": ["string"],
+  "recommendedStack": {
+    "frontend": ["string"],
+    "backend": ["string"],
+    "database": ["string"],
+    "ai": ["string"],
+    "deployment": ["string"]
+  },
+  "reasoning": "string",
+  "finalRecommendation": "string"
+}`;
+
+  // 1. Prioritize OpenRouter
+  if (openRouterKey) {
+    try {
+      console.log('Attempting AI stack analysis via OpenRouter...');
+      const openrouter = new OpenAI({
+        baseURL: 'https://openrouter.ai/api/v1',
+        apiKey: openRouterKey,
+        timeout: 30000,
+        defaultHeaders: {
+          'HTTP-Referer': 'http://localhost:3050',
+          'X-Title': 'HackBuddy',
+        }
+      });
+      const response = await openrouter.chat.completions.create({
+        model: OPENROUTER_MODEL,
+        messages: [
+          { role: 'system', content: 'You are a JSON-only API. Respond with raw JSON only. No explanations, no markdown, no thinking.' },
+          { role: 'user', content: prompt }
+        ],
+        temperature: 0,
+        top_p: 0.1,
+        max_tokens: 3000,
+      });
+      return cleanAndParseTechStackAnalysis(response.choices[0]?.message?.content || '');
+    } catch (err) {
+      console.error('OpenRouter stack analysis failed:', err);
+      console.log('Falling back to Mock tech stack consensus analysis...');
+      return generateMockTechStackAnalysis(proposalContext.proposal, proposalContext.votes, proposalContext.members);
+    }
+  }
+
+  // 2. Try Qwen via Featherless
+  if (qwenKey) {
+    try {
+      console.log('Attempting AI stack analysis via Qwen API...');
+      const qwenClient = new OpenAI({
+        baseURL: qwenBaseUrl,
+        apiKey: qwenKey,
+        timeout: 10000,
+        defaultHeaders: {
+          'HTTP-Referer': 'http://localhost:3000',
+          'X-Title': 'HackBuddy',
+        }
+      });
+      const response = await qwenClient.chat.completions.create({
+        model: 'Qwen/Qwen3.6-35B-A3B',
+        messages: [
+          { role: 'system', content: 'You are a JSON-only API. Respond with raw JSON only. No explanations, no markdown, no thinking.' },
+          { role: 'user', content: prompt }
+        ],
+        temperature: 0,
+        top_p: 0.1,
+        max_tokens: 3000,
+      });
+      return cleanAndParseTechStackAnalysis(response.choices[0]?.message?.content || '');
+    } catch (err) {
+      console.error('Qwen API stack analysis failed:', err);
+      console.log('Falling back to Mock tech stack consensus analysis...');
+      return generateMockTechStackAnalysis(proposalContext.proposal, proposalContext.votes, proposalContext.members);
+    }
+  }
+
+  console.warn('WARNING: Neither QWEN_API nor OPENROUTER_API_KEY is defined. Using mock stack analysis.');
+  return generateMockTechStackAnalysis(proposalContext.proposal, proposalContext.votes, proposalContext.members);
 };
 
 module.exports = {
@@ -1148,5 +1375,7 @@ module.exports = {
   analyzeProjectWithAI,
   chatWithMentorAI,
   generateTaskPlanWithAI,
-  getMarketplaceRecommendation
+  getMarketplaceRecommendation,
+  analyzeTechStackWithAI
 };
+

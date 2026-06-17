@@ -94,14 +94,13 @@ class MockUserInstance {
     return this;
   }
 }
-
 const MockUserModel = {
   findOne: async (query) => {
     let match = null;
-    if (query.email) {
+    if (query && query.email) {
       const targetEmail = query.email.toLowerCase();
       match = memoryDB.find(u => u.email === targetEmail);
-    } else if (query.$or) {
+    } else if (query && query.$or) {
       match = memoryDB.find(u => {
         return query.$or.some(q => {
           if (q.email && u.email === q.email.toLowerCase()) return true;
@@ -110,6 +109,8 @@ const MockUserModel = {
           return false;
         });
       });
+    } else if (memoryDB.length > 0) {
+      match = memoryDB[0];
     }
     return match ? new MockUserInstance(match) : null;
   },

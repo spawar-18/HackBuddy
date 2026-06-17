@@ -1,74 +1,80 @@
 require('dotenv').config();
-const { OpenAI } = require('openai');
+const { analyzeTechStackWithAI, generateTaskPlanWithAI } = require('./services/aiService');
 
-async function testFeatherless() {
-  const qwenKey = process.env.QWEN_API;
-  const qwenBaseUrl = process.env.QWEN_BASE_URL || 'https://api.featherless.ai/v1';
+async function testTechStackAnalysis() {
+  console.log('\n--- Testing analyzeTechStackWithAI ---');
+  const proposalContext = {
+    proposal: {
+      frontend: 'React',
+      backend: 'Node.js',
+      database: 'MongoDB',
+      ai: 'Gemini',
+      deployment: 'Vercel'
+    },
+    votes: [
+      {
+        voter: 'Sahil',
+        voteType: 'Approve',
+        confidenceScores: { frontend: 8, backend: 8, database: 8, ai: 8, deployment: 8 },
+        reason: 'Looks good and we know React/Node.',
+        suggestedAlternatives: {}
+      }
+    ],
+    members: [{ name: 'Sahil' }]
+  };
+  const teamContext = `- Sahil: Skills: [React, Node.js, MongoDB], Resume parsed: No\n`;
+  const hackathonDuration = '36 hours';
+  const projectComplexity = 'Problem: Need a collaborative tool for hackathons. Features: Auth, Real-time Voting, AI consensus score';
 
-  console.log('Testing Featherless API...');
-  console.log('API Key:', qwenKey ? 'Present' : 'Missing');
-  console.log('Base URL:', qwenBaseUrl);
-
-  if (!qwenKey) return;
-
+  const start = Date.now();
   try {
-    const qwenClient = new OpenAI({
-      baseURL: qwenBaseUrl,
-      apiKey: qwenKey,
-    });
-
-    const response = await qwenClient.chat.completions.create({
-      model: 'Qwen/Qwen3.6-35B-A3B',
-      messages: [{ role: 'user', content: 'Say hello' }],
-      temperature: 0,
-      max_tokens: 2000,
-    });
-
-    console.log('Featherless Response SUCCESS:');
-    console.log(JSON.stringify(response, null, 2));
+    const result = await analyzeTechStackWithAI(proposalContext, teamContext, hackathonDuration, projectComplexity);
+    console.log(`Success! Took ${(Date.now() - start) / 1000}s`);
+    console.log(JSON.stringify(result, null, 2));
   } catch (err) {
-    console.error('Featherless Response ERROR:');
-    console.error(err);
+    console.error(`Error after ${(Date.now() - start) / 1000}s:`, err.message || err);
   }
 }
 
-async function testOpenRouter() {
-  // Read key with trailing space if it exists
-  const openRouterKey = process.env.OPENROUTER_API_KEY || process.env['OPENROUTER_API_KEY '];
+async function testTaskPlan() {
+  console.log('\n--- Testing generateTaskPlanWithAI ---');
+  const contextString = `Project Name: HackBuddy
+Track: Developer Tools
+Duration: 36 hours
+Problem Statement: Hackathon teams struggles to agree on a tech stack.
+Description: Collaborative tool with voting, confidence scores, and AI recommendations.
+Features To Build:
+- Propose stack
+- Team voting & confidence scoring
+- AI stack analysis
+- AI task plan generation
 
-  console.log('\nTesting OpenRouter API...');
-  console.log('API Key:', openRouterKey ? 'Present' : 'Missing');
+Final Tech Stack:
+- Frontend: React
+- Backend: Node.js
+- Database: MongoDB
+- AI/ML: OpenRouter Qwen
+- Deployment: Vercel
+`;
 
-  if (!openRouterKey) return;
+  const members = [
+    { name: 'Sahil', skills: ['React', 'Node.js', 'MongoDB'] }
+  ];
 
+  const start = Date.now();
   try {
-    const openrouter = new OpenAI({
-      baseURL: 'https://openrouter.ai/api/v1',
-      apiKey: openRouterKey,
-      defaultHeaders: {
-        'HTTP-Referer': 'http://localhost:3000',
-        'X-Title': 'HackBuddy',
-      }
-    });
-
-    const response = await openrouter.chat.completions.create({
-      model: 'qwen/qwen3.6-35b-a3b',
-      messages: [{ role: 'user', content: 'Say hello' }],
-      temperature: 0,
-      max_tokens: 2000,
-    });
-
-    console.log('OpenRouter Response SUCCESS:');
-    console.log(JSON.stringify(response, null, 2));
+    const result = await generateTaskPlanWithAI(contextString, members);
+    console.log(`Success! Took ${(Date.now() - start) / 1000}s`);
+    console.log(JSON.stringify(result, null, 2));
   } catch (err) {
-    console.error('OpenRouter Response ERROR:');
-    console.error(err);
+    console.error(`Error after ${(Date.now() - start) / 1000}s:`, err.message || err);
   }
 }
 
 async function run() {
-  await testFeatherless();
-  await testOpenRouter();
+  await testTechStackAnalysis();
+  await testTaskPlan();
 }
 
 run();
+

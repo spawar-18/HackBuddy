@@ -1,9 +1,32 @@
 require('dotenv').config();
+const fs = require('fs');
+const path = require('path');
+const logFile = path.join(__dirname, 'server_debug.log');
+
+// Clear existing log file on start
+try { fs.writeFileSync(logFile, ''); } catch (e) {}
+
+const originalLog = console.log;
+const originalError = console.error;
+
+console.log = (...args) => {
+  originalLog(...args);
+  try {
+    fs.appendFileSync(logFile, args.map(a => typeof a === 'object' ? JSON.stringify(a) : String(a)).join(' ') + '\n');
+  } catch (e) {}
+};
+
+console.error = (...args) => {
+  originalError(...args);
+  try {
+    fs.appendFileSync(logFile, '[ERROR] ' + args.map(a => typeof a === 'object' ? JSON.stringify(a) : String(a)).join(' ') + '\n');
+  } catch (e) {}
+};
+
 const express = require('express');
 const mongoose = require('mongoose');
 const cors = require('cors');
 
-const path = require('path');
 const authRoutes = require('./routes/authRoutes');
 const userRoutes = require('./routes/userRoutes');
 const profileRoutes = require('./routes/profileRoutes');
@@ -12,6 +35,7 @@ const teamAnalysisRoutes = require('./routes/teamAnalysisRoutes');
 const projectRoutes = require('./routes/projectRoutes');
 const chatRoutes = require('./routes/chatRoutes');
 const marketplaceRoutes = require('./routes/marketplaceRoutes');
+const techStackRoutes = require('./routes/techStackRoutes');
 
 const app = express();
 const port = process.env.PORT || 5000;
@@ -31,6 +55,8 @@ app.use('/api/project', projectRoutes);
 app.use('/api/projects', projectRoutes);
 app.use('/api/project', chatRoutes);
 app.use('/api/projects', chatRoutes);
+app.use('/api/projects/:projectId/tech-stack', techStackRoutes);
+app.use('/api/project/:projectId/tech-stack', techStackRoutes);
 app.use('/api', marketplaceRoutes);
 
 // Root Route (Welcome message/status)
