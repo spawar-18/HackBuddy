@@ -116,6 +116,25 @@ const renderMarkdown = (text) => {
     );
   });
 };
+const getStepMeta = (stepText) => {
+  const text = (stepText || '').toLowerCase();
+  if (text.includes('setup') || text.includes('repo') || text.includes('initial') || text.includes('environment')) {
+    return { label: 'Environment Setup', color: 'bg-slate-50 text-slate-700 border-slate-200', icon: FolderGit2 };
+  }
+  if (text.includes('database') || text.includes('schema') || text.includes('model') || text.includes('mongodb') || text.includes('sql')) {
+    return { label: 'Database & Models', color: 'bg-indigo-50 text-indigo-700 border-indigo-200', icon: Cpu };
+  }
+  if (text.includes('auth') || text.includes('login') || text.includes('api') || text.includes('backend') || text.includes('server') || text.includes('route') || text.includes('controller')) {
+    return { label: 'Backend APIs', color: 'bg-blue-50 text-blue-700 border-blue-200', icon: Cpu };
+  }
+  if (text.includes('ui') || text.includes('page') || text.includes('screen') || text.includes('frontend') || text.includes('css') || text.includes('component') || text.includes('dashboard')) {
+    return { label: 'UI & Components', color: 'bg-purple-50 text-purple-700 border-purple-200', icon: Layers };
+  }
+  if (text.includes('deploy') || text.includes('production') || text.includes('vercel') || text.includes('aws') || text.includes('host') || text.includes('render') || text.includes('publish')) {
+    return { label: 'Deployment', color: 'bg-emerald-50 text-emerald-700 border-emerald-200', icon: Zap };
+  }
+  return { label: 'Development Phase', color: 'bg-neutral-50 text-neutral-700 border-neutral-200', icon: Activity };
+};
 
 const ProjectHub = ({ teamId }) => {
   const [project, setProject] = useState(null);
@@ -130,6 +149,8 @@ const ProjectHub = ({ teamId }) => {
   const [chatError, setChatError] = useState(null);
   const [historyLoading, setHistoryLoading] = useState(false);
   const [view, setView] = useState('dashboard'); // 'dashboard', 'create', 'edit'
+  const [activeTaskPlanTab, setActiveTaskPlanTab] = useState('roadmap');
+  const [hoveredMember, setHoveredMember] = useState(null);
   const messagesContainerRef = useRef(null);
 
   // Auto-scroll chat window
@@ -968,271 +989,154 @@ const ProjectHub = ({ teamId }) => {
         const barFills = ['bg-gradient-to-r from-violet-500 to-purple-500','bg-gradient-to-r from-blue-500 to-cyan-500','bg-gradient-to-r from-emerald-500 to-teal-500','bg-gradient-to-r from-amber-500 to-orange-500','bg-gradient-to-r from-rose-500 to-pink-500'];
 
         return (
-          <div className="flex flex-col gap-7 animate-slide-up">
+          <div className="flex flex-col gap-6 animate-slide-up">
             {/* ═══ Header Banner ═══ */}
-            <div className="relative overflow-hidden rounded-2xl bg-gradient-to-br from-violet-600 via-purple-600 to-indigo-700 p-6 shadow-lg">
-              <div className="absolute inset-0 opacity-[0.07]" style={{ backgroundImage: 'radial-gradient(circle, white 1px, transparent 1px)', backgroundSize: '18px 18px' }}></div>
-              <div className="absolute -top-10 -right-10 w-40 h-40 bg-white/10 rounded-full blur-2xl"></div>
-              <div className="absolute -bottom-10 -left-10 w-32 h-32 bg-purple-400/20 rounded-full blur-2xl"></div>
-              <div className="relative z-10 flex flex-col md:flex-row justify-between items-start gap-4">
+            <div className="relative overflow-hidden rounded-2xl bg-neutral-900 border border-neutral-800 p-6 shadow-lg">
+              <div className="absolute inset-0 opacity-[0.03]" style={{ backgroundImage: 'radial-gradient(circle, white 1px, transparent 1px)', backgroundSize: '16px 16px' }}></div>
+              <div className="absolute -top-10 -right-10 w-48 h-48 bg-purple-500/10 rounded-full blur-3xl"></div>
+              <div className="absolute -bottom-10 -left-10 w-40 h-40 bg-indigo-500/10 rounded-full blur-3xl"></div>
+              
+              <div className="relative z-10 flex flex-col md:flex-row justify-between items-start md:items-center gap-4">
                 <div>
                   <div className="flex items-center gap-2 mb-2">
-                    <div className="w-8 h-8 rounded-lg bg-white/15 backdrop-blur-sm flex items-center justify-center">
-                      <Layers size={16} className="text-white" />
-                    </div>
-                    <span className="text-[10px] font-bold uppercase tracking-[0.2em] text-white/60">AI Task Splitter & Project Roadmap</span>
+                    <span className="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full text-[9px] font-bold uppercase tracking-wider bg-purple-950/50 border border-purple-500/30 text-purple-400">
+                      <Cpu size={10} className="animate-pulse" /> AI Agent Intelligence
+                    </span>
+                    <span className="text-[10px] font-bold uppercase tracking-[0.2em] text-neutral-500">Task Splitter & Roadmap</span>
                   </div>
                   <h2 className="text-xl md:text-2xl font-extrabold text-white tracking-tight">{project.projectName}</h2>
                   {project.taskPlanGeneratedAt && (
-                    <p className="text-[11px] text-white/50 mt-1.5 flex items-center gap-1.5">
-                      <Clock size={11} /> Generated {new Date(project.taskPlanGeneratedAt).toLocaleString()}
+                    <p className="text-[11px] text-neutral-400 mt-1 flex items-center gap-1.5">
+                      <Clock size={11} /> Plan generated {new Date(project.taskPlanGeneratedAt).toLocaleString()}
                     </p>
                   )}
                 </div>
-                <div className="flex items-center gap-2 shrink-0">
+                <div className="flex items-center gap-2 shrink-0 self-stretch md:self-auto justify-end">
                   <button type="button" onClick={handleRegenerateTaskPlan} disabled={splitterLoading}
-                    className="flex items-center gap-1.5 px-3.5 py-2 rounded-lg bg-white/15 hover:bg-white/25 backdrop-blur-sm text-white text-xs font-semibold cursor-pointer border border-white/20 transition-all duration-200">
-                    {splitterLoading ? <RefreshCw className="animate-spin" size={13} /> : <RefreshCw size={13} />} Regenerate
+                    className="flex items-center justify-center gap-1.5 px-3.5 py-2 rounded-lg bg-neutral-850 hover:bg-neutral-800 text-white text-xs font-semibold cursor-pointer border border-neutral-700 transition-all duration-200 disabled:opacity-50">
+                    {splitterLoading ? <RefreshCw className="animate-spin text-purple-400" size={13} /> : <RefreshCw size={13} />} Regenerate Plan
                   </button>
                   <button type="button" onClick={() => setView('dashboard')}
-                    className="flex items-center gap-1 px-3.5 py-2 rounded-lg bg-white/10 hover:bg-white/20 text-white/80 hover:text-white text-xs font-semibold cursor-pointer border border-white/10 transition-all duration-200">
+                    className="flex items-center justify-center gap-1 px-3.5 py-2 rounded-lg bg-neutral-900 hover:bg-neutral-855 text-neutral-400 hover:text-white text-xs font-semibold cursor-pointer border border-neutral-800 transition-all duration-200">
                     <ArrowLeft size={13} /> Back
                   </button>
                 </div>
               </div>
-              {/* Overall progress strip */}
-              <div className="relative z-10 mt-5 flex items-center gap-3">
-                <div className="flex-1 h-2 bg-white/15 rounded-full overflow-hidden backdrop-blur-sm">
-                  <div className="h-full bg-white/80 rounded-full transition-all duration-700 ease-out" style={{ width: `${completionPct}%` }}></div>
-                </div>
-                <span className="text-xs font-bold text-white font-mono">{completionPct}%</span>
-              </div>
-            </div>
 
-            {/* ═══ Stats Overview ═══ */}
-            <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
-              <div className="bg-white border border-neutral-200 rounded-xl p-4 flex items-center gap-3 shadow-xs hover:shadow-md hover:border-purple-200 transition-all duration-200">
-                <div className="w-10 h-10 rounded-xl bg-purple-50 text-purple-600 flex items-center justify-center shrink-0"><Layers size={18} /></div>
-                <div>
-                  <div className="text-xl font-extrabold text-neutral-900 font-mono leading-none">{totalTasks}</div>
-                  <div className="text-[10px] font-bold text-neutral-400 uppercase tracking-wider mt-0.5">Total Tasks</div>
-                </div>
-              </div>
-              <div className="bg-white border border-neutral-200 rounded-xl p-4 flex items-center gap-3 shadow-xs hover:shadow-md hover:border-blue-200 transition-all duration-200">
-                <div className="w-10 h-10 rounded-xl bg-blue-50 text-blue-600 flex items-center justify-center shrink-0"><Users size={18} /></div>
-                <div>
-                  <div className="text-xl font-extrabold text-neutral-900 font-mono leading-none">{plan.assignments?.length || 0}</div>
-                  <div className="text-[10px] font-bold text-neutral-400 uppercase tracking-wider mt-0.5">Team Members</div>
-                </div>
-              </div>
-              <div className="bg-white border border-neutral-200 rounded-xl p-4 flex items-center gap-3 shadow-xs hover:shadow-md hover:border-emerald-200 transition-all duration-200">
-                <div className="w-10 h-10 rounded-xl bg-emerald-50 text-emerald-600 flex items-center justify-center shrink-0"><Activity size={18} /></div>
-                <div>
-                  <div className="text-xl font-extrabold text-neutral-900 font-mono leading-none">{completedCount}<span className="text-sm text-neutral-400 font-normal">/{allAssigned.length}</span></div>
-                  <div className="text-[10px] font-bold text-neutral-400 uppercase tracking-wider mt-0.5">Completed</div>
-                </div>
-              </div>
-              <div className="bg-white border border-neutral-200 rounded-xl p-4 flex items-center gap-3 shadow-xs hover:shadow-md hover:border-amber-200 transition-all duration-200">
-                <div className="w-10 h-10 rounded-xl bg-amber-50 text-amber-600 flex items-center justify-center shrink-0"><Zap size={18} /></div>
-                <div>
-                  <div className="text-xl font-extrabold text-neutral-900 font-mono leading-none">{plan.criticalTasks?.length || 0}</div>
-                  <div className="text-[10px] font-bold text-neutral-400 uppercase tracking-wider mt-0.5">Critical Tasks</div>
-                </div>
-              </div>
-            </div>
-
-            {/* ═══ Project Tasks Breakdown ═══ */}
-            <div className="flex flex-col gap-3">
-              <div className="flex items-center gap-2">
-                <ListTodo size={15} className="text-neutral-500" />
-                <h3 className="text-xs font-bold text-neutral-500 uppercase tracking-wider">Project Task Breakdown</h3>
-              </div>
-              <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-                {/* Core Features */}
-                <div className="bg-white border border-neutral-200 rounded-xl overflow-hidden shadow-xs hover:shadow-md transition-all duration-200">
-                  <div className="h-1 bg-gradient-to-r from-violet-500 to-purple-500"></div>
-                  <div className="p-4 flex flex-col gap-3">
-                    <div className="flex items-center justify-between">
-                      <h4 className="text-xs font-bold text-neutral-700 uppercase tracking-wider">Core Features</h4>
-                      <span className="px-2 py-0.5 rounded-full bg-purple-50 text-purple-600 text-[10px] font-extrabold">{coreCount}</span>
-                    </div>
-                    <div className="flex flex-col gap-2">
-                      {plan.projectTasks?.coreFeatures?.map((task, idx) => (
-                        <div key={idx} className="flex items-start gap-2.5 p-2.5 bg-neutral-50 hover:bg-purple-50/50 border border-neutral-100 rounded-lg transition-colors duration-150 group">
-                          <span className="w-1.5 h-1.5 bg-purple-400 rounded-full mt-1.5 shrink-0 group-hover:bg-purple-500"></span>
-                          <span className="text-xs font-medium text-neutral-700 leading-relaxed">{task}</span>
-                        </div>
-                      )) || <span className="text-xs text-neutral-400 italic">None</span>}
-                    </div>
+              {/* Progress Summary Track */}
+              <div className="relative z-10 mt-6 pt-5 border-t border-neutral-850 flex flex-col md:flex-row md:items-center gap-4">
+                <div className="flex-1">
+                  <div className="flex justify-between items-center mb-1.5">
+                    <span className="text-[10px] font-bold text-neutral-400 uppercase tracking-widest">Aggregate Completion Scope</span>
+                    <span className="text-xs font-black text-white font-mono">{completionPct}%</span>
+                  </div>
+                  <div className="h-2.5 bg-neutral-850 rounded-full overflow-hidden p-[2px] border border-neutral-800">
+                    <div className="h-full bg-gradient-to-r from-purple-500 via-violet-500 to-indigo-500 rounded-full transition-all duration-1000 ease-out shadow-[0_0_12px_rgba(124,58,237,0.45)]" style={{ width: `${completionPct}%` }}></div>
                   </div>
                 </div>
-                {/* Technical Tasks */}
-                <div className="bg-white border border-neutral-200 rounded-xl overflow-hidden shadow-xs hover:shadow-md transition-all duration-200">
-                  <div className="h-1 bg-gradient-to-r from-blue-500 to-cyan-500"></div>
-                  <div className="p-4 flex flex-col gap-3">
-                    <div className="flex items-center justify-between">
-                      <h4 className="text-xs font-bold text-neutral-700 uppercase tracking-wider">Technical Tasks</h4>
-                      <span className="px-2 py-0.5 rounded-full bg-blue-50 text-blue-600 text-[10px] font-extrabold">{techCount}</span>
-                    </div>
-                    <div className="flex flex-col gap-2">
-                      {plan.projectTasks?.technicalTasks?.map((task, idx) => (
-                        <div key={idx} className="flex items-start gap-2.5 p-2.5 bg-neutral-50 hover:bg-blue-50/50 border border-neutral-100 rounded-lg transition-colors duration-150 group">
-                          <span className="w-1.5 h-1.5 bg-blue-400 rounded-full mt-1.5 shrink-0 group-hover:bg-blue-500"></span>
-                          <span className="text-xs font-medium text-neutral-700 leading-relaxed">{task}</span>
-                        </div>
-                      )) || <span className="text-xs text-neutral-400 italic">None</span>}
-                    </div>
-                  </div>
-                </div>
-                {/* Deployment Tasks */}
-                <div className="bg-white border border-neutral-200 rounded-xl overflow-hidden shadow-xs hover:shadow-md transition-all duration-200">
-                  <div className="h-1 bg-gradient-to-r from-emerald-500 to-teal-500"></div>
-                  <div className="p-4 flex flex-col gap-3">
-                    <div className="flex items-center justify-between">
-                      <h4 className="text-xs font-bold text-neutral-700 uppercase tracking-wider">Deployment Tasks</h4>
-                      <span className="px-2 py-0.5 rounded-full bg-emerald-50 text-emerald-600 text-[10px] font-extrabold">{deployCount}</span>
-                    </div>
-                    <div className="flex flex-col gap-2">
-                      {plan.projectTasks?.deploymentTasks?.map((task, idx) => (
-                        <div key={idx} className="flex items-start gap-2.5 p-2.5 bg-neutral-50 hover:bg-emerald-50/50 border border-neutral-100 rounded-lg transition-colors duration-150 group">
-                          <span className="w-1.5 h-1.5 bg-emerald-400 rounded-full mt-1.5 shrink-0 group-hover:bg-emerald-500"></span>
-                          <span className="text-xs font-medium text-neutral-700 leading-relaxed">{task}</span>
-                        </div>
-                      )) || <span className="text-xs text-neutral-400 italic">None</span>}
-                    </div>
+                <div className="flex items-center gap-3 bg-neutral-950/40 border border-neutral-850 rounded-xl px-4 py-2 shrink-0">
+                  <Activity size={14} className="text-emerald-400 animate-pulse" />
+                  <div className="text-left">
+                    <div className="text-xs font-black text-white leading-none">{completedCount} <span className="text-neutral-500 font-normal">/ {allAssigned.length}</span></div>
+                    <span className="text-[9px] font-bold text-neutral-550 uppercase tracking-wider mt-0.5">Tasks Completed</span>
                   </div>
                 </div>
               </div>
             </div>
 
-            {/* ═══ Team Assignments ═══ */}
-            <div className="flex flex-col gap-3">
-              <div className="flex items-center gap-2">
-                <Users size={15} className="text-neutral-500" />
-                <h3 className="text-xs font-bold text-neutral-500 uppercase tracking-wider">Team Assignments & Task Tracking</h3>
-              </div>
-              <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
-                {plan.assignments?.map((assign, idx) => {
-                  const memberTasks = assign.assignedTasks || [];
-                  const memberCompleted = memberTasks.filter(t => t.status === 'Completed').length;
-                  const memberProgress = memberTasks.length > 0 ? Math.round((memberCompleted / memberTasks.length) * 100) : 0;
-                  const colorIdx = idx % memberGradients.length;
-                  return (
-                    <div key={idx} className="bg-white border border-neutral-200 rounded-xl overflow-hidden shadow-xs hover:shadow-md transition-all duration-200">
-                      {/* Member Header */}
-                      <div className="p-4 pb-3 border-b border-neutral-100">
-                        <div className="flex items-center gap-3">
-                          <div className={`w-10 h-10 rounded-xl bg-gradient-to-br ${memberGradients[colorIdx]} flex items-center justify-center text-white font-bold text-sm shrink-0 shadow-sm`}>
-                            {assign.member.charAt(0).toUpperCase()}
-                          </div>
-                          <div className="flex-1 min-w-0">
-                            <h4 className="text-sm font-bold text-neutral-900 truncate">{assign.member}</h4>
-                            <div className="flex flex-wrap gap-1 mt-1">
-                              {assign.skills.map((s, sIdx) => (
-                                <span key={sIdx} className={`px-1.5 py-0.5 text-[9px] font-bold rounded-md border ${memberBgColors[colorIdx]}`}>{s}</span>
-                              ))}
-                            </div>
-                          </div>
-                          <div className="text-right shrink-0">
-                            <div className="text-lg font-extrabold text-neutral-900 font-mono leading-none">{memberCompleted}<span className="text-xs text-neutral-400 font-normal">/{memberTasks.length}</span></div>
-                            <div className="text-[9px] font-bold text-neutral-400 uppercase tracking-wider">Done</div>
-                          </div>
-                        </div>
-                        <div className="mt-3 h-1.5 bg-neutral-100 rounded-full overflow-hidden">
-                          <div className={`h-full rounded-full transition-all duration-700 ease-out ${barFills[colorIdx]}`} style={{ width: `${memberProgress}%` }}></div>
-                        </div>
-                      </div>
-                      {/* Task List */}
-                      <div className="p-4 flex flex-col gap-2 max-h-[340px] overflow-y-auto">
-                        {memberTasks.map((t, tIdx) => {
-                          const sc = { 'Not Started': { dot: 'bg-neutral-300', bg: 'bg-neutral-50/50', tx: 'text-neutral-500' }, 'In Progress': { dot: 'bg-amber-400 animate-pulse', bg: 'bg-amber-50/40', tx: 'text-amber-700' }, 'Completed': { dot: 'bg-emerald-500', bg: 'bg-emerald-50/40', tx: 'text-emerald-700' } };
-                          const cfg = sc[t.status] || sc['Not Started'];
-                          return (
-                            <div key={tIdx} className={`flex items-center gap-3 p-2.5 rounded-lg border border-neutral-100 ${cfg.bg} transition-all duration-150 hover:border-neutral-200`}>
-                              <span className={`w-2 h-2 rounded-full shrink-0 ${cfg.dot}`}></span>
-                              <span className="text-xs font-medium text-neutral-700 flex-1 leading-relaxed">{t.task}</span>
-                              <select value={t.status} onChange={(e) => handleUpdateTaskStatus(assign.member, t.task, e.target.value)}
-                                className={`text-[10px] font-bold border border-neutral-200 rounded-lg px-2 py-1 bg-white cursor-pointer hover:border-neutral-300 focus:outline-none ${cfg.tx}`}
-                                style={{ minWidth: '100px' }}>
-                                <option value="Not Started">⏳ Not Started</option>
-                                <option value="In Progress">🔄 In Progress</option>
-                                <option value="Completed">✅ Completed</option>
-                              </select>
-                            </div>
-                          );
-                        })}
-                      </div>
-                      {/* AI Rationale */}
-                      {assign.reason && (
-                        <div className="px-4 pb-4">
-                          <div className="bg-neutral-50 border border-neutral-100 rounded-lg p-3">
-                            <p className="text-[11px] text-neutral-500 leading-relaxed"><span className="font-bold text-neutral-600">AI Rationale: </span>{assign.reason}</p>
-                          </div>
-                        </div>
-                      )}
-                    </div>
-                  );
-                })}
-              </div>
+            {/* ═══ Navigation Tabs ═══ */}
+            <div className="flex border-b border-neutral-200/80 gap-1 p-1 bg-neutral-100/60 rounded-xl overflow-x-auto scrollbar-none">
+              {[
+                { id: 'roadmap', label: 'Roadmap Timeline', icon: GitBranch, color: 'text-purple-600 bg-purple-50/80' },
+                { id: 'team', label: 'Team Workload', icon: Users, color: 'text-blue-600 bg-blue-50/80' },
+                { id: 'tasks', label: 'Task Checklist', icon: ListTodo, color: 'text-emerald-600 bg-emerald-50/80' },
+                { id: 'insights', label: 'MVP Focus & Risks', icon: Target, color: 'text-amber-600 bg-amber-50/80' },
+              ].map((tab) => {
+                const Icon = tab.icon;
+                const isActive = activeTaskPlanTab === tab.id;
+                return (
+                  <button
+                    key={tab.id}
+                    type="button"
+                    onClick={() => setActiveTaskPlanTab(tab.id)}
+                    className={`flex items-center gap-2 px-4 py-2 text-xs font-bold uppercase tracking-wider rounded-lg transition-all duration-200 cursor-pointer shrink-0 ${
+                      isActive 
+                        ? 'bg-white text-neutral-900 shadow-xs border border-neutral-200/60 font-black' 
+                        : 'text-neutral-500 hover:text-neutral-850 hover:bg-white/40'
+                    }`}
+                  >
+                    <Icon size={13} className={isActive ? tab.color.split(' ')[0] : 'text-neutral-450'} />
+                    <span>{tab.label}</span>
+                  </button>
+                );
+              })}
             </div>
 
-            {/* ═══ Workload Distribution ═══ */}
-            <div className="flex flex-col gap-3">
-              <div className="flex items-center gap-2">
-                <BarChart3 size={15} className="text-neutral-500" />
-                <h3 className="text-xs font-bold text-neutral-500 uppercase tracking-wider">Workload Distribution</h3>
-              </div>
-              <div className="bg-white border border-neutral-200 rounded-xl p-5 shadow-xs flex flex-col gap-4">
-                {plan.workloadDistribution?.map((dist, idx) => {
-                  const colorIdx = idx % barFills.length;
-                  return (
-                    <div key={idx} className="flex flex-col gap-2">
-                      <div className="flex justify-between items-center">
-                        <div className="flex items-center gap-2.5">
-                          <div className={`w-7 h-7 rounded-lg bg-gradient-to-br ${memberGradients[colorIdx]} flex items-center justify-center text-white font-bold text-[10px] shrink-0`}>
-                            {dist.member.charAt(0).toUpperCase()}
-                          </div>
-                          <span className="text-xs font-bold text-neutral-800">{dist.member}</span>
-                        </div>
-                        <span className="text-sm font-extrabold text-neutral-900 font-mono">{dist.percentage}%</span>
-                      </div>
-                      <div className="h-3 bg-neutral-100 rounded-full overflow-hidden">
-                        <div className={`h-full rounded-full ${barFills[colorIdx]} transition-all duration-1000 ease-out`} style={{ width: `${dist.percentage}%` }}></div>
-                      </div>
-                    </div>
-                  );
-                })}
-              </div>
-            </div>
+            {/* ═══ Tab Contents ═══ */}
 
-            {/* ═══ Execution Roadmap ═══ */}
-            <div className="flex flex-col gap-3">
-              <div className="flex items-center gap-2">
-                <GitBranch size={15} className="text-neutral-500" />
-                <h3 className="text-xs font-bold text-neutral-500 uppercase tracking-wider">Execution Roadmap</h3>
-              </div>
-              <div className="bg-white border border-neutral-200 rounded-xl p-5 shadow-xs">
-                <div className="relative">
-                  <div className="absolute left-[19px] top-5 bottom-5 w-[2px] bg-gradient-to-b from-purple-300 via-blue-300 to-emerald-300"></div>
-                  <div className="flex flex-col gap-1">
+            {/* Tab 1: Execution Roadmap Timeline */}
+            {activeTaskPlanTab === 'roadmap' && (
+              <div className="flex flex-col gap-1.5 animate-slide-up">
+                <div className="flex items-center justify-between mb-2">
+                  <div>
+                    <h3 className="text-xs font-bold text-neutral-505 uppercase tracking-widest">Execution Roadmap</h3>
+                    <p className="text-xs text-neutral-500 mt-0.5">Sequential implementation plan generated specifically for your team structure</p>
+                  </div>
+                  <span className="text-[10px] font-bold px-2.5 py-1 bg-purple-50 text-purple-700 rounded-md border border-purple-100 uppercase tracking-widest font-mono">
+                    {plan.executionOrder?.length || 0} Phases
+                  </span>
+                </div>
+                
+                <div className="relative mt-2 pl-2 md:pl-4">
+                  <div className="flex flex-col">
                     {plan.executionOrder?.map((step, idx) => {
+                      const meta = getStepMeta(step);
+                      const StepIcon = meta.icon;
                       const isFirst = idx === 0;
-                      const isLast = idx === (plan.executionOrder.length - 1);
+                      const isLast = idx === plan.executionOrder.length - 1;
+                      const cleanText = step.replace(/^\d+\.\s*/, '');
                       return (
-                        <div key={idx} className="flex gap-4 items-center relative group">
-                          <div className={`w-10 h-10 rounded-full flex items-center justify-center text-xs font-extrabold shrink-0 z-10 transition-all duration-200 ${
-                            isFirst ? 'bg-gradient-to-br from-violet-500 to-purple-600 text-white shadow-md shadow-purple-200' :
-                            isLast ? 'bg-gradient-to-br from-emerald-500 to-teal-600 text-white shadow-md shadow-emerald-200' :
-                            'bg-white border-2 border-neutral-200 text-neutral-500 group-hover:border-purple-300 group-hover:text-purple-600'
-                          }`}>
-                            {idx + 1}
+                        <div key={idx} className="flex gap-4 relative group items-stretch">
+                          {/* Timeline vertical bar & counter */}
+                          <div className="flex flex-col items-center shrink-0">
+                            <div className={`w-9 h-9 rounded-full flex items-center justify-center text-xs font-bold border-2 transition-all duration-300 z-10 ${
+                              isFirst 
+                                ? 'bg-gradient-to-br from-purple-600 to-indigo-600 border-transparent text-white shadow-[0_0_12px_rgba(124,58,237,0.3)]' 
+                                : 'bg-white border-neutral-200 text-neutral-505 group-hover:border-purple-300 group-hover:text-purple-600'
+                            }`}>
+                              {idx + 1}
+                            </div>
+                            {!isLast && (
+                              <div className="w-[2px] grow bg-neutral-200 my-1.5 group-hover:bg-purple-250 transition-colors"></div>
+                            )}
                           </div>
-                          <div className={`flex-1 py-2.5 px-4 rounded-xl text-xs font-semibold transition-all duration-200 ${
-                            isFirst ? 'bg-purple-50 text-purple-800 border border-purple-100' :
-                            isLast ? 'bg-emerald-50 text-emerald-800 border border-emerald-100' :
-                            'bg-neutral-50 text-neutral-700 border border-neutral-100 group-hover:bg-purple-50/30 group-hover:border-purple-100'
-                          }`}>
-                            {step.replace(/^\d+\.\s*/, '')}
+                          {/* Card details */}
+                          <div className="flex-1 pb-6">
+                            <div className="bg-white border border-neutral-200/80 hover:border-purple-200 rounded-2xl p-5 shadow-xs hover:shadow-md transition-all duration-300 relative overflow-hidden flex flex-col md:flex-row md:items-center justify-between gap-4 group">
+                              <div className="absolute left-0 top-0 bottom-0 w-1 bg-transparent group-hover:bg-purple-500 transition-all duration-300"></div>
+                              
+                              <div className="flex items-start gap-3.5">
+                                <div className={`w-9 h-9 rounded-xl flex items-center justify-center shrink-0 transition-transform duration-300 group-hover:scale-105 border ${
+                                  isFirst ? 'bg-purple-50 border-purple-100 text-purple-600' : 'bg-neutral-50 border-neutral-100 text-neutral-450'
+                                }`}>
+                                  <StepIcon size={15} />
+                                </div>
+                                <div>
+                                  <span className={`inline-flex items-center px-2 py-0.5 rounded-md text-[9px] font-bold uppercase tracking-wider border mb-1.5 ${meta.color}`}>
+                                    {meta.label}
+                                  </span>
+                                  <h4 className="text-xs font-semibold text-neutral-750 leading-relaxed group-hover:text-neutral-900 transition-colors">
+                                    {cleanText}
+                                  </h4>
+                                </div>
+                              </div>
+                              
+                              <div className="shrink-0 flex items-center gap-2">
+                                <span className="text-[10px] font-bold text-neutral-400 uppercase tracking-widest bg-neutral-50 px-2 py-1 rounded-md border border-neutral-150 font-mono">
+                                  Step {idx + 1}
+                                </span>
+                              </div>
+                            </div>
                           </div>
                         </div>
                       );
@@ -1240,74 +1144,427 @@ const ProjectHub = ({ teamId }) => {
                   </div>
                 </div>
               </div>
-            </div>
+            )}
 
-            {/* ═══ Critical | Focus | Warnings ═══ */}
-            <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-              {/* Critical Tasks */}
-              <div className="bg-white border border-amber-200 rounded-xl overflow-hidden shadow-xs">
-                <div className="h-1 bg-gradient-to-r from-amber-400 to-orange-500"></div>
-                <div className="p-5 flex flex-col gap-3">
-                  <div className="flex items-center gap-2">
-                    <div className="w-8 h-8 rounded-lg bg-amber-50 text-amber-600 flex items-center justify-center"><Zap size={16} /></div>
-                    <div>
-                      <h3 className="text-xs font-bold text-amber-800 uppercase tracking-wider">Critical for Demo</h3>
-                      <p className="text-[10px] text-amber-600/70">Must complete for MVP</p>
+            {/* Tab 2: Team Assignments & Workloads */}
+            {activeTaskPlanTab === 'team' && (() => {
+              const percentages = plan.workloadDistribution?.map(d => d.percentage || 0) || [];
+              const maxPct = Math.max(...percentages, 0);
+              const minPct = Math.min(...percentages, 0);
+              const diffPct = maxPct - minPct;
+              
+              const strokeHexColors = ['#8b5cf6', '#3b82f6', '#10b981', '#f59e0b', '#f43f5e'];
+
+              return (
+                <div className="flex flex-col gap-6 animate-slide-up">
+                  {/* Workload Distribution Analytics */}
+                  <div className="bg-white border border-neutral-200/80 rounded-2xl p-5 shadow-xs">
+                    <div className="mb-4">
+                      <h3 className="text-xs font-bold text-neutral-405 uppercase tracking-widest flex items-center gap-1.5">
+                        <BarChart3 size={13} className="text-neutral-505" /> Workload Allocation Analysis
+                      </h3>
+                      <p className="text-[11px] text-neutral-500 mt-0.5">Complexity allocation derived from task counts, deliverables scope, and skills compatibility</p>
+                    </div>
+
+                    <div className="grid grid-cols-1 lg:grid-cols-12 gap-6 items-center">
+                      {/* Left: Interactive Donut Chart */}
+                      <div className="lg:col-span-5 flex flex-col sm:flex-row lg:flex-col items-center justify-center gap-6 p-5 bg-neutral-50/45 border border-neutral-150 rounded-2xl">
+                        
+                        {/* Circle Donut Wrapper */}
+                        <div className="relative w-36 h-36 flex items-center justify-center shrink-0">
+                          <svg viewBox="0 0 100 100" className="w-full h-full transform -rotate-90 origin-center">
+                            {/* Base Track */}
+                            <circle
+                              cx="50"
+                              cy="50"
+                              r="38"
+                              fill="transparent"
+                              stroke="#f1f5f9"
+                              strokeWidth="8.5"
+                            />
+                            {/* Segment Circles */}
+                            {(() => {
+                              let accumulatedOffset = 0;
+                              return plan.workloadDistribution?.map((dist, idx) => {
+                                const segmentLength = ((dist.percentage || 0) / 100) * 238.76;
+                                const strokeDashoffset = -accumulatedOffset;
+                                accumulatedOffset += segmentLength;
+                                const strokeColor = strokeHexColors[idx % strokeHexColors.length];
+                                const isHovered = hoveredMember && hoveredMember.member === dist.member;
+
+                                return (
+                                  <circle
+                                    key={idx}
+                                    cx="50"
+                                    cy="50"
+                                    r="38"
+                                    fill="transparent"
+                                    stroke={strokeColor}
+                                    strokeWidth={isHovered ? 11.5 : 8.5}
+                                    strokeDasharray={`${segmentLength} 238.76`}
+                                    strokeDashoffset={strokeDashoffset}
+                                    className="transition-all duration-250 cursor-pointer origin-center"
+                                    onMouseEnter={() => setHoveredMember(dist)}
+                                    onMouseLeave={() => setHoveredMember(null)}
+                                  />
+                                );
+                              });
+                            })()}
+                          </svg>
+
+                          {/* Center Text Panel */}
+                          <div className="absolute inset-0 flex flex-col items-center justify-center text-center p-3 pointer-events-none">
+                            {hoveredMember ? (
+                              <>
+                                <span className="text-[10px] font-bold text-neutral-450 uppercase tracking-wider truncate max-w-[85px] leading-none">
+                                  {hoveredMember.member}
+                                </span>
+                                <span className="text-sm font-black text-neutral-905 font-mono mt-1">
+                                  {hoveredMember.percentage}%
+                                </span>
+                              </>
+                            ) : (
+                              <>
+                                <span className="text-[9px] font-bold text-neutral-400 uppercase tracking-widest leading-none">
+                                  Balance
+                                </span>
+                                <span className={`text-[10px] font-extrabold mt-1.5 px-2 py-0.5 rounded-md border text-center leading-none ${
+                                  diffPct > 30 ? 'bg-red-50 text-red-700 border-red-100' :
+                                  diffPct > 15 ? 'bg-amber-50 text-amber-700 border-amber-100' :
+                                  'bg-emerald-50 text-emerald-700 border-emerald-100'
+                                }`}>
+                                  {diffPct > 30 ? 'Skewed' : diffPct > 15 ? 'Moderate' : 'Optimal'}
+                                </span>
+                              </>
+                            )}
+                          </div>
+                        </div>
+
+                        {/* Donut stats panel */}
+                        <div className="flex flex-col gap-2.5 w-full sm:flex-1 lg:w-full">
+                          <div className="flex justify-between items-center text-xs border-b border-neutral-200/50 pb-2">
+                            <span className="text-neutral-500 font-medium">Workload Delta</span>
+                            <span className="font-bold text-neutral-800 font-mono">{diffPct}% max diff</span>
+                          </div>
+                          <div className="flex justify-between items-center text-xs border-b border-neutral-200/50 pb-2">
+                            <span className="text-neutral-500 font-medium">Team Members</span>
+                            <span className="font-bold text-neutral-800 font-mono">{plan.assignments?.length || 0} dev(s)</span>
+                          </div>
+                          <div className="flex justify-between items-center text-xs">
+                            <span className="text-neutral-500 font-medium">Average Load</span>
+                            <span className="font-bold text-neutral-800 font-mono">
+                              {Math.round(100 / (plan.assignments?.length || 1))}% / dev
+                            </span>
+                          </div>
+                        </div>
+
+                      </div>
+
+                      {/* Right: Detailed List and Bars */}
+                      <div className="lg:col-span-7 flex flex-col gap-3">
+                        {plan.workloadDistribution?.map((dist, idx) => {
+                          const colorIdx = idx % barFills.length;
+                          const isHovered = hoveredMember && hoveredMember.member === dist.member;
+                          const hexColor = strokeHexColors[colorIdx];
+                          const memberTasks = plan.assignments?.find(a => a.member === dist.member)?.assignedTasks || [];
+                          
+                          return (
+                            <div 
+                              key={idx} 
+                              onMouseEnter={() => setHoveredMember(dist)}
+                              onMouseLeave={() => setHoveredMember(null)}
+                              className={`border rounded-xl p-3.5 flex flex-col gap-2.5 transition-all duration-200 ${
+                                isHovered 
+                                  ? 'bg-neutral-50 border-purple-305 shadow-3xs' 
+                                  : 'bg-neutral-50/20 border-neutral-150 hover:border-neutral-250 hover:bg-neutral-50/50'
+                              }`}
+                            >
+                              <div className="flex justify-between items-center">
+                                <div className="flex items-center gap-2.5">
+                                  <div className={`w-7 h-7 rounded-lg bg-gradient-to-br ${memberGradients[colorIdx]} flex items-center justify-center text-white font-extrabold text-[10px] shrink-0 shadow-3xs`}>
+                                    {dist.member.charAt(0).toUpperCase()}
+                                  </div>
+                                  <div>
+                                    <span className="text-xs font-bold text-neutral-850 block">{dist.member}</span>
+                                    <span className="text-[10px] text-neutral-450 block font-semibold">{memberTasks.length} tasks assigned</span>
+                                  </div>
+                                </div>
+                                <span className="text-sm font-black text-neutral-900 font-mono" style={{ color: isHovered ? hexColor : undefined }}>
+                                  {dist.percentage}%
+                                </span>
+                              </div>
+                              <div className="h-2 bg-neutral-200/85 rounded-full overflow-hidden p-[1px]">
+                                <div className={`h-full rounded-full ${barFills[colorIdx]} transition-all duration-1000 ease-out`} style={{ width: `${dist.percentage}%` }}></div>
+                              </div>
+                            </div>
+                          );
+                        })}
+                      </div>
                     </div>
                   </div>
-                  <div className="flex flex-col gap-2">
-                    {plan.criticalTasks?.map((task, idx) => (
-                      <div key={idx} className="flex items-start gap-2 p-2.5 bg-amber-50/50 border border-amber-100 rounded-lg">
-                        <AlertTriangle size={12} className="text-amber-500 mt-0.5 shrink-0" />
-                        <span className="text-xs font-semibold text-amber-800 leading-relaxed">{task}</span>
+
+                  {/* Team Member Task Boards */}
+                  <div className="flex flex-col gap-1.5">
+                    <div className="mb-2">
+                      <h3 className="text-xs font-bold text-neutral-405 uppercase tracking-widest">Team Boards</h3>
+                      <p className="text-xs text-neutral-500 mt-0.5">Track individual milestones and click checkmarks to quickly toggle completion</p>
+                    </div>
+                    <div className="grid grid-cols-1 lg:grid-cols-2 gap-5">
+                      {plan.assignments?.map((assign, idx) => {
+                        const memberTasks = assign.assignedTasks || [];
+                        const memberCompleted = memberTasks.filter(t => t.status === 'Completed').length;
+                        const memberProgress = memberTasks.length > 0 ? Math.round((memberCompleted / memberTasks.length) * 100) : 0;
+                        const colorIdx = idx % memberGradients.length;
+                        return (
+                          <div key={idx} className="bg-white border border-neutral-205 rounded-2xl overflow-hidden shadow-xs hover:shadow-md hover:border-purple-200 transition-all duration-300 flex flex-col group">
+                            {/* Card Header with user identity */}
+                            <div className="p-4 bg-neutral-50/50 border-b border-neutral-100">
+                              <div className="flex items-center gap-3">
+                                <div className={`w-10 h-10 rounded-xl bg-gradient-to-br ${memberGradients[colorIdx]} flex items-center justify-center text-white font-bold text-sm shrink-0 shadow-xs`}>
+                                  {assign.member.charAt(0).toUpperCase()}
+                                </div>
+                                <div className="flex-1 min-w-0">
+                                  <h4 className="text-xs font-bold text-neutral-905 truncate group-hover:text-purple-650 transition-colors">
+                                    {assign.member}
+                                  </h4>
+                                  <div className="flex flex-wrap gap-1 mt-1">
+                                    {assign.skills.map((s, sIdx) => (
+                                      <span key={sIdx} className={`px-2 py-0.5 text-[8px] font-bold rounded-md border tracking-wider uppercase ${memberBgColors[colorIdx]}`}>
+                                        {s}
+                                      </span>
+                                    ))}
+                                  </div>
+                                </div>
+                                <div className="text-right shrink-0">
+                                  <div className="text-base font-extrabold text-neutral-900 font-mono leading-none">
+                                    {memberCompleted}<span className="text-xs text-neutral-450 font-normal">/{memberTasks.length}</span>
+                                  </div>
+                                  <span className="text-[9px] font-bold text-neutral-455 uppercase tracking-widest mt-1 inline-block">Done</span>
+                                </div>
+                              </div>
+                              
+                              <div className="mt-3.5 flex items-center gap-2">
+                                <div className="flex-1 h-1.5 bg-neutral-200 rounded-full overflow-hidden">
+                                  <div className={`h-full rounded-full transition-all duration-700 ease-out ${barFills[colorIdx]}`} style={{ width: `${memberProgress}%` }}></div>
+                                </div>
+                                <span className="text-[9px] font-bold text-neutral-500 font-mono">{memberProgress}%</span>
+                              </div>
+                            </div>
+
+                            {/* Checklist Section */}
+                            <div className="p-4 flex flex-col gap-2 max-h-[300px] overflow-y-auto grow">
+                              {memberTasks.map((t, tIdx) => {
+                                const sc = { 
+                                  'Not Started': { dot: 'bg-neutral-350', bg: 'bg-neutral-50/50 border-neutral-100 hover:border-neutral-205', tx: 'text-neutral-500 border-neutral-200 bg-white' }, 
+                                  'In Progress': { dot: 'bg-amber-400 animate-pulse', bg: 'bg-amber-50/20 border-amber-100/70 hover:border-amber-200/50', tx: 'text-amber-700 border-amber-200 bg-amber-50/30' }, 
+                                  'Completed': { dot: 'bg-emerald-500', bg: 'bg-emerald-50/15 border-emerald-100 hover:border-emerald-200/40', tx: 'text-emerald-700 border-emerald-200 bg-emerald-50/30' } 
+                                };
+                                const cfg = sc[t.status] || sc['Not Started'];
+                                const isCompleted = t.status === 'Completed';
+                                
+                                return (
+                                  <div key={tIdx} className={`flex items-center gap-3 p-2.5 rounded-xl border transition-all duration-200 ${cfg.bg}`}>
+                                    <button 
+                                      type="button"
+                                      onClick={() => handleUpdateTaskStatus(assign.member, t.task, isCompleted ? 'Not Started' : 'Completed')}
+                                      className={`w-4.5 h-4.5 rounded-md border flex items-center justify-center shrink-0 cursor-pointer transition-all duration-200 ${
+                                        isCompleted 
+                                          ? 'bg-emerald-500 border-emerald-500 text-white shadow-2xs' 
+                                          : 'bg-white border-neutral-250 text-transparent hover:border-emerald-400 hover:text-emerald-500/20'
+                                      }`}
+                                    >
+                                      <CheckCircle size={10} className={isCompleted ? 'stroke-[3.5]' : ''} />
+                                    </button>
+                                    
+                                    <span className={`text-xs font-semibold flex-1 leading-relaxed ${isCompleted ? 'text-neutral-400 line-through font-normal' : 'text-neutral-705'}`}>
+                                      {t.task}
+                                    </span>
+                                    
+                                    <select 
+                                      value={t.status} 
+                                      onChange={(e) => handleUpdateTaskStatus(assign.member, t.task, e.target.value)}
+                                      className={`text-[9px] font-bold rounded-lg px-2 py-1 bg-white border cursor-pointer hover:border-neutral-305 focus:outline-none transition-colors ${cfg.tx}`}
+                                    >
+                                      <option value="Not Started">⏳ Not Started</option>
+                                      <option value="In Progress">🔄 In Progress</option>
+                                      <option value="Completed">✅ Completed</option>
+                                    </select>
+                                  </div>
+                                );
+                              })}
+                            </div>
+
+                            {/* AI Placement explanation */}
+                            {assign.reason && (
+                              <div className="px-4 pb-4 mt-auto border-t border-neutral-50 pt-3 bg-neutral-50/30">
+                                <div className="bg-neutral-50 border border-neutral-100 rounded-xl p-3 flex gap-2">
+                                  <Cpu size={12} className="text-purple-400 mt-0.5 shrink-0" />
+                                  <p className="text-[10px] text-neutral-500 leading-relaxed">
+                                    <span className="font-bold text-neutral-600">AI Assignment logic: </span>
+                                    {assign.reason}
+                                  </p>
+                                </div>
+                              </div>
+                            )}
+                          </div>
+                        );
+                      })}
+                    </div>
+                  </div>
+                </div>
+              );
+            })()}
+
+            {/* Tab 3: Detailed Task Checklist */}
+            {activeTaskPlanTab === 'tasks' && (
+              <div className="flex flex-col gap-1.5 animate-slide-up">
+                <div className="mb-2">
+                  <h3 className="text-xs font-bold text-neutral-405 uppercase tracking-widest">Milestones Overview</h3>
+                  <p className="text-xs text-neutral-500 mt-0.5">Complete list of scope elements split by task types</p>
+                </div>
+                <div className="grid grid-cols-1 md:grid-cols-3 gap-5">
+                  {/* Core Features */}
+                  <div className="bg-white border border-neutral-200 rounded-2xl overflow-hidden shadow-xs hover:shadow-md transition-all duration-200 flex flex-col">
+                    <div className="h-1 bg-gradient-to-r from-violet-500 to-purple-500"></div>
+                    <div className="p-4 flex flex-col gap-3 grow">
+                      <div className="flex items-center justify-between">
+                        <span className="text-xs font-black text-neutral-700 uppercase tracking-wider flex items-center gap-1.5">
+                          <Layers size={13} className="text-purple-500" /> Core Features
+                        </span>
+                        <span className="px-2 py-0.5 rounded-full bg-purple-50 border border-purple-100 text-purple-600 text-[10px] font-extrabold">{coreCount}</span>
                       </div>
-                    )) || <p className="text-xs text-neutral-400 italic">None identified</p>}
+                      <div className="flex flex-col gap-2 grow">
+                        {plan.projectTasks?.coreFeatures?.map((task, idx) => (
+                          <div key={idx} className="flex items-start gap-2.5 p-2.5 bg-neutral-50/50 hover:bg-purple-50/20 border border-neutral-100 rounded-xl transition-all duration-150 group">
+                            <span className="w-1.5 h-1.5 bg-purple-400 rounded-full mt-1.5 shrink-0 group-hover:bg-purple-500"></span>
+                            <span className="text-xs font-semibold text-neutral-600 leading-relaxed group-hover:text-neutral-900 transition-colors">{task}</span>
+                          </div>
+                        )) || <span className="text-xs text-neutral-405 italic">None</span>}
+                      </div>
+                    </div>
+                  </div>
+
+                  {/* Technical Tasks */}
+                  <div className="bg-white border border-neutral-200 rounded-2xl overflow-hidden shadow-xs hover:shadow-md transition-all duration-200 flex flex-col">
+                    <div className="h-1 bg-gradient-to-r from-blue-500 to-cyan-500"></div>
+                    <div className="p-4 flex flex-col gap-3 grow">
+                      <div className="flex items-center justify-between">
+                        <span className="text-xs font-black text-neutral-700 uppercase tracking-wider flex items-center gap-1.5">
+                          <Cpu size={13} className="text-blue-500" /> Technical Tasks
+                        </span>
+                        <span className="px-2 py-0.5 rounded-full bg-blue-50 border border-blue-100 text-blue-600 text-[10px] font-extrabold">{techCount}</span>
+                      </div>
+                      <div className="flex flex-col gap-2 grow">
+                        {plan.projectTasks?.technicalTasks?.map((task, idx) => (
+                          <div key={idx} className="flex items-start gap-2.5 p-2.5 bg-neutral-50/50 hover:bg-blue-50/20 border border-neutral-100 rounded-xl transition-all duration-150 group">
+                            <span className="w-1.5 h-1.5 bg-blue-400 rounded-full mt-1.5 shrink-0 group-hover:bg-blue-500"></span>
+                            <span className="text-xs font-semibold text-neutral-600 leading-relaxed group-hover:text-neutral-900 transition-colors">{task}</span>
+                          </div>
+                        )) || <span className="text-xs text-neutral-405 italic">None</span>}
+                      </div>
+                    </div>
+                  </div>
+
+                  {/* Deployment Tasks */}
+                  <div className="bg-white border border-neutral-200 rounded-2xl overflow-hidden shadow-xs hover:shadow-md transition-all duration-200 flex flex-col">
+                    <div className="h-1 bg-gradient-to-r from-emerald-500 to-teal-500"></div>
+                    <div className="p-4 flex flex-col gap-3 grow">
+                      <div className="flex items-center justify-between">
+                        <span className="text-xs font-black text-neutral-700 uppercase tracking-wider flex items-center gap-1.5">
+                          <Zap size={13} className="text-emerald-500 animate-pulse" /> Deployment Tasks
+                        </span>
+                        <span className="px-2 py-0.5 rounded-full bg-emerald-50 border border-emerald-100 text-emerald-600 text-[10px] font-extrabold">{deployCount}</span>
+                      </div>
+                      <div className="flex flex-col gap-2 grow">
+                        {plan.projectTasks?.deploymentTasks?.map((task, idx) => (
+                          <div key={idx} className="flex items-start gap-2.5 p-2.5 bg-neutral-50/50 hover:bg-emerald-50/20 border border-neutral-100 rounded-xl transition-all duration-150 group">
+                            <span className="w-1.5 h-1.5 bg-emerald-400 rounded-full mt-1.5 shrink-0 group-hover:bg-emerald-500"></span>
+                            <span className="text-xs font-semibold text-neutral-600 leading-relaxed group-hover:text-neutral-900 transition-colors">{task}</span>
+                          </div>
+                        )) || <span className="text-xs text-neutral-405 italic">None</span>}
+                      </div>
+                    </div>
                   </div>
                 </div>
               </div>
-              {/* Recommended Focus */}
-              <div className="bg-white border border-purple-200 rounded-xl overflow-hidden shadow-xs">
-                <div className="h-1 bg-gradient-to-r from-purple-400 to-violet-500"></div>
-                <div className="p-5 flex flex-col gap-3">
-                  <div className="flex items-center gap-2">
-                    <div className="w-8 h-8 rounded-lg bg-purple-50 text-purple-600 flex items-center justify-center"><Target size={16} /></div>
-                    <div>
-                      <h3 className="text-xs font-bold text-purple-800 uppercase tracking-wider">Judging Impact</h3>
-                      <p className="text-[10px] text-purple-600/70">Maximize your score</p>
+            )}
+
+            {/* Tab 4: Insights & MVP Focus */}
+            {activeTaskPlanTab === 'insights' && (
+              <div className="grid grid-cols-1 md:grid-cols-3 gap-5 animate-slide-up">
+                {/* Critical Tasks */}
+                <div className="bg-white border border-amber-200 rounded-2xl overflow-hidden shadow-xs hover:shadow-md hover:border-amber-300 transition-all duration-200">
+                  <div className="h-1.5 bg-gradient-to-r from-amber-400 to-orange-500"></div>
+                  <div className="p-5 flex flex-col gap-4">
+                    <div className="flex items-center gap-2.5">
+                      <div className="w-8 h-8 rounded-lg bg-amber-50 text-amber-600 flex items-center justify-center shrink-0">
+                        <Zap size={16} className="stroke-[2.5]" />
+                      </div>
+                      <div>
+                        <h3 className="text-xs font-bold text-amber-800 uppercase tracking-widest">Critical for Demo</h3>
+                        <p className="text-[10px] text-amber-600/70 mt-0.5">MVP Core Deliverables</p>
+                      </div>
+                    </div>
+                    <div className="flex flex-col gap-2">
+                      {plan.criticalTasks?.map((task, idx) => (
+                        <div key={idx} className="flex items-start gap-2 p-2.5 bg-amber-50/30 border border-amber-100 rounded-xl">
+                          <AlertTriangle size={12} className="text-amber-505 mt-0.5 shrink-0" />
+                          <span className="text-xs font-semibold text-amber-850 leading-relaxed">{task}</span>
+                        </div>
+                      )) || <p className="text-xs text-neutral-450 italic">None identified</p>}
                     </div>
                   </div>
-                  <div className="flex flex-col gap-2">
-                    {plan.recommendedFocus?.map((focus, idx) => (
-                      <div key={idx} className="flex items-start gap-2 p-2.5 bg-purple-50/50 border border-purple-100 rounded-lg">
-                        <Star size={12} className="text-purple-500 mt-0.5 shrink-0" />
-                        <span className="text-xs font-semibold text-purple-800 leading-relaxed">{focus}</span>
+                </div>
+
+                {/* Recommended Focus */}
+                <div className="bg-white border border-purple-200 rounded-2xl overflow-hidden shadow-xs hover:shadow-md hover:border-purple-300 transition-all duration-200">
+                  <div className="h-1.5 bg-gradient-to-r from-purple-400 to-violet-500"></div>
+                  <div className="p-5 flex flex-col gap-4">
+                    <div className="flex items-center gap-2.5">
+                      <div className="w-8 h-8 rounded-lg bg-purple-50 text-purple-650 flex items-center justify-center shrink-0">
+                        <Target size={16} />
                       </div>
-                    )) || <p className="text-xs text-neutral-400 italic">None identified</p>}
+                      <div>
+                        <h3 className="text-xs font-bold text-purple-805 uppercase tracking-widest">Judging Impact</h3>
+                        <p className="text-[10px] text-purple-600/70 mt-0.5">Focus areas to stand out</p>
+                      </div>
+                    </div>
+                    <div className="flex flex-col gap-2">
+                      {plan.recommendedFocus?.map((focus, idx) => (
+                        <div key={idx} className="flex items-start gap-2 p-2.5 bg-purple-50/30 border border-purple-100 rounded-xl">
+                          <Star size={12} className="text-purple-500 mt-0.5 shrink-0" />
+                          <span className="text-xs font-semibold text-purple-855 leading-relaxed">{focus}</span>
+                        </div>
+                      )) || <p className="text-xs text-neutral-450 italic">None identified</p>}
+                    </div>
+                  </div>
+                </div>
+
+                {/* Risk Alerts */}
+                <div className="bg-white border border-red-200 rounded-2xl overflow-hidden shadow-xs hover:shadow-md hover:border-red-300 transition-all duration-200">
+                  <div className="h-1.5 bg-gradient-to-r from-red-400 to-rose-500"></div>
+                  <div className="p-5 flex flex-col gap-4">
+                    <div className="flex items-center gap-2.5">
+                      <div className="w-8 h-8 rounded-lg bg-red-50 text-red-650 flex items-center justify-center shrink-0">
+                        <ShieldAlert size={16} />
+                      </div>
+                      <div>
+                        <h3 className="text-xs font-bold text-red-805 uppercase tracking-widest">Risk Alerts</h3>
+                        <p className="text-[10px] text-red-650/70 mt-0.5">Keep an eye on these pitfalls</p>
+                      </div>
+                    </div>
+                    <div className="flex flex-col gap-2">
+                      {plan.warnings?.map((warning, idx) => (
+                        <div key={idx} className="flex items-start gap-2 p-2.5 bg-red-50/30 border border-red-100 rounded-xl">
+                          <AlertTriangle size={12} className="text-red-505 mt-0.5 shrink-0" />
+                          <span className="text-xs font-semibold text-red-855 leading-relaxed">{warning}</span>
+                        </div>
+                      )) || <p className="text-xs text-neutral-450 italic">None identified</p>}
+                    </div>
                   </div>
                 </div>
               </div>
-              {/* Risk Alerts */}
-              <div className="bg-white border border-red-200 rounded-xl overflow-hidden shadow-xs">
-                <div className="h-1 bg-gradient-to-r from-red-400 to-rose-500"></div>
-                <div className="p-5 flex flex-col gap-3">
-                  <div className="flex items-center gap-2">
-                    <div className="w-8 h-8 rounded-lg bg-red-50 text-red-600 flex items-center justify-center"><ShieldAlert size={16} /></div>
-                    <div>
-                      <h3 className="text-xs font-bold text-red-800 uppercase tracking-wider">Risk Alerts</h3>
-                      <p className="text-[10px] text-red-600/70">Watch out for these</p>
-                    </div>
-                  </div>
-                  <div className="flex flex-col gap-2">
-                    {plan.warnings?.map((warning, idx) => (
-                      <div key={idx} className="flex items-start gap-2 p-2.5 bg-red-50/50 border border-red-100 rounded-lg">
-                        <AlertTriangle size={12} className="text-red-500 mt-0.5 shrink-0" />
-                        <span className="text-xs font-semibold text-red-800 leading-relaxed">{warning}</span>
-                      </div>
-                    )) || <p className="text-xs text-neutral-400 italic">None identified</p>}
-                  </div>
-                </div>
-              </div>
-            </div>
+            )}
           </div>
         );
       })()}
