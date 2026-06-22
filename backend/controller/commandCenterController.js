@@ -431,9 +431,8 @@ exports.getCommandCenterDashboard = async (req, res) => {
       .map(e => ({ ...e, time: new Date(e.time) }))
       .sort((a, b) => b.time - a.time); // Latest first for dashboard timeline display
 
-    // Check if there is an existing AI Command Center report
-    const TechStackAnalysis = require('../models/TechStackAnalysis');
-    const existingAnalysis = await TechStackAnalysis.findOne({ projectId, analysisType: 'CommandCenter' });
+    // Check if there is an existing AI Command Center report (stored on the project)
+    const existingAiReport = project.commandCenterReport || null;
 
     res.status(200).json({
       success: true,
@@ -464,7 +463,7 @@ exports.getCommandCenterDashboard = async (req, res) => {
       })),
       notifications: recentNotifications,
       timeline: sortedTimeline,
-      aiAnalysis: existingAnalysis ? existingAnalysis.aiReport : null,
+      aiAnalysis: existingAiReport,
       isOwner: isSameUser(project.createdBy, req.user.id) || isSameUser(team.createdBy, req.user.id)
     });
 
@@ -545,15 +544,16 @@ exports.triggerCommandCenterAnalysis = async (req, res) => {
       return res.status(502).json({ success: false, message: 'AI Analysis timeout or failed. Try again.' });
     }
 
-    // Save/cache analysis report
-    const TechStackAnalysis = require('../models/TechStackAnalysis');
-    await TechStackAnalysis.deleteMany({ projectId, analysisType: 'CommandCenter' });
-    await TechStackAnalysis.create({
-      projectId,
-      analysisType: 'CommandCenter',
-      aiReport, // custom nested payload
-      generatedAt: new Date()
-    });
+    // Save/cache analysis report directly on the project document (avoids TechStackAnalysis schema conflicts)
+    try {
+      project.commandCenterReport = aiReport;
+      project.commandCenterReportGeneratedAt = new Date();
+      project.markModified('commandCenterReport');
+      await project.save();
+    } catch (saveErr) {
+      console.error('Warning: Could not persist Command Center report to project:', saveErr.message);
+      // Non-fatal: still return the report to the user
+    }
 
     // Create an in-app notification
     await Notification.create({

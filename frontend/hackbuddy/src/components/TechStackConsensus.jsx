@@ -275,24 +275,55 @@ const TechStackConsensus = ({ projectId, onBack }) => {
 
       {/* FINALIZED STACK DISPLAY IF APPLICABLE */}
       {finalTechStack && finalTechStack.frontend && proposal?.status === 'Finalized' && (
-        <div className="bg-emerald-50/50 border border-emerald-250 p-5 rounded-2xl flex flex-col md:flex-row md:items-center justify-between gap-4 shadow-sm animate-pulse">
-          <div className="flex items-center gap-3">
-            <div className="w-10 h-10 rounded-xl bg-emerald-500 text-white flex items-center justify-center shrink-0">
-              <CheckCircle2 size={20} />
+        <div className="bg-emerald-50/50 border border-emerald-250 p-5 rounded-2xl flex flex-col gap-4 shadow-sm">
+          <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
+            <div className="flex items-center gap-3">
+              <div className="w-10 h-10 rounded-xl bg-emerald-500 text-white flex items-center justify-center shrink-0">
+                <CheckCircle2 size={20} />
+              </div>
+              <div>
+                <h3 className="text-xs font-bold text-emerald-800 uppercase tracking-widest">Stack Finalized & Approved</h3>
+                <p className="text-xs text-neutral-500 mt-0.5">This stack is now locked and feeds directly into the AI Task Splitter and scope systems.</p>
+              </div>
             </div>
-            <div>
-              <h3 className="text-xs font-bold text-emerald-800 uppercase tracking-widest">Stack Finalized & Approved</h3>
-              <p className="text-xs text-neutral-500 mt-0.5">This stack is now locked and feeds directly into the AI Task Splitter and scope systems.</p>
+            <div className="flex flex-wrap gap-2">
+              {['frontend', 'backend', 'database', 'ai', 'deployment'].map(cat => (
+                <span key={cat} className="px-3 py-1 text-xs font-bold bg-white border border-emerald-200 text-emerald-700 rounded-lg shadow-2xs">
+                  <span className="capitalize text-neutral-450 font-normal mr-1">{cat}:</span>
+                  {finalTechStack[cat]}
+                </span>
+              ))}
             </div>
           </div>
-          <div className="flex flex-wrap gap-2">
-            {['frontend', 'backend', 'database', 'ai', 'deployment'].map(cat => (
-              <span key={cat} className="px-3 py-1 text-xs font-bold bg-white border border-emerald-200 text-emerald-700 rounded-lg shadow-2xs">
-                <span className="capitalize text-neutral-450 font-normal mr-1">{cat}:</span>
-                {finalTechStack[cat]}
-              </span>
-            ))}
-          </div>
+          {isOwner && (
+            <div className="flex items-center gap-2 border-t border-emerald-200/60 pt-3">
+              <span className="text-[10px] text-emerald-700 font-semibold mr-auto">🔐 Owner Controls</span>
+              <button
+                onClick={() => {
+                  setModifyForm({
+                    frontend: finalTechStack.frontend,
+                    backend: finalTechStack.backend,
+                    database: finalTechStack.database,
+                    ai: finalTechStack.ai,
+                    deployment: finalTechStack.deployment
+                  });
+                  setShowModifyForm(true);
+                  // Scroll down so user sees the form
+                }}
+                disabled={finalizingStack}
+                className="flex items-center gap-1.5 px-3 py-1.5 text-xs font-bold rounded-lg bg-white border border-emerald-300 text-emerald-700 hover:bg-emerald-50 cursor-pointer transition-colors disabled:opacity-50"
+              >
+                <Edit3 size={12} /> Edit & Re-finalize
+              </button>
+              <button
+                onClick={() => handleFinalizeAction('RESTART_VOTING')}
+                disabled={finalizingStack}
+                className="flex items-center gap-1.5 px-3 py-1.5 text-xs font-bold rounded-lg bg-white border border-red-200 text-red-600 hover:bg-red-50 cursor-pointer transition-colors disabled:opacity-50"
+              >
+                <Undo size={12} /> Re-open Voting
+              </button>
+            </div>
+          )}
         </div>
       )}
 
@@ -793,7 +824,7 @@ const TechStackConsensus = ({ projectId, onBack }) => {
             </div>
 
             {/* SECTION 5: Final Decision (Owner Actions) */}
-            {proposal.status !== 'Finalized' && (
+            {(proposal.status !== 'Finalized' || (isOwner && showModifyForm)) && (
               <div className="bg-white border border-neutral-200 rounded-2xl p-5 shadow-xs flex flex-col gap-4">
                 <div className="border-b border-neutral-100 pb-3">
                   <h3 className="text-xs font-bold text-neutral-550 uppercase tracking-widest">Finalization Hub</h3>

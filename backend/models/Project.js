@@ -115,6 +115,14 @@ const projectSchema = new mongoose.Schema({
     database: { type: String, default: '' },
     ai: { type: String, default: '' },
     deployment: { type: String, default: '' }
+  },
+  commandCenterReport: {
+    type: mongoose.Schema.Types.Mixed,
+    default: null
+  },
+  commandCenterReportGeneratedAt: {
+    type: Date,
+    default: null
   }
 });
 
@@ -147,6 +155,8 @@ const createMockProjectInstance = (data) => {
       ai: '',
       deployment: ''
     },
+    commandCenterReport: data.commandCenterReport || null,
+    commandCenterReportGeneratedAt: data.commandCenterReportGeneratedAt || null,
     markModified(path) {
       // dummy function for in-memory database fallback
     },

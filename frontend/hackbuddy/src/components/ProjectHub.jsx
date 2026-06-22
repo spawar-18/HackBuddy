@@ -260,7 +260,7 @@ const ProjectHub = ({ teamId }) => {
 
     try {
       setReviewLoading(true);
-      const isRegen = !!project.projectReview;
+      const isRegen = !!project.projectReviewGeneratedAt;
       const res = await analyzeProject(project._id);
       
       if (res.success) {
@@ -672,7 +672,7 @@ const ProjectHub = ({ teamId }) => {
               </div>
             ) : (
               <div className="flex gap-2 flex-wrap mt-1">
-                {!project.projectReview ? (
+                {!project.projectReviewGeneratedAt ? (
                   <button
                     type="button"
                     onClick={handleRunAnalysis}
@@ -742,7 +742,7 @@ const ProjectHub = ({ teamId }) => {
               </div>
             ) : (
               <div className="flex gap-2 flex-wrap mt-1">
-                {!project.taskPlan ? (
+                {!project.taskPlanGeneratedAt ? (
                   <button
                     type="button"
                     onClick={handleGenerateTaskPlan}
@@ -819,7 +819,7 @@ const ProjectHub = ({ teamId }) => {
       )}
 
       {/* AI Project Review Report View */}
-      {view === 'review-report' && project && project.projectReview && (
+      {view === 'review-report' && project && project.projectReviewGeneratedAt && (
         <div className="flex flex-col gap-5">
           <div className="flex justify-between items-center border-b border-neutral-100 pb-2 mb-2">
             <div className="flex items-center gap-2">
@@ -1006,7 +1006,7 @@ const ProjectHub = ({ teamId }) => {
       )}
 
       {/* AI Task Splitter Results View */}
-      {view === 'task-plan' && project && project.taskPlan && (() => {
+      {view === 'task-plan' && project && project.taskPlanGeneratedAt && (() => {
         const plan = project.taskPlan;
         const coreCount = plan.projectTasks?.coreFeatures?.length || 0;
         const techCount = plan.projectTasks?.technicalTasks?.length || 0;

@@ -55,7 +55,7 @@ ${resumeText}`;
 
   try {
     const response = await openai.chat.completions.create({
-      model: 'openai/gpt-oss-20b',
+      model: process.env.OPENROUTER_MODEL || 'google/gemini-2.5-flash',
       messages: [
         {
           role: 'user',

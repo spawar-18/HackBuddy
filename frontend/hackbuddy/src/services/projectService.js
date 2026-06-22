@@ -249,3 +249,58 @@ export const finalizeTechStack = async (projectId, data) => {
   const response = await api.post(`/projects/${projectId}/tech-stack/finalize`, data);
   return response.data;
 };
+
+/**
+ * Gets hackathon configuration.
+ * @param {string} projectId
+ */
+export const getHackathonConfig = async (projectId) => {
+  const response = await api.get(`/projects/${projectId}/hackathon/config`);
+  return response.data;
+};
+
+/**
+ * Saves hackathon configuration.
+ * @param {string} projectId
+ * @param {Object} data
+ */
+export const saveHackathonConfig = async (projectId, data) => {
+  const response = await api.post(`/projects/${projectId}/hackathon/config`, data);
+  return response.data;
+};
+
+/**
+ * Gets aggregated Hackathon Command Center details.
+ * @param {string} projectId
+ */
+export const getCommandCenterDashboard = async (projectId) => {
+  const response = await api.get(`/projects/${projectId}/hackathon/dashboard`);
+  return response.data;
+};
+
+/**
+ * Triggers AI Hackathon Command Center review.
+ * @param {string} projectId
+ */
+export const triggerCommandCenterAnalysis = async (projectId) => {
+  const response = await api.post(`/projects/${projectId}/hackathon/analyze`);
+  return response.data;
+};
+
+/**
+ * Gets in-app notifications.
+ * @param {string} projectId
+ */
+export const getInAppNotifications = async (projectId) => {
+  const response = await api.get(`/projects/${projectId}/hackathon/notifications`);
+  return response.data;
+};
+
+/**
+ * Marks notifications as read.
+ * @param {string} projectId
+ */
+export const markNotificationsAsRead = async (projectId) => {
+  const response = await api.post(`/projects/${projectId}/hackathon/notifications/read`);
+  return response.data;
+};

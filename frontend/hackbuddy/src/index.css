@@ -616,3 +616,120 @@ h1:hover, h2:hover, h3:hover, h4:hover, h5:hover, h6:hover, p:hover, span:hover,
   color: #00f0ff !important;
   border-color: rgba(0, 240, 255, 0.2) !important;
 }
+/* ============================================
+   LIGHT MODE OVERRIDES (html.light class)
+   ============================================ */
+html.light body {
+  background-color: #f8fafc !important;
+  background-image: radial-gradient(rgba(0,0,0,0.04) 1px, transparent 1px) !important;
+  background-size: 24px 24px !important;
+  color: #1e293b !important;
+}
+html.light h1, html.light h2, html.light h3, html.light h4,
+html.light h5, html.light h6, html.light p, html.light span,
+html.light label, html.light li, html.light a, html.light th,
+html.light td, html.light dd, html.light dt, html.light time {
+  color: #1e293b !important;
+  text-shadow: none !important;
+}
+html.light h1:hover, html.light h2:hover, html.light h3:hover,
+html.light h4:hover, html.light p:hover, html.light span:hover,
+html.light li:hover, html.light a:hover, html.light label:hover {
+  color: #0f172a !important;
+  text-shadow: none !important;
+}
+html.light ::-webkit-scrollbar-track { background: #f1f5f9; }
+html.light ::-webkit-scrollbar-thumb { background: #cbd5e1; box-shadow: none; }
+html.light ::-webkit-scrollbar-thumb:hover { background: #94a3b8; box-shadow: none; }
+
+html.light .bg-white, html.light [class*="bg-white"],
+html.light [class*="bg-neutral-50"], html.light [class*="bg-brand-50"],
+html.light [class*="bg-neutral-100"] { background-color: #ffffff !important; }
+
+html.light .border-neutral-200, html.light .border-brand-100,
+html.light [class*="border-neutral-"], html.light [class*="border-brand-"] {
+  border-color: #e2e8f0 !important;
+}
+html.light .glass {
+  background-color: rgba(255,255,255,0.9) !important;
+  border: 1px solid #e2e8f0 !important;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.06) !important;
+}
+html.light .dashboard-container { background-color: #f8fafc !important; }
+html.light .dashboard-header {
+  background-color: rgba(255,255,255,0.95) !important;
+  border-bottom: 1px solid #e2e8f0 !important;
+}
+html.light .dashboard-sidebar {
+  background-color: #ffffff !important;
+  border-right: 1px solid #e2e8f0 !important;
+}
+html.light .dashboard-card {
+  background-color: #ffffff !important;
+  border: 1px solid #e2e8f0 !important;
+  box-shadow: 0 1px 4px rgba(0,0,0,0.05) !important;
+}
+html.light .menu-item { color: #475569 !important; }
+html.light .menu-item:hover {
+  background-color: #f1f5f9 !important;
+  color: #0f172a !important;
+  text-shadow: none !important;
+}
+html.light .menu-item.active {
+  background-color: #2563eb !important;
+  color: #ffffff !important;
+  box-shadow: 0 2px 8px rgba(37,99,235,0.3) !important;
+}
+html.light .form-input, html.light .input-field,
+html.light .hackos-input, html.light select, html.light textarea {
+  background-color: #f8fafc !important;
+  border: 1px solid #cbd5e1 !important;
+  color: #1e293b !important;
+}
+html.light .form-input:focus, html.light .input-field:focus,
+html.light select:focus, html.light textarea:focus {
+  border-color: #2563eb !important;
+  box-shadow: 0 0 0 3px rgba(37,99,235,0.1) !important;
+}
+html.light .form-input::placeholder, html.light .input-field::placeholder {
+  color: #94a3b8 !important;
+}
+html.light .btn-primary, html.light .submit-btn {
+  background-color: #2563eb !important;
+  border: 1px solid #2563eb !important;
+  box-shadow: 0 1px 3px rgba(0,0,0,0.1) !important;
+  color: #ffffff !important;
+}
+html.light .btn-primary:hover, html.light .submit-btn:hover {
+  background-color: #1d4ed8 !important;
+  box-shadow: 0 4px 12px rgba(37,99,235,0.3) !important;
+}
+html.light .btn-secondary {
+  background-color: #ffffff !important;
+  color: #475569 !important;
+  border: 1px solid #cbd5e1 !important;
+}
+html.light .btn-secondary:hover {
+  background-color: #f1f5f9 !important;
+  color: #1e293b !important;
+  border-color: #94a3b8 !important;
+  box-shadow: none !important;
+}
+html.light .hackos-auth-page { background-color: #f8fafc !important; }
+html.light .hackos-auth-card {
+  background-color: #ffffff !important;
+  border: 1px solid #e2e8f0 !important;
+  box-shadow: 0 8px 32px rgba(0,0,0,0.08) !important;
+}
+html.light .team-page-container { background-color: #f8fafc !important; }
+html.light .team-card {
+  background-color: #ffffff !important;
+  border: 1px solid #e2e8f0 !important;
+  box-shadow: 0 4px 16px rgba(0,0,0,0.06) !important;
+}
+html.light .chat-container { background-color: #ffffff !important; border: 1px solid #e2e8f0 !important; }
+html.light .user-bubble { background-color: #2563eb !important; border: 1px solid #1d4ed8 !important; }
+html.light .assistant-bubble { background-color: #f8fafc !important; border: 1px solid #e2e8f0 !important; }
+html.light .sticky-input { background-color: #ffffff !important; border-top: 1px solid #e2e8f0 !important; }
+html.light .code-box { background-color: #f8fafc !important; border: 1px solid #e2e8f0 !important; }
+html.light .code-val { color: #2563eb !important; text-shadow: none !important; }

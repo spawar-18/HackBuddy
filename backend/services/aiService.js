@@ -177,7 +177,7 @@ ${teamDataString}`;
         ],
         temperature: 0,
         top_p: 0.1,
-        max_tokens: 6000,
+        max_tokens: 2000,
       });
 
       const responseText = response.choices[0]?.message?.content || '';
@@ -211,7 +211,7 @@ ${teamDataString}`;
         ],
         temperature: 0,
         top_p: 0.1,
-        max_tokens: 6000,
+        max_tokens: 2000,
       });
 
       const responseText = response.choices[0]?.message?.content || '';
@@ -449,7 +449,7 @@ ${projectContextString}`;
         ],
         temperature: 0,
         top_p: 0.1,
-        max_tokens: 6000,
+        max_tokens: 2000,
       });
 
       const responseText = response.choices[0]?.message?.content || '';
@@ -483,7 +483,7 @@ ${projectContextString}`;
         ],
         temperature: 0,
         top_p: 0.1,
-        max_tokens: 6000,
+        max_tokens: 2000,
       });
 
       const responseText = response.choices[0]?.message?.content || '';
@@ -604,7 +604,7 @@ Do not return JSON. Use Markdown for list and formatting if appropriate.`;
         messages: messages,
         temperature: 0.2,
         top_p: 0.9,
-        max_tokens: 4000,
+        max_tokens: 1500,
       });
 
       return response.choices[0]?.message?.content || 'No response from mentor AI.';
@@ -634,7 +634,7 @@ Do not return JSON. Use Markdown for list and formatting if appropriate.`;
         messages: messages,
         temperature: 0.2,
         top_p: 0.9,
-        max_tokens: 4000,
+        max_tokens: 1500,
       });
 
       return response.choices[0]?.message?.content || 'No response from mentor AI.';
@@ -928,7 +928,7 @@ ${memberList}`;
         ],
         temperature: 0,
         top_p: 0.1,
-        max_tokens: 8000,
+        max_tokens: 2500,
       });
 
       const responseText = response.choices[0]?.message?.content || '';
@@ -965,7 +965,7 @@ ${memberList}`;
         ],
         temperature: 0,
         top_p: 0.1,
-        max_tokens: 8000,
+        max_tokens: 2500,
       });
 
       const responseText = response.choices[0]?.message?.content || '';
@@ -1095,7 +1095,7 @@ You MUST respond ONLY with a valid JSON object in this exact format, with no oth
         ],
         temperature: 0,
         top_p: 0.1,
-        max_tokens: 3000,
+        max_tokens: 1500,
       });
       return parseResponse(response.choices[0]?.message?.content || '');
     } catch (err) {
@@ -1126,7 +1126,7 @@ You MUST respond ONLY with a valid JSON object in this exact format, with no oth
         ],
         temperature: 0,
         top_p: 0.1,
-        max_tokens: 3000,
+        max_tokens: 1500,
       });
       return parseResponse(response.choices[0]?.message?.content || '');
     } catch (err) {
@@ -1325,7 +1325,7 @@ You MUST respond ONLY with a valid JSON object in this exact format, with no oth
         ],
         temperature: 0,
         top_p: 0.1,
-        max_tokens: 3000,
+        max_tokens: 1500,
       });
       return cleanAndParseTechStackAnalysis(response.choices[0]?.message?.content || '');
     } catch (err) {
@@ -1356,7 +1356,7 @@ You MUST respond ONLY with a valid JSON object in this exact format, with no oth
         ],
         temperature: 0,
         top_p: 0.1,
-        max_tokens: 3000,
+        max_tokens: 1500,
       });
       return cleanAndParseTechStackAnalysis(response.choices[0]?.message?.content || '');
     } catch (err) {
@@ -1370,12 +1370,211 @@ You MUST respond ONLY with a valid JSON object in this exact format, with no oth
   return generateMockTechStackAnalysis(proposalContext.proposal, proposalContext.votes, proposalContext.members);
 };
 
+/**
+ * Generate a mock Hackathon Command Center AI analysis report.
+ * @param {object} context - Hackathon context object
+ * @returns {object} Mock report
+ */
+const generateMockCommandCenterReport = (context) => {
+  const { projectDetails, timeRemaining, taskPlan } = context;
+  const assignments = taskPlan?.assignments || [];
+  const totalTasks = assignments.reduce((sum, a) => sum + (a.assignedTasks?.length || 0), 0);
+  const completedTasks = assignments.reduce((sum, a) =>
+    sum + (a.assignedTasks?.filter(t => t.status === 'Completed')?.length || 0), 0);
+  const blockedTasks = assignments.reduce((sum, a) =>
+    sum + (a.assignedTasks?.filter(t => t.status === 'Blocked')?.length || 0), 0);
+  const pct = totalTasks > 0 ? Math.round((completedTasks / totalTasks) * 100) : 0;
+
+  let overallStatus = 'On Track';
+  let riskLevel = 'Low';
+  if (pct < 25) { overallStatus = 'High Risk'; riskLevel = 'High'; }
+  else if (pct < 50) { overallStatus = 'Slightly Behind'; riskLevel = 'Medium'; }
+  else if (pct >= 80) { overallStatus = 'Ready For Demo'; }
+
+  return {
+    overallStatus,
+    riskLevel,
+    completionPrediction: `Based on current velocity, the team is ${pct}% complete with ${timeRemaining}. ${
+      pct >= 70 ? 'On track for a successful demo.' :
+      pct >= 40 ? 'Focus is required on critical path tasks.' :
+      'Significant effort needed — consider scope reduction.'
+    }`,
+    currentFocus: [
+      `Complete remaining ${totalTasks - completedTasks} pending tasks`,
+      'Finalize core MVP features before adding extras',
+      'Prepare demo environment and test all user flows',
+    ].filter(Boolean),
+    tasksToPostpone: blockedTasks > 0 ? [
+      'Any non-critical nice-to-have features',
+      'Advanced analytics and reporting dashboards',
+      'Third-party integrations that are not core to the demo'
+    ] : [],
+    reasoning: `The team has completed ${completedTasks} of ${totalTasks} tasks (${pct}%). ${
+      blockedTasks > 0 ? `There are ${blockedTasks} blocked tasks that need immediate attention.` : 'No blocked tasks detected.'
+    } Prioritize the critical path to ensure a working demo.`,
+    judgePreparationTips: [
+      'Lead with the problem statement and quantify the impact clearly',
+      'Demonstrate a working end-to-end user flow, not just individual features',
+      'Prepare answers for: "Why this approach?" and "What would you build next?"',
+      'Have a backup demo video in case of live demo technical issues',
+    ]
+  };
+};
+
+/**
+ * Analyzes hackathon progress and generates AI command center report.
+ * Falls back to OpenRouter, then Qwen, then mock.
+ * @param {object} context - { projectDetails, finalTechStack, teamSkills, taskPlan, timeRemaining, projectReview, marketplaceActivity, previousAlerts }
+ * @returns {Promise<object>} Parsed structured AI report
+ */
+const analyzeHackathonCommandCenterWithAI = async (context) => {
+  const qwenKey = process.env.QWEN_API;
+  const qwenBaseUrl = process.env.QWEN_BASE_URL || 'https://api.featherless.ai/v1';
+  const openRouterKey = process.env.OPENROUTER_API_KEY;
+
+  const { projectDetails, finalTechStack, teamSkills, taskPlan, timeRemaining, previousAlerts } = context;
+
+  // Summarise task progress for prompt
+  const assignments = taskPlan?.assignments || [];
+  const totalTasks = assignments.reduce((sum, a) => sum + (a.assignedTasks?.length || 0), 0);
+  const completedTasks = assignments.reduce((sum, a) =>
+    sum + (a.assignedTasks?.filter(t => t.status === 'Completed')?.length || 0), 0);
+  const blockedTasks = assignments.reduce((sum, a) =>
+    sum + (a.assignedTasks?.filter(t => t.status === 'Blocked')?.length || 0), 0);
+  const pct = totalTasks > 0 ? Math.round((completedTasks / totalTasks) * 100) : 0;
+
+  const memberSummary = Object.entries(teamSkills || {})
+    .map(([name, skills]) => `- ${name}: ${(skills || []).join(', ') || 'No skills listed'}`)
+    .join('\n');
+
+  const prompt = `You are an AI Hackathon Command Center acting as Engineering Manager, Technical Lead, and Mentor.
+
+Project: ${projectDetails?.projectName || 'Unknown'}
+Problem: ${projectDetails?.problemStatement || 'N/A'}
+Features: ${(projectDetails?.featuresToBuild || []).join(', ') || 'N/A'}
+Tech Stack: ${JSON.stringify(finalTechStack || {})}
+Time Remaining: ${timeRemaining}
+Task Progress: ${completedTasks}/${totalTasks} completed (${pct}%), ${blockedTasks} blocked
+Team Members & Skills:
+${memberSummary}
+Previous Alerts: ${(previousAlerts || []).join('; ') || 'None'}
+
+Analyze and provide a JSON command center report.
+
+Rules:
+- Be specific to this project, not generic
+- Consider the time remaining critically
+- Identify real risks based on task progress
+- Suggest concrete scope cuts if needed
+- Return ONLY valid JSON
+
+Required Format:
+{
+  "overallStatus": "On Track" | "Slightly Behind" | "High Risk" | "Critical" | "Ready For Demo",
+  "riskLevel": "Low" | "Medium" | "High" | "Critical",
+  "completionPrediction": "string (1-2 sentences on whether they will finish)",
+  "currentFocus": ["string", "string", "string"],
+  "tasksToPostpone": ["string"],
+  "reasoning": "string (2-3 sentences explaining the assessment)",
+  "judgePreparationTips": ["string", "string", "string"]
+}`;
+
+  const cleanAndParseCommandCenterReport = (responseText) => {
+    const stripped = stripThinkTags(responseText);
+    const firstBrace = stripped.indexOf('{');
+    if (firstBrace === -1) throw new Error('No JSON found in command center AI response');
+    let cleanText = stripped.substring(firstBrace);
+    const lastBrace = cleanText.lastIndexOf('}');
+    if (lastBrace !== -1) cleanText = cleanText.substring(0, lastBrace + 1);
+    let parsed;
+    try {
+      parsed = JSON.parse(cleanText.trim());
+    } catch (e) {
+      const repaired = repairTruncatedJson(cleanText.trim());
+      parsed = JSON.parse(repaired);
+    }
+    // Ensure required fields exist
+    if (!parsed.overallStatus) parsed.overallStatus = 'On Track';
+    if (!parsed.riskLevel) parsed.riskLevel = 'Medium';
+    if (!parsed.completionPrediction) parsed.completionPrediction = 'Analysis inconclusive.';
+    if (!Array.isArray(parsed.currentFocus)) parsed.currentFocus = [];
+    if (!Array.isArray(parsed.tasksToPostpone)) parsed.tasksToPostpone = [];
+    if (!parsed.reasoning) parsed.reasoning = '';
+    if (!Array.isArray(parsed.judgePreparationTips)) parsed.judgePreparationTips = [];
+    return parsed;
+  };
+
+  // 1. Try OpenRouter
+  if (openRouterKey) {
+    try {
+      console.log('Attempting Command Center AI analysis via OpenRouter...');
+      const openrouter = new OpenAI({
+        baseURL: 'https://openrouter.ai/api/v1',
+        apiKey: openRouterKey,
+        timeout: 45000,
+        defaultHeaders: {
+          'HTTP-Referer': 'http://localhost:3000',
+          'X-Title': 'HackBuddy',
+        }
+      });
+      const response = await openrouter.chat.completions.create({
+        model: OPENROUTER_MODEL,
+        messages: [
+          { role: 'system', content: 'You are a JSON-only API. Respond with raw JSON only. No explanations, no markdown, no thinking.' },
+          { role: 'user', content: prompt }
+        ],
+        temperature: 0,
+        top_p: 0.1,
+        max_tokens: 1500,
+      });
+      return cleanAndParseCommandCenterReport(response.choices[0]?.message?.content || '');
+    } catch (err) {
+      console.error('OpenRouter Command Center AI failed:', err.message || err);
+      console.log('Falling back to Qwen for Command Center analysis...');
+    }
+  }
+
+  // 2. Try Qwen
+  if (qwenKey) {
+    try {
+      console.log('Attempting Command Center AI analysis via Qwen...');
+      const qwenClient = new OpenAI({
+        baseURL: qwenBaseUrl,
+        apiKey: qwenKey,
+        timeout: 20000,
+        defaultHeaders: {
+          'HTTP-Referer': 'http://localhost:3000',
+          'X-Title': 'HackBuddy',
+        }
+      });
+      const response = await qwenClient.chat.completions.create({
+        model: 'Qwen/Qwen3.6-35B-A3B',
+        messages: [
+          { role: 'system', content: 'You are a JSON-only API. Respond with raw JSON only. No explanations, no markdown, no thinking.' },
+          { role: 'user', content: prompt }
+        ],
+        temperature: 0,
+        top_p: 0.1,
+        max_tokens: 1500,
+      });
+      return cleanAndParseCommandCenterReport(response.choices[0]?.message?.content || '');
+    } catch (err) {
+      console.error('Qwen Command Center AI failed:', err.message || err);
+      console.log('Falling back to mock Command Center report...');
+    }
+  }
+
+  console.warn('WARNING: No AI API key available. Using mock Command Center report.');
+  return generateMockCommandCenterReport(context);
+};
+
 module.exports = {
   analyzeTeamWithAI,
   analyzeProjectWithAI,
   chatWithMentorAI,
   generateTaskPlanWithAI,
   getMarketplaceRecommendation,
-  analyzeTechStackWithAI
+  analyzeTechStackWithAI,
+  analyzeHackathonCommandCenterWithAI
 };
 

@@ -36,6 +36,7 @@ const projectRoutes = require('./routes/projectRoutes');
 const chatRoutes = require('./routes/chatRoutes');
 const marketplaceRoutes = require('./routes/marketplaceRoutes');
 const techStackRoutes = require('./routes/techStackRoutes');
+const commandCenterRoutes = require('./routes/commandCenterRoutes');
 
 const app = express();
 const port = process.env.PORT || 5000;
@@ -57,6 +58,8 @@ app.use('/api/project', chatRoutes);
 app.use('/api/projects', chatRoutes);
 app.use('/api/projects/:projectId/tech-stack', techStackRoutes);
 app.use('/api/project/:projectId/tech-stack', techStackRoutes);
+app.use('/api/projects/:projectId/hackathon', commandCenterRoutes);
+app.use('/api/project/:projectId/hackathon', commandCenterRoutes);
 app.use('/api', marketplaceRoutes);
 
 // Root Route (Welcome message/status)

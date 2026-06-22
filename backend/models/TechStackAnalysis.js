@@ -6,13 +6,19 @@ const techStackAnalysisSchema = new mongoose.Schema({
     ref: 'Project',
     required: true
   },
+  analysisType: {
+    type: String,
+    default: 'TechStack'
+  },
   readinessScore: {
     type: Number,
-    required: true
+    required: false,
+    default: 0
   },
   consensusScore: {
     type: Number,
-    required: true
+    required: false,
+    default: 0
   },
   strengths: {
     type: [String],
@@ -40,6 +46,10 @@ const techStackAnalysisSchema = new mongoose.Schema({
   finalRecommendation: {
     type: String,
     default: ''
+  },
+  aiReport: {
+    type: mongoose.Schema.Types.Mixed,
+    default: null
   },
   generatedAt: {
     type: Date,

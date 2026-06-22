@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
 import api from '../services/api';
@@ -7,8 +7,10 @@ import { getProjectByTeam } from '../services/projectService';
 import {
   LogOut, Bell, Settings, LayoutDashboard, Database, Cpu,
   Send, Users, BookOpen, CheckCircle, Clock,
-  UserCheck, RefreshCw, FolderGit2, Play
+  UserCheck, RefreshCw, FolderGit2, Play,
+  Flame, ShieldCheck, AlertTriangle, Zap, Sun, Moon
 } from 'lucide-react';
+import HackathonCommandCenter from '../components/HackathonCommandCenter';
 
 const Dashboard = () => {
   const { user, logout } = useAuth();
@@ -21,6 +23,30 @@ const Dashboard = () => {
   const [projects, setProjects] = useState({});
   const [loadingProjects, setLoadingProjects] = useState(true);
   const navigate = useNavigate();
+
+  // Command Center and Notification States
+  const [activeTab, setActiveTab] = useState('dashboard');
+  const [selectedProjectId, setSelectedProjectId] = useState(null);
+  const [showNotifications, setShowNotifications] = useState(false);
+  const [dashboardNotifications, setDashboardNotifications] = useState([]);
+  const [unreadCount, setUnreadCount] = useState(0);
+  const bellRef = useRef(null);
+
+  // Dark/Light mode toggle
+  const [isDark, setIsDark] = useState(() => {
+    const saved = localStorage.getItem('hackbuddy-theme');
+    return saved ? saved === 'dark' : true; // default dark
+  });
+
+  useEffect(() => {
+    if (isDark) {
+      document.documentElement.classList.remove('light');
+      localStorage.setItem('hackbuddy-theme', 'dark');
+    } else {
+      document.documentElement.classList.add('light');
+      localStorage.setItem('hackbuddy-theme', 'light');
+    }
+  }, [isDark]);
 
   // Countdown timer simulation
   useEffect(() => {
@@ -38,6 +64,122 @@ const Dashboard = () => {
     }, 1000);
     return () => clearInterval(timer);
   }, []);
+
+  // Derived array of active projects
+  const activeProjectsList = Object.values(projects).filter(Boolean);
+  const currentProjectId = selectedProjectId || activeProjectsList[0]?._id;
+
+  // Fetch notifications for all active projects
+  const fetchDashboardNotifications = async () => {
+    const activeProjects = Object.values(projects).filter(Boolean);
+    if (activeProjects.length === 0) return;
+
+    try {
+      const promises = activeProjects.map(async (proj) => {
+        try {
+          const res = await api.get(`/projects/${proj._id}/hackathon/notifications`);
+          if (res.data && res.data.success) {
+            return res.data.notifications.map(n => ({
+              ...n,
+              projectName: proj.projectName,
+              projectId: proj._id
+            }));
+          }
+        } catch (err) {
+          console.error(`Error fetching notifications for project ${proj._id}:`, err);
+        }
+        return [];
+      });
+
+      const results = await Promise.all(promises);
+      const allNotifs = results.flat().sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt));
+      setDashboardNotifications(allNotifs);
+      setUnreadCount(allNotifs.filter(n => !n.read).length);
+    } catch (err) {
+      console.error('Error fetching dashboard notifications:', err);
+    }
+  };
+
+  // Poll for notifications
+  useEffect(() => {
+    if (Object.keys(projects).length > 0) {
+      fetchDashboardNotifications();
+      const interval = setInterval(fetchDashboardNotifications, 30000);
+      return () => clearInterval(interval);
+    }
+  }, [projects]);
+
+  // Click outside listener for notifications dropdown
+  useEffect(() => {
+    const handleOutsideClick = (e) => {
+      if (bellRef.current && !bellRef.current.contains(e.target)) {
+        setShowNotifications(false);
+      }
+    };
+    document.addEventListener('mousedown', handleOutsideClick);
+    return () => document.removeEventListener('mousedown', handleOutsideClick);
+  }, []);
+
+  // Mark notifications read
+  const handleMarkAllAsRead = async () => {
+    const activeProjects = Object.values(projects).filter(Boolean);
+    if (activeProjects.length === 0) return;
+
+    try {
+      await Promise.all(activeProjects.map(async (proj) => {
+        try {
+          await api.post(`/projects/${proj._id}/hackathon/notifications/read`);
+        } catch (err) {
+          console.error(`Error marking notifications read for project ${proj._id}:`, err);
+        }
+      }));
+      setUnreadCount(0);
+      setDashboardNotifications(prev => prev.map(n => ({ ...n, read: true })));
+    } catch (err) {
+      console.error('Error marking all notifications as read:', err);
+    }
+  };
+
+  const getNotificationStyles = (type, read) => {
+    const config = {
+      Milestone: {
+        icon: <ShieldCheck size={14} className="text-purple-600" />,
+        bg: read ? 'bg-purple-50/60' : 'bg-purple-50',
+        border: read ? 'border-purple-200/50' : 'border-purple-300',
+        textColor: read ? 'text-neutral-700' : 'text-neutral-900',
+        badge: 'Milestone'
+      },
+      TaskOverdue: {
+        icon: <AlertTriangle size={14} className="text-rose-600 animate-pulse" />,
+        bg: read ? 'bg-rose-50/60' : 'bg-rose-50',
+        border: read ? 'border-rose-200/50' : 'border-rose-300',
+        textColor: read ? 'text-neutral-750' : 'text-neutral-900',
+        badge: 'Overdue'
+      },
+      ActionRequired: {
+        icon: <Zap size={14} className="text-amber-600 animate-bounce" />,
+        bg: read ? 'bg-amber-50/60' : 'bg-amber-50',
+        border: read ? 'border-amber-200/50' : 'border-amber-300',
+        textColor: read ? 'text-neutral-750' : 'text-neutral-900',
+        badge: 'Action Required'
+      },
+      Marketplace: {
+        icon: <Database size={14} className="text-emerald-600" />,
+        bg: read ? 'bg-emerald-50/60' : 'bg-emerald-50',
+        border: read ? 'border-emerald-200/50' : 'border-emerald-300',
+        textColor: read ? 'text-neutral-750' : 'text-neutral-900',
+        badge: 'Marketplace'
+      },
+      General: {
+        icon: <Bell size={14} className="text-brand-600" />,
+        bg: read ? 'bg-brand-50/40' : 'bg-brand-50/80',
+        border: read ? 'border-brand-200/50' : 'border-brand-300',
+        textColor: read ? 'text-neutral-750' : 'text-neutral-900',
+        badge: 'Alert'
+      }
+    };
+    return config[type] || config.General;
+  };
 
   // Fetch updated profile data from protected endpoint on mount
   useEffect(() => {
@@ -166,12 +308,86 @@ const Dashboard = () => {
         {/* Action Widgets */}
         <div className="flex items-center gap-4">
           <button className="btn-secondary py-1 px-3 text-xs hidden md:inline-flex">Submit Project</button>
-          <Bell size={18} className="text-neutral-500 hover:text-neutral-800 cursor-pointer transition-colors" />
-          <Settings
-            size={18}
-            className="text-neutral-500 hover:text-neutral-800 cursor-pointer transition-colors"
-            onClick={() => navigate('/profile')}
-          />
+          
+          {/* Bell Icon with Red Unread Badge */}
+          <div className="relative" ref={bellRef}>
+            <button 
+              onClick={() => {
+                const nextState = !showNotifications;
+                setShowNotifications(nextState);
+                if (nextState) {
+                  handleMarkAllAsRead();
+                }
+              }}
+              className="p-1 bg-transparent border-0 cursor-pointer hover:bg-neutral-50 rounded-lg transition-colors relative flex items-center justify-center"
+            >
+              <Bell size={18} className="text-neutral-500 hover:text-neutral-800" />
+              {unreadCount > 0 && (
+                <span className="absolute top-0 right-0 w-3.5 h-3.5 bg-red-500 text-white text-[8px] font-bold rounded-full flex items-center justify-center border border-white">
+                  {unreadCount}
+                </span>
+              )}
+            </button>
+
+            {/* Notifications Dropdown Panel */}
+            {showNotifications && (
+              <div className="absolute right-0 mt-3 w-80 bg-white/95 backdrop-blur-md border border-brand-100 rounded-2xl shadow-xl z-50 p-4 max-h-96 overflow-y-auto animate-slide-up flex flex-col gap-3">
+                <div className="flex justify-between items-center border-b border-neutral-100 pb-2.5">
+                  <h3 className="text-[10px] font-black text-neutral-800 uppercase tracking-widest flex items-center gap-1.5">
+                    <Bell size={11} className="text-brand-500" /> Notifications Feed
+                  </h3>
+                  <span className="text-[9px] font-bold bg-brand-50 px-2 py-0.5 rounded-full border border-brand-100/50 text-brand-700">
+                    {dashboardNotifications.length} Total
+                  </span>
+                </div>
+                <div className="flex flex-col gap-2.5">
+                  {dashboardNotifications.length === 0 ? (
+                    <p className="text-[10px] text-neutral-400 italic text-center py-8">No recent updates in your projects.</p>
+                  ) : (
+                    dashboardNotifications.map((notif, idx) => {
+                      const styles = getNotificationStyles(notif.type, notif.read);
+                      return (
+                        <div 
+                          key={notif._id || idx} 
+                          className={`p-3 rounded-xl border text-[11px] leading-relaxed transition-all flex gap-3 text-left ${styles.bg} ${styles.border} ${styles.textColor} hover:shadow-2xs`}
+                        >
+                          <div className="mt-0.5 shrink-0">
+                            {styles.icon}
+                          </div>
+                          <div className="flex-1 flex flex-col gap-1 min-w-0">
+                            <div className="flex justify-between items-center gap-2">
+                              <span className="font-extrabold text-[8px] uppercase tracking-wider text-neutral-500">
+                                {notif.projectName}
+                              </span>
+                              <span className="text-[8px] text-neutral-400 font-bold font-mono">
+                                {notif.createdAt ? new Date(notif.createdAt).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }) : 'Just now'}
+                              </span>
+                            </div>
+                            <span className={notif.read ? 'font-medium' : 'font-extrabold text-neutral-800'}>
+                              {notif.message}
+                            </span>
+                          </div>
+                        </div>
+                      );
+                    })
+                  )}
+                </div>
+              </div>
+            )}
+          </div>
+
+          <Settings size={18} className="text-neutral-500 hover:text-neutral-800 cursor-pointer transition-colors" onClick={() => navigate('/profile')} />
+
+          {/* Dark / Light Mode Toggle */}
+          <button
+            onClick={() => setIsDark(prev => !prev)}
+            className="p-1.5 rounded-lg bg-transparent border-0 cursor-pointer hover:bg-neutral-100/10 transition-colors flex items-center justify-center"
+            title={isDark ? 'Switch to Light Mode' : 'Switch to Dark Mode'}
+          >
+            {isDark
+              ? <Sun size={17} className="text-yellow-400" />
+              : <Moon size={17} className="text-neutral-500" />}
+          </button>
           <div className="flex items-center gap-2 border-l border-neutral-200 pl-4 h-6">
             {activeUser?.avatar ? (
               <img src={activeUser.avatar} alt="Avatar" className="w-7 h-7 rounded-full border border-neutral-200 object-cover" />
@@ -188,12 +404,33 @@ const Dashboard = () => {
       {/* Main Layout Area */}
       <div className="dashboard-body">
         {/* Left Navigation Sidebar */}
-        <aside className="dashboard-sidebar">
+        <aside className="dashboard-sidebar font-sans">
           <div className="sidebar-menu flex flex-col gap-1 w-full">
-            <a href="#dashboard" className="menu-item active">
+            <button 
+              onClick={() => setActiveTab('dashboard')} 
+              className={`menu-item w-full bg-transparent border-0 cursor-pointer text-left flex items-center gap-3 py-2 ${
+                activeTab === 'dashboard' ? 'active font-bold text-white' : ''
+              }`}
+            >
               <LayoutDashboard size={16} />
               <span>Dashboard</span>
-            </a>
+            </button>
+
+            <button 
+              onClick={() => setActiveTab('command-center')} 
+              className={`menu-item w-full border-0 cursor-pointer text-left flex items-center gap-3 py-2 transition-all ${
+                activeTab === 'command-center' 
+                  ? 'active font-bold text-white shadow-sm' 
+                  : 'bg-orange-50 text-orange-700 hover:bg-orange-100 hover:text-orange-800 border border-orange-200'
+              }`}
+            >
+              <Flame size={16} className={activeTab === 'command-center' ? 'text-white' : 'text-orange-500'} />
+              <span className="font-semibold">AI Command Center</span>
+              {activeTab !== 'command-center' && (
+                <span className="ml-auto text-[8px] font-black uppercase tracking-wider bg-orange-500 text-white px-1.5 py-0.5 rounded-full">NEW</span>
+              )}
+            </button>
+
             <a href="#tasks" className="menu-item">
               <Database size={16} />
               <span>ALLO Task Board</span>
@@ -239,32 +476,58 @@ const Dashboard = () => {
 
         {/* Main Content Area */}
         <main className="dashboard-content">
-          <div className="dashboard-grid">
-            {/* Left / Centre Column */}
-            <div className="flex flex-col gap-6 lg:col-span-2">
+          {activeTab === 'command-center' ? (
+            <div className="flex flex-col gap-4 w-full">
+              {/* Project selector dropdown when user has multiple projects */}
+              {activeProjectsList.length > 1 && (
+                <div className="flex items-center gap-2 mb-2 bg-white/80 border border-brand-100 px-4 py-2 rounded-xl w-fit shadow-2xs">
+                  <span className="text-[10px] font-bold text-neutral-450 uppercase tracking-widest">Select Workspace:</span>
+                  <select 
+                    value={currentProjectId} 
+                    onChange={(e) => setSelectedProjectId(e.target.value)}
+                    className="bg-transparent border-0 text-xs font-bold text-neutral-800 focus:outline-hidden cursor-pointer"
+                  >
+                    {activeProjectsList.map(proj => (
+                      <option key={proj._id} value={proj._id}>{proj.projectName}</option>
+                    ))}
+                  </select>
+                </div>
+              )}
 
-              {/* Mission Status Header */}
-              <div className="dashboard-card border-l-4 border-l-brand-500 glow-blue">
-                <div className="flex justify-between items-start gap-4 mb-1">
+              {loadingProjects ? (
+                <div className="flex flex-col justify-center items-center py-20 text-slate-400 gap-3 bg-white border border-brand-100 rounded-2xl shadow-xs">
+                  <RefreshCw className="animate-spin text-brand-500" size={28} />
+                  <span className="text-xs font-semibold tracking-wide text-neutral-500">Loading your workspace projects...</span>
+                </div>
+              ) : currentProjectId ? (
+                <HackathonCommandCenter 
+                  projectId={currentProjectId} 
+                  onBack={() => setActiveTab('dashboard')} 
+                />
+              ) : (
+                <div className="glass p-10 flex flex-col items-center justify-center text-center gap-4 bg-white border border-brand-100 rounded-2xl shadow-xs">
+                  <div className="w-14 h-14 rounded-full bg-orange-50 flex items-center justify-center text-orange-500 border border-orange-100">
+                    <Flame size={26} />
+                  </div>
                   <div>
-                    <span className="text-[10px] font-bold text-neutral-400 tracking-wider uppercase">MISSION STATUS</span>
-                    <h2 className="text-2xl md:text-3xl font-extrabold font-mono text-neutral-900 mt-1 tracking-tight">
-                      T-Minus {formatTime(timeLeft)}
-                    </h2>
+                    <h3 className="font-extrabold text-neutral-900 text-lg">No Active Projects Found</h3>
+                    <p className="text-xs text-neutral-500 mt-1 max-w-sm leading-normal">
+                      The Hackathon Command Center requires a project linked to your squad. Create a squad with a project or visit your team workspace to configure one.
+                    </p>
                   </div>
-                  <span className="status-badge badge-critical">Mission Critical</span>
-                </div>
-                <div className="grid grid-cols-2 gap-4 border-t border-neutral-100 pt-4">
-                  <div className="bg-neutral-50 border border-neutral-200/50 rounded-lg p-3 flex flex-col justify-center">
-                    <div className="text-[10px] font-bold text-neutral-400 tracking-wider uppercase">Current Sprint</div>
-                    <div className="text-xs font-bold text-neutral-900 mt-1">MVP Core</div>
-                  </div>
-                  <div className="bg-neutral-50 border border-neutral-200/50 rounded-lg p-3 flex flex-col justify-center">
-                    <div className="text-[10px] font-bold text-neutral-400 tracking-wider uppercase">Squad Velocity</div>
-                    <div className="text-xs font-bold text-emerald-600 mt-1">14.2 pts/hr</div>
+                  <div className="flex gap-3 mt-2">
+                    <button onClick={() => navigate('/team/create')} className="btn-primary text-xs">Create Squad</button>
+                    <button onClick={() => navigate('/team/join')} className="btn-secondary text-xs">Join Squad</button>
                   </div>
                 </div>
-              </div>
+              )}
+            </div>
+          ) : (
+            <div className="dashboard-grid">
+            
+            {/* Left Side Info Pane (Spans 2 columns) */}
+            <div className="lg:col-span-2 flex flex-col gap-6">
+
 
               {/* My Teams Section */}
               <div className="dashboard-card border-l-4 border-l-emerald-500 glow-blue">
@@ -521,7 +784,8 @@ const Dashboard = () => {
 
             </div>
           </div>
-        </main>
+        )}
+      </main>
       </div>
     </div>
   );
