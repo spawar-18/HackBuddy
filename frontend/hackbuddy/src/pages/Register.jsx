@@ -121,7 +121,7 @@ const Register = () => {
                 type="text"
                 id="name"
                 className="hackos-input"
-                placeholder="Linus Torvalds"
+                placeholder="Your Full name"
                 value={name}
                 onChange={(e) => setName(e.target.value)}
                 disabled={loading}
@@ -135,7 +135,7 @@ const Register = () => {
                 type="email"
                 id="email"
                 className="hackos-input"
-                placeholder="dev@hackos.io"
+                placeholder="xyz@hackos.io"
                 value={email}
                 onChange={(e) => setEmail(e.target.value)}
                 disabled={loading}
