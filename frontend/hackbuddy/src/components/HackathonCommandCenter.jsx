@@ -11,7 +11,7 @@ import {
   Clock, Play, CheckCircle, AlertTriangle, AlertCircle, Calendar, 
   Sparkles, RefreshCw, Settings, Info, Bell, ShieldAlert, Users, 
   Activity, ArrowLeft, Save, Ban, Heart, Zap, Award, Flame, CalendarDays,
-  Gauge, TrendingUp, CheckSquare, ShieldCheck, ArrowUpRight, Database
+  Gauge, TrendingUp, CheckSquare, ShieldCheck, ArrowUpRight, Database, Check
 } from 'lucide-react';
 import { toast } from 'react-hot-toast';
 
@@ -849,17 +849,23 @@ const HackathonCommandCenter = ({ projectId, onBack }) => {
               </h3>
               
               <div className="relative pl-3 flex flex-col gap-4">
-                <div className="absolute left-[7px] top-1.5 bottom-1.5 w-[2px] bg-neutral-100"></div>
+                <div className="absolute left-[9px] top-1.5 bottom-1.5 w-[2px] bg-neutral-150"></div>
                 
                 {dashboard.timeline.slice(0, 5).map((event, idx) => (
                   <div key={idx} className="flex gap-4 relative items-start group">
-                    <div className={`w-3.5 h-3.5 rounded-full border-2 border-white flex items-center justify-center shrink-0 z-10 shadow-2xs group-hover:scale-110 transition-transform ${
-                      event.type === 'Success' ? 'bg-emerald-500 shadow-emerald-500/10' :
-                      event.type === 'Milestone' ? 'bg-purple-500 shadow-purple-500/10' :
-                      event.type === 'Info' ? 'bg-blue-500 shadow-blue-500/10' : 'bg-neutral-400'
-                    }`}></div>
+                    <div className={`w-5 h-5 rounded-full flex items-center justify-center shrink-0 z-10 shadow-2xs group-hover:scale-110 transition-transform ${
+                      event.type === 'Success' ? 'bg-emerald-500 border border-emerald-600 text-white' :
+                      event.type === 'Milestone' ? 'bg-purple-500 border border-purple-650 text-white' :
+                      event.type === 'Info' ? 'bg-blue-500 border border-blue-650 text-white' :
+                      'bg-neutral-500 border border-neutral-600 text-white'
+                    }`}>
+                      {event.type === 'Success' && <Check size={10} strokeWidth={3} />}
+                      {event.type === 'Milestone' && <Award size={10} />}
+                      {event.type === 'Info' && <Info size={10} />}
+                      {event.type !== 'Success' && event.type !== 'Milestone' && event.type !== 'Info' && <Clock size={10} />}
+                    </div>
                     
-                    <div className="flex-1 flex flex-col md:flex-row justify-between items-start md:items-center gap-1">
+                    <div className="flex-1 flex flex-col md:flex-row justify-between items-start md:items-center gap-1 min-h-[20px] pt-0.5">
                       <span className="text-xs font-semibold text-neutral-700 leading-normal">{event.event}</span>
                       <span className="text-[9px] font-bold text-neutral-400 font-mono shrink-0">
                         {new Date(event.time).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}

@@ -397,7 +397,7 @@ exports.getCommandCenterDashboard = async (req, res) => {
     }
 
     // Fetch marketplace requests
-    const marketplaceActivity = await TaskMarketplaceRequest.find({ projectId }).populate('userId', 'name');
+    const marketplaceActivity = await TaskMarketplaceRequest.find({ projectId });
 
     // Fetch in-app notifications
     const recentNotifications = await Notification.find({ projectId })

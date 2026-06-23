@@ -231,6 +231,7 @@ exports.updateTaskStatus = async (req, res) => {
 
     // Update status
     taskEntry.status = status;
+    taskEntry.updatedAt = new Date();
 
     // Mark as modified for mongoose (nested objects need explicit marking)
     project.markModified('taskPlan');

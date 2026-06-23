@@ -93,6 +93,10 @@ const projectSchema = new mongoose.Schema({
           type: String,
           enum: ['Locked', 'Available', 'SwapRequested', 'ClaimRequested', 'ReassignmentRequested'],
           default: 'Locked'
+        },
+        updatedAt: {
+          type: Date,
+          default: Date.now
         }
       }],
       reason: String
