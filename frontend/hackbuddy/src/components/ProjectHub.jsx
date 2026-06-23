@@ -141,7 +141,7 @@ const getStepMeta = (stepText) => {
   return { label: 'Development Phase', color: 'bg-neutral-50 text-neutral-700 border-neutral-200', icon: Activity };
 };
 
-const ProjectHub = ({ teamId }) => {
+const ProjectHub = ({ teamId, initialView }) => {
   const [project, setProject] = useState(null);
   const [loading, setLoading] = useState(true);
   const [actionLoading, setActionLoading] = useState(false);
@@ -186,7 +186,12 @@ const ProjectHub = ({ teamId }) => {
         const res = await getProjectByTeam(teamId);
         if (res.success && res.project) {
           setProject(res.project);
-          setView('dashboard');
+          // Navigate directly to task-plan view if requested
+          if (initialView === 'task-plan' && res.project.taskPlanGeneratedAt) {
+            setView('task-plan');
+          } else {
+            setView('dashboard');
+          }
         } else {
           setProject(null);
           setView('create-prompt'); // Prompt to create project
@@ -601,7 +606,20 @@ const ProjectHub = ({ teamId }) => {
             <p className="text-xs text-neutral-400 mt-0.5">Manage project details, tracks, and features</p>
           </div>
         </div>
-        {view === 'dashboard' && project && getStatusBadge(project.status)}
+        {view === 'dashboard' && project && (
+          <div className="flex flex-col items-end gap-1.5">
+            {getStatusBadge(project.status)}
+            {project.projectReviewGeneratedAt && (
+              <button
+                type="button"
+                onClick={openMentorChat}
+                className="btn-secondary text-[10px] py-1 px-2.5 cursor-pointer w-fit border-brand-200 bg-brand-50/20 text-brand-700 hover:bg-brand-50/40"
+              >
+                Open AI Mentor
+              </button>
+            )}
+          </div>
+        )}
       </div>
 
       {/* Dashboard View */}
@@ -688,13 +706,6 @@ const ProjectHub = ({ teamId }) => {
                       className="btn-primary text-xs py-1.5 px-3 cursor-pointer shadow-2xs w-fit"
                     >
                       View Review
-                    </button>
-                    <button
-                      type="button"
-                      onClick={openMentorChat}
-                      className="btn-secondary text-xs py-1.5 px-3 cursor-pointer w-fit border-brand-200 bg-brand-50/20 text-brand-700 hover:bg-brand-50/40"
-                    >
-                      Open AI Mentor
                     </button>
                     <button
                       type="button"
@@ -1044,13 +1055,13 @@ const ProjectHub = ({ teamId }) => {
                   )}
                 </div>
                 <div className="flex items-center gap-2 shrink-0 self-stretch md:self-auto justify-end">
-                  <button type="button" onClick={handleRegenerateTaskPlan} disabled={splitterLoading}
-                    className="flex items-center justify-center gap-1.5 px-3.5 py-2 rounded-lg bg-neutral-850 hover:bg-neutral-800 text-white text-xs font-semibold cursor-pointer border border-neutral-700 transition-all duration-200 disabled:opacity-50">
-                    {splitterLoading ? <RefreshCw className="animate-spin text-purple-400" size={13} /> : <RefreshCw size={13} />} Regenerate Plan
-                  </button>
                   <button type="button" onClick={() => setView('dashboard')}
                     className="flex items-center justify-center gap-1 px-3.5 py-2 rounded-lg bg-neutral-900 hover:bg-neutral-855 text-neutral-400 hover:text-white text-xs font-semibold cursor-pointer border border-neutral-800 transition-all duration-200">
                     <ArrowLeft size={13} /> Back
+                  </button>
+                  <button type="button" onClick={handleRegenerateTaskPlan} disabled={splitterLoading}
+                    className="flex items-center justify-center gap-1.5 px-3.5 py-2 rounded-lg bg-neutral-850 hover:bg-neutral-800 text-white text-xs font-semibold cursor-pointer border border-neutral-700 transition-all duration-200 disabled:opacity-50">
+                    {splitterLoading ? <RefreshCw className="animate-spin text-purple-400" size={13} /> : <RefreshCw size={13} />} Regenerate Plan
                   </button>
                 </div>
               </div>

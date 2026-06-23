@@ -1,2 +1,14 @@
 Successfully connected to MongoDB Atlas
 Server is running on port 5000
+Regenerating AI Task Plan for project: Splitr...
+Attempting AI task plan generation via OpenRouter (OPENROUTER_API_KEY)...
+OpenRouter task plan raw response length: 8471 chars
+Task plan response after stripping think tags (first 300 chars): {
+  "projectTasks": {
+    "coreFeatures": [
+      "Implement Group Expense Entry (manual input)",
+      "Implement Chat-based Expense Input",
+      "Develop Auto Split Engine logic",
+      "Develop Settlement Optimizer algorithm",
+      "Implement Fairness Adjustments for unequal splits",
+      "Cre

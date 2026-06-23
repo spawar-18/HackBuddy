@@ -5,10 +5,11 @@ import api from '../services/api';
 import { getMyTeams } from '../services/teamService';
 import { getProjectByTeam } from '../services/projectService';
 import {
-  LogOut, Bell, Settings, LayoutDashboard, Database, Cpu,
-  Send, Users, BookOpen, CheckCircle, Clock,
+  LogOut, Bell, Settings, LayoutDashboard, Cpu,
+  Users, BookOpen, CheckCircle, Clock,
   UserCheck, RefreshCw, FolderGit2, Play,
-  Flame, ShieldCheck, AlertTriangle, Zap, Sun, Moon
+  Flame, ShieldCheck, AlertTriangle, Zap, Sun, Moon,
+  User, MessageSquare
 } from 'lucide-react';
 import HackathonCommandCenter from '../components/HackathonCommandCenter';
 
@@ -307,11 +308,10 @@ const Dashboard = () => {
 
         {/* Action Widgets */}
         <div className="flex items-center gap-4">
-          <button className="btn-secondary py-1 px-3 text-xs hidden md:inline-flex">Submit Project</button>
-          
+
           {/* Bell Icon with Red Unread Badge */}
           <div className="relative" ref={bellRef}>
-            <button 
+            <button
               onClick={() => {
                 const nextState = !showNotifications;
                 setShowNotifications(nextState);
@@ -347,8 +347,8 @@ const Dashboard = () => {
                     dashboardNotifications.map((notif, idx) => {
                       const styles = getNotificationStyles(notif.type, notif.read);
                       return (
-                        <div 
-                          key={notif._id || idx} 
+                        <div
+                          key={notif._id || idx}
                           className={`p-3 rounded-xl border text-[11px] leading-relaxed transition-all flex gap-3 text-left ${styles.bg} ${styles.border} ${styles.textColor} hover:shadow-2xs`}
                         >
                           <div className="mt-0.5 shrink-0">
@@ -406,23 +406,21 @@ const Dashboard = () => {
         {/* Left Navigation Sidebar */}
         <aside className="dashboard-sidebar font-sans">
           <div className="sidebar-menu flex flex-col gap-1 w-full">
-            <button 
-              onClick={() => setActiveTab('dashboard')} 
-              className={`menu-item w-full bg-transparent border-0 cursor-pointer text-left flex items-center gap-3 py-2 ${
-                activeTab === 'dashboard' ? 'active font-bold text-white' : ''
-              }`}
+            <button
+              onClick={() => setActiveTab('dashboard')}
+              className={`menu-item w-full bg-transparent border-0 cursor-pointer text-left flex items-center gap-3 py-2 ${activeTab === 'dashboard' ? 'active font-bold text-white' : ''
+                }`}
             >
               <LayoutDashboard size={16} />
               <span>Dashboard</span>
             </button>
 
-            <button 
-              onClick={() => setActiveTab('command-center')} 
-              className={`menu-item w-full border-0 cursor-pointer text-left flex items-center gap-3 py-2 transition-all ${
-                activeTab === 'command-center' 
-                  ? 'active font-bold text-white shadow-sm' 
+            <button
+              onClick={() => setActiveTab('command-center')}
+              className={`menu-item w-full border-0 cursor-pointer text-left flex items-center gap-3 py-2 transition-all ${activeTab === 'command-center'
+                  ? 'active font-bold text-white shadow-sm'
                   : 'bg-orange-50 text-orange-700 hover:bg-orange-100 hover:text-orange-800 border border-orange-200'
-              }`}
+                }`}
             >
               <Flame size={16} className={activeTab === 'command-center' ? 'text-white' : 'text-orange-500'} />
               <span className="font-semibold">AI Command Center</span>
@@ -431,18 +429,20 @@ const Dashboard = () => {
               )}
             </button>
 
-            <a href="#tasks" className="menu-item">
-              <Database size={16} />
-              <span>ALLO Task Board</span>
-            </a>
-            <a href="#splitter" className="menu-item">
+            <button
+              onClick={() => {
+                const firstTeam = teams[0];
+                if (firstTeam) {
+                  navigate(`/team/${firstTeam._id}`, { state: { initialView: 'task-plan' } });
+                } else {
+                  navigate('/team/create');
+                }
+              }}
+              className="menu-item w-full bg-transparent border-0 cursor-pointer text-left flex items-center gap-3 py-2"
+            >
               <Cpu size={16} />
               <span>AI Task Splitter</span>
-            </a>
-            <a href="#submission" className="menu-item">
-              <Send size={16} />
-              <span>Submission Hub</span>
-            </a>
+            </button>
             <button
               onClick={() => navigate('/team/create')}
               className="btn-primary mt-6 w-full flex items-center justify-center gap-2 text-xs py-2 shadow-xs cursor-pointer"
@@ -456,6 +456,20 @@ const Dashboard = () => {
             >
               <Users size={14} />
               <span>Join Team</span>
+            </button>
+            <button
+              onClick={() => navigate('/profile')}
+              className="btn-secondary mt-2 w-full flex items-center justify-center gap-2 text-xs py-2 cursor-pointer"
+            >
+              <User size={14} />
+              <span>Edit Profile</span>
+            </button>
+            <button
+              onClick={() => navigate('/chat')}
+              className="btn-secondary mt-2 w-full flex items-center justify-center gap-2 text-xs py-2 cursor-pointer"
+            >
+              <MessageSquare size={14} />
+              <span>Open Chat</span>
             </button>
           </div>
 
@@ -482,8 +496,8 @@ const Dashboard = () => {
               {activeProjectsList.length > 1 && (
                 <div className="flex items-center gap-2 mb-2 bg-white/80 border border-brand-100 px-4 py-2 rounded-xl w-fit shadow-2xs">
                   <span className="text-[10px] font-bold text-neutral-450 uppercase tracking-widest">Select Workspace:</span>
-                  <select 
-                    value={currentProjectId} 
+                  <select
+                    value={currentProjectId}
                     onChange={(e) => setSelectedProjectId(e.target.value)}
                     className="bg-transparent border-0 text-xs font-bold text-neutral-800 focus:outline-hidden cursor-pointer"
                   >
@@ -500,9 +514,9 @@ const Dashboard = () => {
                   <span className="text-xs font-semibold tracking-wide text-neutral-500">Loading your workspace projects...</span>
                 </div>
               ) : currentProjectId ? (
-                <HackathonCommandCenter 
-                  projectId={currentProjectId} 
-                  onBack={() => setActiveTab('dashboard')} 
+                <HackathonCommandCenter
+                  projectId={currentProjectId}
+                  onBack={() => setActiveTab('dashboard')}
                 />
               ) : (
                 <div className="glass p-10 flex flex-col items-center justify-center text-center gap-4 bg-white border border-brand-100 rounded-2xl shadow-xs">
@@ -524,268 +538,258 @@ const Dashboard = () => {
             </div>
           ) : (
             <div className="dashboard-grid">
-            
-            {/* Left Side Info Pane (Spans 2 columns) */}
-            <div className="lg:col-span-2 flex flex-col gap-6">
+
+              {/* Left Side Info Pane (Spans 2 columns) */}
+              <div className="lg:col-span-2 flex flex-col gap-6">
 
 
-              {/* My Teams Section */}
-              <div className="dashboard-card border-l-4 border-l-emerald-500 glow-blue">
-                <div className="flex justify-between items-center mb-1">
-                  <div className="flex items-center gap-2">
-                    <Users size={18} className="text-emerald-600" />
-                    <span className="font-bold text-sm uppercase tracking-wider text-neutral-500">My Squads</span>
-                  </div>
-                  <div className="flex gap-2">
-                    <button
-                      onClick={() => navigate('/team/create')}
-                      className="btn-primary text-xs py-1.5 px-3 cursor-pointer shadow-2xs"
-                    >
-                      Create
-                    </button>
-                    <button
-                      onClick={() => navigate('/team/join')}
-                      className="btn-secondary text-xs py-1.5 px-3 cursor-pointer"
-                    >
-                      Join
-                    </button>
-                  </div>
-                </div>
-
-                {loadingTeams ? (
-                  <div className="flex items-center gap-2.5 py-6 justify-center bg-neutral-50 border border-dashed border-neutral-200 rounded-xl text-neutral-500 text-xs">
-                    <RefreshCw className="animate-spin text-brand-500" size={14} />
-                    <span>Scanning network for squads...</span>
-                  </div>
-                ) : teams.length === 0 ? (
-                  <div className="text-center py-8 px-4 bg-neutral-50 border border-dashed border-neutral-200 rounded-xl flex flex-col items-center gap-3">
-                    <div className="w-10 h-10 rounded-full bg-neutral-100 flex items-center justify-center text-neutral-400">
-                      <Users size={20} />
+                {/* My Teams Section */}
+                <div className="dashboard-card border-l-4 border-l-emerald-500 glow-blue">
+                  <div className="flex justify-between items-center mb-1">
+                    <div className="flex items-center gap-2">
+                      <Users size={18} className="text-emerald-600" />
+                      <span className="font-bold text-sm uppercase tracking-wider text-neutral-500">My Squads</span>
                     </div>
-                    <div>
-                      <h4 className="font-bold text-neutral-900 text-sm">No Squads Joined</h4>
-                      <p className="text-xs text-neutral-400 mt-1 max-w-[280px] leading-normal">
-                        You are not a member of any squad. Initiate a new team or enter an invite code to join.
-                      </p>
-                    </div>
-                    <div className="flex gap-2 mt-1">
+                    <div className="flex gap-2">
                       <button
                         onClick={() => navigate('/team/create')}
-                        className="btn-primary text-xs py-1.5 px-3"
+                        className="btn-primary text-xs py-1.5 px-3 cursor-pointer shadow-2xs"
                       >
-                        Create Team
+                        Create
                       </button>
                       <button
                         onClick={() => navigate('/team/join')}
-                        className="btn-secondary text-xs py-1.5 px-3"
+                        className="btn-secondary text-xs py-1.5 px-3 cursor-pointer"
                       >
-                        Join Team
+                        Join
                       </button>
                     </div>
                   </div>
-                ) : (
-                  <div className="flex flex-col gap-3.5 mt-2">
-                    {teams.map((t) => (
-                      <div
-                        key={t._id}
-                        className="bg-neutral-50 border border-neutral-200/80 rounded-xl p-4 flex flex-col md:flex-row md:items-center justify-between gap-4 hover:border-neutral-300 transition-all shadow-2xs"
-                      >
-                        <div className="flex-1 min-w-0 flex flex-col">
-                          <h4 className="font-bold text-sm text-neutral-900 truncate">{t.teamName}</h4>
-                          <p className="text-xs text-neutral-500 mt-1 line-clamp-2 max-w-[500px]">
-                            {t.description || 'No description provided.'}
-                          </p>
-                          <div className="flex items-center gap-1.5 mt-3 text-[10px] font-bold text-neutral-400 uppercase tracking-wider">
-                            <Users size={12} className="text-neutral-400" />
-                            <span>
-                              {t.members ? t.members.length : 0}{' '}
-                              {t.members && t.members.length === 1 ? 'member' : 'members'}
-                            </span>
-                          </div>
 
-                          {/* Linked Project Summary */}
-                          {loadingProjects ? (
-                            <div className="text-[10px] text-neutral-400 mt-2 italic">
-                              Loading project details...
-                            </div>
-                          ) : projects[t._id] ? (
-                            <div className="mt-3 p-3 bg-white border border-neutral-200 rounded-lg flex flex-col gap-2">
-                              <div className="flex justify-between items-center gap-2 flex-wrap">
-                                <div className="flex items-center gap-2 min-w-0">
-                                  <FolderGit2 size={13} className="text-brand-500 shrink-0" />
-                                  <span className="font-bold text-xs text-neutral-850 truncate">
-                                    {projects[t._id].projectName}
-                                  </span>
-                                </div>
-                                {getStatusBadge(projects[t._id].status)}
-                              </div>
-                              {projects[t._id].track && (
-                                <span className="text-[10px] text-neutral-400 font-medium">
-                                  Track:{' '}
-                                  <strong className="text-neutral-600 font-semibold">
-                                    {projects[t._id].track}
-                                  </strong>
-                                </span>
-                              )}
-                            </div>
-                          ) : (
-                            <div className="mt-3 px-2.5 py-1.5 bg-neutral-100/40 border border-dashed border-neutral-200 rounded-lg text-[10px] text-neutral-400 inline-flex items-center gap-1.5 font-medium w-fit">
-                              <FolderGit2 size={11} className="opacity-50" />
-                              <span>No active project configured</span>
-                            </div>
-                          )}
-                        </div>
+                  {loadingTeams ? (
+                    <div className="flex items-center gap-2.5 py-6 justify-center bg-neutral-50 border border-dashed border-neutral-200 rounded-xl text-neutral-500 text-xs">
+                      <RefreshCw className="animate-spin text-brand-500" size={14} />
+                      <span>Scanning network for squads...</span>
+                    </div>
+                  ) : teams.length === 0 ? (
+                    <div className="text-center py-8 px-4 bg-neutral-50 border border-dashed border-neutral-200 rounded-xl flex flex-col items-center gap-3">
+                      <div className="w-10 h-10 rounded-full bg-neutral-100 flex items-center justify-center text-neutral-400">
+                        <Users size={20} />
+                      </div>
+                      <div>
+                        <h4 className="font-bold text-neutral-900 text-sm">No Squads Joined</h4>
+                        <p className="text-xs text-neutral-400 mt-1 max-w-[280px] leading-normal">
+                          You are not a member of any squad. Initiate a new team or enter an invite code to join.
+                        </p>
+                      </div>
+                      <div className="flex gap-2 mt-1">
                         <button
-                          onClick={() => navigate(`/team/${t._id}`)}
-                          className="btn-primary text-xs py-1.5 px-3 shrink-0 self-end md:self-center"
+                          onClick={() => navigate('/team/create')}
+                          className="btn-primary text-xs py-1.5 px-3"
                         >
-                          Workspace
+                          Create Team
+                        </button>
+                        <button
+                          onClick={() => navigate('/team/join')}
+                          className="btn-secondary text-xs py-1.5 px-3"
+                        >
+                          Join Team
                         </button>
                       </div>
-                    ))}
-                  </div>
-                )}
-              </div>
-
-              {/* Active Task Metrics */}
-              <div className="dashboard-card glow-blue">
-                <div className="flex justify-between items-center mb-1">
-                  <span className="font-bold text-sm uppercase tracking-wider text-neutral-500">Active Task Metrics</span>
-                  <span className="status-badge bg-neutral-50 border-neutral-200 text-neutral-500 text-[9px] font-mono">Updated just now</span>
-                </div>
-                <div className="flex flex-col gap-2 mt-2 text-xs text-neutral-400">
-                  {(() => {
-                    let total = 0, completed = 0, inProgress = 0;
-                    Object.values(projects).forEach((p) => {
-                      if (p?.taskPlan?.assignments) {
-                        p.taskPlan.assignments.forEach((a) => {
-                          a.assignedTasks?.forEach((t) => {
-                            total++;
-                            if (t.status === 'Completed') completed++;
-                            else if (t.status === 'In Progress') inProgress++;
-                          });
-                        });
-                      }
-                    });
-                    const pending = total - completed - inProgress;
-                    return (
-                      <>
-                        <div>Total Tasks: {total}</div>
-                        <div>Completed: {completed}</div>
-                        <div>In Progress: {inProgress}</div>
-                        <div>Pending: {pending}</div>
-                      </>
-                    );
-                  })()}
-                </div>
-              </div>
-
-              {/* Quick Actions */}
-              <div className="dashboard-card quick-actions">
-                <div className="flex flex-col gap-2">
-                  <button className="btn-primary text-xs" onClick={() => navigate('/team/create')}>Create Team</button>
-                  <button className="btn-secondary text-xs" onClick={() => navigate('/team/join')}>Join Team</button>
-                  <button className="btn-primary text-xs" onClick={() => navigate('/profile')}>Edit Profile</button>
-                  <button className="btn-primary text-xs" onClick={() => navigate('/chat')}>Open Chat</button>
-                </div>
-              </div>
-            </div>
-
-            {/* Right Side Info Pane */}
-            <div className="flex flex-col gap-6 lg:col-span-1">
-
-              {/* Developer Profile Card */}
-              <div className="dashboard-card border-t-4 border-t-brand-500 glow-blue">
-                <div className="flex justify-between items-center mb-1">
-                  <span className="font-bold text-sm uppercase tracking-wider text-neutral-500">Developer Profile</span>
-                  <span className="status-badge badge-active flex items-center gap-1 text-[9px]">
-                    <UserCheck size={11} />
-                    Verified
-                  </span>
-                </div>
-
-                {loadingProfile ? (
-                  <div className="flex items-center gap-2 py-4 text-neutral-500 text-xs font-semibold justify-center">
-                    <RefreshCw className="animate-spin text-brand-500" size={14} />
-                    <span>Querying DB Node...</span>
-                  </div>
-                ) : (
-                  <div className="flex flex-col gap-4">
-                    <div className="flex items-center gap-3 bg-neutral-50 border border-neutral-200/60 p-4 rounded-xl">
-                      {activeUser?.avatar ? (
-                        <img src={activeUser.avatar} alt="Avatar" className="w-12 h-12 rounded-full border-2 border-brand-500 object-cover" />
-                      ) : (
-                        <div className="w-12 h-12 rounded-full bg-neutral-950 text-white flex items-center justify-center text-lg font-bold shadow-xs">
-                          {activeUser?.name?.charAt(0).toUpperCase() || 'U'}
-                        </div>
-                      )}
-                      <div className="flex-1 min-w-0">
-                        <div className="font-bold text-neutral-900 text-sm truncate">{activeUser?.name}</div>
-                        <div className="text-[10px] text-neutral-400 font-mono mt-0.5 truncate">
-                          ID: {activeUser?._id || activeUser?.id || 'N/A'}
-                        </div>
-                      </div>
                     </div>
-
-                    <div className="flex flex-col gap-3 text-xs mt-1">
-                      <div className="flex justify-between items-center border-b border-neutral-200/60 pb-2.5">
-                        <span className="text-neutral-500 font-bold uppercase tracking-wider text-[10px]">EMAIL ADDRESS:</span>
-                        <span className="text-neutral-900 font-semibold truncate max-w-[170px]" title={activeUser?.email}>
-                          {activeUser?.email}
-                        </span>
-                      </div>
-                      <div className="flex justify-between items-center border-b border-neutral-200/60 pb-2.5">
-                        <span className="text-neutral-500 font-bold uppercase tracking-wider text-[10px]">AUTH SCHEME:</span>
-                        <span className={`font-bold tracking-tight text-[10px] ${
-                          activeUser?.googleId
-                            ? 'text-emerald-700'
-                            : activeUser?.githubId
-                            ? 'text-neutral-800'
-                            : 'text-brand-600'
-                        }`}>
-                          {activeUser?.googleId
-                            ? 'GOOGLE OAUTH'
-                            : activeUser?.githubId
-                            ? 'GITHUB OAUTH'
-                            : 'STANDARD JWT'}
-                        </span>
-                      </div>
-                      <div className="flex justify-between items-center border-b border-neutral-200/60 pb-2.5">
-                        <span className="text-neutral-500 font-bold uppercase tracking-wider text-[10px]">SKILLS DIRECTORY:</span>
-                        <span
-                          className="text-neutral-900 font-semibold truncate max-w-[150px]"
-                          title={activeUser?.skills ? activeUser.skills.join(', ') : 'None'}
+                  ) : (
+                    <div className="flex flex-col gap-3.5 mt-2">
+                      {teams.map((t) => (
+                        <div
+                          key={t._id}
+                          className="bg-neutral-50 border border-neutral-200/80 rounded-xl p-4 flex flex-col md:flex-row md:items-center justify-between gap-4 hover:border-neutral-300 transition-all shadow-2xs"
                         >
-                          {activeUser?.skills && activeUser.skills.length > 0
-                            ? activeUser.skills.join(', ')
-                            : 'None configured'}
-                        </span>
-                      </div>
-                      <div className="flex justify-between items-center">
-                        <span className="text-neutral-500 font-bold uppercase tracking-wider text-[10px]">CREATED AT:</span>
-                        <span className="text-neutral-900 font-semibold font-mono text-[10px]">
-                          {activeUser?.createdAt
-                            ? new Date(activeUser.createdAt).toLocaleDateString()
-                            : new Date().toLocaleDateString()}
-                        </span>
-                      </div>
-                    </div>
+                          <div className="flex-1 min-w-0 flex flex-col">
+                            <h4 className="font-bold text-sm text-neutral-900 truncate">{t.teamName}</h4>
+                            <p className="text-xs text-neutral-500 mt-1 line-clamp-2 max-w-[500px]">
+                              {t.description || 'No description provided.'}
+                            </p>
+                            <div className="flex items-center gap-1.5 mt-3 text-[10px] font-bold text-neutral-400 uppercase tracking-wider">
+                              <Users size={12} className="text-neutral-400" />
+                              <span>
+                                {t.members ? t.members.length : 0}{' '}
+                                {t.members && t.members.length === 1 ? 'member' : 'members'}
+                              </span>
+                            </div>
 
-                    <button
-                      onClick={() => navigate('/profile')}
-                      className="btn-secondary text-xs w-full py-2 flex items-center justify-center gap-1.5 shadow-2xs mt-2"
-                    >
-                      <Settings size={13} />
-                      Edit Developer Profile
-                    </button>
+                            {/* Linked Project Summary */}
+                            {loadingProjects ? (
+                              <div className="text-[10px] text-neutral-400 mt-2 italic">
+                                Loading project details...
+                              </div>
+                            ) : projects[t._id] ? (
+                              <div className="mt-3 p-3 bg-white border border-neutral-200 rounded-lg flex flex-col gap-2">
+                                <div className="flex justify-between items-center gap-2 flex-wrap">
+                                  <div className="flex items-center gap-2 min-w-0">
+                                    <FolderGit2 size={13} className="text-brand-500 shrink-0" />
+                                    <span className="font-bold text-xs text-neutral-850 truncate">
+                                      {projects[t._id].projectName}
+                                    </span>
+                                  </div>
+                                  {getStatusBadge(projects[t._id].status)}
+                                </div>
+                                {projects[t._id].track && (
+                                  <span className="text-[10px] text-neutral-400 font-medium">
+                                    Track:{' '}
+                                    <strong className="text-neutral-600 font-semibold">
+                                      {projects[t._id].track}
+                                    </strong>
+                                  </span>
+                                )}
+                              </div>
+                            ) : (
+                              <div className="mt-3 px-2.5 py-1.5 bg-neutral-100/40 border border-dashed border-neutral-200 rounded-lg text-[10px] text-neutral-400 inline-flex items-center gap-1.5 font-medium w-fit">
+                                <FolderGit2 size={11} className="opacity-50" />
+                                <span>No active project configured</span>
+                              </div>
+                            )}
+                          </div>
+                          <button
+                            onClick={() => navigate(`/team/${t._id}`)}
+                            className="btn-primary text-xs py-1.5 px-3 shrink-0 self-end md:self-center"
+                          >
+                            Workspace
+                          </button>
+                        </div>
+                      ))}
+                    </div>
+                  )}
+                </div>
+
+                {/* Active Task Metrics */}
+                <div className="dashboard-card glow-blue">
+                  <div className="flex justify-between items-center mb-1">
+                    <span className="font-bold text-sm uppercase tracking-wider text-neutral-500">Active Task Metrics</span>
+                    <span className="status-badge bg-neutral-50 border-neutral-200 text-neutral-500 text-[9px] font-mono">Updated just now</span>
                   </div>
-                )}
+                  <div className="flex flex-col gap-2 mt-2 text-xs text-neutral-400">
+                    {(() => {
+                      let total = 0, completed = 0, inProgress = 0;
+                      Object.values(projects).forEach((p) => {
+                        if (p?.taskPlan?.assignments) {
+                          p.taskPlan.assignments.forEach((a) => {
+                            a.assignedTasks?.forEach((t) => {
+                              total++;
+                              if (t.status === 'Completed') completed++;
+                              else if (t.status === 'In Progress') inProgress++;
+                            });
+                          });
+                        }
+                      });
+                      const pending = total - completed - inProgress;
+                      return (
+                        <>
+                          <div>Total Tasks: {total}</div>
+                          <div>Completed: {completed}</div>
+                          <div>In Progress: {inProgress}</div>
+                          <div>Pending: {pending}</div>
+                        </>
+                      );
+                    })()}
+                  </div>
+                </div>
+
               </div>
 
+              {/* Right Side Info Pane */}
+              <div className="flex flex-col gap-6 lg:col-span-1">
+
+                {/* Developer Profile Card */}
+                <div className="dashboard-card border-t-4 border-t-brand-500 glow-blue">
+                  <div className="flex justify-between items-center mb-1">
+                    <span className="font-bold text-sm uppercase tracking-wider text-neutral-500">Developer Profile</span>
+                    <span className="status-badge badge-active flex items-center gap-1 text-[9px]">
+                      <UserCheck size={11} />
+                      Verified
+                    </span>
+                  </div>
+
+                  {loadingProfile ? (
+                    <div className="flex items-center gap-2 py-4 text-neutral-500 text-xs font-semibold justify-center">
+                      <RefreshCw className="animate-spin text-brand-500" size={14} />
+                      <span>Querying DB Node...</span>
+                    </div>
+                  ) : (
+                    <div className="flex flex-col gap-4">
+                      <div className="flex items-center gap-3 bg-neutral-50 border border-neutral-200/60 p-4 rounded-xl">
+                        {activeUser?.avatar ? (
+                          <img src={activeUser.avatar} alt="Avatar" className="w-12 h-12 rounded-full border-2 border-brand-500 object-cover" />
+                        ) : (
+                          <div className="w-12 h-12 rounded-full bg-neutral-950 text-white flex items-center justify-center text-lg font-bold shadow-xs">
+                            {activeUser?.name?.charAt(0).toUpperCase() || 'U'}
+                          </div>
+                        )}
+                        <div className="flex-1 min-w-0">
+                          <div className="font-bold text-neutral-900 text-sm truncate">{activeUser?.name}</div>
+                          <div className="text-[10px] text-neutral-400 font-mono mt-0.5 truncate">
+                            ID: {activeUser?._id || activeUser?.id || 'N/A'}
+                          </div>
+                        </div>
+                      </div>
+
+                      <div className="flex flex-col gap-3 text-xs mt-1">
+                        <div className="flex justify-between items-center border-b border-neutral-200/60 pb-2.5">
+                          <span className="text-neutral-500 font-bold uppercase tracking-wider text-[10px]">EMAIL ADDRESS:</span>
+                          <span className="text-neutral-900 font-semibold truncate max-w-[170px]" title={activeUser?.email}>
+                            {activeUser?.email}
+                          </span>
+                        </div>
+                        <div className="flex justify-between items-center border-b border-neutral-200/60 pb-2.5">
+                          <span className="text-neutral-500 font-bold uppercase tracking-wider text-[10px]">AUTH SCHEME:</span>
+                          <span className={`font-bold tracking-tight text-[10px] ${activeUser?.googleId
+                              ? 'text-emerald-700'
+                              : activeUser?.githubId
+                                ? 'text-neutral-800'
+                                : 'text-brand-600'
+                            }`}>
+                            {activeUser?.googleId
+                              ? 'GOOGLE OAUTH'
+                              : activeUser?.githubId
+                                ? 'GITHUB OAUTH'
+                                : 'STANDARD JWT'}
+                          </span>
+                        </div>
+                        <div className="flex justify-between items-center border-b border-neutral-200/60 pb-2.5">
+                          <span className="text-neutral-500 font-bold uppercase tracking-wider text-[10px]">SKILLS DIRECTORY:</span>
+                          <span
+                            className="text-neutral-900 font-semibold truncate max-w-[150px]"
+                            title={activeUser?.skills ? activeUser.skills.join(', ') : 'None'}
+                          >
+                            {activeUser?.skills && activeUser.skills.length > 0
+                              ? activeUser.skills.join(', ')
+                              : 'None configured'}
+                          </span>
+                        </div>
+                        <div className="flex justify-between items-center">
+                          <span className="text-neutral-500 font-bold uppercase tracking-wider text-[10px]">CREATED AT:</span>
+                          <span className="text-neutral-900 font-semibold font-mono text-[10px]">
+                            {activeUser?.createdAt
+                              ? new Date(activeUser.createdAt).toLocaleDateString()
+                              : new Date().toLocaleDateString()}
+                          </span>
+                        </div>
+                      </div>
+
+                      <button
+                        onClick={() => navigate('/profile')}
+                        className="btn-secondary text-xs w-full py-2 flex items-center justify-center gap-1.5 shadow-2xs mt-2"
+                      >
+                        <Settings size={13} />
+                        Edit Developer Profile
+                      </button>
+                    </div>
+                  )}
+                </div>
+
+              </div>
             </div>
-          </div>
-        )}
-      </main>
+          )}
+        </main>
       </div>
     </div>
   );

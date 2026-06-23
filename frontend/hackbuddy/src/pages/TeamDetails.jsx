@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react';
-import { useParams, useNavigate } from 'react-router-dom';
+import { useParams, useNavigate, useLocation } from 'react-router-dom';
 import { 
   getTeamDetails, 
   leaveTeam, 
@@ -20,6 +20,7 @@ import {
 const TeamDetails = () => {
   const { teamId } = useParams();
   const navigate = useNavigate();
+  const location = useLocation();
   const { user } = useAuth();
   const [team, setTeam] = useState(null);
   const [loading, setLoading] = useState(true);
@@ -575,7 +576,7 @@ const TeamDetails = () => {
 
           {/* Right Panel: Project Workspace (2 Columns) */}
           <div className="lg:col-span-2 flex flex-col gap-6">
-            <ProjectHub teamId={teamId} />
+            <ProjectHub teamId={teamId} initialView={location.state?.initialView} />
           </div>
         </div>
       </div>
