@@ -1,3 +1,2 @@
 Successfully connected to MongoDB Atlas
 Server is running on port 5000
-[ERROR] getCommandCenterDashboard error: {"path":"userId"}
