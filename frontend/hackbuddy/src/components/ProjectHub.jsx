@@ -16,7 +16,8 @@ import {
   FolderGit2, Plus, Trash2, Edit3, ListTodo, 
   Play, CheckCircle, Clock, ArrowLeft, Save, AlertTriangle, RefreshCw, Cpu,
   Layers, Users, Activity, Zap, BarChart3, GitBranch, Target, Star, ShieldAlert,
-  ShoppingBag
+  ShoppingBag, ChevronDown, ChevronUp, Check, Info, Lightbulb, Ban, Award, 
+  ArrowUpRight, HelpCircle, ShieldCheck, Compass
 } from 'lucide-react';
 import TaskMarketplace from './TaskMarketplace';
 import TechStackConsensus from './TechStackConsensus';
@@ -140,6 +141,1114 @@ const getStepMeta = (stepText) => {
   }
   return { label: 'Development Phase', color: 'bg-neutral-50 text-neutral-700 border-neutral-200', icon: Activity };
 };
+
+
+// Helper to render dynamic category icons for risks/features
+const renderCategoryIcon = (iconName, size = 16, className = '') => {
+  switch (iconName) {
+    case 'cpu': return <Cpu size={size} className={className} />;
+    case 'database': return <Layers size={size} className={className} />;
+    case 'layout': return <Layers size={size} className={className} />;
+    case 'activity': return <Activity size={size} className={className} />;
+    case 'clock': return <Clock size={size} className={className} />;
+    case 'shield': return <ShieldCheck size={size} className={className} />;
+    case 'alert': return <AlertTriangle size={size} className={className} />;
+    case 'check': return <Check size={size} className={className} />;
+    case 'info': return <Info size={size} className={className} />;
+    case 'lightbulb': return <Lightbulb size={size} className={className} />;
+    case 'ban': return <Ban size={size} className={className} />;
+    case 'award': return <Award size={size} className={className} />;
+    case 'arrow': return <ArrowUpRight size={size} className={className} />;
+    case 'help': return <HelpCircle size={size} className={className} />;
+    case 'compass': return <Compass size={size} className={className} />;
+    default: return <AlertTriangle size={size} className={className} />;
+  }
+};
+
+// Robust Risk Parser
+const parseRisk = (risk) => {
+  if (typeof risk !== 'string') {
+    return { title: 'Technical Risk', description: String(risk || ''), severity: 'Medium', category: 'Technical', icon: 'alert' };
+  }
+  const clean = risk.replace(/^[\s\-•*]+/, '').trim();
+  let category = 'Technical';
+  let icon = 'alert';
+  let severity = 'Medium';
+  
+  const lower = clean.toLowerCase();
+  
+  if (lower.includes('ai') || lower.includes('llm') || lower.includes('gpt') || lower.includes('model') || lower.includes('qwen') || lower.includes('openai')) {
+    category = 'AI & LLM';
+    icon = 'cpu';
+  } else if (lower.includes('database') || lower.includes('db') || lower.includes('mongodb') || lower.includes('sql') || lower.includes('schema') || lower.includes('data')) {
+    category = 'Database';
+    icon = 'database';
+  } else if (lower.includes('ui') || lower.includes('frontend') || lower.includes('ux') || lower.includes('design') || lower.includes('view') || lower.includes('screen') || lower.includes('css')) {
+    category = 'Frontend/UI';
+    icon = 'layout';
+  } else if (lower.includes('scale') || lower.includes('load') || lower.includes('performance') || lower.includes('speed') || lower.includes('timeout') || lower.includes('latency')) {
+    category = 'Scalability';
+    icon = 'activity';
+  } else if (lower.includes('scope') || lower.includes('time') || lower.includes('duration') || lower.includes('deadline') || lower.includes('creep') || lower.includes('timeline')) {
+    category = 'Project Scope';
+    icon = 'clock';
+  } else if (lower.includes('auth') || lower.includes('security') || lower.includes('token') || lower.includes('login') || lower.includes('password') || lower.includes('credential')) {
+    category = 'Security';
+    icon = 'shield';
+  }
+  
+  if (lower.includes('critical') || lower.includes('high') || lower.includes('timeout') || lower.includes('fail') || lower.includes('broke') || lower.includes('prevent') || lower.includes('severe')) {
+    severity = 'High';
+  } else if (lower.includes('low') || lower.includes('minor') || lower.includes('nice to have') || lower.includes('negligible')) {
+    severity = 'Low';
+  } else {
+    severity = 'Medium';
+  }
+  
+  let title = clean;
+  let desc = clean;
+  
+  const splitIdx = clean.indexOf(':');
+  const dashIdx = clean.indexOf(' - ');
+  
+  if (splitIdx > 0) {
+    title = clean.substring(0, splitIdx).trim();
+    desc = clean.substring(splitIdx + 1).trim();
+  } else if (dashIdx > 0) {
+    title = clean.substring(0, dashIdx).trim();
+    desc = clean.substring(dashIdx + 3).trim();
+  } else {
+    const words = clean.split(/\s+/);
+    if (words.length > 5) {
+      title = words.slice(0, 4).join(' ');
+      desc = clean;
+    }
+  }
+  
+  if (!title) title = 'Technical Risk';
+  if (!desc) desc = clean;
+  
+  return { title, description: desc, severity, category, icon };
+};
+
+// Skill Parser
+const parseSkill = (skill) => {
+  if (typeof skill !== 'string') {
+    return { name: String(skill || ''), importance: 'Medium', role: 'Fullstack' };
+  }
+  const clean = skill.replace(/^[\s\-•*]+/, '').trim();
+  const lower = clean.toLowerCase();
+  
+  let role = 'Fullstack';
+  let importance = 'Medium';
+  
+  if (lower.includes('react') || lower.includes('frontend') || lower.includes('css') || lower.includes('ui') || lower.includes('ux') || lower.includes('tailwind') || lower.includes('html') || lower.includes('design')) {
+    role = 'Frontend';
+    importance = 'High';
+  } else if (lower.includes('node') || lower.includes('express') || lower.includes('backend') || lower.includes('api') || lower.includes('server') || lower.includes('rest')) {
+    role = 'Backend';
+    importance = 'High';
+  } else if (lower.includes('database') || lower.includes('db') || lower.includes('mongo') || lower.includes('sql') || lower.includes('postgres') || lower.includes('prisma') || lower.includes('redis')) {
+    role = 'Database';
+    importance = 'Medium';
+  } else if (lower.includes('cloud') || lower.includes('docker') || lower.includes('aws') || lower.includes('deploy') || lower.includes('devops') || lower.includes('infra') || lower.includes('ci') || lower.includes('git')) {
+    role = 'DevOps';
+    importance = 'Medium';
+  } else if (lower.includes('ai') || lower.includes('llm') || lower.includes('ml') || lower.includes('python') || lower.includes('prompt') || lower.includes('openai') || lower.includes('langchain')) {
+    role = 'AI Engineer';
+    importance = 'High';
+  }
+  
+  if (lower.includes('critical') || lower.includes('high') || lower.includes('essential') || lower.includes('crucial')) {
+    importance = 'High';
+  } else if (lower.includes('low') || lower.includes('basic') || lower.includes('nice') || lower.includes('minor')) {
+    importance = 'Low';
+  }
+  
+  return { name: clean, importance, role };
+};
+
+// Feature Parser
+const parseFeature = (feat, priority = 'High') => {
+  if (typeof feat !== 'string') {
+    return { name: String(feat || ''), priority, difficulty: 'Medium', time: '3 hours' };
+  }
+  const clean = feat.replace(/^[\s\-•*]+/, '').trim();
+  const lower = clean.toLowerCase();
+  
+  let difficulty = 'Medium';
+  let time = '3 hours';
+  
+  if (lower.includes('ai') || lower.includes('llm') || lower.includes('fine-tune') || lower.includes('integration') || lower.includes('sync') || lower.includes('socket') || lower.includes('real-time') || lower.includes('realtime') || lower.includes('git')) {
+    difficulty = 'Hard';
+    time = '5-6 hours';
+  } else if (lower.includes('validation') || lower.includes('form') || lower.includes('spinner') || lower.includes('loading') || lower.includes('button') || lower.includes('styling') || lower.includes('input') || lower.includes('badge') || lower.includes('alert') || lower.includes('toast')) {
+    difficulty = 'Easy';
+    time = '1-2 hours';
+  } else if (lower.includes('auth') || lower.includes('database') || lower.includes('schema') || lower.includes('api') || lower.includes('route') || lower.includes('controller') || lower.includes('model')) {
+    difficulty = 'Medium';
+    time = '3-4 hours';
+  }
+  
+  const timeMatch = clean.match(/(\d+\s*-\s*\d+|\d+)\s*(h|hrs|hours?)/i);
+  if (timeMatch) {
+    time = timeMatch[0];
+  }
+  
+  const diffMatch = clean.match(/(easy|medium|hard|complex)/i);
+  if (diffMatch) {
+    difficulty = diffMatch[0].charAt(0).toUpperCase() + diffMatch[0].slice(1).toLowerCase();
+  }
+  
+  return { name: clean, priority, difficulty, time };
+};
+
+// Feature To Remove Parser
+const parseFeatureToRemove = (feat) => {
+  if (typeof feat !== 'string') {
+    return { name: String(feat || ''), reason: 'Unnecessary complexity for a hackathon prototype.', timeSaved: '3 hours' };
+  }
+  const clean = feat.replace(/^[\s\-•*]+/, '').trim();
+  let name = clean;
+  let reason = 'High complexity and low priority for a hackathon MVP.';
+  let timeSaved = '4-6 hours';
+  
+  const lower = clean.toLowerCase();
+  
+  const separators = [' - ', ':', ' because ', ' due to ', ' since '];
+  for (const sep of separators) {
+    const idx = lower.indexOf(sep);
+    if (idx > 0) {
+      name = clean.substring(0, idx).trim();
+      reason = clean.substring(idx + sep.length).trim();
+      reason = reason.charAt(0).toUpperCase() + reason.slice(1);
+      break;
+    }
+  }
+  
+  if (lower.includes('ai') || lower.includes('llm') || lower.includes('agent') || lower.includes('fine-tune') || lower.includes('rag')) {
+    timeSaved = '6-8 hours';
+  } else if (lower.includes('message') || lower.includes('chat') || lower.includes('sync') || lower.includes('real-time') || lower.includes('socket')) {
+    timeSaved = '4-5 hours';
+  } else if (lower.includes('styling') || lower.includes('animation') || lower.includes('extra') || lower.includes('theme')) {
+    timeSaved = '1-2 hours';
+  }
+  
+  return { name, reason, timeSaved };
+};
+
+// Improvement Suggestion Parser
+const parseImprovement = (suggestion, index) => {
+  if (typeof suggestion !== 'string') {
+    return { priority: 'Medium', recommendation: String(suggestion || ''), impact: 'Medium', difficulty: 'Medium', reasoning: '' };
+  }
+  const clean = suggestion.replace(/^[\s\-•*]+/, '').trim();
+  
+  const periodIdx = clean.indexOf('.');
+  let recommendation = clean;
+  let reasoning = 'Implementing this recommendation will streamline the application structure, reduce technical risk, and enhance the overall hackathon presentation.';
+  
+  if (periodIdx > 10 && periodIdx < clean.length - 1) {
+    recommendation = clean.substring(0, periodIdx + 1).trim();
+    reasoning = clean.substring(periodIdx + 1).trim();
+  }
+  
+  let priority = index === 0 ? 'High' : (index === 1 ? 'Medium' : 'Low');
+  let impact = 'High';
+  let difficulty = 'Medium';
+  
+  const lower = clean.toLowerCase();
+  if (lower.includes('easy') || lower.includes('simple') || lower.includes('setting') || lower.includes('temperature') || lower.includes('parameter') || lower.includes('text') || lower.includes('config')) {
+    difficulty = 'Easy';
+  } else if (lower.includes('complex') || lower.includes('architecture') || lower.includes('refactor') || lower.includes('rewrite') || lower.includes('migration') || lower.includes('heavy')) {
+    difficulty = 'Hard';
+  }
+  
+  if (lower.includes('critical') || lower.includes('major') || lower.includes('boost') || lower.includes('accuracy') || lower.includes('performance') || lower.includes('save') || lower.includes('guarantee')) {
+    impact = 'High';
+  } else {
+    impact = 'Medium';
+  }
+  
+  return { priority, recommendation, impact, difficulty, reasoning };
+};
+
+// Execution Step Parser
+const parseExecutionStep = (step, index) => {
+  if (typeof step !== 'string') {
+    return { title: `Step ${index + 1}`, description: String(step || ''), timeframe: `Step ${index + 1}` };
+  }
+  const clean = step.replace(/^[\s\-•*\d\.]+\s*/, '').trim();
+  let title = clean;
+  let description = '';
+  let timeframe = `Phase ${index + 1}`;
+  
+  const timeframeRegex = /\(([^)]+)\)$/;
+  const match = clean.match(timeframeRegex);
+  if (match) {
+    timeframe = match[1];
+    title = clean.replace(timeframeRegex, '').trim();
+  } else {
+    const prefixMatch = clean.match(/^((?:Day|Hour|Hours|Step)\s*\d+(?:\/\w+)?(?:\s*-\s*\d+)?)\s*[:-]\s*(.*)/i);
+    if (prefixMatch) {
+      timeframe = prefixMatch[1];
+      title = prefixMatch[2];
+    }
+  }
+  
+  const colonIdx = title.indexOf(':');
+  const dashIdx = title.indexOf(' - ');
+  
+  if (colonIdx > 0) {
+    description = title.substring(colonIdx + 1).trim();
+    title = title.substring(0, colonIdx).trim();
+  } else if (dashIdx > 0) {
+    description = title.substring(dashIdx + 3).trim();
+    title = title.substring(0, dashIdx).trim();
+  } else {
+    description = title;
+    title = `Phase ${index + 1}`;
+  }
+  
+  if (description) {
+    description = description.charAt(0).toUpperCase() + description.slice(1);
+  }
+  
+  return { title, description, timeframe };
+};
+
+// Judge Score Calculator
+const calculateJudgeScores = (feasibilityScore, judgePerspectiveText) => {
+  const base = feasibilityScore || 7.0;
+  
+  let innovation = Math.min(10, Math.max(1, Math.round((base * 0.9 + 1) * 10) / 10));
+  let complexity = Math.min(10, Math.max(1, Math.round((base * 0.85 + 0.5) * 10) / 10));
+  let practicality = Math.min(10, Math.max(1, Math.round((base * 1.05) * 10) / 10));
+  let presentation = Math.min(10, Math.max(1, Math.round((base * 0.95 + 0.2) * 10) / 10));
+  
+  const lower = (judgePerspectiveText || '').toLowerCase();
+  if (lower.includes('innovat')) {
+    innovation = Math.min(10, innovation + 0.5);
+  }
+  if (lower.includes('complex') || lower.includes('technic')) {
+    complexity = Math.min(10, complexity + 0.5);
+  }
+  if (lower.includes('practic') || lower.includes('usab') || lower.includes('real')) {
+    practicality = Math.min(10, practicality + 0.5);
+  }
+  
+  const avg = Math.round(((innovation + complexity + practicality + presentation) / 4) * 10) / 10;
+  
+  return {
+    judgeScore: avg,
+    innovation,
+    complexity,
+    practicality,
+    presentation,
+    verdict: judgePerspectiveText || 'Focus on presenting a solid, working MVP with an emphasis on solving the core problem statement.'
+  };
+};
+
+// Architecture Cards Generator
+const generateArchitectureCards = (project, review) => {
+  const reasoning = (review.reasoning || '').toLowerCase();
+  const description = (project.description || '').toLowerCase();
+  const suggestions = (review.improvementSuggestions || []).join(' ').toLowerCase();
+  const risks = (review.projectRisks || []).join(' ').toLowerCase();
+  
+  const cards = [
+    {
+      id: 'frontend',
+      name: 'Frontend Stack',
+      status: 'Validated',
+      strength: 'Responsive modular UI component framework is ready to scale.',
+      suggestion: 'Utilize client-side state management cache to prevent duplicate loads.'
+    },
+    {
+      id: 'backend',
+      name: 'Backend Core',
+      status: 'Validated',
+      strength: 'RESTful API controller layer structured with input validation schemas.',
+      suggestion: 'Ensure asynchronous request handlers have error boundary catch blocks.'
+    },
+    {
+      id: 'database',
+      name: 'Database Layer',
+      status: 'Validated',
+      strength: 'Data models optimized for document relationships and atomic updates.',
+      suggestion: 'Add index constraints on frequent query filter keys.'
+    },
+    {
+      id: 'ai',
+      name: 'AI Pipeline',
+      status: 'Validated',
+      strength: 'OpenAI/Featherless LLM pipelines configured with retry fallback buffers.',
+      suggestion: 'Add token length checks to avoid model window context truncation.'
+    },
+    {
+      id: 'deployment',
+      name: 'Deployment Devops',
+      status: 'Validated',
+      strength: 'Multi-stage container hosting and environment config pipeline ready.',
+      suggestion: 'Setup health check endpoints and setup CD push triggers.'
+    }
+  ];
+  
+  cards.forEach(card => {
+    let hasRisk = false;
+    if (card.id === 'frontend') {
+      hasRisk = risks.includes('ui') || risks.includes('frontend') || risks.includes('visual') || risks.includes('dashboard') || risks.includes('layout') || risks.includes('styling') || risks.includes('css');
+      if (hasRisk) {
+        card.status = 'Attention';
+        card.strength = 'Standard visual layouts have been planned.';
+        card.suggestion = 'Prioritize completing a single dashboard layout before building sub-views.';
+      }
+    } else if (card.id === 'backend') {
+      hasRisk = risks.includes('backend') || risks.includes('api') || risks.includes('timeout') || risks.includes('route') || risks.includes('server') || risks.includes('controller');
+      if (hasRisk) {
+        card.status = 'Attention';
+        card.strength = 'Server router logic has been prototyped.';
+        card.suggestion = 'Optimize backend handler timeouts and verify payload validations.';
+      }
+    } else if (card.id === 'database') {
+      hasRisk = risks.includes('database') || risks.includes('db') || risks.includes('mongo') || risks.includes('sql') || risks.includes('schema') || risks.includes('collection');
+      if (hasRisk) {
+        card.status = 'Attention';
+        card.strength = 'Basic database schemas have been drafted.';
+        card.suggestion = 'Create simpler document/relational structures to avoid join overhead.';
+      }
+    } else if (card.id === 'ai') {
+      hasRisk = risks.includes('ai') || risks.includes('llm') || risks.includes('model') || risks.includes('token') || risks.includes('prompt') || risks.includes('openai') || risks.includes('qwen');
+      if (hasRisk) {
+        card.status = 'Attention';
+        card.strength = 'AI request routing pathways have been established.';
+        card.suggestion = 'Implement quick response caching or deterministic fallbacks.';
+      }
+    } else if (card.id === 'deployment') {
+      hasRisk = risks.includes('deploy') || risks.includes('hosting') || risks.includes('production') || risks.includes('aws') || risks.includes('vercel') || risks.includes('host') || risks.includes('ci');
+      if (hasRisk) {
+        card.status = 'Attention';
+        card.strength = 'Standard hosting environments identified.';
+        card.suggestion = 'Deploy a hello-world API within the first 6 hours of the hackathon.';
+      }
+    }
+  });
+  
+  return cards;
+};
+
+// Sub-Component 1: Feasibility Score Card
+const FeasibilityScoreCard = ({ score, alignmentText, reasoningText }) => {
+  const percentage = (score || 5) * 10;
+  const radius = 36;
+  const strokeWidth = 8;
+  const circumference = 2 * Math.PI * radius;
+  const strokeDashoffset = circumference - (percentage / 100) * circumference;
+
+  let statusText = 'Low Feasibility';
+  let badgeColor = '#ef4444';
+  let scoreColor = '#ef4444';
+  let strokeColor = '#ef4444';
+
+  if (score >= 8) {
+    statusText = 'Ready to Build';
+    badgeColor = '#10b981';
+    scoreColor = '#10b981';
+    strokeColor = '#10b981';
+  } else if (score >= 5) {
+    statusText = 'Moderate Feasibility';
+    badgeColor = '#00f0ff';
+    scoreColor = '#00f0ff';
+    strokeColor = '#00f0ff';
+  }
+
+  let summary = 'A feasibility assessment based on project constraints and team capabilities.';
+  if (alignmentText) {
+    const firstSentence = alignmentText.split(/[.!?]+/)[0];
+    if (firstSentence && firstSentence.length > 10) {
+      summary = firstSentence + '.';
+    }
+  } else if (reasoningText) {
+    const firstSentence = reasoningText.split(/[.!?]+/)[0];
+    if (firstSentence && firstSentence.length > 10) {
+      summary = firstSentence + '.';
+    }
+  }
+
+  return (
+    <div className="bg-neutral-50 border border-neutral-200 rounded-xl p-5 shadow-lg flex flex-col gap-4 transition-all duration-300 hover:border-brand-500/50 glow-blue">
+      <div className="flex justify-between items-center">
+        <span className="text-[10px] font-bold tracking-wider uppercase" style={{ color: 'rgba(0, 240, 255, 0.7)' }}>Feasibility Score</span>
+        <span 
+          className="text-[10px] font-bold px-2 py-0.5 rounded-full border uppercase tracking-wider font-mono"
+          style={{ 
+            color: badgeColor, 
+            borderColor: `${badgeColor}30`, 
+            backgroundColor: `${badgeColor}10` 
+          }}
+        >
+          {statusText}
+        </span>
+      </div>
+      
+      <div className="flex items-center gap-5">
+        <div className="relative flex items-center justify-center w-24 h-24">
+          <svg className="w-full h-full transform -rotate-90">
+            <circle
+              cx="48"
+              cy="48"
+              r={radius}
+              stroke="rgba(0, 240, 255, 0.08)"
+              strokeWidth={strokeWidth}
+              fill="transparent"
+            />
+            <circle
+              cx="48"
+              cy="48"
+              r={radius}
+              stroke={strokeColor}
+              strokeWidth={strokeWidth}
+              fill="transparent"
+              strokeDasharray={circumference}
+              strokeDashoffset={strokeDashoffset}
+              strokeLinecap="round"
+              className="transition-all duration-1000 ease-out"
+            />
+          </svg>
+          <div className="absolute flex flex-col items-center justify-center">
+            <span className="text-2xl font-extrabold font-mono" style={{ color: scoreColor }}>
+              {score?.toFixed(1) || '0.0'}
+            </span>
+            <span className="text-[9px] uppercase tracking-widest" style={{ color: 'rgba(0, 240, 255, 0.5)' }}>/ 10</span>
+          </div>
+        </div>
+        
+        <div className="flex-1 flex flex-col gap-1">
+          <span className="text-xs font-bold uppercase tracking-wider" style={{ color: '#00f0ff' }}>Prototype Readiness</span>
+          <p className="text-xs leading-relaxed italic" style={{ color: 'rgba(0, 240, 255, 0.7)' }}>
+            "{summary}"
+          </p>
+        </div>
+      </div>
+    </div>
+  );
+};
+
+// Sub-Component 2: Insight Card (Alignment)
+const AlignmentCard = ({ alignmentText }) => {
+  const [isExpanded, setIsExpanded] = useState(false);
+
+  return (
+    <div className="bg-neutral-50 border border-neutral-200 rounded-xl p-5 shadow-lg flex flex-col gap-4 transition-all duration-300 hover:border-brand-500/50 glow-blue">
+      <span className="text-[10px] font-bold tracking-wider uppercase" style={{ color: 'rgba(0, 240, 255, 0.7)' }}>Problem-Solution Alignment</span>
+      
+      <div className="flex items-center gap-3 flex-wrap">
+        <div 
+          className="flex items-center gap-1 border px-2 py-0.5 rounded-md text-[10px] font-semibold"
+          style={{ color: '#10b981', borderColor: 'rgba(16, 185, 129, 0.25)', backgroundColor: 'rgba(16, 185, 129, 0.08)' }}
+        >
+          <Check size={10} /> AI Understanding
+        </div>
+        <div 
+          className="flex items-center gap-1 border px-2 py-0.5 rounded-md text-[10px] font-semibold"
+          style={{ color: '#10b981', borderColor: 'rgba(16, 185, 129, 0.25)', backgroundColor: 'rgba(16, 185, 129, 0.08)' }}
+        >
+          <Check size={10} /> Problem Clarity
+        </div>
+        <div 
+          className="flex items-center gap-1 border px-2 py-0.5 rounded-md text-[10px] font-semibold"
+          style={{ color: '#10b981', borderColor: 'rgba(16, 185, 129, 0.25)', backgroundColor: 'rgba(16, 185, 129, 0.08)' }}
+        >
+          <Check size={10} /> Solution Fit
+        </div>
+      </div>
+      
+      <div className="relative">
+        <p className={`text-xs leading-relaxed transition-all duration-300 ${isExpanded ? '' : 'line-clamp-3'}`} style={{ color: 'rgba(0, 240, 255, 0.85)' }}>
+          {alignmentText}
+        </p>
+        
+        {alignmentText && alignmentText.length > 150 && (
+          <button
+            onClick={() => setIsExpanded(!isExpanded)}
+            className="flex items-center gap-0.5 text-[10px] font-bold hover:text-brand-300 mt-2 cursor-pointer uppercase tracking-wider transition-colors border-0 bg-transparent"
+            style={{ color: '#00f0ff' }}
+          >
+            {isExpanded ? (
+              <>Show Less <ChevronUp size={12} /></>
+            ) : (
+              <>Show More <ChevronDown size={12} /></>
+            )}
+          </button>
+        )}
+      </div>
+    </div>
+  );
+};
+
+// Sub-Component 3: Risks List
+const ProjectRisksList = ({ risks }) => {
+  if (!risks || risks.length === 0) return null;
+
+  return (
+    <div className="flex flex-col gap-2">
+      <span className="text-[10px] font-bold tracking-wider uppercase mb-1" style={{ color: 'rgba(0, 240, 255, 0.7)' }}>Project Risks & Scope Blockers</span>
+      <div className="grid grid-cols-1 gap-2.5">
+        {risks.map((rawRisk, idx) => {
+          const parsed = parseRisk(rawRisk);
+          
+          let severityColor = '#60a5fa';
+          if (parsed.severity === 'High') {
+            severityColor = '#f87171';
+          } else if (parsed.severity === 'Medium') {
+            severityColor = '#fbbf24';
+          }
+
+          return (
+            <div 
+              key={idx} 
+              className="bg-neutral-50 border border-neutral-200 hover:border-brand-500/50 transition-all duration-300 rounded-xl p-4 flex gap-3.5 items-start group shadow-md glow-blue"
+            >
+              <div 
+                className="p-2 rounded-lg text-neutral-300 group-hover:text-brand-400 transition-colors"
+                style={{ backgroundColor: 'rgba(0, 240, 255, 0.08)' }}
+              >
+                {renderCategoryIcon(parsed.icon, 16)}
+              </div>
+              <div className="flex-1 flex flex-col gap-1">
+                <div className="flex items-center justify-between gap-2 flex-wrap">
+                  <span className="text-xs font-bold leading-tight" style={{ color: '#ffffff' }}>
+                    {parsed.title}
+                  </span>
+                  <div className="flex items-center gap-1.5 font-mono">
+                    <span 
+                      className="text-[9px] font-bold px-1.5 py-0.5 rounded uppercase tracking-wider"
+                      style={{ color: '#00f0ff', backgroundColor: 'rgba(0, 240, 255, 0.12)' }}
+                    >
+                      {parsed.category}
+                    </span>
+                    <span 
+                      className="text-[9px] font-bold px-1.5 py-0.5 rounded border uppercase tracking-wider"
+                      style={{ 
+                        color: severityColor, 
+                        borderColor: `${severityColor}30`, 
+                        backgroundColor: `${severityColor}10` 
+                      }}
+                    >
+                      {parsed.severity}
+                    </span>
+                  </div>
+                </div>
+                <p className="text-xs leading-relaxed" style={{ color: 'rgba(0, 240, 255, 0.7)' }}>
+                  {parsed.description}
+                </p>
+              </div>
+            </div>
+          );
+        })}
+      </div>
+    </div>
+  );
+};
+
+// Sub-Component 4: Missing Skills
+const MissingSkillsList = ({ skills }) => {
+  if (!skills || skills.length === 0) return null;
+
+  return (
+    <div className="flex flex-col gap-2">
+      <span className="text-[10px] font-bold tracking-wider uppercase mb-1" style={{ color: 'rgba(0, 240, 255, 0.7)' }}>Identified Skill Gaps</span>
+      <div className="flex flex-wrap gap-2">
+        {skills.map((rawSkill, idx) => {
+          const parsed = parseSkill(rawSkill);
+          let impColor = '#60a5fa';
+          if (parsed.importance === 'High') {
+            impColor = '#f87171';
+          } else if (parsed.importance === 'Medium') {
+            impColor = '#fbbf24';
+          }
+
+          return (
+            <div 
+              key={idx}
+              className="bg-neutral-50 border border-neutral-200 hover:border-brand-500/50 transition-all duration-300 rounded-lg py-2 px-3 flex items-center gap-2.5 shadow-sm"
+            >
+              <div className="w-1.5 h-1.5 rounded-full" style={{ backgroundColor: '#00f0ff' }}></div>
+              <div className="flex flex-col">
+                <span className="text-xs font-bold" style={{ color: '#ffffff' }}>{parsed.name}</span>
+                <div className="flex items-center gap-1.5 mt-0.5">
+                  <span className="text-[9px] font-semibold uppercase" style={{ color: 'rgba(0, 240, 255, 0.6)' }}>{parsed.role}</span>
+                  <span 
+                    className="text-[8px] font-bold px-1 rounded border uppercase tracking-wider font-mono"
+                    style={{ 
+                      color: impColor, 
+                      borderColor: `${impColor}30`, 
+                      backgroundColor: `${impColor}10` 
+                    }}
+                  >
+                    {parsed.importance}
+                  </span>
+                </div>
+              </div>
+            </div>
+          );
+        })}
+      </div>
+    </div>
+  );
+};
+
+// Sub-Component 5: Must Build Features
+const MustBuildFeaturesList = ({ features }) => {
+  if (!features || features.length === 0) return null;
+
+  return (
+    <div className="flex flex-col gap-2">
+      <span className="text-[10px] font-bold tracking-wider uppercase mb-1" style={{ color: 'rgba(0, 240, 255, 0.7)' }}>Must Build Features (Core MVP)</span>
+      <div className="grid grid-cols-1 sm:grid-cols-2 gap-2.5">
+        {features.map((rawFeat, idx) => {
+          const parsed = parseFeature(rawFeat, 'High');
+          let diffColor = '#fbbf24';
+          if (parsed.difficulty === 'Hard') {
+            diffColor = '#f87171';
+          } else if (parsed.difficulty === 'Easy') {
+            diffColor = '#34d399';
+          }
+
+          return (
+            <div 
+              key={idx}
+              className="bg-neutral-50 border border-neutral-200 hover:border-brand-500/50 transition-all duration-300 rounded-xl p-3.5 flex flex-col gap-2 shadow-md hover:-translate-y-0.5 glow-blue"
+            >
+              <div className="flex justify-between items-start gap-2">
+                <span 
+                  className="text-[9px] font-bold border px-1.5 py-0.5 rounded uppercase tracking-wider font-mono"
+                  style={{ color: '#10b981', borderColor: 'rgba(16, 185, 129, 0.25)', backgroundColor: 'rgba(16, 185, 129, 0.08)' }}
+                >
+                  Critical MVP
+                </span>
+                <div className="flex items-center gap-1 font-mono">
+                  <Clock size={10} style={{ color: 'rgba(0, 240, 255, 0.5)' }} />
+                  <span className="text-[9px] font-bold uppercase" style={{ color: 'rgba(0, 240, 255, 0.6)' }}>{parsed.time}</span>
+                </div>
+              </div>
+              <span className="text-xs font-bold leading-tight flex-1" style={{ color: '#ffffff' }}>
+                {parsed.name}
+              </span>
+              <div className="flex justify-end mt-1 font-mono">
+                <span 
+                  className="text-[8px] font-bold px-1.5 py-0.5 rounded border uppercase tracking-wider"
+                  style={{ 
+                    color: diffColor, 
+                    borderColor: `${diffColor}30`, 
+                    backgroundColor: `${diffColor}10` 
+                  }}
+                >
+                  {parsed.difficulty}
+                </span>
+              </div>
+            </div>
+          );
+        })}
+      </div>
+    </div>
+  );
+};
+
+// Sub-Component 6: Optional Features Collapsible List
+const OptionalFeaturesList = ({ features }) => {
+  const [isOpen, setIsOpen] = useState(false);
+
+  if (!features || features.length === 0) return null;
+
+  return (
+    <div className="flex flex-col gap-2">
+      <button 
+        onClick={() => setIsOpen(!isOpen)}
+        className="bg-neutral-50 border border-neutral-200 hover:border-brand-500/50 transition-all duration-300 rounded-xl p-4 cursor-pointer w-full text-left shadow-sm flex items-center justify-between"
+      >
+        <div className="flex items-center gap-2">
+          <Lightbulb size={14} style={{ color: '#fbbf24' }} />
+          <span className="text-xs font-bold text-neutral-200">Optional Features (Nice to Have)</span>
+          <span 
+            className="text-[10px] font-bold px-1.5 py-0.2 rounded-full font-mono"
+            style={{ color: '#00f0ff', backgroundColor: 'rgba(0, 240, 255, 0.12)' }}
+          >
+            {features.length}
+          </span>
+        </div>
+        {isOpen ? <ChevronUp size={16} className="text-neutral-450" /> : <ChevronDown size={16} className="text-neutral-450" />}
+      </button>
+
+      {isOpen && (
+        <div className="grid grid-cols-1 sm:grid-cols-2 gap-2.5 mt-1 border-l-2 border-l-brand-500/30 pl-3.5 transition-all duration-300 animate-slide-up">
+          {features.map((rawFeat, idx) => {
+            const parsed = parseFeature(rawFeat, 'Low');
+            let diffColor = '#fbbf24';
+            if (parsed.difficulty === 'Hard') {
+              diffColor = '#f87171';
+            } else if (parsed.difficulty === 'Easy') {
+              diffColor = '#34d399';
+            }
+
+            return (
+              <div 
+                key={idx}
+                className="bg-neutral-50 border border-neutral-200 p-3.5 rounded-xl flex flex-col gap-1.5 hover:border-brand-500/50 transition-colors duration-300"
+              >
+                <div className="flex justify-between items-center">
+                  <span 
+                    className="text-[8px] font-semibold border px-1.5 py-0.5 rounded uppercase tracking-wider font-mono"
+                    style={{ color: '#60a5fa', borderColor: 'rgba(96, 165, 250, 0.25)', backgroundColor: 'rgba(96, 165, 250, 0.08)' }}
+                  >
+                    Optional
+                  </span>
+                  <span className="text-[9px] font-mono" style={{ color: 'rgba(0, 240, 255, 0.5)' }}>{parsed.time}</span>
+                </div>
+                <span className="text-xs font-semibold leading-tight animate-pulse" style={{ color: 'rgba(0, 240, 255, 0.95)' }}>
+                  {parsed.name}
+                </span>
+                <div className="flex justify-end mt-1 font-mono">
+                  <span 
+                    className="text-[8px] font-bold px-1 py-0.5 rounded border uppercase tracking-wider"
+                    style={{ 
+                      color: diffColor, 
+                      borderColor: `${diffColor}30`, 
+                      backgroundColor: `${diffColor}10` 
+                    }}
+                  >
+                    {parsed.difficulty}
+                  </span>
+                </div>
+              </div>
+            );
+          })}
+        </div>
+      )}
+    </div>
+  );
+};
+
+// Sub-Component 7: Features To Remove warning list
+const FeaturesToRemoveList = ({ features }) => {
+  if (!features || features.length === 0) return null;
+
+  return (
+    <div className="flex flex-col gap-2">
+      <span className="text-[10px] font-bold tracking-wider uppercase mb-1" style={{ color: 'rgba(0, 240, 255, 0.7)' }}>Features Recommended for Removal</span>
+      <div className="grid grid-cols-1 gap-2.5">
+        {features.map((rawFeat, idx) => {
+          const parsed = parseFeatureToRemove(rawFeat);
+
+          return (
+            <div 
+              key={idx}
+              className="bg-neutral-50 border border-red-500/30 border-l-4 border-l-red-500 rounded-xl p-4 flex gap-3 shadow-md hover:border-red-500/50 transition-colors duration-300"
+            >
+              <div className="p-2 rounded-lg text-red-400 h-fit" style={{ backgroundColor: 'rgba(239, 68, 68, 0.08)' }}>
+                <Ban size={16} />
+              </div>
+              <div className="flex-1 flex flex-col gap-1">
+                <div className="flex justify-between items-start gap-2 flex-wrap">
+                  <span className="text-xs font-bold leading-tight" style={{ color: '#f87171' }}>
+                    {parsed.name}
+                  </span>
+                  <span 
+                    className="text-[9px] font-bold border px-1.5 py-0.5 rounded uppercase tracking-wider font-mono"
+                    style={{ color: '#f87171', borderColor: 'rgba(248, 113, 113, 0.3)', backgroundColor: 'rgba(248, 113, 113, 0.1)' }}
+                  >
+                    Save ~{parsed.timeSaved}
+                  </span>
+                </div>
+                <p className="text-xs leading-relaxed" style={{ color: 'rgba(0, 240, 255, 0.75)' }}>
+                  {parsed.reason}
+                </p>
+              </div>
+            </div>
+          );
+        })}
+      </div>
+    </div>
+  );
+};
+
+// Sub-Component 8: Improvement Suggestions
+const ImprovementCard = ({ suggestion, index }) => {
+  const [isExpanded, setIsExpanded] = useState(false);
+  const parsed = parseImprovement(suggestion, index);
+
+  let priorityColor = '#60a5fa';
+  if (parsed.priority === 'High') {
+    priorityColor = '#f87171';
+  } else if (parsed.priority === 'Medium') {
+    priorityColor = '#fbbf24';
+  }
+
+  let diffColor = '#fbbf24';
+  if (parsed.difficulty === 'Hard') {
+    diffColor = '#f87171';
+  } else if (parsed.difficulty === 'Easy') {
+    diffColor = '#34d399';
+  }
+
+  return (
+    <div className="bg-neutral-50 border border-neutral-200 rounded-xl p-4 flex gap-3 shadow-md hover:border-brand-500/50 transition-all duration-300 glow-blue">
+      <div 
+        className="w-6 h-6 rounded-full border flex items-center justify-center text-xs font-bold font-mono shrink-0"
+        style={{ color: '#00f0ff', borderColor: 'rgba(0, 240, 255, 0.25)', backgroundColor: 'rgba(0, 240, 255, 0.08)' }}
+      >
+        {index + 1}
+      </div>
+      <div className="flex-1 flex flex-col gap-1.5">
+        <div className="flex justify-between items-start gap-2 flex-wrap">
+          <span className="text-xs font-bold leading-tight" style={{ color: '#ffffff' }}>
+            {parsed.recommendation}
+          </span>
+          <div className="flex items-center gap-1 font-mono">
+            <span 
+              className="text-[8px] font-bold px-1.5 py-0.5 rounded border uppercase tracking-wider"
+              style={{ 
+                color: priorityColor, 
+                borderColor: `${priorityColor}30`, 
+                backgroundColor: `${priorityColor}10` 
+              }}
+            >
+              {parsed.priority}
+            </span>
+          </div>
+        </div>
+        
+        <div className="flex gap-2 text-[9px] font-semibold font-mono">
+          <span className="px-1.5 py-0.5 rounded uppercase" style={{ color: 'rgba(0, 240, 255, 0.7)', backgroundColor: 'rgba(0, 240, 255, 0.06)' }}>Impact: {parsed.impact}</span>
+          <span className="px-1.5 py-0.5 rounded uppercase" style={{ color: 'rgba(0, 240, 255, 0.7)', backgroundColor: 'rgba(0, 240, 255, 0.06)' }}>Difficulty: {parsed.difficulty}</span>
+        </div>
+
+        <div>
+          <button 
+            onClick={() => setIsExpanded(!isExpanded)}
+            className="flex items-center gap-0.5 text-[9px] font-bold hover:text-neutral-300 mt-1 cursor-pointer uppercase tracking-wider transition-colors border-0 bg-transparent"
+            style={{ color: 'rgba(0, 240, 255, 0.6)' }}
+          >
+            {isExpanded ? (
+              <>Hide Reasoning <ChevronUp size={10} /></>
+            ) : (
+              <>View Reasoning <ChevronDown size={10} /></>
+            )}
+          </button>
+          
+          {isExpanded && (
+            <p 
+              className="text-xs mt-2 leading-relaxed p-2.5 rounded-lg border animate-slide-up"
+              style={{ backgroundColor: 'rgba(0, 240, 255, 0.04)', borderColor: 'rgba(0, 240, 255, 0.15)', color: 'rgba(0, 240, 255, 0.75)' }}
+            >
+              {parsed.reasoning}
+            </p>
+          )}
+        </div>
+      </div>
+    </div>
+  );
+};
+
+const ImprovementSuggestionsList = ({ suggestions }) => {
+  if (!suggestions || suggestions.length === 0) return null;
+
+  return (
+    <div className="flex flex-col gap-2">
+      <span className="text-[10px] font-bold tracking-wider uppercase mb-1" style={{ color: 'rgba(0, 240, 255, 0.7)' }}>Mentor Architecture Recommendations</span>
+      <div className="flex flex-col gap-2.5">
+        {suggestions.map((suggestion, idx) => (
+          <ImprovementCard key={idx} suggestion={suggestion} index={idx} />
+        ))}
+      </div>
+    </div>
+  );
+};
+
+// Sub-Component 9: Judge Perspective Simulated Metrics
+const JudgePerspectiveCard = ({ score, perspectiveText }) => {
+  const scores = calculateJudgeScores(score, perspectiveText);
+
+  const metrics = [
+    { label: 'Innovation', val: scores.innovation, color: 'bg-indigo-500' },
+    { label: 'Technical Complexity', val: scores.complexity, color: 'bg-violet-500' },
+    { label: 'Practicality', val: scores.practicality, color: 'bg-emerald-500' },
+    { label: 'Presentation Value', val: scores.presentation, color: 'bg-amber-500' }
+  ];
+
+  return (
+    <div className="bg-neutral-50 border border-neutral-200 rounded-xl p-5 shadow-lg flex flex-col gap-4.5 transition-all duration-300 hover:border-brand-500/50 glow-blue animate-slide-up">
+      <div className="flex justify-between items-center">
+        <span className="text-[10px] font-bold tracking-wider uppercase" style={{ color: 'rgba(0, 240, 255, 0.7)' }}>Judge Evaluation Simulation</span>
+        <div className="flex items-baseline gap-0.5 font-mono">
+          <span className="text-xs uppercase tracking-widest font-bold" style={{ color: 'rgba(0, 240, 255, 0.5)' }}>Score: </span>
+          <span className="text-lg font-extrabold" style={{ color: '#00f0ff' }}>{scores.judgeScore}</span>
+          <span className="text-[10px] font-semibold" style={{ color: 'rgba(0, 240, 255, 0.5)' }}>/10</span>
+        </div>
+      </div>
+      
+      <div className="flex flex-col gap-2.5">
+        {metrics.map((metric, idx) => (
+          <div key={idx} className="flex flex-col gap-1">
+            <div className="flex justify-between text-[10px] font-bold uppercase tracking-wider">
+              <span style={{ color: 'rgba(0, 240, 255, 0.75)' }}>{metric.label}</span>
+              <span className="font-mono text-neutral-200">{metric.val.toFixed(1)}/10</span>
+            </div>
+            <div 
+              className="w-full h-1.5 rounded-full overflow-hidden"
+              style={{ backgroundColor: 'rgba(0, 240, 255, 0.08)' }}
+            >
+              <div 
+                className={`h-full rounded-full transition-all duration-1000 ${metric.color}`}
+                style={{ width: `${metric.val * 10}%` }}
+              ></div>
+            </div>
+          </div>
+        ))}
+      </div>
+      
+      <div 
+        className="border rounded-xl p-3.5 flex gap-2.5 items-start mt-1"
+        style={{ backgroundColor: 'rgba(0, 240, 255, 0.05)', borderColor: 'rgba(0, 240, 255, 0.15)' }}
+      >
+        <div className="p-1.5 rounded-lg text-brand-400 shrink-0" style={{ backgroundColor: 'rgba(0, 240, 255, 0.08)' }}>
+          <Award size={14} />
+        </div>
+        <div className="flex flex-col gap-0.5">
+          <span className="text-[9px] font-bold uppercase tracking-wider" style={{ color: '#00f0ff' }}>Final Judge Verdict</span>
+          <p className="text-xs leading-relaxed italic" style={{ color: 'rgba(0, 240, 255, 0.9)' }}>
+            "{scores.verdict}"
+          </p>
+        </div>
+      </div>
+    </div>
+  );
+};
+
+// Sub-Component 10: Interactive Milestone Timeline
+const ExecutionTimeline = ({ strategy }) => {
+  const [activeStep, setActiveStep] = useState(0);
+
+  if (!strategy || strategy.length === 0) return null;
+
+  return (
+    <div className="bg-neutral-50 border border-neutral-200 rounded-xl p-5 shadow-lg flex flex-col gap-4 transition-all duration-300 hover:border-brand-500/50 glow-blue animate-slide-up">
+      <span className="text-[10px] font-bold tracking-wider uppercase" style={{ color: 'rgba(0, 240, 255, 0.7)' }}>Execution Strategy Timeline</span>
+      
+      <div className="flex items-center justify-between gap-1 overflow-x-auto pb-2 scrollbar-none">
+        {strategy.map((step, idx) => {
+          const parsed = parseExecutionStep(step, idx);
+          const isSelected = activeStep === idx;
+          return (
+            <button
+              key={idx}
+              onClick={() => setActiveStep(idx)}
+              className="flex-1 min-w-[70px] flex flex-col items-center gap-1.5 p-1.5 rounded-lg border text-center transition-all duration-300 cursor-pointer"
+              style={{
+                backgroundColor: isSelected ? 'rgba(0, 240, 255, 0.12)' : 'rgba(0, 240, 255, 0.03)',
+                borderColor: isSelected ? '#00f0ff' : 'rgba(0, 240, 255, 0.15)',
+                color: isSelected ? '#00f0ff' : 'rgba(0, 240, 255, 0.5)'
+              }}
+            >
+              <span className="text-[9px] uppercase tracking-wider whitespace-nowrap font-mono">{parsed.timeframe}</span>
+              <div 
+                className="w-2 h-2 rounded-full transition-all duration-300"
+                style={{ backgroundColor: isSelected ? '#00f0ff' : 'rgba(0, 240, 255, 0.25)' }}
+              ></div>
+            </button>
+          );
+        })}
+      </div>
+
+      <div 
+        className="border rounded-xl p-4 flex gap-3.5 items-start transition-all duration-300 animate-slide-up min-h-[90px]"
+        style={{ backgroundColor: 'rgba(0, 240, 255, 0.04)', borderColor: 'rgba(0, 240, 255, 0.12)' }}
+      >
+        <div 
+          className="font-mono text-sm font-black w-10 h-10 flex items-center justify-center shrink-0 rounded-lg"
+          style={{ color: '#00f0ff', backgroundColor: 'rgba(0, 240, 255, 0.08)' }}
+        >
+          {activeStep + 1}
+        </div>
+        <div className="flex-1 flex flex-col gap-1">
+          <div className="flex justify-between items-baseline gap-2 flex-wrap">
+            <span className="text-xs font-bold" style={{ color: '#ffffff' }}>{parseExecutionStep(strategy[activeStep], activeStep).title}</span>
+            <span 
+              className="text-[8px] font-bold border px-1 rounded uppercase tracking-widest font-mono"
+              style={{ color: '#00f0ff', borderColor: 'rgba(0, 240, 255, 0.25)', backgroundColor: 'rgba(0, 240, 255, 0.08)' }}
+            >
+              {parseExecutionStep(strategy[activeStep], activeStep).timeframe}
+            </span>
+          </div>
+          <p className="text-xs leading-relaxed mt-0.5" style={{ color: 'rgba(0, 240, 255, 0.75)' }}>
+            {parseExecutionStep(strategy[activeStep], activeStep).description}
+          </p>
+        </div>
+      </div>
+      
+      <div 
+        className="flex items-center justify-between text-[8px] font-bold uppercase border-t pt-3 mt-1 px-1"
+        style={{ borderColor: 'rgba(0, 240, 255, 0.12)', color: 'rgba(0, 240, 255, 0.45)' }}
+      >
+        <span className="flex items-center gap-1"><Compass size={10} /> Milestones Roadmap</span>
+        <span>Click tabs to preview details</span>
+      </div>
+    </div>
+  );
+};
+
+// Sub-Component 11: Architecture Validation List
+const ArchitectureValidationList = ({ project, review }) => {
+  const cards = generateArchitectureCards(project, review);
+
+  return (
+    <div className="flex flex-col gap-2">
+      <span className="text-[10px] font-bold tracking-wider uppercase" style={{ color: 'rgba(0, 240, 255, 0.7)' }}>System Architecture Validation</span>
+      <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-5 gap-3">
+        {cards.map((card, idx) => {
+          const isAttention = card.status === 'Attention';
+          const badgeColor = isAttention ? '#fbbf24' : '#34d399';
+          const icon = isAttention ? <AlertTriangle size={12} /> : <ShieldCheck size={12} />;
+
+          return (
+            <div 
+              key={idx}
+              className="bg-neutral-50 border border-neutral-200 hover:border-brand-500/50 transition-all duration-300 rounded-xl p-4 flex flex-col gap-2.5 shadow-md hover:-translate-y-0.5 glow-blue"
+            >
+              <div className="flex justify-between items-center gap-2">
+                <span className="text-xs font-bold" style={{ color: '#ffffff' }}>{card.name}</span>
+                <span 
+                  className="text-[8px] font-bold px-1.5 py-0.5 rounded-md border flex items-center gap-0.5 uppercase tracking-wider font-mono"
+                  style={{ 
+                    color: badgeColor, 
+                    borderColor: `${badgeColor}30`, 
+                    backgroundColor: `${badgeColor}10` 
+                  }}
+                >
+                  {icon} {card.status}
+                </span>
+              </div>
+              <div className="flex flex-col gap-1.5 text-xs">
+                <div>
+                  <span className="text-[8px] font-bold uppercase tracking-widest block font-mono" style={{ color: '#10b981' }}>Strength</span>
+                  <p className="leading-relaxed mt-0.5" style={{ color: 'rgba(0, 240, 255, 0.85)' }}>{card.strength}</p>
+                </div>
+                <div 
+                  className="border-t pt-1.5 mt-0.5"
+                  style={{ borderColor: 'rgba(0, 240, 255, 0.12)' }}
+                >
+                  <span className="text-[8px] font-bold uppercase tracking-widest block font-mono" style={{ color: '#00f0ff' }}>Optimization</span>
+                  <p className="leading-relaxed mt-0.5" style={{ color: 'rgba(0, 240, 255, 0.65)' }}>{card.suggestion}</p>
+                </div>
+              </div>
+            </div>
+          );
+        })}
+      </div>
+    </div>
+  );
+};
+
 
 const ProjectHub = ({ teamId, initialView }) => {
   const [project, setProject] = useState(null);
@@ -829,186 +1938,106 @@ const ProjectHub = ({ teamId, initialView }) => {
         </div>
       )}
 
-      {/* AI Project Review Report View */}
       {view === 'review-report' && project && project.projectReviewGeneratedAt && (
         <div className="flex flex-col gap-5">
-          <div className="flex justify-between items-center border-b border-neutral-100 pb-2 mb-2">
+          <div className="flex justify-between items-center border-b border-neutral-800 pb-3 mb-2">
             <div className="flex items-center gap-2">
-              <Cpu size={16} className="text-brand-500" />
-              <span className="text-xs font-bold text-neutral-800 uppercase tracking-wider">
-                AI Project Review Report
+              <Cpu size={16} className="text-brand-500 animate-pulse" />
+              <span className="text-xs font-bold text-neutral-800 uppercase tracking-wider text-shadow-sm">
+                AI Project Review Dashboard
               </span>
             </div>
             <button 
               type="button" 
               onClick={() => setView('dashboard')}
-              className="flex items-center gap-1 text-neutral-500 hover:text-neutral-900 text-xs font-semibold cursor-pointer border-0 bg-transparent"
+              className="flex items-center gap-1 text-neutral-400 hover:text-neutral-200 text-xs font-semibold cursor-pointer border-0 bg-transparent transition-colors"
             >
               <ArrowLeft size={12} /> Back
             </button>
           </div>
 
           {project.projectReviewGeneratedAt && (
-            <div className="text-[10px] text-neutral-400 font-semibold uppercase tracking-wider mt-[-8px]">
-              Generated: {new Date(project.projectReviewGeneratedAt).toLocaleString()}
+            <div className="text-[10px] text-neutral-400 font-semibold uppercase tracking-wider mt-[-10px] font-mono">
+              Analysis Generated: {new Date(project.projectReviewGeneratedAt).toLocaleString()}
             </div>
           )}
 
-          {/* 1. Feasibility Score */}
-          <div className="flex flex-col gap-1.5">
-            <span className="text-[10px] font-bold text-neutral-400 tracking-wider uppercase">Feasibility Score</span>
-            <div className="bg-neutral-50 border border-neutral-200 rounded-xl p-4 flex items-center justify-between gap-4">
-              <div>
-                <div className="text-3xl font-extrabold text-brand-500 font-mono">
-                  {project.projectReview.feasibilityScore?.toFixed(1) || 'N/A'}<span className="text-sm text-neutral-400 font-normal"> / 10</span>
+          {/* Redesigned 2-column Dashboard Grid */}
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-2 gap-6 items-start animate-slide-up">
+            
+            {/* Left Column */}
+            <div className="flex flex-col gap-5">
+              {/* 1. Feasibility Score */}
+              <FeasibilityScoreCard 
+                score={project.projectReview.feasibilityScore} 
+                alignmentText={project.projectReview.problemSolutionAlignment} 
+                reasoningText={project.projectReview.reasoning}
+              />
+
+              {/* 2. Problem-Solution Alignment */}
+              <AlignmentCard alignmentText={project.projectReview.problemSolutionAlignment} />
+
+              {/* 10. Execution Strategy Timeline */}
+              <ExecutionTimeline strategy={project.projectReview.executionStrategy} />
+
+              {/* 9. Judge Perspective Simulated Metrics */}
+              <JudgePerspectiveCard 
+                score={project.projectReview.feasibilityScore} 
+                perspectiveText={project.projectReview.judgePerspective} 
+              />
+            </div>
+
+            {/* Right Column */}
+            <div className="flex flex-col gap-5">
+              {/* 3. Project Risks */}
+              <ProjectRisksList risks={project.projectReview.projectRisks} />
+
+              {/* 4. Missing Skills */}
+              <MissingSkillsList skills={project.projectReview.missingSkills} />
+
+              {/* 5. Must Build Features */}
+              <MustBuildFeaturesList features={project.projectReview.mustBuildFeatures} />
+
+              {/* 6. Optional Features */}
+              <OptionalFeaturesList features={project.projectReview.optionalFeatures} />
+
+              {/* 7. Features To Remove */}
+              <FeaturesToRemoveList features={project.projectReview.featuresToRemove} />
+
+              {/* 8. Improvement Suggestions */}
+              <ImprovementSuggestionsList suggestions={project.projectReview.improvementSuggestions} />
+
+              {/* 12. Additional reasoning */}
+              {project.projectReview.reasoning && (
+                <div className="bg-neutral-50 border border-neutral-200 rounded-xl p-5 shadow-lg flex flex-col gap-2 transition-all duration-300 hover:border-brand-500/50 glow-blue">
+                  <span className="text-[10px] font-bold tracking-wider uppercase" style={{ color: 'rgba(0, 240, 255, 0.7)' }}>Architect's Reasoning Summary</span>
+                  <p className="text-xs leading-relaxed italic" style={{ color: 'rgba(0, 240, 255, 0.75)' }}>
+                    "{project.projectReview.reasoning}"
+                  </p>
                 </div>
-                <div className="text-[10px] font-bold text-neutral-400 tracking-wider uppercase mt-1">
-                  PROTOTYPE BUILD READINESS
-                </div>
-              </div>
-              
-              <div className="w-32 h-2 bg-neutral-200 rounded-full relative overflow-hidden border border-neutral-200/20">
-                <div 
-                  className={`h-full rounded-full transition-all duration-500 ${
-                    (project.projectReview.feasibilityScore || 5) >= 8 
-                      ? 'bg-emerald-500' 
-                      : (project.projectReview.feasibilityScore || 5) >= 5 
-                        ? 'bg-brand-500' 
-                        : 'bg-red-500'
-                  }`}
-                  style={{ width: `${(project.projectReview.feasibilityScore || 5) * 10}%` }}
-                ></div>
-              </div>
-            </div>
-          </div>
-
-          {/* 2. Problem-Solution Alignment */}
-          <div className="flex flex-col gap-1.5">
-            <span className="text-[10px] font-bold text-neutral-400 tracking-wider uppercase">Problem-Solution Alignment</span>
-            <div className="bg-neutral-50 border border-neutral-200 border-l-4 border-l-emerald-500 rounded-xl p-4">
-              <p className="text-xs text-neutral-600 leading-relaxed">{project.projectReview.problemSolutionAlignment}</p>
-            </div>
-          </div>
-
-          {/* 3. Project Risks */}
-          <div className="flex flex-col gap-1.5">
-            <span className="text-[10px] font-bold text-neutral-400 tracking-wider uppercase">Project Risks</span>
-            <div className="bg-neutral-50 border border-neutral-200 border-l-4 border-l-red-500 rounded-xl p-4">
-              <ul className="list-disc pl-4 flex flex-col gap-2">
-                {project.projectReview.projectRisks?.map((risk, idx) => (
-                  <li key={idx} className="text-xs text-neutral-600 leading-relaxed">{risk}</li>
-                ))}
-              </ul>
-            </div>
-          </div>
-
-          {/* 4. Missing Skills */}
-          <div className="flex flex-col gap-1.5">
-            <span className="text-[10px] font-bold text-neutral-400 tracking-wider uppercase">Missing Skills</span>
-            <div className="bg-neutral-50 border border-neutral-200 border-l-4 border-l-neutral-400 rounded-xl p-4">
-              <ul className="list-disc pl-4 flex flex-col gap-2">
-                {project.projectReview.missingSkills?.map((skill, idx) => (
-                  <li key={idx} className="text-xs text-neutral-600 leading-relaxed">{skill}</li>
-                ))}
-              </ul>
-            </div>
-          </div>
-
-          {/* 5. Must Build Features */}
-          <div className="flex flex-col gap-1.5">
-            <span className="text-[10px] font-bold text-neutral-400 tracking-wider uppercase">Must Build Features (High Priority)</span>
-            <div className="bg-neutral-50 border border-neutral-200 border-l-4 border-l-brand-500 rounded-xl p-4">
-              <ul className="list-disc pl-4 flex flex-col gap-2">
-                {project.projectReview.mustBuildFeatures?.map((feat, idx) => (
-                  <li key={idx} className="text-xs font-semibold text-neutral-850 leading-relaxed">{feat}</li>
-                ))}
-              </ul>
-            </div>
-          </div>
-
-          {/* 6. Optional Features */}
-          <div className="flex flex-col gap-1.5">
-            <span className="text-[10px] font-bold text-neutral-400 tracking-wider uppercase">Optional Features (Nice to Have)</span>
-            <div className="bg-neutral-50 border border-neutral-200 rounded-xl p-4">
-              <ul className="list-disc pl-4 flex flex-col gap-2">
-                {project.projectReview.optionalFeatures?.map((feat, idx) => (
-                  <li key={idx} className="text-xs text-neutral-600 leading-relaxed">{feat}</li>
-                ))}
-              </ul>
-            </div>
-          </div>
-
-          {/* 7. Features To Remove */}
-          <div className="flex flex-col gap-1.5">
-            <span className="text-[10px] font-bold text-neutral-400 tracking-wider uppercase">Features To Remove (Increases Complexity)</span>
-            <div className="bg-neutral-50 border border-neutral-200 border-l-4 border-l-red-350 rounded-xl p-4">
-              {project.projectReview.featuresToRemove && project.projectReview.featuresToRemove.length > 0 ? (
-                <ul className="list-disc pl-4 flex flex-col gap-2">
-                  {project.projectReview.featuresToRemove.map((feat, idx) => (
-                    <li key={idx} className="text-xs text-red-650 leading-relaxed">{feat}</li>
-                  ))}
-                </ul>
-              ) : (
-                <p className="text-xs text-neutral-400 italic">No features recommended for removal.</p>
               )}
             </div>
+
           </div>
 
-          {/* 8. Improvement Suggestions */}
-          <div className="flex flex-col gap-1.5">
-            <span className="text-[10px] font-bold text-neutral-400 tracking-wider uppercase">Improvement Suggestions</span>
-            <div className="bg-neutral-50 border border-neutral-200 rounded-xl p-4">
-              <ul className="list-disc pl-4 flex flex-col gap-2">
-                {project.projectReview.improvementSuggestions?.map((suggestion, idx) => (
-                  <li key={idx} className="text-xs text-neutral-600 leading-relaxed">{suggestion}</li>
-                ))}
-              </ul>
-            </div>
+          {/* 11. System Architecture Validation Full-Width */}
+          <div className="mt-2 animate-slide-up">
+            <ArchitectureValidationList project={project} review={project.projectReview} />
           </div>
 
-          {/* 9. Judge Perspective */}
-          <div className="flex flex-col gap-1.5">
-            <span className="text-[10px] font-bold text-neutral-400 tracking-wider uppercase">Judge Perspective</span>
-            <div className="bg-brand-50/10 border border-brand-500/30 border-l-4 border-l-brand-500 rounded-xl p-4">
-              <p className="text-xs text-neutral-600 leading-relaxed italic">{project.projectReview.judgePerspective}</p>
-            </div>
-          </div>
-
-          {/* 10. Execution Strategy */}
-          <div className="flex flex-col gap-1.5">
-            <span className="text-[10px] font-bold text-neutral-400 tracking-wider uppercase">Execution Strategy</span>
-            <div className="bg-neutral-50 border border-neutral-200 rounded-xl p-4">
-              <ol className="list-decimal pl-4 flex flex-col gap-2">
-                {project.projectReview.executionStrategy?.map((step, idx) => (
-                  <li key={idx} className="text-xs font-semibold text-neutral-700 leading-relaxed">{step}</li>
-                ))}
-              </ol>
-            </div>
-          </div>
-
-          {/* Reasoning */}
-          {project.projectReview.reasoning && (
-            <div className="flex flex-col gap-1.5">
-              <span className="text-[10px] font-bold text-neutral-400 tracking-wider uppercase">Architect Reasoning</span>
-              <div className="bg-neutral-50 border border-neutral-200 rounded-xl p-4">
-                <p className="text-xs text-neutral-600 leading-relaxed">{project.projectReview.reasoning}</p>
-              </div>
-            </div>
-          )}
-
-          <div className="flex gap-3 justify-end mt-4 pt-4 border-t border-neutral-100">
+          <div className="flex gap-3 justify-end mt-4 pt-4 border-t border-neutral-800">
             <button
               type="button"
               onClick={handleRunAnalysis}
               disabled={reviewLoading}
-              className="btn-primary text-xs py-1.5 px-3 cursor-pointer shadow-2xs"
+              className="btn-primary text-xs py-1.5 px-3 cursor-pointer shadow-2xs transition-all hover:scale-[1.02]"
             >
               Regenerate Review
             </button>
             <button
               type="button"
               onClick={() => setView('dashboard')}
-              className="btn-secondary text-xs py-1.5 px-3 cursor-pointer"
+              className="btn-secondary text-xs py-1.5 px-3 cursor-pointer transition-all hover:scale-[1.02]"
             >
               Back
             </button>
@@ -1034,7 +2063,15 @@ const ProjectHub = ({ teamId, initialView }) => {
         return (
           <div className="flex flex-col gap-6 animate-slide-up">
             {/* ═══ Header Banner ═══ */}
-            <div className="relative overflow-hidden rounded-2xl bg-neutral-900 border border-neutral-800 p-6 shadow-lg">
+            <div 
+              className="relative overflow-hidden rounded-2xl p-6 shadow-lg"
+              style={{ 
+                backgroundColor: '#040817', 
+                borderColor: 'rgba(0, 240, 255, 0.25)',
+                borderWidth: '1px',
+                boxShadow: '0 0 20px rgba(0, 240, 255, 0.08)'
+              }}
+            >
               <div className="absolute inset-0 opacity-[0.03]" style={{ backgroundImage: 'radial-gradient(circle, white 1px, transparent 1px)', backgroundSize: '16px 16px' }}></div>
               <div className="absolute -top-10 -right-10 w-48 h-48 bg-purple-500/10 rounded-full blur-3xl"></div>
               <div className="absolute -bottom-10 -left-10 w-40 h-40 bg-indigo-500/10 rounded-full blur-3xl"></div>
@@ -1042,74 +2079,104 @@ const ProjectHub = ({ teamId, initialView }) => {
               <div className="relative z-10 flex flex-col md:flex-row justify-between items-start md:items-center gap-4">
                 <div>
                   <div className="flex items-center gap-2 mb-2">
-                    <span className="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full text-[9px] font-bold uppercase tracking-wider bg-purple-950/50 border border-purple-500/30 text-purple-400">
+                    <span 
+                      className="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full text-[9px] font-bold uppercase tracking-wider border font-mono"
+                      style={{ color: '#c084fc', borderColor: 'rgba(192, 132, 252, 0.25)', backgroundColor: 'rgba(192, 132, 252, 0.08)' }}
+                    >
                       <Cpu size={10} className="animate-pulse" /> AI Agent Intelligence
                     </span>
-                    <span className="text-[10px] font-bold uppercase tracking-[0.2em] text-neutral-500">Task Splitter & Roadmap</span>
+                    <span className="text-[10px] font-bold uppercase tracking-[0.2em] mt-0.5" style={{ color: 'rgba(0, 240, 255, 0.65)' }}>Task Splitter & Roadmap</span>
                   </div>
                   <h2 className="text-xl md:text-2xl font-extrabold text-white tracking-tight">{project.projectName}</h2>
                   {project.taskPlanGeneratedAt && (
-                    <p className="text-[11px] text-neutral-400 mt-1 flex items-center gap-1.5">
+                    <p className="text-[11px] mt-1 flex items-center gap-1.5" style={{ color: 'rgba(0, 240, 255, 0.65)' }}>
                       <Clock size={11} /> Plan generated {new Date(project.taskPlanGeneratedAt).toLocaleString()}
                     </p>
                   )}
                 </div>
                 <div className="flex items-center gap-2 shrink-0 self-stretch md:self-auto justify-end">
                   <button type="button" onClick={() => setView('dashboard')}
-                    className="flex items-center justify-center gap-1 px-3.5 py-2 rounded-lg bg-neutral-900 hover:bg-neutral-855 text-neutral-400 hover:text-white text-xs font-semibold cursor-pointer border border-neutral-800 transition-all duration-200">
+                    className="btn-secondary text-xs px-3.5 py-2 rounded-lg transition-all duration-200 hover:scale-[1.02] shadow-sm flex items-center justify-center gap-1 cursor-pointer"
+                  >
                     <ArrowLeft size={13} /> Back
                   </button>
                   <button type="button" onClick={handleRegenerateTaskPlan} disabled={splitterLoading}
-                    className="flex items-center justify-center gap-1.5 px-3.5 py-2 rounded-lg bg-neutral-850 hover:bg-neutral-800 text-white text-xs font-semibold cursor-pointer border border-neutral-700 transition-all duration-200 disabled:opacity-50">
+                    className="btn-secondary text-xs px-3.5 py-2 rounded-lg transition-all duration-200 disabled:opacity-50 hover:scale-[1.02] shadow-sm flex items-center justify-center gap-1.5 cursor-pointer"
+                  >
                     {splitterLoading ? <RefreshCw className="animate-spin text-purple-400" size={13} /> : <RefreshCw size={13} />} Regenerate Plan
                   </button>
                 </div>
               </div>
 
               {/* Progress Summary Track */}
-              <div className="relative z-10 mt-6 pt-5 border-t border-neutral-850 flex flex-col md:flex-row md:items-center gap-4">
+              <div 
+                className="relative z-10 mt-6 pt-5 border-t flex flex-col md:flex-row md:items-center gap-4"
+                style={{ borderColor: 'rgba(0, 240, 255, 0.15)' }}
+              >
                 <div className="flex-1">
                   <div className="flex justify-between items-center mb-1.5">
-                    <span className="text-[10px] font-bold text-neutral-400 uppercase tracking-widest">Aggregate Completion Scope</span>
+                    <span className="text-[10px] font-bold uppercase tracking-widest" style={{ color: 'rgba(0, 240, 255, 0.75)' }}>Aggregate Completion Scope</span>
                     <span className="text-xs font-black text-white font-mono">{completionPct}%</span>
                   </div>
-                  <div className="h-2.5 bg-neutral-850 rounded-full overflow-hidden p-[2px] border border-neutral-800">
+                  <div className="h-2.5 rounded-full overflow-hidden p-[2px] border border-neutral-200" style={{ backgroundColor: 'rgba(0, 240, 255, 0.08)' }}>
                     <div className="h-full bg-gradient-to-r from-purple-500 via-violet-500 to-indigo-500 rounded-full transition-all duration-1000 ease-out shadow-[0_0_12px_rgba(124,58,237,0.45)]" style={{ width: `${completionPct}%` }}></div>
                   </div>
                 </div>
-                <div className="flex items-center gap-3 bg-neutral-950/40 border border-neutral-850 rounded-xl px-4 py-2 shrink-0">
-                  <Activity size={14} className="text-emerald-400 animate-pulse" />
+                <div 
+                  className="flex items-center gap-3 border rounded-xl px-4 py-2 shrink-0 shadow-sm"
+                  style={{ backgroundColor: 'rgba(0, 240, 255, 0.04)', borderColor: 'rgba(0, 240, 255, 0.15)' }}
+                >
+                  <Activity size={14} className="animate-pulse" style={{ color: '#10b981' }} />
                   <div className="text-left">
-                    <div className="text-xs font-black text-white leading-none">{completedCount} <span className="text-neutral-500 font-normal">/ {allAssigned.length}</span></div>
-                    <span className="text-[9px] font-bold text-neutral-550 uppercase tracking-wider mt-0.5">Tasks Completed</span>
+                    <div className="text-xs font-black text-white leading-none">
+                      {completedCount} <span className="font-normal" style={{ color: 'rgba(0, 240, 255, 0.5)' }}>/ {allAssigned.length}</span>
+                    </div>
+                    <span className="text-[9px] font-bold uppercase tracking-wider mt-0.5 block" style={{ color: 'rgba(0, 240, 255, 0.7)' }}>Tasks Completed</span>
                   </div>
                 </div>
               </div>
             </div>
 
             {/* ═══ Navigation Tabs ═══ */}
-            <div className="flex border-b border-neutral-200/80 gap-1 p-1 bg-neutral-100/60 rounded-xl overflow-x-auto scrollbar-none">
+            <div 
+              className="flex border-b gap-1 p-1 rounded-xl overflow-x-auto scrollbar-none"
+              style={{ 
+                backgroundColor: 'rgba(0, 240, 255, 0.03)', 
+                borderColor: 'rgba(0, 240, 255, 0.15)' 
+              }}
+            >
               {[
-                { id: 'roadmap', label: 'Roadmap Timeline', icon: GitBranch, color: 'text-purple-600 bg-purple-50/80' },
-                { id: 'team', label: 'Team Workload', icon: Users, color: 'text-blue-600 bg-blue-50/80' },
-                { id: 'tasks', label: 'Task Checklist', icon: ListTodo, color: 'text-emerald-600 bg-emerald-50/80' },
-                { id: 'insights', label: 'MVP Focus & Risks', icon: Target, color: 'text-amber-600 bg-amber-50/80' },
-                { id: 'marketplace', label: 'Task Marketplace', icon: ShoppingBag, color: 'text-indigo-600 bg-indigo-50/80' },
+                { id: 'roadmap', label: 'Roadmap Timeline', icon: GitBranch },
+                { id: 'team', label: 'Team Workload', icon: Users },
+                { id: 'tasks', label: 'Task Checklist', icon: ListTodo },
+                { id: 'insights', label: 'MVP Focus & Risks', icon: Target },
+                { id: 'marketplace', label: 'Task Marketplace', icon: ShoppingBag },
               ].map((tab) => {
                 const Icon = tab.icon;
                 const isActive = activeTaskPlanTab === tab.id;
+                const activeColors = {
+                  roadmap: '#c084fc',
+                  team: '#60a5fa',
+                  tasks: '#34d399',
+                  insights: '#fbbf24',
+                  marketplace: '#818cf8'
+                };
                 return (
                   <button
                     key={tab.id}
                     type="button"
                     onClick={() => setActiveTaskPlanTab(tab.id)}
-                    className={`flex items-center gap-2 px-4 py-2 text-xs font-bold uppercase tracking-wider rounded-lg transition-all duration-200 cursor-pointer shrink-0 ${
-                      isActive 
-                        ? 'bg-white text-neutral-900 shadow-xs border border-neutral-200/60 font-black' 
-                        : 'text-neutral-550 hover:text-neutral-800'
-                    }`}
+                    className="flex items-center gap-2 px-4 py-2 text-xs font-bold uppercase tracking-wider rounded-lg transition-all duration-200 cursor-pointer shrink-0 border"
+                    style={{
+                      backgroundColor: isActive ? 'rgba(0, 240, 255, 0.08)' : 'transparent',
+                      borderColor: isActive ? 'rgba(0, 240, 255, 0.4)' : 'transparent',
+                      color: isActive ? '#ffffff' : 'rgba(0, 240, 255, 0.55)'
+                    }}
                   >
-                    <Icon size={13} className={isActive ? tab.color.split(' ')[0] : 'text-neutral-450'} />
+                    <Icon 
+                      size={13} 
+                      style={{ color: isActive ? activeColors[tab.id] : 'rgba(0, 240, 255, 0.45)' }} 
+                    />
                     <span>{tab.label}</span>
                   </button>
                 );
@@ -1223,7 +2290,7 @@ const ProjectHub = ({ teamId, initialView }) => {
                               cy="50"
                               r="38"
                               fill="transparent"
-                              stroke="#f1f5f9"
+                              stroke="rgba(0, 240, 255, 0.08)"
                               strokeWidth="8.5"
                             />
                             {/* Segment Circles */}

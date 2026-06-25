@@ -171,9 +171,12 @@ label:hover {
 }
 
 .glow-blue {
-  @apply hover:shadow-md;
-  hover: border-color: #00f0ff !important;
-  hover: box-shadow: 0 0 20px rgba(0, 240, 255, 0.3) !important;
+  transition: all 0.2s ease;
+}
+
+.glow-blue:hover {
+  border-color: #00f0ff !important;
+  box-shadow: 0 0 20px rgba(0, 240, 255, 0.3) !important;
 }
 
 /* Page Containers */
@@ -686,7 +689,7 @@ textarea:focus {
 }
 
 /* Extra overrides for specific UI components with white backgrounds inside cards */
-.px-2.py-0.5.text-\[11px\].font-medium.bg-white,
+.px-2.py-0\.5.text-\[11px\].font-medium.bg-white,
 .px-3.py-1.text-xs.font-bold.bg-white,
 [class*="group-hover:text-"],
 [class*="group-hover:border-"] {

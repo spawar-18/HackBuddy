@@ -103,8 +103,12 @@ exports.joinTeam = async (req, res) => {
 // @access  Private
 exports.getMyTeams = async (req, res) => {
   try {
-    // Return all teams where current user exists in members array
-    const teams = await Team.find({ members: req.user.id });
+    const fs = require('fs');
+    fs.appendFileSync('persistent_calls.log', `[${new Date().toISOString()}] getMyTeams called by user: ${req.user.id}\n`);
+    console.log('[DEBUG] getMyTeams called by user:', req.user.id);
+    // Return all teams where current user exists in members array, populating member profiles
+    const teams = await Team.find({ members: req.user.id }).populate('members', 'name email skills avatar');
+    console.log('[DEBUG] getMyTeams found teams:', teams.map(t => ({ id: t._id, name: t.teamName })));
     res.status(200).json(teams);
   } catch (error) {
     console.error('getMyTeams error:', error);

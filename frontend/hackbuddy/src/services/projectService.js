@@ -304,3 +304,58 @@ export const markNotificationsAsRead = async (projectId) => {
   const response = await api.post(`/projects/${projectId}/hackathon/notifications/read`);
   return response.data;
 };
+
+/**
+ * Connects a GitHub repository to a project.
+ * @param {string} projectId 
+ * @param {Object} data - { owner, repository, defaultBranch, repositoryUrl }
+ */
+export const connectGitHubRepository = async (projectId, data) => {
+  const response = await api.post(`/projects/${projectId}/hackathon/github/connect`, data);
+  return response.data;
+};
+
+/**
+ * Disconnects a GitHub repository from a project.
+ * @param {string} projectId 
+ */
+export const disconnectGitHubRepository = async (projectId) => {
+  const response = await api.delete(`/projects/${projectId}/hackathon/github/disconnect`);
+  return response.data;
+};
+
+/**
+ * Gets repository sync and commit analytics.
+ * @param {string} projectId 
+ */
+export const getRepositoryAnalytics = async (projectId) => {
+  const response = await api.get(`/projects/${projectId}/hackathon/github/analytics`);
+  return response.data;
+};
+
+/**
+ * Performs manual synchronization of repository data.
+ * @param {string} projectId 
+ */
+export const manualSyncRepository = async (projectId) => {
+  const response = await api.post(`/projects/${projectId}/hackathon/github/sync`);
+  return response.data;
+};
+
+/**
+ * Triggers AI repo structure and quality analysis.
+ * @param {string} projectId 
+ */
+export const triggerGitHubAIAnalysis = async (projectId) => {
+  const response = await api.post(`/projects/${projectId}/hackathon/github/analyze`);
+  return response.data;
+};
+
+/**
+ * Gets AI task alignment reality check assessment.
+ * @param {string} projectId 
+ */
+export const getProjectRealityCheck = async (projectId) => {
+  const response = await api.get(`/projects/${projectId}/hackathon/github/reality-check`);
+  return response.data;
+};

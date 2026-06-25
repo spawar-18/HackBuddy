@@ -154,7 +154,7 @@ const MockUserModel = {
 // Export a Proxy that dynamically switches between MongoDB and local in-memory DB
 const ModelProxy = new Proxy(MongoUser, {
   get(target, prop) {
-    if (mongoose.connection.readyState === 1) {
+    if (process.env.MONGO_URI || mongoose.connection.readyState === 1) {
       return Reflect.get(target, prop);
     }
     // If not connected to MongoDB, redirect target model calls to the mock database
@@ -164,7 +164,7 @@ const ModelProxy = new Proxy(MongoUser, {
     return Reflect.get(target, prop);
   },
   construct(target, argumentsList) {
-    if (mongoose.connection.readyState === 1) {
+    if (process.env.MONGO_URI || mongoose.connection.readyState === 1) {
       return Reflect.construct(target, argumentsList);
     }
     return new MockUserInstance(argumentsList[0] || {});

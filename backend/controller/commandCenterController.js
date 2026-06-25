@@ -353,26 +353,26 @@ exports.getCommandCenterDashboard = async (req, res) => {
 
     if (config.status === 'Running') {
       if (hoursRemaining <= 1) {
-        alerts.push({ message: '🚨 1 Hour Remaining: Code freeze recommended immediately. Clean up presentation and dry-run slides!', priority: 'Critical' });
+        alerts.push({ message: '🚨 1 Hour Remaining: Code freeze recommended immediately. Clean up presentation and dry-run slides!', priority: 'Critical', timestamp: new Date() });
       } else if (hoursRemaining <= 3) {
-        alerts.push({ message: '🚨 3 Hours Remaining: Stop feature development! Focus purely on staging deployments and presentation structure.', priority: 'Critical' });
+        alerts.push({ message: '🚨 3 Hours Remaining: Stop feature development! Focus purely on staging deployments and presentation structure.', priority: 'Critical', timestamp: new Date() });
       } else if (hoursRemaining <= 6) {
-        alerts.push({ message: '⚠️ 6 Hours Remaining: Lock your feature scope. Stop adding Nice-to-Have tools, focus on testing.', priority: 'High' });
+        alerts.push({ message: '⚠️ 6 Hours Remaining: Lock your feature scope. Stop adding Nice-to-Have tools, focus on testing.', priority: 'High', timestamp: new Date() });
       } else if (hoursRemaining <= 12) {
-        alerts.push({ message: '⚠️ 12 Hours Remaining: Deployment should begin soon to identify host container / database binding issues early.', priority: 'High' });
+        alerts.push({ message: '⚠️ 12 Hours Remaining: Deployment should begin soon to identify host container / database binding issues early.', priority: 'High', timestamp: new Date() });
       } else if (hoursRemaining <= 24) {
-        alerts.push({ message: '💡 24 Hours Remaining: Midpoint check-in. Review pending Critical path tasks and reallocate workloads.', priority: 'Medium' });
+        alerts.push({ message: '💡 24 Hours Remaining: Midpoint check-in. Review pending Critical path tasks and reallocate workloads.', priority: 'Medium', timestamp: new Date() });
       }
     }
 
     // Smart Alerts from task metrics
     if (criticalTasksTotal - criticalTasksCompleted > 0 && hoursRemaining <= 12) {
-      alerts.push({ message: `⚠️ There are still ${criticalTasksTotal - criticalTasksCompleted} critical path tasks pending with 12h or less remaining!`, priority: 'High' });
+      alerts.push({ message: `⚠️ There are still ${criticalTasksTotal - criticalTasksCompleted} critical path tasks pending with 12h or less remaining!`, priority: 'High', timestamp: new Date() });
     }
 
     // Blocked tasks alerts
     if (blockedTasks > 0) {
-      alerts.push({ message: `🚫 Stalled progress: ${blockedTasks} tasks are currently marked as "Blocked". Resolve immediately!`, priority: 'High' });
+      alerts.push({ message: `🚫 Stalled progress: ${blockedTasks} tasks are currently marked as "Blocked". Resolve immediately!`, priority: 'High', timestamp: new Date() });
     }
 
     // Check workload balance
@@ -391,7 +391,7 @@ exports.getCommandCenterDashboard = async (req, res) => {
     let teamHealth = 'Balanced';
     if (maxLoad - minLoad > 5) {
       teamHealth = 'High Risk';
-      alerts.push({ message: `⚠️ Workload Imbalance: ${overloadedMember} is carrying an overloaded task load (${maxLoad} pending) compared to others.`, priority: 'High' });
+      alerts.push({ message: `⚠️ Workload Imbalance: ${overloadedMember} is carrying an overloaded task load (${maxLoad} pending) compared to others.`, priority: 'High', timestamp: new Date() });
     } else if (maxLoad - minLoad > 3) {
       teamHealth = 'Moderately Balanced';
     }

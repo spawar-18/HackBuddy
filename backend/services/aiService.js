@@ -330,6 +330,41 @@ const cleanAndParseProjectReview = (responseText) => {
  * @returns {object} Mock review
  */
 const generateMockProjectReview = (projectContextString) => {
+  // Extract hours from the context string (e.g., "Duration: 24 hours")
+  const durationMatch = (projectContextString || '').match(/Duration:\s*(\d+)\s*hours?/i) || (projectContextString || '').match(/Duration:\s*(\d+)/i);
+  const hours = durationMatch ? parseInt(durationMatch[1], 10) : 24;
+
+  let executionStrategy = [];
+  if (hours <= 12) {
+    executionStrategy = [
+      '1. Setup minimal database schemas and mockup endpoints immediately.',
+      '2. Develop the absolute core feature flow on frontend and backend (freeze optional features).',
+      '3. Deploy to production early (e.g. within 6 hours) to test hosting connectivity.',
+      '4. Polish key presentation views and record a backup demo walkthrough.'
+    ];
+  } else if (hours <= 24) {
+    executionStrategy = [
+      '1. Database & Route Setup: Build schemas and core REST APIs (first 4 hours).',
+      '2. AI Service Hookup: Connect LLM APIs and set up parser/repaired JSON parsing (hours 4-10).',
+      '3. UI Development: Build responsive dashboard panels, lists, and loading indicators (hours 10-18).',
+      '4. Integration, Testing, Deployment and demo pitch rehearsals (final 6 hours).'
+    ];
+  } else if (hours <= 48) {
+    executionStrategy = [
+      '1. Architecture Design & Setup: Establish DB schemas, routers, and test files (first 8 hours).',
+      '2. Core API & State Sync: Implement complete controllers, team sync hooks, and validations (hours 8-20).',
+      '3. Frontend Assembly & Custom Styling: Design premium glassmorphism layouts, lists, and forms (hours 20-36).',
+      '4. Rigorous manual testing, deployments, git-sync verification, and demo day slide preparation (final 12 hours).'
+    ];
+  } else {
+    executionStrategy = [
+      '1. Specification & Framework Setup: Complete database schema designs and REST routes architectures (Day 1).',
+      '2. Feature Implementation Phase: Implement APIs, backend services, and front-end interface layouts (Day 2).',
+      '3. Verification & Optimization: Establish automated task verifiers, performance metrics, and caching (Day 3).',
+      '4. Deployment, styling polish, and extensive judge-day presentation rehearsal (Day 4/Final).'
+    ];
+  }
+
   return {
     feasibilityScore: 8.5,
     problemSolutionAlignment: 'The proposed solution aligns strongly with the problem of hackathon scope inflation. The core features address the key pain points directly, but the technical scope is slightly high for the duration.',
@@ -360,12 +395,7 @@ const generateMockProjectReview = (projectContextString) => {
     ],
     reasoning: 'The technical blueprint is highly structured, and the team members possess strong full-stack skills. Postponing high-overhead features will guarantee a successful working prototype.',
     judgePerspective: 'Judges will prioritize a functional end-to-end user loop. Avoid displaying too many disabled features on the UI during demo day.',
-    executionStrategy: [
-      '1. Map schema changes in the database model.',
-      '2. Implement POST /api/projects/:projectId/analyze route with auto-invalidation.',
-      '3. Integrate frontend triggers, loading states, and custom result cards.',
-      '4. Verify correct rendering under both success and mock-fallback states.'
-    ]
+    executionStrategy
   };
 };
 
@@ -407,6 +437,7 @@ Rules:
 * Think like a hackathon judge.
 * Think like a technical architect.
 * Think like a mentor helping the team maximize impact.
+* Tailor the "executionStrategy" list steps to the specified "Duration". If the duration is 24 hours, 36 hours, or 48 hours, output hourly milestone phases (e.g., "Hours 0-8: ...", "Hours 8-16: ...", "Hours 16-24: ...") instead of Days. Only use Day-based milestones (e.g., "Day 1", "Day 2") if the duration is 72 hours (3 days) or longer.
 * Return JSON only.
 
 Required Format:
@@ -1391,6 +1422,41 @@ const generateMockCommandCenterReport = (context) => {
   else if (pct < 50) { overallStatus = 'Slightly Behind'; riskLevel = 'Medium'; }
   else if (pct >= 80) { overallStatus = 'Ready For Demo'; }
 
+  // Extract hours left to adapt the execution strategy dynamically
+  const hoursLeftMatch = (timeRemaining || '').match(/(\d+)/);
+  const hoursLeft = hoursLeftMatch ? parseInt(hoursLeftMatch[1], 10) : 24;
+
+  let executionStrategy = [];
+  if (hoursLeft <= 6) {
+    executionStrategy = [
+      'CRITICAL FREEZE: Implement absolutely no new features. Fix critical path bugs only.',
+      'Demo Deployment: Deploy current stable branch to Vercel/Render immediately.',
+      'Dry Run: Test the end-to-end user loop 3 times. Record a fallback video.',
+      'Pitch Prep: Focus on problem statement impact and live demo setup.'
+    ];
+  } else if (hoursLeft <= 12) {
+    executionStrategy = [
+      'Feature Freeze: Lock features and focus on database and API integration.',
+      'Integration & Testing: Test API connectivity and mock fallback database connections.',
+      'Basic Deployment: Build production bundles and deploy early version to staging.',
+      'UI Refinement: Polishing alignments, styles, and dashboard metrics.'
+    ];
+  } else if (hoursLeft <= 24) {
+    executionStrategy = [
+      'Backend MVP Completion: Finalize database controllers and github API services.',
+      'Frontend Layout & Hook Integration: Bind API endpoints to client components.',
+      'Core Feature Validation: Verify automated task parsing and consensus rules.',
+      'Freeze, Polish & Pitch Prep: Clean up code and prepare pitch materials.'
+    ];
+  } else {
+    executionStrategy = [
+      'Core Architecting: Finalize database models, router endpoints, and third-party integrations.',
+      'Iterative Building: Team splits tasks across database, APIs, and React interfaces.',
+      'Testing & Verification: Set up unit tests, code verification scripts, and lint checkups.',
+      'Polish & UI Refinements: Polish UI micro-animations, glassmorphism transitions, and demo slides.'
+    ];
+  }
+
   return {
     overallStatus,
     riskLevel,
@@ -1417,7 +1483,8 @@ const generateMockCommandCenterReport = (context) => {
       'Demonstrate a working end-to-end user flow, not just individual features',
       'Prepare answers for: "Why this approach?" and "What would you build next?"',
       'Have a backup demo video in case of live demo technical issues',
-    ]
+    ],
+    executionStrategy
   };
 };
 
@@ -1476,7 +1543,8 @@ Required Format:
   "currentFocus": ["string", "string", "string"],
   "tasksToPostpone": ["string"],
   "reasoning": "string (2-3 sentences explaining the assessment)",
-  "judgePreparationTips": ["string", "string", "string"]
+  "judgePreparationTips": ["string", "string", "string"],
+  "executionStrategy": ["string (step-by-step strategy adapted to the time remaining and hackathon configuration)"]
 }`;
 
   const cleanAndParseCommandCenterReport = (responseText) => {
@@ -1501,6 +1569,7 @@ Required Format:
     if (!Array.isArray(parsed.tasksToPostpone)) parsed.tasksToPostpone = [];
     if (!parsed.reasoning) parsed.reasoning = '';
     if (!Array.isArray(parsed.judgePreparationTips)) parsed.judgePreparationTips = [];
+    if (!Array.isArray(parsed.executionStrategy)) parsed.executionStrategy = [];
     return parsed;
   };
 
@@ -1568,6 +1637,273 @@ Required Format:
   return generateMockCommandCenterReport(context);
 };
 
+/**
+ * Clean up and parse the AI repository analysis response text as JSON.
+ * @param {string} responseText - Text returned by the model
+ * @returns {object} Parsed JSON analysis
+ */
+const cleanAndParseRepoAnalysis = (responseText) => {
+  const stripped = stripThinkTags(responseText);
+  const firstBrace = stripped.indexOf('{');
+  if (firstBrace === -1) {
+    throw new Error('No JSON object found in repo analysis AI response');
+  }
+  let cleanText = stripped.substring(firstBrace);
+  const lastBrace = cleanText.lastIndexOf('}');
+  if (lastBrace !== -1) {
+    cleanText = cleanText.substring(0, lastBrace + 1);
+  }
+
+  let parsed;
+  try {
+    parsed = JSON.parse(cleanText.trim());
+  } catch (err) {
+    try {
+      const repaired = repairTruncatedJson(cleanText.trim());
+      parsed = JSON.parse(repaired);
+    } catch (e) {
+      console.error('Failed to parse AI repository analysis response as JSON even after repair. Raw response:', responseText);
+      throw new Error('Invalid AI JSON response for repository analysis');
+    }
+  }
+
+  // Ensure all keys required by UI exist
+  if (!parsed.repositoryHealth) parsed.repositoryHealth = 'Healthy';
+  if (!parsed.developmentStatus) parsed.developmentStatus = 'Active';
+  if (!parsed.documentationStatus) parsed.documentationStatus = 'Good';
+  if (!parsed.testingStatus) parsed.testingStatus = 'No tests detected';
+  if (!parsed.deploymentStatus) parsed.deploymentStatus = 'Missing configuration';
+  if (!Array.isArray(parsed.inactiveMembers)) parsed.inactiveMembers = [];
+  if (!Array.isArray(parsed.missingComponents)) parsed.missingComponents = [];
+  if (!Array.isArray(parsed.repositoryWarnings)) parsed.repositoryWarnings = [];
+  if (!Array.isArray(parsed.recommendations)) parsed.recommendations = [];
+  if (!parsed.reasoning) parsed.reasoning = 'No reasoning summary provided.';
+
+  return parsed;
+};
+
+/**
+ * Generate a context-aware fallback repository analysis if keys are missing/failed.
+ */
+const generateFallbackRepoAnalysis = (context) => {
+  const { healthStatus, healthScore, hasReadme, hasTestFiles, hasDeployment } = context;
+  return {
+    repositoryHealth: healthStatus || 'Healthy',
+    developmentStatus: 'Active',
+    documentationStatus: hasReadme ? 'Good (README found)' : 'Missing README',
+    testingStatus: hasTestFiles ? 'Tests detected' : 'No tests found',
+    deploymentStatus: hasDeployment ? 'Deployment configured' : 'Missing configuration',
+    inactiveMembers: [],
+    missingComponents: [],
+    repositoryWarnings: [
+      !hasReadme && 'README file is missing from repository.',
+      !hasTestFiles && 'No test files detected in repository tree.',
+      !hasDeployment && 'No deployment configurations found (Dockerfile, vercel.json, etc.).'
+    ].filter(Boolean),
+    recommendations: [
+      'Set up a solid README to guide pitch judges.',
+      'Add test scripts and setup a basic test suite to improve score.',
+      'Configure production deployment setups early to prevent late delivery issues.'
+    ],
+    reasoning: 'Repository scanned successfully. Computed metrics based on repository metadata and file indicators.'
+  };
+};
+
+/**
+ * Analyzes repository structure, README, package.json dependencies, and code files using Qwen/Gemini.
+ * Performs a code-aware assessment of feature completeness and member contributions.
+ * @param {object} context - Repository and project context details
+ * @returns {Promise<object>} Structured repository analysis
+ */
+const analyzeGitHubRepositoryWithAI = async (context) => {
+  const qwenKey = process.env.QWEN_API;
+  const qwenBaseUrl = process.env.QWEN_BASE_URL || 'https://api.featherless.ai/v1';
+  const openRouterKey = process.env.OPENROUTER_API_KEY;
+
+  const {
+    projectDetails,
+    finalTechStack,
+    taskPlan,
+    timeRemaining,
+    commitSummary,
+    contributors,
+    languages,
+    hasReadme,
+    hasTestFiles,
+    hasDeployment,
+    healthScore,
+    healthStatus,
+    completedTasks,
+    totalTasks,
+    previousAiRecommendations,
+    tree = [],
+    readmeContent = '',
+    packageJsonContent = '',
+    entrypointCodeContents = []
+  } = context;
+
+  // Format file structure
+  const formattedTree = tree
+    .map(f => `- ${f.path} (${f.type === 'tree' ? 'Directory' : 'File'})`)
+    .slice(0, 150)
+    .join('\n') || 'No file tree cached';
+
+  // Format code snippets
+  const formattedCodeSnippets = (entrypointCodeContents || [])
+    .map(file => `### File: ${file.path}\n\`\`\`\n${file.content}\n\`\`\``)
+    .join('\n\n') || 'No code snippets fetched';
+
+  // Format languages
+  const formattedLanguages = Object.entries(languages || {})
+    .map(([lang, bytes]) => `${lang}: ${bytes} bytes`)
+    .join(', ') || 'Unknown';
+
+  // Format contributors
+  const formattedContributors = (contributors || [])
+    .map(c => `- ${c.name} (${c.commits || 0} commits, ${c.percentage || 0}%)`)
+    .join('\n') || 'None';
+
+  // Format task assignments
+  const assignments = taskPlan?.assignments || [];
+  const formattedTasks = assignments
+    .map(a => `- Member: ${a.member}\n  Assigned Tasks: ${(a.assignedTasks || []).map(t => `[${t.status}] ${t.task}`).join(', ')}`)
+    .join('\n') || 'No tasks assigned';
+
+  const prompt = `You are HackBuddy Repository Intelligence Analyzer.
+You act as a senior software architect, technical reviewer, and hackathon mentor.
+Your goal is to parse the connected repository structure, dependencies, README, and code contents to determine the exact state of implementation.
+
+Compare the planned task lists, user requirements, and technical scope against what is ACTUALLY in the repository.
+
+INPUTS:
+1. PROJECT DESCRIPTION:
+- Name: ${projectDetails?.projectName || 'N/A'}
+- Problem Statement: ${projectDetails?.problemStatement || 'N/A'}
+- Features To Build: ${(projectDetails?.featuresToBuild || []).join(', ') || 'N/A'}
+- Planned Tech Stack: ${JSON.stringify(finalTechStack || {})}
+
+2. TEAM & TASK PLAN STATUS:
+- Tasks & Statuses:
+${formattedTasks}
+- Scheduled Duration / Progress: ${completedTasks}/${totalTasks} tasks completed. Time remaining: ${timeRemaining}
+
+3. GIT HUB METRICS & REPO HEALTH:
+- Languages: ${formattedLanguages}
+- Contributor Commits:
+${formattedContributors}
+- Raw Health Indicators: README present: ${hasReadme}, Tests present: ${hasTestFiles}, Deployment Config: ${hasDeployment}
+
+4. FILE STRUCTURE & TREE (MAX 150 files):
+${formattedTree}
+
+5. PACKAGE DEPENDENCIES (package.json contents):
+${packageJsonContent || 'package.json not detected'}
+
+6. README FILE CONTENT:
+${readmeContent || 'README.md not detected or empty'}
+
+7. KEY ENTRYPOINT CODE SNIPPETS:
+${formattedCodeSnippets}
+
+EVALUATION DIRECTIONS:
+1. Examine if the technologies in package.json/code match the finalTechStack and features.
+2. Determine which features or components from the "Features To Build" list are missing based on the file tree and code snippets (put them in "missingComponents").
+3. Determine if any team member is "inactive" in the repository (e.g. they are assigned tasks in the task plan, but have 0 commits/contributions in the contributor summary list). Add their names to the "inactiveMembers" array.
+4. Detect specific warnings (e.g., repository has no commits from a member, no tests, missing environment config, API keys committed in code, no deployment configs, or no commits in the last 12 hours).
+5. Generate repositoryHealth: "Excellent", "Healthy", "Needs Attention", or "Critical".
+6. Generate developmentStatus: "Active", "Slow Progress", "Stalled", or "Ready For Demo".
+7. Provide documentationStatus (e.g., "Good README", "Incomplete docs"), testingStatus (e.g., "Jest configured", "No tests found"), and deploymentStatus (e.g., "Vercel configured", "Missing config").
+8. Provide actionable technical recommendations and a reasoning summary.
+
+You MUST respond ONLY with a valid JSON object in this exact format, with no other text, markdown wrapper, or thinking tags:
+{
+  "repositoryHealth": "Excellent" | "Healthy" | "Needs Attention" | "Critical",
+  "developmentStatus": "Active" | "Slow Progress" | "Stalled" | "Ready For Demo",
+  "documentationStatus": "string",
+  "testingStatus": "string",
+  "deploymentStatus": "string",
+  "inactiveMembers": ["string"],
+  "missingComponents": ["string"],
+  "repositoryWarnings": ["string"],
+  "recommendations": ["string"],
+  "reasoning": "string"
+}
+`;
+
+  // Parse helper
+  const parseResult = (responseText) => {
+    return cleanAndParseRepoAnalysis(responseText);
+  };
+
+  // 1. Try OpenRouter
+  if (openRouterKey) {
+    try {
+      console.log('Attempting AI repository analysis via OpenRouter (OPENROUTER_API_KEY)...');
+      const openrouter = new OpenAI({
+        baseURL: 'https://openrouter.ai/api/v1',
+        apiKey: openRouterKey,
+        timeout: 45000,
+        defaultHeaders: {
+          'HTTP-Referer': 'http://localhost:3000',
+          'X-Title': 'HackBuddy',
+        }
+      });
+
+      const response = await openrouter.chat.completions.create({
+        model: OPENROUTER_MODEL,
+        messages: [
+          { role: 'system', content: 'You are a JSON-only API. Respond with raw JSON only. No explanations, no markdown, no thinking.' },
+          { role: 'user', content: prompt }
+        ],
+        temperature: 0,
+        top_p: 0.1,
+        max_tokens: 2000,
+      });
+
+      const responseText = response.choices[0]?.message?.content || '';
+      return parseResult(responseText);
+    } catch (err) {
+      console.error('OpenRouter repository analysis failed:', err.message || err);
+      console.log('Falling back to Qwen for repository analysis...');
+    }
+  }
+
+  // 2. Try Qwen
+  if (qwenKey) {
+    try {
+      console.log(`Attempting AI repository analysis via Qwen at ${qwenBaseUrl}...`);
+      const qwenClient = new OpenAI({
+        baseURL: qwenBaseUrl,
+        apiKey: qwenKey,
+        timeout: 25000,
+        defaultHeaders: {
+          'HTTP-Referer': 'http://localhost:3000',
+          'X-Title': 'HackBuddy',
+        }
+      });
+
+      const response = await qwenClient.chat.completions.create({
+        model: 'Qwen/Qwen3.6-35B-A3B',
+        messages: [
+          { role: 'system', content: 'You are a JSON-only API. Respond with raw JSON only. No explanations, no markdown, no thinking.' },
+          { role: 'user', content: prompt }
+        ],
+        temperature: 0,
+        top_p: 0.1,
+        max_tokens: 2000,
+      });
+
+      const responseText = response.choices[0]?.message?.content || '';
+      return parseResult(responseText);
+    } catch (err) {
+      console.error('Qwen repository analysis failed:', err.message || err);
+    }
+  }
+
+  console.warn('WARNING: No AI keys available. Generating fallback analysis.');
+  return generateFallbackRepoAnalysis(context);
+};
+
 module.exports = {
   analyzeTeamWithAI,
   analyzeProjectWithAI,
@@ -1575,6 +1911,7 @@ module.exports = {
   generateTaskPlanWithAI,
   getMarketplaceRecommendation,
   analyzeTechStackWithAI,
-  analyzeHackathonCommandCenterWithAI
+  analyzeHackathonCommandCenterWithAI,
+  analyzeGitHubRepositoryWithAI
 };
 

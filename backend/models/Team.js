@@ -204,7 +204,7 @@ const MockTeamModel = {
 
 const ModelProxy = new Proxy(MongoTeam, {
   get(target, prop) {
-    if (mongoose.connection.readyState === 1) {
+    if (process.env.MONGO_URI || mongoose.connection.readyState === 1) {
       return Reflect.get(target, prop);
     }
     if (prop in MockTeamModel) {
@@ -213,7 +213,7 @@ const ModelProxy = new Proxy(MongoTeam, {
     return Reflect.get(target, prop);
   },
   construct(target, argumentsList) {
-    if (mongoose.connection.readyState === 1) {
+    if (process.env.MONGO_URI || mongoose.connection.readyState === 1) {
       return Reflect.construct(target, argumentsList);
     }
     return createMockTeamInstance(argumentsList[0] || {});

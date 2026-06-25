@@ -253,7 +253,7 @@ const MockProjectModel = {
 
 const ModelProxy = new Proxy(MongoProject, {
   get(target, prop) {
-    if (mongoose.connection.readyState === 1) {
+    if (process.env.MONGO_URI || mongoose.connection.readyState === 1) {
       return Reflect.get(target, prop);
     }
     if (prop in MockProjectModel) {
@@ -262,7 +262,7 @@ const ModelProxy = new Proxy(MongoProject, {
     return Reflect.get(target, prop);
   },
   construct(target, argumentsList) {
-    if (mongoose.connection.readyState === 1) {
+    if (process.env.MONGO_URI || mongoose.connection.readyState === 1) {
       return Reflect.construct(target, argumentsList);
     }
     return createMockProjectInstance(argumentsList[0] || {});

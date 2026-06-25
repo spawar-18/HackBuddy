@@ -1,14 +1,21 @@
 Successfully connected to MongoDB Atlas
+Successfully connected to MongoDB Atlas
 Server is running on port 5000
-Regenerating AI Task Plan for project: Splitr...
-Attempting AI task plan generation via OpenRouter (OPENROUTER_API_KEY)...
-OpenRouter task plan raw response length: 8471 chars
-Task plan response after stripping think tags (first 300 chars): {
-  "projectTasks": {
-    "coreFeatures": [
-      "Implement Group Expense Entry (manual input)",
-      "Implement Chat-based Expense Input",
-      "Develop Auto Split Engine logic",
-      "Develop Settlement Optimizer algorithm",
-      "Implement Fairness Adjustments for unequal splits",
-      "Cre
+Server is running on port 5000
+[DEBUG] getMyTeams called by user: 6a265746b1a1c29afedf3e69
+[DEBUG] getMyTeams found teams: [{"id":"6a390e011b4929bad5c6d64d","name":"Vibecoders"},{"id":"6a3925fe5d71e86ea882c3cb","name":"BugSolvers"},{"id":"6a3ad641c0b9fc7aa496a90f","name":"bugcrushers"},{"id":"6a3ad6dfee899979c52f7816","name":"CodeSmashers"},{"id":"6a3ade6cb85814ce17284608","name":"Vibers"}]
+[DEBUG] getMyTeams called by user: 6a265746b1a1c29afedf3e69
+[DEBUG] getMyTeams found teams: [{"id":"6a390e011b4929bad5c6d64d","name":"Vibecoders"},{"id":"6a3925fe5d71e86ea882c3cb","name":"BugSolvers"},{"id":"6a3ad641c0b9fc7aa496a90f","name":"bugcrushers"},{"id":"6a3ad6dfee899979c52f7816","name":"CodeSmashers"},{"id":"6a3ade6cb85814ce17284608","name":"Vibers"}]
+[DEBUG] getMyTeams called by user: 6a265746b1a1c29afedf3e69
+[DEBUG] getMyTeams found teams: [{"id":"6a390e011b4929bad5c6d64d","name":"Vibecoders"},{"id":"6a3925fe5d71e86ea882c3cb","name":"BugSolvers"},{"id":"6a3ad641c0b9fc7aa496a90f","name":"bugcrushers"},{"id":"6a3ad6dfee899979c52f7816","name":"CodeSmashers"},{"id":"6a3ade6cb85814ce17284608","name":"Vibers"}]
+[DEBUG] getMyTeams called by user: 6a265746b1a1c29afedf3e69
+[DEBUG] getMyTeams found teams: [{"id":"6a390e011b4929bad5c6d64d","name":"Vibecoders"},{"id":"6a3925fe5d71e86ea882c3cb","name":"BugSolvers"},{"id":"6a3ad641c0b9fc7aa496a90f","name":"bugcrushers"},{"id":"6a3ad6dfee899979c52f7816","name":"CodeSmashers"},{"id":"6a3ade6cb85814ce17284608","name":"Vibers"}]
+[DEBUG] getMyTeams called by user: 6a265746b1a1c29afedf3e69
+[DEBUG] getMyTeams found teams: [{"id":"6a390e011b4929bad5c6d64d","name":"Vibecoders"},{"id":"6a3925fe5d71e86ea882c3cb","name":"BugSolvers"},{"id":"6a3ad641c0b9fc7aa496a90f","name":"bugcrushers"},{"id":"6a3ad6dfee899979c52f7816","name":"CodeSmashers"},{"id":"6a3ade6cb85814ce17284608","name":"Vibers"}]
+[DEBUG] getMyTeams called by user: 6a265746b1a1c29afedf3e69
+[DEBUG] getMyTeams found teams: [{"id":"6a390e011b4929bad5c6d64d","name":"Vibecoders"},{"id":"6a3925fe5d71e86ea882c3cb","name":"BugSolvers"},{"id":"6a3ad641c0b9fc7aa496a90f","name":"bugcrushers"},{"id":"6a3ad6dfee899979c52f7816","name":"CodeSmashers"},{"id":"6a3ade6cb85814ce17284608","name":"Vibers"}]
+Attempting Command Center AI analysis via OpenRouter...
+[ERROR] OpenRouter Command Center AI failed: 402 This request requires more credits, or fewer max_tokens. You requested up to 1500 tokens, but can only afford 1239. To increase, visit https://openrouter.ai/settings/credits and upgrade to a paid account
+Falling back to Qwen for Command Center analysis...
+[SyncService] Syncing GitHub repository Atharvanair09/Splitr for project 6a390f1a1b4929bad5c6d652...
+[SyncService] Sync complete for Atharvanair09/Splitr. Status: Error

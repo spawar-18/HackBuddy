@@ -11,9 +11,10 @@ import {
   Clock, Play, CheckCircle, AlertTriangle, AlertCircle, Calendar, 
   Sparkles, RefreshCw, Settings, Info, Bell, ShieldAlert, Users, 
   Activity, ArrowLeft, Save, Ban, Heart, Zap, Award, Flame, CalendarDays,
-  Gauge, TrendingUp, CheckSquare, ShieldCheck, ArrowUpRight, Database, Check
+  Gauge, TrendingUp, CheckSquare, ShieldCheck, ArrowUpRight, Database, Check, Code
 } from 'lucide-react';
 import { toast } from 'react-hot-toast';
+import GitHubPanel from './GitHubPanel';
 
 const HackathonCommandCenter = ({ projectId, onBack }) => {
   const [config, setConfig] = useState(null);
@@ -25,6 +26,7 @@ const HackathonCommandCenter = ({ projectId, onBack }) => {
   const [notifications, setNotifications] = useState([]);
   const [unreadNotifsCount, setUnreadNotifsCount] = useState(0);
   const [showNotificationsDropdown, setShowNotificationsDropdown] = useState(false);
+  const [activeTab, setActiveTab] = useState('overview'); // 'overview' or 'github'
   
   // Timer countdown state
   const [countdown, setCountdown] = useState({
@@ -672,8 +674,46 @@ const HackathonCommandCenter = ({ projectId, onBack }) => {
         </div>
       )}
 
-      {/* ═══ Main Split Dashboard Layout ═══ */}
-      <div className="grid grid-cols-1 lg:grid-cols-12 gap-6 items-start w-full">
+      {/* ═══ View Switching Tabs ═══ */}
+      <div 
+        className="flex border-b gap-1 p-1 rounded-xl overflow-x-auto scrollbar-none w-fit mb-2"
+        style={{ 
+          backgroundColor: 'rgba(0, 240, 255, 0.03)', 
+          borderColor: 'rgba(0, 240, 255, 0.15)',
+          borderWidth: '1px'
+        }}
+      >
+        <button
+          type="button"
+          onClick={() => setActiveTab('overview')}
+          className="flex items-center gap-2 px-4 py-2 text-xs font-bold uppercase tracking-wider rounded-lg transition-all duration-200 cursor-pointer shrink-0 border"
+          style={{
+            backgroundColor: activeTab === 'overview' ? 'rgba(0, 240, 255, 0.08)' : 'transparent',
+            borderColor: activeTab === 'overview' ? 'rgba(0, 240, 255, 0.4)' : 'transparent',
+            color: activeTab === 'overview' ? '#ffffff' : 'rgba(0, 240, 255, 0.55)'
+          }}
+        >
+          <Activity size={13} style={{ color: activeTab === 'overview' ? '#60a5fa' : 'rgba(0, 240, 255, 0.45)' }} />
+          <span>Dashboard Overview</span>
+        </button>
+
+        <button
+          type="button"
+          onClick={() => setActiveTab('github')}
+          className="flex items-center gap-2 px-4 py-2 text-xs font-bold uppercase tracking-wider rounded-lg transition-all duration-200 cursor-pointer shrink-0 border"
+          style={{
+            backgroundColor: activeTab === 'github' ? 'rgba(0, 240, 255, 0.08)' : 'transparent',
+            borderColor: activeTab === 'github' ? 'rgba(0, 240, 255, 0.4)' : 'transparent',
+            color: activeTab === 'github' ? '#ffffff' : 'rgba(0, 240, 255, 0.55)'
+          }}
+        >
+          <Code size={13} style={{ color: activeTab === 'github' ? '#c084fc' : 'rgba(0, 240, 255, 0.45)' }} />
+          <span>GitHub Integration</span>
+        </button>
+      </div>
+
+      {activeTab === 'overview' ? (
+        <div className="grid grid-cols-1 lg:grid-cols-12 gap-6 items-start w-full">
         
         {/* LEFT COLUMN (8 cols): Ticking HUD Clock, Progress, Team Workloads, Timelines */}
         <div className="lg:col-span-8 flex flex-col gap-6 w-full">
@@ -724,7 +764,18 @@ const HackathonCommandCenter = ({ projectId, onBack }) => {
                       isCrit ? 'bg-red-50/50 border-red-200 text-red-800' : 'bg-amber-50/50 border-amber-200 text-amber-800'
                     }`}>
                       <AlertTriangle size={14} className={`shrink-0 mt-0.5 ${isCrit ? 'text-red-500 animate-bounce' : 'text-amber-500'}`} />
-                      <span className="font-semibold">{alert.message}</span>
+                      <div className="flex-1 flex justify-between items-start gap-2">
+                        <span className="font-semibold">{alert.message}</span>
+                        {alert.timestamp && (
+                          <span className={`text-[8px] font-mono font-bold shrink-0 px-1.5 py-0.5 rounded-sm border ${
+                            isCrit 
+                              ? 'bg-red-500/10 border-red-500/20 text-red-400 animate-pulse' 
+                              : 'bg-amber-500/10 border-amber-500/20 text-amber-500'
+                          }`}>
+                            {new Date(alert.timestamp).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
+                          </span>
+                        )}
+                      </div>
                     </div>
                   );
                 })}
@@ -748,7 +799,7 @@ const HackathonCommandCenter = ({ projectId, onBack }) => {
                       cy="18"
                       r="16"
                       strokeWidth="2.5"
-                      stroke="#f1f5f9"
+                      stroke="rgba(0, 240, 255, 0.08)"
                       fill="none"
                     />
                     <circle
@@ -948,6 +999,23 @@ const HackathonCommandCenter = ({ projectId, onBack }) => {
                   </div>
                 )}
 
+                {/* Execution Strategy */}
+                {aiReport.executionStrategy && aiReport.executionStrategy.length > 0 && (
+                  <div className="flex flex-col gap-2">
+                    <span className="text-[9px] font-black text-neutral-400 uppercase tracking-widest">TIME-BASED EXECUTION STRATEGY</span>
+                    <div className="flex flex-col gap-1.5">
+                      {aiReport.executionStrategy.map((step, idx) => (
+                        <div key={idx} className="flex items-start gap-2.5 text-xs text-neutral-700 bg-neutral-50/40 p-2.5 rounded-xl border border-neutral-150/40 hover:border-neutral-200 transition-colors shadow-3xs">
+                          <span className="font-extrabold text-brand-500 text-[10px] bg-brand-50 border border-brand-100 rounded-md w-5 h-5 flex items-center justify-center shrink-0">
+                            {idx + 1}
+                          </span>
+                          <span className="leading-relaxed">{step}</span>
+                        </div>
+                      ))}
+                    </div>
+                  </div>
+                )}
+
                 {/* Scope Guardian Section */}
                 <div className="flex flex-col gap-2 bg-neutral-50/30 border border-neutral-200 rounded-2xl p-4 shadow-3xs">
                   <div className="flex items-center gap-1.5">
@@ -1020,6 +1088,11 @@ const HackathonCommandCenter = ({ projectId, onBack }) => {
         </div>
 
       </div>
+      ) : (
+        <div className="animate-slide-up w-full">
+          <GitHubPanel projectId={projectId} isOwner={dashboard?.isOwner} />
+        </div>
+      )}
 
     </div>
   );

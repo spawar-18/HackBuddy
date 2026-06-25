@@ -1,6 +1,7 @@
 const Project = require('../models/Project');
 const Team = require('../models/Team');
 const User = require('../models/User');
+const HackathonConfig = require('../models/HackathonConfig');
 const { analyzeProjectWithAI } = require('../services/aiService');
 
 // Helper to compare user IDs (handles populated user objects and ObjectIds)
@@ -319,10 +320,19 @@ exports.analyzeProject = async (req, res) => {
       });
     }
 
-    // 4. Build Context
+    // 4. Fetch Hackathon Config if it exists to get the real time duration configured in Command Center
+    const hackConfig = await HackathonConfig.findOne({ projectId });
+    let hackathonDuration = project.duration || 'Not specified';
+    if (hackConfig && hackConfig.startTime && hackConfig.endTime) {
+      const diffMs = hackConfig.endTime - hackConfig.startTime;
+      const hours = Math.max(0, Math.round(diffMs / (1000 * 60 * 60)));
+      hackathonDuration = `${hours} hours`;
+    }
+
+    // 5. Build Context
     let contextString = `Project Name: ${project.projectName}
 Track: ${project.track || 'Not specified'}
-Duration: ${project.duration || 'Not specified'}
+Duration: ${hackathonDuration}
 Problem Statement: ${project.problemStatement}
 Description: ${project.description || 'Not specified'}
 Features to Build:
