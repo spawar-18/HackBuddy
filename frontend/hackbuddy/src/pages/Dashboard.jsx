@@ -13,12 +13,11 @@ import {
   User, MessageSquare, Award, TrendingUp, GitBranch,
   ArrowUpRight, Sparkles, ListTodo, CheckCircle2,
   PlayCircle, Code, Share2, Wrench, Shield, Plus,
-  Activity, BarChart3, Database
+  Activity, BarChart3, Database, Eye, ExternalLink
 } from 'lucide-react';
-import HackathonCommandCenter from '../components/HackathonCommandCenter';
 
-// ─── SVG Chart Helpers for Premium Dashboard Data Visualization ────────────────
-const CircularProgress = ({ percentage = 75, size = 48, strokeWidth = 4, color = '#00f0ff' }) => {
+// ─── SVG Chart Helpers for Premium Dashboard ───
+const CircularProgress = ({ percentage = 75, size = 42, strokeWidth = 3, color = '#00f0ff' }) => {
   const radius = (size - strokeWidth) / 2;
   const circumference = 2 * Math.PI * radius;
   const strokeDashoffset = circumference - (percentage / 100) * circumference;
@@ -46,82 +45,12 @@ const CircularProgress = ({ percentage = 75, size = 48, strokeWidth = 4, color =
           strokeLinecap="round"
           style={{ 
             transition: 'stroke-dashoffset 0.8s ease-in-out',
-            filter: `drop-shadow(0 0 3px ${color})` 
+            filter: `drop-shadow(0 0 2px ${color})` 
           }}
         />
       </svg>
-      <div className="absolute text-[9px] font-black text-white font-mono">{percentage}%</div>
+      <div className="absolute text-[8px] font-black text-white font-mono">{percentage}%</div>
     </div>
-  );
-};
-
-const DonutChart = ({ percentage = 85, size = 60, strokeWidth = 5, color = '#00f0ff', label }) => {
-  const radius = (size - strokeWidth) / 2;
-  const circumference = 2 * Math.PI * radius;
-  const strokeDashoffset = circumference - (percentage / 100) * circumference;
-
-  return (
-    <div className="relative flex flex-col items-center justify-center shrink-0" style={{ width: size, height: size }}>
-      <svg className="transform -rotate-90" width={size} height={size}>
-        <circle
-          cx={size / 2}
-          cy={size / 2}
-          r={radius}
-          fill="none"
-          stroke="rgba(255, 255, 255, 0.03)"
-          strokeWidth={strokeWidth}
-        />
-        <circle
-          cx={size / 2}
-          cy={size / 2}
-          r={radius}
-          fill="none"
-          stroke={color}
-          strokeWidth={strokeWidth}
-          strokeDasharray={circumference}
-          strokeDashoffset={strokeDashoffset}
-          strokeLinecap="round"
-          style={{ 
-            transition: 'stroke-dashoffset 1s ease-in-out',
-            filter: `drop-shadow(0 0 4px ${color})` 
-          }}
-        />
-      </svg>
-      <div className="absolute flex flex-col items-center justify-center">
-        <span className="text-[10px] font-extrabold text-white leading-none font-mono">{percentage}%</span>
-        {label && <span className="text-[5px] font-bold uppercase tracking-wider mt-0.5" style={{ color: 'rgba(0, 240, 255, 0.6)' }}>{label}</span>}
-      </div>
-    </div>
-  );
-};
-
-const Sparkline = ({ points = [10, 15, 8, 22, 14, 25, 18, 30], width = 90, height = 20, color = '#00f0ff', id = 'spark' }) => {
-  const max = Math.max(...points);
-  const min = Math.min(...points);
-  const range = max - min || 1;
-  const len = points.length;
-
-  const pathD = points
-    .map((val, idx) => {
-      const x = (idx / (len - 1)) * width;
-      const y = height - ((val - min) / range) * height;
-      return `${idx === 0 ? 'M' : 'L'} ${x} ${y}`;
-    })
-    .join(' ');
-
-  const fillD = `${pathD} L ${width} ${height} L 0 ${height} Z`;
-
-  return (
-    <svg width={width} height={height} className="overflow-visible select-none pointer-events-none">
-      <defs>
-        <linearGradient id={`grad-${id}`} x1="0" y1="0" x2="0" y2="1">
-          <stop offset="0%" stopColor={color} stopOpacity="0.2" />
-          <stop offset="100%" stopColor={color} stopOpacity="0.0" />
-        </linearGradient>
-      </defs>
-      <path d={fillD} fill={`url(#grad-${id})`} />
-      <path d={pathD} fill="none" stroke={color} strokeWidth="1" strokeLinecap="round" strokeLinejoin="round" />
-    </svg>
   );
 };
 
@@ -147,33 +76,26 @@ const Dashboard = () => {
   const { user, logout } = useAuth();
   const [profileData, setProfileData] = useState(null);
   const [loadingProfile, setLoadingProfile] = useState(true);
-  const [fixApplied, setFixApplied] = useState(false);
-  const [timeLeft, setTimeLeft] = useState({ hours: 34, minutes: 8, seconds: 58 });
-  const [commandCenterData, setCommandCenterData] = useState(null);
-  const [githubAnalytics, setGithubAnalytics] = useState(null);
-  const [loadingCC, setLoadingCC] = useState(false);
-  const [loadingGH, setLoadingGH] = useState(false);
-  const [countdown, setCountdown] = useState(null);
   const [teams, setTeams] = useState([]);
   const [loadingTeams, setLoadingTeams] = useState(true);
   const [projects, setProjects] = useState({});
   const [loadingProjects, setLoadingProjects] = useState(true);
-  const navigate = useNavigate();
-
-  // Command Center and Notification States
-  const [activeTab, setActiveTab] = useState('dashboard');
-  const [selectedProjectId, setSelectedProjectId] = useState(null);
-  const [showNotifications, setShowNotifications] = useState(false);
   const [dashboardNotifications, setDashboardNotifications] = useState([]);
   const [unreadCount, setUnreadCount] = useState(0);
+  const [showNotifications, setShowNotifications] = useState(false);
+  const [selectedProjectId, setSelectedProjectId] = useState(null);
   const [copilotQuery, setCopilotQuery] = useState('');
-  const [syncingRepo, setSyncingRepo] = useState(false);
-  const bellRef = useRef(null);
+  
+  // Quick AI Review Modal State
+  const [activeReviewProj, setActiveReviewProj] = useState(null);
 
-  // Dark/Light mode toggle
+  const bellRef = useRef(null);
+  const navigate = useNavigate();
+
+  // Dark/Light mode theme
   const [isDark, setIsDark] = useState(() => {
     const saved = localStorage.getItem('hackbuddy-theme');
-    return saved ? saved === 'dark' : true; // default dark
+    return saved ? saved === 'dark' : true;
   });
 
   useEffect(() => {
@@ -186,111 +108,55 @@ const Dashboard = () => {
     }
   }, [isDark]);
 
-  // Countdown timer simulation
+  // Fetch updated profile data from protected endpoint on mount
   useEffect(() => {
-    const timer = setInterval(() => {
-      setTimeLeft((prev) => {
-        if (prev.seconds > 0) {
-          return { ...prev, seconds: prev.seconds - 1 };
-        } else if (prev.minutes > 0) {
-          return { ...prev, minutes: prev.minutes - 1, seconds: 59 };
-        } else if (prev.hours > 0) {
-          return { hours: prev.hours - 1, minutes: 59, seconds: 59 };
-        }
-        return prev;
-      });
-    }, 1000);
-    return () => clearInterval(timer);
+    const fetchProfile = async () => {
+      try {
+        const response = await api.get('/user/profile');
+        setProfileData(response.data);
+      } catch (err) {
+        console.error('Error fetching profile data:', err);
+      } finally {
+        setLoadingProfile(false);
+      }
+    };
+    fetchProfile();
   }, []);
 
-  // Derived array of active projects
-  const activeProjectsList = Object.values(projects).filter(Boolean);
-  const currentProjectId = selectedProjectId || activeProjectsList[0]?._id;
-
-  // Fetch Command Center dashboard and GitHub analytics data
+  // Fetch user teams and their projects
   useEffect(() => {
-    if (!currentProjectId) {
-      setCommandCenterData(null);
-      setGithubAnalytics(null);
-      return;
-    }
-
-    const fetchTelemetry = async () => {
+    const fetchTeamsAndProjects = async () => {
       try {
-        setLoadingCC(true);
-        setLoadingGH(true);
-        
-        const [ccRes, ghRes] = await Promise.allSettled([
-          getCommandCenterDashboard(currentProjectId),
-          getRepositoryAnalytics(currentProjectId)
-        ]);
-
-        if (ccRes.status === 'fulfilled' && ccRes.value && ccRes.value.success) {
-          setCommandCenterData(ccRes.value);
-        } else {
-          setCommandCenterData(null);
-        }
-
-        if (ghRes.status === 'fulfilled' && ghRes.value && ghRes.value.success) {
-          setGithubAnalytics(ghRes.value);
-        } else {
-          setGithubAnalytics(null);
+        setLoadingTeams(true);
+        setLoadingProjects(true);
+        const data = await getMyTeams();
+        setTeams(data);
+        if (data && data.length > 0) {
+          const projectPromises = data.map(async (t) => {
+            try {
+              const res = await getProjectByTeam(t._id);
+              return { teamId: t._id, project: res?.project || null };
+            } catch (err) {
+              console.error(`Error fetching project for team ${t._id}:`, err);
+              return { teamId: t._id, project: null };
+            }
+          });
+          const results = await Promise.all(projectPromises);
+          const projectMap = {};
+          results.forEach((res) => {
+            projectMap[res.teamId] = res.project;
+          });
+          setProjects(projectMap);
         }
       } catch (err) {
-        console.error('Error fetching dashboard telemetry:', err);
+        console.error('Error fetching teams:', err);
       } finally {
-        setLoadingCC(false);
-        setLoadingGH(false);
+        setLoadingTeams(false);
+        setLoadingProjects(false);
       }
     };
-
-    fetchTelemetry();
-    // Poll every 30 seconds for telemetry updates
-    const interval = setInterval(fetchTelemetry, 30000);
-    return () => clearInterval(interval);
-  }, [currentProjectId]);
-
-  // Countdown timer clock tick based on command center config
-  useEffect(() => {
-    const config = commandCenterData?.config;
-    if (!config || !config.endTime) {
-      setCountdown(null);
-      return;
-    }
-
-    const tick = () => {
-      const endTime = new Date(config.endTime).getTime();
-      const now = new Date().getTime();
-      const diff = endTime - now;
-
-      if (diff <= 0) {
-        setCountdown({
-          days: 0,
-          hours: 0,
-          minutes: 0,
-          seconds: 0,
-          isCompleted: true
-        });
-      } else {
-        const days = Math.floor(diff / (1000 * 60 * 60 * 24));
-        const hours = Math.floor((diff % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
-        const minutes = Math.floor((diff % (1000 * 60 * 60)) / (1000 * 60));
-        const seconds = Math.floor((diff % (1000 * 60)) / 1000);
-
-        setCountdown({
-          days,
-          hours,
-          minutes,
-          seconds,
-          isCompleted: false
-        });
-      }
-    };
-
-    tick();
-    const interval = setInterval(tick, 1000);
-    return () => clearInterval(interval);
-  }, [commandCenterData?.config?.endTime]);
+    fetchTeamsAndProjects();
+  }, []);
 
   // Fetch notifications for all active projects
   const fetchDashboardNotifications = async () => {
@@ -343,7 +209,6 @@ const Dashboard = () => {
     return () => document.removeEventListener('mousedown', handleOutsideClick);
   }, []);
 
-  // Mark notifications read
   const handleMarkAllAsRead = async () => {
     const activeProjects = Object.values(projects).filter(Boolean);
     if (activeProjects.length === 0) return;
@@ -363,270 +228,60 @@ const Dashboard = () => {
     }
   };
 
-  const getNotificationStyles = (type, read) => {
-    const config = {
-      Milestone: {
-        icon: <ShieldCheck size={14} className="text-purple-600" />,
-        bg: read ? 'bg-purple-50/60' : 'bg-purple-50',
-        border: read ? 'border-purple-200/50' : 'border-purple-300',
-        textColor: read ? 'text-neutral-700' : 'text-neutral-900',
-        badge: 'Milestone'
-      },
-      TaskOverdue: {
-        icon: <AlertTriangle size={14} className="text-rose-600 animate-pulse" />,
-        bg: read ? 'bg-rose-50/60' : 'bg-rose-50',
-        border: read ? 'border-rose-200/50' : 'border-rose-300',
-        textColor: read ? 'text-neutral-750' : 'text-neutral-900',
-        badge: 'Overdue'
-      },
-      ActionRequired: {
-        icon: <Zap size={14} className="text-amber-600 animate-bounce" />,
-        bg: read ? 'bg-amber-50/60' : 'bg-amber-50',
-        border: read ? 'border-amber-200/50' : 'border-amber-300',
-        textColor: read ? 'text-neutral-750' : 'text-neutral-900',
-        badge: 'Action Required'
-      },
-      Marketplace: {
-        icon: <Database size={14} className="text-emerald-600" />,
-        bg: read ? 'bg-emerald-50/60' : 'bg-emerald-50',
-        border: read ? 'border-emerald-200/50' : 'border-emerald-300',
-        textColor: read ? 'text-neutral-750' : 'text-neutral-900',
-        badge: 'Marketplace'
-      },
-      General: {
-        icon: <Bell size={14} className="text-brand-600" />,
-        bg: read ? 'bg-brand-50/40' : 'bg-brand-50/80',
-        border: read ? 'border-brand-200/50' : 'border-brand-300',
-        textColor: read ? 'text-neutral-750' : 'text-neutral-900',
-        badge: 'Alert'
-      }
-    };
-    return config[type] || config.General;
-  };
-
-  // Fetch updated profile data from protected endpoint on mount
-  useEffect(() => {
-    const fetchProfile = async () => {
-      try {
-        const response = await api.get('/user/profile');
-        setProfileData(response.data);
-      } catch (err) {
-        console.error('Error fetching profile data:', err);
-      } finally {
-        setLoadingProfile(false);
-      }
-    };
-    fetchProfile();
-  }, []);
-
-  // Fetch user teams and their projects on mount
-  useEffect(() => {
-    const fetchTeamsAndProjects = async () => {
-      try {
-        setLoadingTeams(true);
-        setLoadingProjects(true);
-        const data = await getMyTeams();
-        setTeams(data);
-        if (data && data.length > 0) {
-          const projectPromises = data.map(async (t) => {
-            try {
-              const res = await getProjectByTeam(t._id);
-              return { teamId: t._id, project: res?.project || null };
-            } catch (err) {
-              console.error(`Error fetching project for team ${t._id}:`, err);
-              return { teamId: t._id, project: null };
-            }
-          });
-          const results = await Promise.all(projectPromises);
-          const projectMap = {};
-          results.forEach((res) => {
-            projectMap[res.teamId] = res.project;
-          });
-          setProjects(projectMap);
-        }
-      } catch (err) {
-        console.error('Error fetching teams:', err);
-      } finally {
-        setLoadingTeams(false);
-        setLoadingProjects(false);
-      }
-    };
-    fetchTeamsAndProjects();
-  }, []);
-
-  // Handle pending invite code check after login
-  useEffect(() => {
-    const pendingCode = localStorage.getItem('pendingInviteCode');
-    if (pendingCode && user && user.profileCompleted) {
-      localStorage.removeItem('pendingInviteCode');
-      navigate(`/join/${pendingCode}`);
-    }
-  }, [user, navigate]);
-
-  const formatTime = (t) => {
-    return `${String(t.hours).padStart(2, '0')}:${String(t.minutes).padStart(2, '00')}:${String(t.seconds).padStart(2, '0')}`;
-  };
-
-  const getStatusBadge = (statusVal) => {
-    switch (statusVal) {
-      case 'Planning':
-        return (
-          <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-xs font-bold bg-amber-50 border border-amber-200 text-amber-700">
-            <Clock size={10} /> Planning
-          </span>
-        );
-      case 'In Progress':
-        return (
-          <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-xs font-bold bg-blue-50 border border-blue-200 text-blue-700">
-            <Play size={10} /> In Progress
-          </span>
-        );
-      case 'Completed':
-        return (
-          <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-xs font-bold bg-emerald-50 border border-emerald-200 text-emerald-700">
-            <CheckCircle size={10} /> Completed
-          </span>
-        );
-      default:
-        return null;
-    }
-  };
-
-  const handleApplyFix = () => {
-    setFixApplied(true);
-    setTimeout(() => {
-      alert('Hotfix Applied: LLM Response latency optimized to 120ms via Edge Streaming!');
-    }, 100);
-  };
-
   const handleLogout = () => {
     logout();
     navigate('/login');
   };
 
-  const handleAskCopilot = (e) => {
-    e.preventDefault();
-    if (!copilotQuery.trim()) return;
-    const firstTeam = teams[0];
-    if (firstTeam) {
-      navigate(`/team/${firstTeam._id}`, { state: { initialView: 'mentor-chat', query: copilotQuery } });
-    } else {
-      navigate('/team/create');
-    }
-  };
-
-  const navigateToWorkspace = (viewName) => {
-    const firstTeam = teams[0];
-    if (firstTeam) {
-      navigate(`/team/${firstTeam._id}`, { state: { initialView: viewName } });
-    } else {
-      navigate('/team/create');
-    }
-  };
-
   const activeUser = profileData || user;
-  const activeProject = activeProjectsList.find(p => p._id === currentProjectId) || activeProjectsList[0];
-  const activeTeam = teams.find(t => t._id === activeProject?.teamId) || teams[0];
+  const activeProjectsList = Object.values(projects).filter(Boolean);
+  const currentProjectId = selectedProjectId || activeProjectsList[0]?._id;
 
-  // ─── Extract Real Metrics from Selected/First Project ───
-  const healthPercent = activeProject?.projectReview?.feasibilityScore || 85;
-  const healthStatus = healthPercent >= 80 ? 'OPTIMAL' : healthPercent >= 50 ? 'STABLE' : 'CRITICAL';
+  // Personal summary aggregates
+  const totalProjects = activeProjectsList.length;
+  const runningHackathons = activeProjectsList.filter(p => p.track || p.status === 'In Progress').length;
   
-  // Clean one-line AI summary from projectReview execution strategy or problemSolutionAlignment
-  let healthSummary = 'Core stack looks solid. Ready for feature splitting.';
-  if (activeProject?.projectReview?.executionStrategy?.length > 0) {
-    healthSummary = activeProject.projectReview.executionStrategy[0];
-  } else if (activeProject?.projectReview?.problemSolutionAlignment) {
-    healthSummary = activeProject.projectReview.problemSolutionAlignment;
-  }
-  if (healthSummary.length > 80) {
-    healthSummary = healthSummary.substring(0, 77) + '...';
-  }
+  // Calculate average winning probability
+  const avgWinningProbability = totalProjects > 0
+    ? Math.round(activeProjectsList.reduce((acc, p) => {
+        const feasibility = p.projectReview?.feasibilityScore || 8.0;
+        const prob = Math.min(95, Math.max(45, Math.round((feasibility * 9) + (p.status === 'Completed' ? 10 : 0))));
+        return acc + prob;
+      }, 0) / totalProjects)
+    : 0;
 
-  // Winning Probability calculations
-  const winningPercent = Math.min(95, Math.max(45, Math.round((healthPercent * 0.9) + (activeProject?.status === 'Completed' ? 10 : 0))));
-  const aiConfidence = Math.min(98, Math.round(80 + (healthPercent * 0.15)));
-  const riskStatus = winningPercent >= 75 ? 'LOW RISK' : winningPercent >= 55 ? 'MODERATE RISK' : 'HIGH RISK';
-  const riskColor = winningPercent >= 75 ? '#10b981' : winningPercent >= 55 ? '#f59e0b' : '#ef4444';
-
-  // Repository Health
-  const repoConnected = githubAnalytics?.connected || false;
-  const repoScore = repoConnected ? (githubAnalytics?.healthScore || 0) : 0;
-  const repoStatus = repoConnected ? (githubAnalytics?.healthStatus || 'CONNECTED') : 'NOT CONNECTED';
-  const lastSyncTime = repoConnected && githubAnalytics?.lastSyncedAt 
-    ? new Date(githubAnalytics.lastSyncedAt).toLocaleString() 
-    : 'Never';
-
-  // Task statistics
-  let calcTotal = 0;
-  let calcCompleted = 0;
-  let calcInProgress = 0;
-  let calcBlocked = 0;
-
-  if (activeProject?.taskPlan?.assignments) {
-    activeProject.taskPlan.assignments.forEach(a => {
-      a.assignedTasks?.forEach(t => {
-        calcTotal++;
-        if (t.status === 'Completed') calcCompleted++;
-        else if (t.status === 'In Progress') calcInProgress++;
-        else if (t.status === 'Blocked' || t.marketplaceStatus === 'SwapRequested') calcBlocked++;
+  // Tasks due today count
+  let tasksDueTodayCount = 0;
+  activeProjectsList.forEach(p => {
+    if (p.taskPlan?.assignments) {
+      p.taskPlan.assignments.forEach(a => {
+        a.assignedTasks?.forEach(t => {
+          if (t.status === 'In Progress') {
+            tasksDueTodayCount++;
+          }
+        });
       });
-    });
-  }
-
-  const totalTasks = calcTotal || 18;
-  const completedTasks = calcCompleted || 12;
-  const inProgressTasks = calcInProgress || 4;
-  const blockedTasks = calcBlocked || 2;
-  const pendingTasks = totalTasks - completedTasks - inProgressTasks;
-  const verificationRate = Math.round((completedTasks / totalTasks) * 100) || 70;
-
-  const teamMembers = activeTeam?.members || [];
-  const displayMembers = teamMembers.map((m, idx) => {
-    const name = typeof m === 'object' ? (m.name || m.email || 'Operative') : m;
-    const initials = name.charAt(0).toUpperCase();
-    let assignedCount = 0;
-    let completedCount = 0;
-    if (activeProject?.taskPlan?.assignments) {
-      const assignment = activeProject.taskPlan.assignments.find(a => {
-        const aName = a.member;
-        return aName && name.toLowerCase().includes(aName.toLowerCase());
-      });
-      if (assignment?.assignedTasks) {
-        assignedCount = assignment.assignedTasks.length;
-        completedCount = assignment.assignedTasks.filter(t => t.status === 'Completed').length;
-      }
     }
-    let total = assignedCount || (6 - idx * 2);
-    let completed = completedCount || (4 - idx * 1);
-    
-    // Try to get real metrics from CommandCenter memberProgress
-    if (commandCenterData?.memberProgress) {
-      const match = commandCenterData.memberProgress.find(mp => 
-        mp.member && mp.member.toLowerCase() === name.toLowerCase()
-      );
-      if (match) {
-        total = match.total;
-        completed = match.completed;
-      }
-    }
-    
-    const pct = total > 0 ? Math.round((completed / total) * 100) : 0;
-
-    // Get real commits count from GitHub contributors
-    let commitsCount = 0;
-    if (repoConnected && githubAnalytics?.contributors) {
-      const ghCont = githubAnalytics.contributors.find(c => 
-        c.login.toLowerCase().includes(name.toLowerCase()) || 
-        (c.name && c.name.toLowerCase().includes(name.toLowerCase()))
-      );
-      if (ghCont) {
-        commitsCount = ghCont.commits;
-      }
-    }
-    
-    return { name, initials, total, completed, pct, commits: commitsCount };
   });
+  if (tasksDueTodayCount === 0 && totalProjects > 0) {
+    tasksDueTodayCount = 3; // fallback default
+  }
+
+  // Developer Profile Scores calculations (dynamic and based on user data)
+  const completedTasksCount = activeProjectsList.reduce((acc, p) => {
+    let completed = 0;
+    if (p.taskPlan?.assignments) {
+      p.taskPlan.assignments.forEach(a => {
+        completed += a.assignedTasks?.filter(t => t.status === 'Completed').length || 0;
+      });
+    }
+    return acc + completed;
+  }, 0) || 12;
+
+  const developerScore = Math.min(98, 75 + (completedTasksCount * 1.5) + (teams.length * 2));
+  const aiReputation = Math.min(99, 85 + (completedTasksCount * 0.8) + (totalProjects * 1));
+  const contributionScore = Math.min(95, 70 + (completedTasksCount * 1.2) + (teams.length * 3));
+  const githubConnected = activeUser?.githubId ? 'CONNECTED' : 'DISCONNECTED';
 
   return (
     <div className="dashboard-container">
@@ -639,33 +294,33 @@ const Dashboard = () => {
           </span>
           <span className="status-badge badge-active ml-2.5 text-[10px] flex items-center gap-1">
             <span className="status-pulse bg-emerald-500"></span>
-            ACTIVE
+            PERSONAL CONSOLE
           </span>
         </div>
 
-        {/* Sprint Countdown Display */}
-        <div 
-          onClick={() => setActiveTab('command-center')} 
-          className="hidden sm:flex items-center gap-2.5 font-mono bg-neutral-50 border border-neutral-200/60 rounded-full px-3 py-1 text-xs shadow-2xs cursor-pointer hover:bg-neutral-100 transition-all"
-          title="Go to AI Command Center to configure hackathon milestones"
-        >
-          <Clock size={13} className="text-neutral-500" />
-          <span className="text-neutral-500 font-bold uppercase tracking-wider text-[10px]">HUD CLOCK:</span>
-          <span className="text-neutral-900 font-bold tracking-wider text-xs">
-            {commandCenterData?.configured && countdown ? (
-              countdown.isCompleted ? '00:00:00' : (
-                `${String(countdown.days * 24 + countdown.hours).padStart(2, '0')}:${String(countdown.minutes).padStart(2, '0')}:${String(countdown.seconds).padStart(2, '0')}`
-              )
-            ) : (
-              'Not Configured'
-            )}
-          </span>
-        </div>
-
-        {/* Action Widgets */}
+        {/* Current Project Selector Dropdown */}
+        {activeProjectsList.length > 0 && (
+          <div className="flex items-center gap-2 bg-neutral-100 border border-neutral-200 px-3 py-1.5 rounded-xl shadow-2xs">
+            <span className="text-[10px] font-bold text-neutral-450 uppercase tracking-widest">Active Workspace:</span>
+            <select
+              value={currentProjectId || ''}
+              onChange={(e) => {
+                const projId = e.target.value;
+                setSelectedProjectId(projId);
+                navigate(`/workspace/${projId}`);
+              }}
+              className="bg-transparent border-0 text-xs font-bold text-neutral-600 focus:outline-hidden cursor-pointer p-0"
+            >
+              {activeProjectsList.map(proj => (
+                <option key={proj._id} value={proj._id} className="bg-neutral-100 text-neutral-600">{proj.projectName}</option>
+              ))}
+            </select>
+          </div>
+        )}
+        {/* Header Action widgets */}
         <div className="flex items-center gap-4">
-
-          {/* Bell Icon with Red Unread Badge */}
+          
+          {/* Notifications bell */}
           <div className="relative" ref={bellRef}>
             <button
               onClick={() => {
@@ -685,12 +340,11 @@ const Dashboard = () => {
               )}
             </button>
 
-            {/* Notifications Dropdown Panel */}
             {showNotifications && (
               <div className="absolute right-0 mt-3 w-80 bg-white/95 backdrop-blur-md border border-brand-100 rounded-2xl shadow-xl z-50 p-4 max-h-96 overflow-y-auto animate-slide-up flex flex-col gap-3">
                 <div className="flex justify-between items-center border-b border-neutral-100 pb-2.5">
                   <h3 className="text-[10px] font-black text-neutral-800 uppercase tracking-widest flex items-center gap-1.5">
-                    <Bell size={11} className="text-brand-500" /> Notifications Feed
+                    <Bell size={11} className="text-brand-500" /> Alerts & Notifications
                   </h3>
                   <span className="text-[9px] font-bold bg-brand-50 px-2 py-0.5 rounded-full border border-brand-100/50 text-brand-700">
                     {dashboardNotifications.length} Total
@@ -698,34 +352,14 @@ const Dashboard = () => {
                 </div>
                 <div className="flex flex-col gap-2.5">
                   {dashboardNotifications.length === 0 ? (
-                    <p className="text-[10px] text-neutral-400 italic text-center py-8">No recent updates in your projects.</p>
+                    <p className="text-[10px] text-neutral-400 italic text-center py-8">No recent alerts in your squads.</p>
                   ) : (
-                    dashboardNotifications.map((notif, idx) => {
-                      const styles = getNotificationStyles(notif.type, notif.read);
-                      return (
-                        <div
-                          key={notif._id || idx}
-                          className={`p-3 rounded-xl border text-[11px] leading-relaxed transition-all flex gap-3 text-left ${styles.bg} ${styles.border} ${styles.textColor} hover:shadow-2xs`}
-                        >
-                          <div className="mt-0.5 shrink-0">
-                            {styles.icon}
-                          </div>
-                          <div className="flex-1 flex flex-col gap-1 min-w-0">
-                            <div className="flex justify-between items-center gap-2">
-                              <span className="font-extrabold text-[8px] uppercase tracking-wider text-neutral-500">
-                                {notif.projectName}
-                              </span>
-                              <span className="text-[8px] text-neutral-400 font-bold font-mono">
-                                {notif.createdAt ? new Date(notif.createdAt).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }) : 'Just now'}
-                              </span>
-                            </div>
-                            <span className={notif.read ? 'font-medium' : 'font-extrabold text-neutral-800'}>
-                              {notif.message}
-                            </span>
-                          </div>
-                        </div>
-                      );
-                    })
+                    dashboardNotifications.map((notif, idx) => (
+                      <div key={idx} className="p-3 rounded-xl border border-brand-200/20 text-[11px] text-left hover:shadow-2xs bg-neutral-900/30">
+                        <span className="font-extrabold text-[8px] uppercase tracking-wider text-neutral-400 block mb-0.5">{notif.projectName}</span>
+                        <span className="font-medium text-neutral-850">{notif.message}</span>
+                      </div>
+                    ))
                   )}
                 </div>
               </div>
@@ -734,16 +368,13 @@ const Dashboard = () => {
 
           <Settings size={18} className="text-neutral-500 hover:text-neutral-800 cursor-pointer transition-colors" onClick={() => navigate('/profile')} />
 
-          {/* Dark / Light Mode Toggle */}
           <button
             onClick={() => setIsDark(prev => !prev)}
             className="p-1.5 rounded-lg bg-transparent border-0 cursor-pointer hover:bg-neutral-100/10 transition-colors flex items-center justify-center"
-            title={isDark ? 'Switch to Light Mode' : 'Switch to Dark Mode'}
           >
-            {isDark
-              ? <Sun size={17} className="text-yellow-400" />
-              : <Moon size={17} className="text-neutral-500" />}
+            {isDark ? <Sun size={17} className="text-yellow-400" /> : <Moon size={17} className="text-neutral-500" />}
           </button>
+
           <div className="flex items-center gap-2 border-l border-neutral-200 pl-4 h-6">
             {activeUser?.avatar ? (
               <img src={activeUser.avatar} alt="Avatar" className="w-7 h-7 rounded-full border border-neutral-200 object-cover" />
@@ -759,51 +390,33 @@ const Dashboard = () => {
 
       {/* Main Layout Area */}
       <div className="dashboard-body">
-        {/* Left Navigation Sidebar */}
+        {/* Left Sidebar */}
         <aside className="dashboard-sidebar font-sans">
-          <div className="sidebar-menu flex flex-col gap-1 w-full">
+          <div className="sidebar-menu flex flex-col gap-1.5 w-full">
             <button
-              onClick={() => setActiveTab('dashboard')}
-              className={`menu-item w-full bg-transparent border-0 cursor-pointer text-left flex items-center gap-3 py-2 ${activeTab === 'dashboard' ? 'active font-bold text-white' : ''
-                }`}
+              onClick={() => navigate('/dashboard')}
+              className="menu-item w-full bg-transparent border-0 cursor-pointer text-left flex items-center gap-3 py-2.5 active font-bold text-white shadow-sm"
             >
               <LayoutDashboard size={16} />
-              <span>Dashboard</span>
-            </button>
-
-            <button
-              onClick={() => setActiveTab('command-center')}
-              className={`menu-item w-full border-0 cursor-pointer text-left flex items-center gap-3 py-2 transition-all ${activeTab === 'command-center'
-                  ? 'active font-bold text-white shadow-sm'
-                  : 'bg-orange-50 text-orange-700 hover:bg-orange-100 hover:text-orange-800 border border-orange-200'
-                }`}
-            >
-              <Flame size={16} className={activeTab === 'command-center' ? 'text-white' : 'text-orange-500'} />
-              <span className="font-semibold">AI Command Center</span>
-              {activeTab !== 'command-center' && (
-                <span className="ml-auto text-[8px] font-black uppercase tracking-wider bg-orange-500 text-white px-1.5 py-0.5 rounded-full">NEW</span>
-              )}
+              <span>Personal Console</span>
             </button>
 
             <button
               onClick={() => {
-                const firstTeam = teams[0];
-                if (firstTeam) {
-                  navigate(`/team/${firstTeam._id}`, { state: { initialView: 'task-plan' } });
-                } else {
-                  navigate('/team/create');
-                }
+                if (currentProjectId) navigate(`/workspace/${currentProjectId}`);
+                else toast.error('Create a project to open the workspace.');
               }}
-              className="menu-item w-full bg-transparent border-0 cursor-pointer text-left flex items-center gap-3 py-2"
+              className="menu-item w-full bg-transparent border-0 cursor-pointer text-left flex items-center gap-3 py-2.5"
             >
-              <Cpu size={16} />
-              <span>AI Task Splitter</span>
+              <Wrench size={16} />
+              <span>Project Workspaces</span>
             </button>
+
             <button
               onClick={() => navigate('/team/create')}
               className="btn-primary mt-6 w-full flex items-center justify-center gap-2 text-xs py-2 shadow-xs cursor-pointer"
             >
-              <Users size={14} />
+              <Plus size={14} />
               <span>Create Team</span>
             </button>
             <button
@@ -819,13 +432,6 @@ const Dashboard = () => {
             >
               <User size={14} />
               <span>Edit Profile</span>
-            </button>
-            <button
-              onClick={() => navigate('/chat')}
-              className="btn-secondary mt-2 w-full flex items-center justify-center gap-2 text-xs py-2 cursor-pointer"
-            >
-              <MessageSquare size={14} />
-              <span>Open Chat</span>
             </button>
           </div>
 
@@ -845,758 +451,534 @@ const Dashboard = () => {
         </aside>
 
         {/* Main Content Area */}
-        <main className="dashboard-content">
-          {activeTab === 'command-center' ? (
-            <div className="flex flex-col gap-4 w-full">
-              {/* Project selector dropdown when user has multiple projects */}
-              {activeProjectsList.length > 1 && (
-                <div className="flex items-center gap-2 mb-2 bg-white/80 border border-brand-100 px-4 py-2 rounded-xl w-fit shadow-2xs">
-                  <span className="text-[10px] font-bold text-neutral-450 uppercase tracking-widest">Select Workspace:</span>
-                  <select
-                    value={currentProjectId}
-                    onChange={(e) => setSelectedProjectId(e.target.value)}
-                    className="bg-transparent border-0 text-xs font-bold text-neutral-800 focus:outline-hidden cursor-pointer"
-                  >
-                    {activeProjectsList.map(proj => (
-                      <option key={proj._id} value={proj._id}>{proj.projectName}</option>
-                    ))}
-                  </select>
-                </div>
-              )}
-
-              {loadingProjects ? (
-                <div className="flex flex-col justify-center items-center py-20 text-slate-400 gap-3 bg-white border border-brand-100 rounded-2xl shadow-xs">
-                  <RefreshCw className="animate-spin text-brand-500" size={28} />
-                  <span className="text-xs font-semibold tracking-wide text-neutral-500">Loading your workspace projects...</span>
-                </div>
-              ) : currentProjectId ? (
-                <HackathonCommandCenter
-                  projectId={currentProjectId}
-                  onBack={() => setActiveTab('dashboard')}
-                />
-              ) : (
-                <div className="glass p-10 flex flex-col items-center justify-center text-center gap-4 bg-white border border-brand-100 rounded-2xl shadow-xs">
-                  <div className="w-14 h-14 rounded-full bg-orange-50 flex items-center justify-center text-orange-500 border border-orange-100">
-                    <Flame size={26} />
+        <main className="dashboard-content max-w-full lg:max-w-full">
+          <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 items-start w-full">
+            
+            {/* Center Section (Left & Center Columns on large screens) */}
+            <div className="lg:col-span-2 flex flex-col gap-6 w-full">
+              
+              {/* AI Personal Assistant Banner */}
+              <div className="dashboard-card glow-blue border-l-4 border-l-[#00f0ff] p-5">
+                <div className="flex justify-between items-start border-b border-brand-200/20 pb-3">
+                  <div className="flex flex-col gap-0.5 text-left">
+                    <h2 className="text-base font-extrabold text-white">Good Evening, {activeUser?.name || 'Sahil'}.</h2>
                   </div>
-                  <div>
-                    <h3 className="font-extrabold text-neutral-900 text-lg">No Active Projects Found</h3>
-                    <p className="text-xs text-neutral-500 mt-1 max-w-sm leading-normal">
-                      The Hackathon Command Center requires a project linked to your squad. Create a squad with a project or visit your team workspace to configure one.
-                    </p>
-                  </div>
-                  <div className="flex gap-3 mt-2">
-                    <button onClick={() => navigate('/team/create')} className="btn-primary text-xs">Create Squad</button>
-                    <button onClick={() => navigate('/team/join')} className="btn-secondary text-xs">Join Squad</button>
-                  </div>
+                  <span className="text-[8px] font-extrabold px-1.5 py-0.5 rounded bg-brand-200/10 text-brand-400 border border-brand-200/20 font-mono">
+                    ONLINE
+                  </span>
                 </div>
-              )}
-            </div>
-          ) : (
-            <div className="flex flex-col gap-6 w-full animate-fade-in">
-              {/* TOP ROW: Hero Metrics (3-columns) */}
-              <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-                {/* Card 1: AI Project Health */}
-                <div className="dashboard-card glow-blue flex-row items-center gap-4 p-4 border-l-4 border-l-[#00f0ff]">
-                  <CircularProgress percentage={healthPercent} size={56} strokeWidth={5} color="#00f0ff" />
-                  <div className="flex-1 min-w-0 flex flex-col gap-1">
-                    <div className="flex items-center justify-between">
-                      <div style={{ color: '#94a3b8' }} className="text-[10px] font-black tracking-widest uppercase">AI Project Health</div>
-                      <div className="text-[9px] font-extrabold px-2 py-0.5 rounded-full border border-emerald-500/30 text-emerald-400 bg-emerald-500/10">
-                        {healthStatus}
-                      </div>
-                    </div>
-                    <div style={{ color: '#fff' }} className="text-lg font-black leading-none font-mono mt-0.5">{healthPercent}%</div>
-                    <div style={{ color: '#cbd5e1' }} className="text-[10px] leading-tight mt-1 line-clamp-2">
-                      {healthSummary}
-                    </div>
+                <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 mt-3 text-left">
+                  <div className="bg-neutral-900/40 p-2.5 rounded-xl border border-brand-200/10">
+                    <span className="text-[8px] font-black uppercase text-neutral-400">Squads Joined</span>
+                    <div className="text-sm font-bold text-white font-mono mt-0.5">{teams.length} Teams</div>
+                  </div>
+                  <div className="bg-neutral-900/40 p-2.5 rounded-xl border border-brand-200/10">
+                    <span className="text-[8px] font-black uppercase text-neutral-400">Active Workspaces</span>
+                    <div className="text-sm font-bold text-white font-mono mt-0.5">{totalProjects} Projects</div>
+                  </div>
+                  <div className="bg-neutral-900/40 p-2.5 rounded-xl border border-brand-200/10">
+                    <span className="text-[8px] font-black uppercase text-neutral-400">Milestone Events</span>
+                    <div className="text-sm font-bold text-white font-mono mt-0.5">{runningHackathons} Running</div>
                   </div>
                 </div>
 
-                {/* Card 2: Repository Health */}
-                <div 
-                  onClick={() => navigateToWorkspace('github')}
-                  className="dashboard-card glow-blue flex-row items-center gap-4 p-4 border-l-4 border-l-[#00f0ff] cursor-pointer hover:bg-neutral-800/25 transition-all"
-                  title={repoConnected ? "Click to view Git details" : "Click to connect GitHub Repository"}
-                >
-                  <CircularProgress percentage={repoScore} size={56} strokeWidth={5} color="#00f0ff" />
-                  <div className="flex-1 min-w-0 flex flex-col gap-1">
-                    <div className="flex items-center justify-between">
-                      <div style={{ color: '#94a3b8' }} className="text-[10px] font-black tracking-widest uppercase">Repo Health</div>
-                      <div className={`text-[9px] font-extrabold px-2 py-0.5 rounded-full border ${repoConnected ? 'border-emerald-500/30 text-emerald-400 bg-emerald-500/10' : 'border-rose-500/30 text-rose-400 bg-rose-500/10'}`}>
-                        {repoStatus}
-                      </div>
-                    </div>
-                    <div style={{ color: '#fff' }} className="text-lg font-black leading-none font-mono mt-0.5">
-                      {repoConnected ? `${repoScore}/100` : '—'}
-                    </div>
-                    <div style={{ color: '#94a3b8' }} className="text-[10px] mt-1 font-mono">
-                      {repoConnected ? `Last Sync: ${lastSyncTime}` : 'No repo connected'}
-                    </div>
+                {/* AI Recommendations List */}
+                <div className="mt-4 flex flex-col gap-2.5 text-left border-t border-brand-200/10 pt-3.5">
+                  <div className="flex items-center gap-1.5">
+                    <Sparkles size={13} className="text-brand-400 animate-pulse" />
+                    <span className="text-[9px] font-black uppercase tracking-wider text-brand-400">AI Telemetry Advice</span>
                   </div>
-                </div>
-
-                {/* Card 3: Hackathon Countdown */}
-                <div 
-                  onClick={() => setActiveTab('command-center')}
-                  className="dashboard-card glow-blue flex-row items-center gap-4 p-4 border-l-4 border-l-orange-500 cursor-pointer hover:bg-neutral-800/25 transition-all"
-                  title="Click to go to AI Command Center HUD"
-                >
-                  <div className="relative shrink-0 flex items-center justify-center w-14 h-14 rounded-full bg-neutral-900 border-2 border-orange-500/40">
-                    <Clock size={20} className="text-orange-500 animate-pulse" />
-                  </div>
-                  <div className="flex-1 min-w-0 flex flex-col gap-1">
-                    <div className="flex items-center justify-between">
-                      <div style={{ color: '#94a3b8' }} className="text-[10px] font-black tracking-widest uppercase">T-MINUS COUNTDOWN</div>
-                      <div className={`text-[9px] font-extrabold px-2 py-0.5 rounded-full border border-orange-500/30 text-orange-400 bg-orange-500/10 font-mono ${countdown ? 'animate-pulse' : ''}`}>
-                        {commandCenterData?.configured ? (countdown?.isCompleted ? 'COMPLETED' : 'LIVE') : 'NOT SET'}
-                      </div>
-                    </div>
-                    <div style={{ color: '#fff' }} className="text-lg font-extrabold leading-none font-mono mt-0.5 tracking-wider">
-                      {commandCenterData?.configured && countdown ? (
-                        countdown.isCompleted ? '00:00:00' : (
-                          `${String(countdown.days * 24 + countdown.hours).padStart(2, '0')}:${String(countdown.minutes).padStart(2, '0')}:${String(countdown.seconds).padStart(2, '0')}`
-                        )
-                      ) : (
-                        '— : — : —'
-                      )}
-                    </div>
-                    <div style={{ color: '#94a3b8' }} className="text-[9px] mt-1 uppercase font-semibold">
-                      Phase: <span className="text-orange-400 font-black">
-                        {commandCenterData?.configured ? (
-                          commandCenterData.config.status === 'Completed' ? 'SUBMISSION' :
-                          commandCenterData.config.status === 'Running' ? 'DEVELOPMENT' : 'PLANNING'
-                        ) : 'NOT CONFIGURED'}
-                      </span>
-                    </div>
-                  </div>
-                </div>
-              </div>
-
-              {/* SECOND ROW */}
-              <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
-                
-                {/* LEFT: AI Copilot Card */}
-                <div className="dashboard-card glow-blue flex flex-col justify-between border-t-2 border-t-[#00f0ff] p-5 h-full">
-                  <div className="flex flex-col gap-4">
-                    <div className="flex justify-between items-center pb-2 border-b border-brand-200/30">
-                      <div className="flex items-center gap-2">
-                        <Sparkles size={16} style={{ color: '#00f0ff' }} className="animate-pulse" />
-                        <div style={{ color: '#fff' }} className="text-[11px] font-black tracking-widest uppercase font-mono">HACKBUDDY AI COPILOT</div>
-                      </div>
-                      <div className="text-[8px] font-extrabold px-1.5 py-0.5 rounded-sm bg-[#00f0ff]/10 text-[#00f0ff] border border-[#00f0ff]/20 font-mono">
-                        v2.4-ACTIVE
-                      </div>
-                    </div>
-
-                    <div className="flex flex-col gap-3 text-xs leading-relaxed">
-                      <div className="p-3 bg-neutral-900/60 border border-brand-200/20 rounded-xl">
-                        <div style={{ color: '#94a3b8' }} className="text-[9px] font-black font-mono uppercase">SYSTEM OPERATIONAL</div>
-                        <div style={{ color: '#fff' }} className="font-extrabold mt-1 font-mono">Welcome back, {activeUser?.name || 'Operative'}!</div>
-                        <div style={{ color: '#cbd5e1' }} className="mt-1.5 text-[11px]">
-                          {activeProject 
-                            ? `I've analyzed project "${activeProject.projectName}". Ready for telemetry review.`
-                            : "No squad configured yet. Ready to initialize squad workspace."}
-                        </div>
-                      </div>
-
-                      <div className="flex flex-col gap-2">
-                        <div className="flex justify-between items-start">
-                          <div style={{ color: '#94a3b8' }} className="text-[9px] font-bold uppercase w-24 shrink-0 mt-0.5">Recommendation:</div>
-                          <div style={{ color: '#e2e8f0' }} className="text-[11px] flex-1 text-right">
-                            {activeProject?.projectReview?.improvementSuggestions?.[0] || "Refactor project requirements into features."}
-                          </div>
-                        </div>
-
-                        <div className="flex justify-between items-center border-t border-brand-200/10 pt-2">
-                          <div style={{ color: '#94a3b8' }} className="text-[9px] font-bold uppercase">Top Priority:</div>
-                          <div style={{ color: '#f59e0b' }} className="font-extrabold text-[10px] font-mono">
-                            {activeProject?.taskPlan?.criticalTasks?.[0] || "Generate Project Backlog"}
-                          </div>
-                        </div>
-
-                        <div className="flex justify-between items-center border-t border-brand-200/10 pt-2">
-                          <div style={{ color: '#94a3b8' }} className="text-[9px] font-bold uppercase">Current Risk:</div>
-                          <div style={{ color: '#f87171' }} className="font-bold text-[10px] font-mono">
-                            {activeProject?.projectReview?.projectRisks?.[0] || "Lack of detailed feature spec"}
-                          </div>
-                        </div>
-
-                        <div className="flex justify-between items-center border-t border-brand-200/10 pt-2">
-                          <div style={{ color: '#94a3b8' }} className="text-[9px] font-bold uppercase">Suggested Action:</div>
-                          <div style={{ color: '#00f0ff' }} className="font-semibold text-[10px] font-mono">
-                            {activeProject?.taskPlanGeneratedAt ? "Review Backlog" : "Initialize Backlog Splitter"}
-                          </div>
-                        </div>
-                      </div>
-                    </div>
-                  </div>
-
-                  {/* Ask Copilot Form */}
-                  <form onSubmit={handleAskCopilot} className="mt-4 flex gap-2 border border-brand-200/30 bg-neutral-950 p-1.5 rounded-xl">
-                    <input
-                      type="text"
-                      placeholder="Ask AI anything..."
-                      value={copilotQuery}
-                      onChange={(e) => setCopilotQuery(e.target.value)}
-                      className="bg-transparent border-0 text-xs text-white focus:outline-hidden px-2 flex-1 font-mono placeholder-slate-500"
-                    />
-                    <button
-                      type="submit"
-                      disabled={!copilotQuery.trim()}
-                      style={{ backgroundColor: '#0077ff' }}
-                      className="p-2 hover:bg-[#00f0ff] text-white hover:text-black rounded-lg transition-all flex items-center justify-center shrink-0 cursor-pointer border-0"
-                    >
-                      <Sparkles size={14} />
-                    </button>
-                  </form>
-                </div>
-
-                {/* CENTER: Project Overview */}
-                <div className="dashboard-card glow-blue flex flex-col justify-between border-t-2 border-t-[#00a2ff] p-5 h-full">
-                  <div className="flex flex-col gap-3">
-                    <div className="flex justify-between items-center pb-2 border-b border-brand-200/30">
-                      <div className="flex items-center gap-2">
-                        <FolderGit2 size={16} style={{ color: '#00a2ff' }} />
-                        <div style={{ color: '#fff' }} className="text-[11px] font-black tracking-widest uppercase font-mono">PROJECT WORKSPACES</div>
-                      </div>
-                      <div style={{ color: '#94a3b8' }} className="text-[9px] font-bold font-mono">
-                        {teams.length} Connected
-                      </div>
-                    </div>
-
-                    <div className="flex flex-col gap-3 max-h-[220px] overflow-y-auto pr-1">
-                      {teams.length === 0 ? (
-                        <div className="flex flex-col items-center justify-center py-8 text-center gap-2">
-                          <div style={{ color: '#94a3b8' }} className="text-xs italic">No active squads found.</div>
-                          <button onClick={() => navigate('/team/create')} className="btn-primary text-xs py-1 mt-1">Create Team</button>
-                        </div>
-                      ) : (
-                        teams.map((team) => {
-                          const proj = projects[team._id];
-                          let projCompleted = 0, projTotal = 0;
-                          if (proj && proj.taskPlan?.assignments) {
-                            proj.taskPlan.assignments.forEach(a => {
-                              a.assignedTasks?.forEach(t => {
-                                projTotal++;
-                                if (t.status === 'Completed') projCompleted++;
-                              });
-                            });
-                          }
-                          const projPercent = projTotal > 0 ? Math.round((projCompleted / projTotal) * 100) : (proj ? 40 : 0);
-                          const isCurrent = proj && proj._id === currentProjectId;
-
-                          return (
-                            <div
-                              key={team._id}
-                              onClick={() => {
-                                if (proj) {
-                                  setSelectedProjectId(proj._id);
-                                } else {
-                                  navigate(`/team/${team._id}`);
-                                }
-                              }}
-                              className={`p-3 rounded-xl border transition-all cursor-pointer flex flex-col gap-2 ${isCurrent ? 'bg-[#00f0ff]/5 border-[#00f0ff]' : 'bg-neutral-900/30 border-brand-200/20 hover:border-brand-200/50'}`}
-                            >
-                              <div className="flex justify-between items-start gap-2">
-                                <div className="min-w-0 flex-1">
-                                  <div style={{ color: '#fff' }} className="font-extrabold text-xs truncate font-mono">
-                                    {team.teamName}
-                                  </div>
-                                  <div style={{ color: '#94a3b8' }} className="text-[9px] font-medium truncate mt-0.5">
-                                    {proj ? `Project: ${proj.projectName} | Track: ${proj.track || 'Unspecified'}` : 'No active project linked'}
-                                  </div>
-                                </div>
-                                <div className="flex flex-col items-end gap-1">
-                                  <div className={`text-[8px] font-extrabold px-1.5 py-0.5 rounded-sm uppercase ${
-                                    proj
-                                      ? (proj.status === 'Completed' ? 'bg-emerald-500/10 text-emerald-400 border border-emerald-500/20' : proj.status === 'In Progress' ? 'bg-blue-500/10 text-blue-400 border border-blue-500/20' : 'bg-amber-500/10 text-amber-400 border border-amber-500/20')
-                                      : 'bg-neutral-500/10 text-neutral-400 border border-neutral-500/20'
-                                  }`}>
-                                    {proj ? proj.status : 'No Project'}
-                                  </div>
-                                </div>
-                              </div>
-
-                              {/* Progress bar */}
-                              {proj && (
-                                <div className="flex items-center gap-2 mt-1">
-                                  <div className="flex-1 bg-neutral-950 h-1.5 rounded-full overflow-hidden border border-brand-200/10">
-                                    <div className="bg-[#00f0ff] h-full rounded-full" style={{ width: `${projPercent}%`, boxShadow: '0 0 4px #00f0ff' }}></div>
-                                  </div>
-                                  <div style={{ color: '#fff' }} className="text-[9px] font-bold font-mono">{projPercent}%</div>
-                                </div>
-                              )}
-
-                              <div className="flex justify-between items-center text-[9px] text-slate-400 border-t border-brand-200/10 pt-2 mt-1">
-                                <div style={{ color: '#94a3b8' }} className="flex items-center gap-1 font-mono">
-                                  <Users size={10} className="text-slate-400" />
-                                  <span>{team.members?.length || 1} Member(s)</span>
-                                </div>
-                                <button
-                                  onClick={(e) => {
-                                    e.stopPropagation();
-                                    navigate(`/team/${team._id}`);
-                                  }}
-                                  style={{ color: '#00f0ff' }}
-                                  className="font-extrabold hover:underline uppercase flex items-center gap-0.5 cursor-pointer bg-transparent border-0 text-[9px]"
-                                >
-                                  Workspace <ArrowUpRight size={10} />
-                                </button>
-                              </div>
-                            </div>
-                          );
-                        })
-                      )}
-                    </div>
-                  </div>
-
-                  <button
-                    onClick={() => navigate('/team/create')}
-                    className="btn-primary text-xs w-full py-2 flex items-center justify-center gap-1.5 mt-2"
-                  >
-                    <Plus size={13} />
-                    Launch New Squad Workspace
-                  </button>
-                </div>
-
-                {/* RIGHT: Developer Profile */}
-                <div className="dashboard-card glow-blue flex flex-col justify-between border-t-2 border-t-[#00f0ff] p-5 h-full">
-                  <div className="flex flex-col gap-4">
-                    <div className="flex justify-between items-center pb-2 border-b border-brand-200/30">
-                      <div className="flex items-center gap-2">
-                        <UserCheck size={16} style={{ color: '#00f0ff' }} />
-                        <div style={{ color: '#fff' }} className="text-[11px] font-black tracking-widest uppercase font-mono">OPERATIVE PROFILE</div>
-                      </div>
-                      <div className="text-[8px] font-extrabold px-1.5 py-0.5 rounded-sm bg-emerald-500/15 text-emerald-400 border border-emerald-500/30 font-mono flex items-center gap-1">
-                        <span className="w-1.5 h-1.5 rounded-full bg-emerald-400 animate-pulse"></span>
-                        VERIFIED
-                      </div>
-                    </div>
-
-                    <div className="flex items-center gap-3 bg-neutral-900/40 p-3 rounded-xl border border-brand-200/10">
-                      {activeUser?.avatar ? (
-                        <img src={activeUser.avatar} alt="Avatar" className="w-10 h-10 rounded-full border border-[#00f0ff] object-cover" />
-                      ) : (
-                        <div style={{ color: '#fff' }} className="w-10 h-10 rounded-full bg-neutral-950 text-white flex items-center justify-center text-sm font-extrabold shadow-sm border border-[#00f0ff]/40 font-mono">
-                          {activeUser?.name?.charAt(0).toUpperCase() || 'U'}
-                        </div>
-                      )}
-                      <div className="flex-1 min-w-0">
-                        <div style={{ color: '#fff' }} className="font-extrabold text-xs truncate font-mono">{activeUser?.name}</div>
-                        <div style={{ color: '#94a3b8' }} className="text-[8px] font-mono mt-0.5 truncate uppercase">ROLE: SQUAD LEAD</div>
-                      </div>
-                    </div>
-
-                    {/* Compact stats */}
-                    <div className="flex flex-col gap-3 text-[10px]">
-                      <div className="flex flex-col gap-2">
-                        <div className="flex justify-between items-center">
-                          <div style={{ color: '#94a3b8' }} className="uppercase font-bold text-[9px]">Active Squads:</div>
-                          <div style={{ color: '#fff' }} className="font-bold font-mono">{teams.length} Connected</div>
-                        </div>
-                        <div className="flex justify-between items-center">
-                          <div style={{ color: '#94a3b8' }} className="uppercase font-bold text-[9px]">Skills Matrix:</div>
-                          <div style={{ color: '#fff' }} className="font-extrabold truncate max-w-[130px] font-mono" title={activeUser?.skills?.join(', ')}>
-                            {activeUser?.skills?.length > 0 ? activeUser.skills.slice(0, 3).join(', ') : 'React, Node, AI'}
-                          </div>
-                        </div>
-                        <div className="flex justify-between items-center">
-                          <div style={{ color: '#94a3b8' }} className="uppercase font-bold text-[9px]">Linked Repository:</div>
-                          <div style={{ color: '#00f0ff' }} className="font-bold font-mono truncate max-w-[130px]">
-                            {activeUser?.githubId ? 'github.com/auth' : 'github.com/hackbuddy'}
-                          </div>
-                        </div>
-                      </div>
-                    </div>
-                  </div>
-
-                  <button
-                    onClick={() => navigate('/profile')}
-                    className="btn-secondary text-xs w-full py-2 flex items-center justify-center gap-1.5 mt-2"
-                  >
-                    <Settings size={13} />
-                    Modify Dev Profile
-                  </button>
-                </div>
-              </div>
-
-              {/* THIRD ROW */}
-              <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
-                
-                {/* LEFT: AI Command Center Snapshot */}
-                <div className="dashboard-card glow-blue flex flex-col justify-between border-t-2 border-t-[#00f0ff] p-5 h-full">
-                  <div className="flex flex-col gap-4">
-                    <div className="flex justify-between items-center pb-2 border-b border-brand-200/30">
-                      <div className="flex items-center gap-2">
-                        <LayoutDashboard size={16} style={{ color: '#00f0ff' }} />
-                        <div style={{ color: '#fff' }} className="text-[11px] font-black tracking-widest uppercase font-mono">COMMAND SNAPSHOT</div>
-                      </div>
-                      <div className="text-[8px] font-extrabold px-1.5 py-0.5 rounded-sm bg-orange-500/10 text-orange-400 border border-orange-500/20 font-mono">
-                        SYNCED
-                      </div>
-                    </div>
-
-                    {/* Overall Progress Bar */}
-                    <div className="flex flex-col gap-1.5 text-left">
-                      <div className="flex justify-between items-center text-[10px]">
-                        <div style={{ color: '#94a3b8' }} className="uppercase font-bold">Overall Task Completion</div>
-                        <div style={{ color: '#fff' }} className="font-extrabold font-mono">{verificationRate}%</div>
-                      </div>
-                      <div className="bg-neutral-950 h-2 rounded-full overflow-hidden border border-brand-200/10">
-                        <div className="bg-[#00f0ff] h-full rounded-full" style={{ width: `${verificationRate}%`, boxShadow: '0 0 5px #00f0ff' }}></div>
-                      </div>
-                    </div>
-
-                    {/* Grid of Mini KPI Cards (2x2) */}
-                    <div className="grid grid-cols-2 gap-3 mt-1">
-                      
-                      {/* Completed */}
-                      <div className="bg-neutral-950/60 p-2.5 rounded-xl border border-emerald-500/20 flex flex-col gap-1 text-left">
-                        <div style={{ color: '#94a3b8' }} className="text-[8px] font-black uppercase tracking-wider">Completed</div>
-                        <div className="text-base font-black text-emerald-400 font-mono">{completedTasks}</div>
-                        <div style={{ color: '#64748b' }} className="text-[8px] font-semibold font-mono">Verified SLA</div>
-                      </div>
-
-                      {/* Pending */}
-                      <div className="bg-neutral-950/60 p-2.5 rounded-xl border border-[#00f0ff]/20 flex flex-col gap-1 text-left">
-                        <div style={{ color: '#94a3b8' }} className="text-[8px] font-black uppercase tracking-wider">Pending</div>
-                        <div className="text-base font-black text-[#00f0ff] font-mono">{pendingTasks}</div>
-                        <div style={{ color: '#64748b' }} className="text-[8px] font-semibold font-mono">In Backlog</div>
-                      </div>
-
-                      {/* Blocked */}
-                      <div className="bg-neutral-950/60 p-2.5 rounded-xl border border-rose-500/20 flex flex-col gap-1 text-left">
-                        <div style={{ color: '#94a3b8' }} className="text-[8px] font-black uppercase tracking-wider">Blocked</div>
-                        <div className="text-base font-black text-rose-400 font-mono">{blockedTasks}</div>
-                        <div style={{ color: '#64748b' }} className="text-[8px] font-semibold font-mono">Action Needed</div>
-                      </div>
-
-                      {/* Verification Rate */}
-                      <div className="bg-neutral-950/60 p-2.5 rounded-xl border border-purple-500/20 flex flex-col gap-1 text-left">
-                        <div style={{ color: '#94a3b8' }} className="text-[8px] font-black uppercase tracking-wider">Verification</div>
-                        <div className="text-base font-black text-purple-400 font-mono">{verificationRate}%</div>
-                        <div style={{ color: '#64748b' }} className="text-[8px] font-semibold font-mono">Accuracy</div>
-                      </div>
-
-                    </div>
-                  </div>
-
-                  <button
-                    onClick={() => setActiveTab('command-center')}
-                    className="btn-secondary text-xs w-full py-2 flex items-center justify-center gap-1.5 mt-2"
-                  >
-                    <Flame size={13} className="text-orange-500" />
-                    Open AI Command Center HUD
-                  </button>
-                </div>
-
-                {/* CENTER: AI Activity Feed */}
-                <div className="dashboard-card glow-blue flex flex-col justify-between border-t-2 border-t-[#00a2ff] p-5 h-full">
-                  <div className="flex flex-col gap-3">
-                    <div className="flex justify-between items-center pb-2 border-b border-brand-200/30">
-                      <div className="flex items-center gap-2">
-                        <Activity size={16} style={{ color: '#00a2ff' }} className="animate-pulse" />
-                        <div style={{ color: '#fff' }} className="text-[11px] font-black tracking-widest uppercase font-mono">AI LOG & ACTIVITY FEED</div>
-                      </div>
-                      <div className="text-[8px] font-extrabold px-1.5 py-0.5 rounded-sm bg-neutral-950 text-[#00a2ff] border border-brand-200/20 font-mono">
-                        REAL-TIME
-                      </div>
-                    </div>
-
-                    {/* Timeline List */}
-                    <div className="relative flex flex-col gap-4 mt-2 pl-4 max-h-[220px] overflow-y-auto">
-                      {/* Vertical line connector */}
-                      <div className="absolute left-[7px] top-1.5 bottom-1.5 w-0.5 bg-brand-200/20"></div>
-
-                      {commandCenterData?.timeline && commandCenterData.timeline.length > 0 ? (
-                        commandCenterData.timeline.slice(0, 5).map((evt, idx) => {
-                          const isSuccess = evt.type === 'Success' || evt.event.includes('Completed');
-                          const isMilestone = evt.type === 'Milestone' || evt.event.includes('Deadline');
-                          const colorClass = isSuccess ? 'bg-emerald-400' : isMilestone ? 'bg-purple-400' : 'bg-blue-400';
-                          const timeStr = evt.time ? new Date(evt.time).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }) : '';
-                          
-                          return (
-                            <div key={idx} className="relative flex flex-col gap-0.5 text-left">
-                              <div className={`absolute -left-[13px] top-1 w-2.5 h-2.5 rounded-full ${colorClass} border-2 border-neutral-950`}></div>
-                              <div className="flex justify-between items-center">
-                                <div style={{ color: '#fff' }} className="font-extrabold text-[10px] font-mono truncate max-w-[170px]">{evt.event}</div>
-                                <div style={{ color: '#64748b' }} className="text-[8px] font-mono shrink-0">{timeStr}</div>
-                              </div>
-                            </div>
-                          );
-                        })
-                      ) : (
-                        <div className="relative flex flex-col gap-0.5 text-left">
-                          <div className="absolute -left-[13px] top-1 w-2.5 h-2.5 rounded-full bg-blue-400 border-2 border-neutral-950"></div>
-                          <div className="flex justify-between items-center">
-                            <div style={{ color: '#fff' }} className="font-extrabold text-[10px] font-mono">No telemetry events yet</div>
-                          </div>
-                          <div style={{ color: '#94a3b8' }} className="text-[9px] leading-snug">
-                            Connect your repository and update tasks to stream logs here.
-                          </div>
-                        </div>
-                      )}
-                    </div>
-
-                    <div style={{ color: '#64748b' }} className="text-[8px] text-center font-mono mt-2">
-                      LOGS LIVE STREAMING ON WORKSPACE CHANNELS
-                    </div>
-                  </div>
-                </div>
-
-                {/* RIGHT: GitHub Intelligence */}
-                <div className="dashboard-card glow-blue flex flex-col justify-between border-t-2 border-t-[#00f0ff] p-5 h-full">
-                  <div className="flex flex-col gap-4">
-                    <div className="flex justify-between items-center pb-2 border-b border-brand-200/30">
-                      <div className="flex items-center gap-2">
-                        <GithubIcon size={16} style={{ color: '#00f0ff' }} />
-                        <div style={{ color: '#fff' }} className="text-[11px] font-black tracking-widest uppercase font-mono">GITHUB INTELLIGENCE</div>
-                      </div>
-                      <div className={`text-[8px] font-extrabold px-1.5 py-0.5 rounded-sm font-mono ${
-                        repoConnected 
-                          ? 'bg-emerald-500/10 text-emerald-400 border border-emerald-500/20' 
-                          : 'bg-neutral-800 text-neutral-400 border border-neutral-700 font-mono'
-                      }`}>
-                        {repoConnected ? 'LINKED' : 'NOT LINKED'}
-                      </div>
-                    </div>
-
-                    {repoConnected ? (
+                  <div className="flex flex-col gap-2">
+                    {activeProjectsList.length > 0 ? (
                       <>
-                        {/* Stats — dynamic metrics */}
-                        <div className="grid grid-cols-2 gap-3 text-[10px]">
-                          {[
-                            { label: 'Commits Today', value: githubAnalytics?.stats?.commitsToday ?? 0, color: 'text-brand-400' },
-                            { label: 'Open PRs', value: githubAnalytics?.stats?.openPRCount ?? 0, color: 'text-emerald-400' },
-                            { label: 'Open Issues', value: githubAnalytics?.stats?.openIssueCount ?? 0, color: 'text-orange-400' },
-                            { label: 'Contributors', value: githubAnalytics?.stats?.contributorCount ?? 0, color: 'text-purple-400' }
-                          ].map(stat => (
-                            <div key={stat.label} className="flex justify-between items-center bg-neutral-950/40 p-2 rounded-lg border border-brand-200/10 text-left">
-                              <div style={{ color: '#94a3b8' }}>{stat.label}</div>
-                              <div className={`font-extrabold font-mono ${stat.color}`}>{stat.value}</div>
-                            </div>
-                          ))}
+                        <div className="flex items-start gap-2 text-xs">
+                          <span className="w-1.5 h-1.5 rounded-full bg-[#00f0ff] shrink-0 mt-1.5"></span>
+                          <p className="text-neutral-350 leading-relaxed">
+                            Continue <b className="text-[#00f0ff]">{activeProjectsList[0]?.projectName}</b>. Deployment should begin within 3 hours.
+                          </p>
                         </div>
-
-                        {/* Connected Repository Info */}
-                        <div className="flex flex-col gap-2.5 p-3.5 bg-neutral-950/40 rounded-xl border border-brand-200/10 text-left">
-                          <div style={{ color: '#94a3b8' }} className="text-[8px] font-black uppercase tracking-wider font-mono">REPOSITORY TELEMETRY</div>
-                          <div style={{ color: '#fff' }} className="text-[11px] font-bold truncate">
-                            {githubAnalytics?.owner}/{githubAnalytics?.repository}
+                        {activeProjectsList[1] && (
+                          <div className="flex items-start gap-2 text-xs">
+                            <span className="w-1.5 h-1.5 rounded-full bg-amber-400 shrink-0 mt-1.5"></span>
+                            <p className="text-neutral-350 leading-relaxed">
+                              <b className="text-amber-400">{activeProjectsList[1]?.projectName}</b> has no commits in the last 8 hours.
+                            </p>
                           </div>
-                          
-                          {/* Languages display if available */}
-                          {githubAnalytics?.languages && Object.keys(githubAnalytics.languages).length > 0 && (
-                            <div style={{ color: '#00f0ff' }} className="text-[9px] font-semibold font-mono truncate mt-1">
-                              {(() => {
-                                const entries = Object.entries(githubAnalytics.languages);
-                                const total = entries.reduce((s, [, v]) => s + v, 0);
-                                return entries.slice(0, 3).map(([lang, bytes]) => `${lang} ${(bytes/total*100).toFixed(0)}%`).join(' • ');
-                              })()}
-                            </div>
-                          )}
-
-                          {/* Last Commit message */}
-                          {githubAnalytics?.commitSummary?.lastCommitMessage && (
-                            <div className="border-t border-brand-200/5 pt-2 mt-1">
-                              <div style={{ color: '#64748b' }} className="text-[7px] font-black uppercase font-mono">Last Commit Message</div>
-                              <div style={{ color: '#94a3b8' }} className="text-[9px] italic line-clamp-1 leading-snug mt-0.5">
-                                "{githubAnalytics.commitSummary.lastCommitMessage}"
-                              </div>
-                            </div>
-                          )}
-                        </div>
+                        )}
+                        {activeProjectsList[2] && (
+                          <div className="flex items-start gap-2 text-xs">
+                            <span className="w-1.5 h-1.5 rounded-full bg-red-400 shrink-0 mt-1.5"></span>
+                            <p className="text-neutral-350 leading-relaxed">
+                              <b className="text-[#ef4444]">{activeProjectsList[2]?.projectName}</b> has blocked tasks.
+                            </p>
+                          </div>
+                        )}
                       </>
                     ) : (
-                      <>
-                        {/* Stats — dashes since no repo connected */}
-                        <div className="grid grid-cols-2 gap-3 text-[10px]">
-                          {['Commits Today', 'Open PRs', 'Open Issues', 'Contributors'].map(label => (
-                            <div key={label} className="flex justify-between items-center bg-neutral-950/40 p-2 rounded-lg border border-brand-200/10 text-left">
-                              <div style={{ color: '#94a3b8' }}>{label}</div>
-                              <div style={{ color: '#475569' }} className="font-extrabold font-mono">—</div>
-                            </div>
-                          ))}
-                        </div>
-
-                        {/* Not Connected Placeholder */}
-                        <div className="flex flex-col items-center justify-center gap-3 py-5 bg-neutral-950/40 rounded-xl border border-dashed border-neutral-700/60">
-                          <GithubIcon size={30} style={{ color: '#334155' }} />
-                          <div className="text-center px-2">
-                            <div style={{ color: '#94a3b8' }} className="text-[10px] font-bold uppercase tracking-wider">No Repository Linked</div>
-                            <div style={{ color: '#64748b' }} className="text-[9px] mt-1.5 font-mono leading-relaxed">
-                              Connect a GitHub repo in your team workspace to unlock commit tracking, PR monitoring, and language analytics.
-                            </div>
-                          </div>
-                        </div>
-                      </>
+                      <div className="text-xs text-neutral-500 italic">No project recommendations available. Link a team project to begin.</div>
                     )}
                   </div>
+                </div>
 
+                <div className="mt-4 flex gap-2">
                   <button
-                    onClick={() => navigateToWorkspace('github')}
-                    className="btn-primary text-xs w-full py-2 flex items-center justify-center gap-1.5 mt-2"
+                    onClick={() => {
+                      if (currentProjectId) navigate(`/workspace/${currentProjectId}`, { state: { activeTab: 'chat' } });
+                      else toast.error('Create a project to open the assistant.');
+                    }}
+                    className="btn-primary text-xs py-1.5 px-3 flex items-center gap-1.5"
                   >
-                    <GithubIcon size={13} />
-                    {repoConnected ? 'Manage GitHub Repo' : 'Connect GitHub Repository'}
+                    <MessageSquare size={13} />
+                    <span>Open AI Assistant</span>
                   </button>
                 </div>
               </div>
 
-              {/* FOURTH ROW */}
-              <div className="grid grid-cols-1 gap-6">
-                
-                {/* LEFT: Team Workloads */}
-                <div className="dashboard-card glow-blue flex flex-col justify-between border-t-2 border-t-[#00f0ff] p-5 h-full">
-                  <div className="flex flex-col gap-4">
-                    <div className="flex justify-between items-center pb-2 border-b border-brand-200/30">
-                      <div className="flex items-center gap-2">
-                        <Users size={16} style={{ color: '#00f0ff' }} />
-                        <div style={{ color: '#fff' }} className="text-[11px] font-black tracking-widest uppercase font-mono">TEAM WORKLOADS</div>
-                      </div>
-                      <div className="text-[8px] font-extrabold px-1.5 py-0.5 rounded-sm bg-neutral-950 text-[#00f0ff] border border-brand-200/20 font-mono">
-                        METRICS
-                      </div>
-                    </div>
+              {/* Personal Summary KPIs */}
+              <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 w-full">
+                {[
+                  { label: 'Projects', val: totalProjects, sub: 'Workspaces', color: 'border-l-brand-400' },
+                  { label: 'Running Hackathons', val: runningHackathons, sub: 'Milestone Events', color: 'border-l-orange-500' },
+                  { label: 'Tasks Due Today', val: tasksDueTodayCount, sub: 'Assignments', color: 'border-l-rose-500' }
+                ].map(k => (
+                  <div key={k.label} className={`dashboard-card glow-blue flex-col items-start gap-1 p-3.5 border-l-4 ${k.color} text-left`}>
+                    <span className="text-[8px] font-black uppercase text-neutral-400 leading-none">{k.label}</span>
+                    <div className="text-lg font-black text-white font-mono mt-1 leading-none">{k.val}</div>
+                    <span className="text-[8px] text-neutral-500 font-semibold font-mono leading-none mt-1">{k.sub}</span>
+                  </div>
+                ))}
+              </div>
 
-                    <div className="flex flex-col gap-3 max-h-[220px] overflow-y-auto pr-1">
-                      {displayMembers.length === 0 ? (
-                        <div style={{ color: '#94a3b8' }} className="text-xs italic text-center py-8">No squad members found. Invite teammates to split work.</div>
-                      ) : (
-                        displayMembers.map((m, idx) => (
-                          <div key={idx} className="flex flex-col gap-1 bg-neutral-950/40 p-2.5 rounded-xl border border-brand-200/10 text-left">
-                            <div className="flex justify-between items-center text-[10px]">
-                              <div className="flex items-center gap-2">
-                                <div style={{ color: '#fff' }} className="w-5 h-5 rounded-full bg-brand-900 border border-[#00f0ff] flex items-center justify-center text-[9px] font-extrabold font-mono">
-                                  {m.initials}
-                                </div>
-                                <div style={{ color: '#fff' }} className="font-extrabold font-mono truncate max-w-[100px]">{m.name}</div>
-                              </div>
-                              <div style={{ color: '#94a3b8' }} className="font-mono">{m.completed}/{m.total} Tasks ({m.pct}%)</div>
+              {/* My Projects Overview */}
+              <div className="flex flex-col gap-3 text-left">
+                <span className="text-[10px] font-black uppercase tracking-widest text-[#00f0ff] flex items-center gap-2">
+                  <FolderGit2 size={14} className="text-[#00f0ff]" />
+                  <span>My Projects Overview</span>
+                </span>
+                
+                {/* Empty state: No Teams */}
+                {teams.length === 0 && (
+                  <div className="dashboard-card glow-blue p-8 items-center text-center justify-center gap-4 bg-neutral-900/20 border-dashed border-neutral-700">
+                    <div className="w-12 h-12 rounded-full bg-brand-200/10 flex items-center justify-center border border-brand-200/20 text-[#00f0ff]">
+                      <Users size={22} />
+                    </div>
+                    <div>
+                      <h3 className="text-sm font-bold text-white">No active squads found</h3>
+                      <p className="text-xs text-neutral-400 mt-1 max-w-sm mx-auto leading-relaxed">
+                        Join or create a team workspace to sync projects, split deliverables, and review feasibility metrics.
+                      </p>
+                    </div>
+                    <div className="flex gap-2">
+                      <button onClick={() => navigate('/team/create')} className="btn-primary text-xs py-1.5 px-3">Create Team</button>
+                      <button onClick={() => navigate('/team/join')} className="btn-secondary text-xs py-1.5 px-3">Join Team</button>
+                    </div>
+                  </div>
+                )}
+
+                {/* Empty state: No Projects */}
+                {teams.length > 0 && activeProjectsList.length === 0 && (
+                  <div className="dashboard-card glow-blue p-8 items-center text-center justify-center gap-4 bg-neutral-900/20 border-dashed border-neutral-700">
+                    <div className="w-12 h-12 rounded-full bg-brand-200/10 flex items-center justify-center border border-brand-200/20 text-[#00f0ff]">
+                      <FolderGit2 size={22} />
+                    </div>
+                    <div>
+                      <h3 className="text-sm font-bold text-white">No active projects configured</h3>
+                      <p className="text-xs text-neutral-400 mt-1 max-w-sm mx-auto leading-relaxed">
+                        You have joined squads, but no projects are configured. Setup your hackathon tracks, features, and repo link.
+                      </p>
+                    </div>
+                    <button
+                      onClick={() => navigate(`/team/${teams[0]._id}`)}
+                      className="btn-primary text-xs py-1.5 px-3"
+                    >
+                      Create Project Profile
+                    </button>
+                  </div>
+                )}
+
+                {/* Grid of Compact Project Cards */}
+                {activeProjectsList.length > 0 && (
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                    {teams.map((team) => {
+                      const proj = projects[team._id];
+                      if (!proj) return null;
+
+                      // Calculate completion percentage
+                      let totalTasks = 0, completedTasks = 0;
+                      if (proj.taskPlan?.assignments) {
+                        proj.taskPlan.assignments.forEach(a => {
+                          a.assignedTasks?.forEach(t => {
+                            totalTasks++;
+                            if (t.status === 'Completed') completedTasks++;
+                          });
+                        });
+                      }
+                      const progressPercent = totalTasks > 0 ? Math.round((completedTasks / totalTasks) * 100) : 40;
+                      
+                      // Calculate winning prob
+                      const feasibility = proj.projectReview?.feasibilityScore || 8.0;
+                      const winningProb = Math.min(95, Math.max(45, Math.round((feasibility * 9) + (proj.status === 'Completed' ? 10 : 0))));
+
+                      return (
+                        <div
+                          key={proj._id}
+                          className="dashboard-card glow-blue p-4 flex flex-col justify-between border-t-2 border-t-[#00f0ff] hover:-translate-y-1 transition-all"
+                        >
+                          <div className="flex justify-between items-start gap-3">
+                            <div className="min-w-0">
+                              <h3 className="text-xs font-extrabold text-white truncate font-mono">{proj.projectName}</h3>
+                              <span className="text-[9px] text-neutral-450 uppercase font-semibold block mt-0.5">Team: {team.teamName}</span>
                             </div>
-                            <div className="flex items-center gap-2 mt-1">
-                              <div className="flex-1 bg-neutral-950 h-1.5 rounded-full overflow-hidden border border-brand-200/10">
-                                <div className="bg-[#00f0ff] h-full rounded-full" style={{ width: `${m.pct}%` }}></div>
-                              </div>
-                              <div style={{ color: '#64748b' }} className="text-[8px] font-mono shrink-0">{m.commits} commits</div>
+                            <CircularProgress percentage={progressPercent} size={38} strokeWidth={3} color="#00f0ff" />
+                          </div>
+
+                          {/* Progress slider bar */}
+                          <div className="flex flex-col gap-1 mt-3">
+                            <div className="flex justify-between text-[8px] text-neutral-400 font-bold uppercase">
+                              <span>Milestone Progress</span>
+                              <span className="font-mono text-white">{progressPercent}%</span>
+                            </div>
+                            <div className="h-1.5 bg-neutral-900 rounded-full overflow-hidden p-[1px] border border-brand-200/10">
+                              <div className="h-full bg-[#00f0ff] rounded-full" style={{ width: `${progressPercent}%` }}></div>
                             </div>
                           </div>
-                        ))
-                      )}
+
+                          {/* Badges rows */}
+                          <div className="flex flex-wrap gap-1.5 mt-3">
+                            <span className={`text-[8px] font-bold px-1.5 py-0.5 rounded-md border font-mono ${
+                              proj.status === 'Completed' ? 'bg-emerald-500/15 border-emerald-500/30 text-emerald-400' :
+                              proj.status === 'In Progress' ? 'bg-blue-500/15 border-blue-500/30 text-blue-400' :
+                              'bg-amber-500/15 border-amber-500/30 text-amber-400'
+                            }`}>
+                              {proj.status}
+                            </span>
+                            
+                            <span className="text-[8px] font-bold px-1.5 py-0.5 rounded-md border border-[#00f0ff]/20 bg-[#00f0ff]/10 text-[#00f0ff] font-mono">
+                              Win: {winningProb}%
+                            </span>
+
+                            <span className="text-[8px] font-bold px-1.5 py-0.5 rounded-md border border-purple-500/20 bg-purple-500/10 text-purple-400 font-mono">
+                              Health: {Math.round(feasibility * 10)}%
+                            </span>
+
+                            {proj.track && (
+                              <span className="text-[8px] font-bold px-1.5 py-0.5 rounded-md border border-orange-500/20 bg-orange-500/10 text-orange-400 font-mono">
+                                Track: {proj.track}
+                              </span>
+                            )}
+                          </div>
+
+                          {/* Footer Actions */}
+                          <div className="flex justify-between items-center border-t border-brand-200/10 pt-3 mt-3">
+                            <button
+                              onClick={() => setActiveReviewProj(proj)}
+                              className="text-[9px] font-bold hover:underline text-[#00f0ff] bg-transparent border-0 cursor-pointer flex items-center gap-0.5 uppercase"
+                            >
+                              Quick AI Review <ArrowUpRight size={10} />
+                            </button>
+                            <button
+                              onClick={() => navigate(`/workspace/${proj._id}`)}
+                              className="text-[9px] font-bold bg-[#0077ff] text-white hover:bg-[#00f0ff] hover:text-[#02040f] px-2.5 py-1 rounded-md border border-[#00f0ff] transition-all cursor-pointer uppercase tracking-wider font-mono shadow-2xs"
+                            >
+                              Workspace
+                            </button>
+                          </div>
+                        </div>
+                      );
+                    })}
+                  </div>
+                )}
+              </div>
+
+              {/* Quick Actions Grid */}
+              <div className="flex flex-col gap-3 text-left">
+                <span className="text-[10px] font-black uppercase tracking-widest text-[#00f0ff] flex items-center gap-2">
+                  <Wrench size={14} className="text-[#00f0ff]" />
+                  <span>AI Operational Control & Quick Actions</span>
+                </span>
+                
+                <div className="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-8 gap-3 w-full">
+                  {[
+                    { label: 'Create Team', sub: 'New Squad', icon: Users, act: () => navigate('/team/create'), color: 'text-indigo-400' },
+                    { label: 'Join Team', sub: 'Link Invite', icon: UserCheck, act: () => navigate('/team/join'), color: 'text-[#00f0ff]' },
+                    { label: 'Create Project', sub: 'Init Backlog', icon: Plus, act: () => {
+                      if (teams.length > 0) navigate(`/team/${teams[0]._id}`);
+                      else navigate('/team/create');
+                    }, color: 'text-emerald-400' },
+                    { label: 'AI Review', sub: 'Risk Analysis', icon: ShieldCheck, act: () => {
+                      if (currentProjectId) navigate(`/workspace/${currentProjectId}`, { state: { activeTab: 'review' } });
+                      else toast.error('Setup project first.');
+                    }, color: 'text-brand-400' },
+                    { label: 'Open Shop', sub: 'Marketplace', icon: Database, act: () => {
+                      if (currentProjectId) navigate(`/workspace/${currentProjectId}`, { state: { activeTab: 'marketplace' } });
+                      else toast.error('Setup project first.');
+                    }, color: 'text-[#00f0ff]' },
+                    { label: 'AI Mentor', sub: 'Advisor chat', icon: MessageSquare, act: () => {
+                      if (currentProjectId) navigate(`/workspace/${currentProjectId}`, { state: { activeTab: 'chat' } });
+                      else toast.error('Setup project first.');
+                    }, color: 'text-violet-400' },
+                    { label: 'Task Splitter', sub: 'Sync roadmap', icon: Cpu, act: () => {
+                      if (currentProjectId) navigate(`/workspace/${currentProjectId}`, { state: { activeTab: 'splitter' } });
+                      else toast.error('Setup project first.');
+                    }, color: 'text-purple-400' },
+                    { label: 'GitHub Sync', sub: 'Git status', icon: GitBranch, act: () => {
+                      if (currentProjectId) navigate(`/workspace/${currentProjectId}`, { state: { activeTab: 'github' } });
+                      else toast.error('Setup project first.');
+                    }, color: 'text-white' }
+                  ].map(a => {
+                    const ActIcon = a.icon;
+                    return (
+                      <div
+                        key={a.label}
+                        onClick={a.act}
+                        className="dashboard-card glow-blue items-center justify-center text-center p-3 border border-brand-200/20 hover:border-[#00f0ff] rounded-xl cursor-pointer hover:-translate-y-1 transition-all bg-neutral-950/40"
+                      >
+                        <ActIcon size={20} className={`${a.color} mb-1.5`} />
+                        <span className="font-extrabold text-[9px] font-mono leading-tight text-white block">{a.label}</span>
+                        <span className="text-[7px] text-neutral-500 font-mono uppercase block mt-0.5">{a.sub}</span>
+                      </div>
+                    );
+                  })}
+                </div>
+              </div>
+
+              {/* Recent Activity Log */}
+              <div className="flex flex-col gap-3 text-left">
+                <span className="text-[10px] font-black uppercase tracking-widest text-[#00f0ff] flex items-center gap-2">
+                  <Activity size={14} className="text-[#00f0ff] animate-pulse" />
+                  <span>Recent Activity log</span>
+                </span>
+                <div className="dashboard-card glow-blue p-4 flex flex-col gap-3 max-h-60 overflow-y-auto w-full">
+                  {dashboardNotifications.length === 0 ? (
+                    <div className="text-xs text-neutral-500 italic py-6 text-center">No recent commit, marketplace, or AI activities found.</div>
+                  ) : (
+                    dashboardNotifications.slice(0, 8).map((notif, idx) => {
+                      const isCommit = notif.message.toLowerCase().includes('commit') || notif.message.toLowerCase().includes('repo');
+                      const isMarket = notif.message.toLowerCase().includes('swap') || notif.message.toLowerCase().includes('claim');
+                      const badgeText = isCommit ? 'GitHub' : isMarket ? 'Marketplace' : 'AI Alert';
+                      const badgeColor = isCommit ? 'bg-indigo-500/10 text-indigo-400 border-indigo-500/20' :
+                                         isMarket ? 'bg-emerald-500/10 text-emerald-400 border-emerald-500/20' :
+                                         'bg-orange-500/10 text-orange-400 border-orange-500/20';
+
+                      return (
+                        <div key={idx} className="flex justify-between items-center text-xs border-b border-brand-200/5 pb-2">
+                          <div className="flex items-center gap-2.5 min-w-0">
+                            <span className={`text-[8px] font-bold px-1.5 py-0.5 rounded border ${badgeColor} font-mono shrink-0`}>
+                              {badgeText}
+                            </span>
+                            <span className="text-neutral-350 truncate">{notif.message}</span>
+                          </div>
+                          <span className="text-[8px] text-neutral-500 font-mono shrink-0 ml-2">
+                            {notif.createdAt ? new Date(notif.createdAt).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }) : 'Just now'}
+                          </span>
+                        </div>
+                      );
+                    })
+                  )}
+                </div>
+              </div>
+
+            </div>
+
+            {/* Right Column: Upgraded Developer Profile */}
+            <div className="lg:col-span-1 flex flex-col gap-6 w-full text-left">
+              <div className="dashboard-card glow-blue flex flex-col justify-between border-t-2 border-t-brand-300 p-5 h-full">
+                <div className="flex flex-col gap-4">
+                  <div className="flex justify-between items-center pb-2 border-b border-brand-200/30">
+                    <div className="flex items-center gap-2">
+                      <UserCheck size={16} className="text-brand-300" />
+                      <div className="text-[11px] font-black tracking-widest uppercase font-mono text-neutral-800">OPERATIVE PROFILE</div>
+                    </div>
+                    <div className="text-[8px] font-extrabold px-1.5 py-0.5 rounded-sm bg-emerald-500/15 text-emerald-400 border border-emerald-500/30 font-mono flex items-center gap-1">
+                      <span className="w-1.5 h-1.5 rounded-full bg-emerald-400 animate-pulse"></span>
+                      VERIFIED
                     </div>
                   </div>
 
-                  <button
-                    onClick={() => {
-                      if (activeTeam) navigate(`/team/${activeTeam._id}`);
-                      else navigate('/team/create');
-                    }}
-                    className="btn-secondary text-xs w-full py-2 flex items-center justify-center gap-1.5 mt-2"
-                  >
-                    <Users size={13} />
-                    Manage Squad Workloads
-                  </button>
+                  <div className="flex items-center gap-3 bg-brand-100 p-3 rounded-xl border border-brand-200">
+                    {activeUser?.avatar ? (
+                      <img src={activeUser.avatar} alt="Avatar" className="w-10 h-10 rounded-full border border-brand-300 object-cover" />
+                    ) : (
+                      <div className="w-10 h-10 rounded-full bg-neutral-950 text-white flex items-center justify-center text-sm font-extrabold shadow-sm border border-brand-300 font-mono">
+                        {activeUser?.name?.charAt(0).toUpperCase() || 'U'}
+                      </div>
+                    )}
+                    <div className="flex-1 min-w-0">
+                      <div className="font-extrabold text-xs truncate font-mono text-neutral-800">{activeUser?.name}</div>
+                      <div className="text-[8px] font-mono mt-0.5 truncate uppercase text-neutral-500">ROLE: SQUAD LEAD</div>
+                    </div>
+                  </div>
+
+                  {/* Dynamic Presentation metrics with mini progress bars */}
+                  <div className="flex flex-col gap-4 text-xs">
+                    
+                    {/* Developer Score */}
+                    <div className="flex flex-col gap-1">
+                      <div className="flex justify-between font-bold text-[10px]">
+                        <span className="text-neutral-400 uppercase">Developer Score</span>
+                        <span className="font-mono text-neutral-800">{developerScore.toFixed(0)}/100</span>
+                      </div>
+                      <div className="h-1.5 bg-neutral-200 rounded-full overflow-hidden p-[1px] border border-brand-200/10">
+                        <div className="h-full bg-brand-300 rounded-full" style={{ width: `${developerScore}%` }}></div>
+                      </div>
+                    </div>
+
+                    {/* AI Reputation */}
+                    <div className="flex flex-col gap-1">
+                      <div className="flex justify-between font-bold text-[10px]">
+                        <span className="text-neutral-400 uppercase">AI Reputation Index</span>
+                        <span className="font-mono text-neutral-800">{aiReputation.toFixed(0)}%</span>
+                      </div>
+                      <div className="h-1.5 bg-neutral-200 rounded-full overflow-hidden p-[1px] border border-brand-200/10">
+                        <div className="h-full bg-purple-500 rounded-full" style={{ width: `${aiReputation}%` }}></div>
+                      </div>
+                    </div>
+
+                    {/* Contribution Score */}
+                    <div className="flex flex-col gap-1">
+                      <div className="flex justify-between font-bold text-[10px]">
+                        <span className="text-neutral-400 uppercase">Contribution Score</span>
+                        <span className="font-mono text-neutral-800">{contributionScore.toFixed(0)}%</span>
+                      </div>
+                      <div className="h-1.5 bg-neutral-200 rounded-full overflow-hidden p-[1px] border border-brand-200/10">
+                        <div className="h-full bg-emerald-500 rounded-full" style={{ width: `${contributionScore}%` }}></div>
+                      </div>
+                    </div>
+
+                    {/* Simple Stats grid */}
+                    <div className="grid grid-cols-2 gap-3 border-t border-brand-200/10 pt-3 text-[10px]">
+                      <div className="flex justify-between border-b border-brand-200/5 pb-1">
+                        <span className="text-neutral-500 font-bold uppercase">Squads</span>
+                        <span className="font-mono text-neutral-800 font-bold">{teams.length}</span>
+                      </div>
+                      <div className="flex justify-between border-b border-brand-200/5 pb-1">
+                        <span className="text-neutral-500 font-bold uppercase">Projects</span>
+                        <span className="font-mono text-neutral-800 font-bold">{totalProjects}</span>
+                      </div>
+                      <div className="flex justify-between border-b border-brand-200/5 pb-1">
+                        <span className="text-neutral-500 font-bold uppercase">Tasks Done</span>
+                        <span className="font-mono text-neutral-800 font-bold">{completedTasksCount}</span>
+                      </div>
+                      <div className="flex justify-between border-b border-brand-200/5 pb-1">
+                        <span className="text-neutral-500 font-bold uppercase">Git Connect</span>
+                        <span className={`font-mono font-bold ${activeUser?.githubId ? 'text-emerald-400' : 'text-neutral-500'}`}>{githubConnected}</span>
+                      </div>
+                    </div>
+
+                    {/* Verified Skills tags */}
+                    <div className="flex flex-col gap-1.5 border-t border-brand-200/10 pt-3">
+                      <span className="text-[9px] font-black uppercase text-neutral-400">Verified Skills Stack</span>
+                      <div className="flex flex-wrap gap-1.5">
+                        {activeUser?.skills?.length > 0 ? (
+                          activeUser.skills.map((skill, i) => (
+                            <span key={i} className="px-2 py-0.5 text-[9px] font-bold border border-brand-200/25 bg-brand-200/10 text-brand-400 rounded">
+                              {skill}
+                            </span>
+                          ))
+                        ) : (
+                          ['React', 'NodeJS', 'Express', 'MongoDB', 'AI Agents'].map((skill, i) => (
+                            <span key={i} className="px-2 py-0.5 text-[9px] font-bold border border-brand-200/25 bg-brand-200/10 text-brand-400 rounded">
+                              {skill}
+                            </span>
+                          ))
+                        )}
+                      </div>
+                    </div>
+
+                  </div>
                 </div>
-              </div>
 
-              {/* BOTTOM ROW: Quick Actions */}
-              <div className="flex flex-col gap-3 mt-2 text-left">
-                <div style={{ color: '#00f0ff' }} className="font-extrabold text-[11px] uppercase tracking-widest flex items-center gap-2">
-                  <Wrench size={14} className="text-[#00f0ff]" />
-                  <span>AI OPERATIONAL CONTROL & QUICK ACTIONS</span>
-                </div>
-                <div className="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-8 gap-4">
-                  
-                  {/* Action 1: AI Project Review */}
-                  <div
-                    onClick={() => navigateToWorkspace('dashboard')}
-                    className="dashboard-card glow-blue items-center justify-center text-center p-4 border border-brand-200/20 hover:border-[#00f0ff] rounded-xl cursor-pointer hover:-translate-y-1 transition-all bg-neutral-950/40"
-                  >
-                    <Activity size={24} className="text-[#00f0ff] mb-2" />
-                    <div style={{ color: '#fff' }} className="font-extrabold text-[10px] font-mono leading-tight">AI Project Review</div>
-                    <div style={{ color: '#64748b' }} className="text-[8px] mt-1 font-mono uppercase">Analyze Feasibility</div>
-                  </div>
-
-                  {/* Action 2: AI Command Center */}
-                  <div
-                    onClick={() => setActiveTab('command-center')}
-                    className="dashboard-card glow-blue items-center justify-center text-center p-4 border border-brand-200/20 hover:border-[#00f0ff] rounded-xl cursor-pointer hover:-translate-y-1 transition-all bg-neutral-950/40"
-                  >
-                    <Flame size={24} className="text-orange-500 mb-2" />
-                    <div style={{ color: '#fff' }} className="font-extrabold text-[10px] font-mono leading-tight">AI Command Center</div>
-                    <div style={{ color: '#64748b' }} className="text-[8px] mt-1 font-mono uppercase">Go to HUD</div>
-                  </div>
-
-                  {/* Action 3: AI Task Splitter */}
-                  <div
-                    onClick={() => navigateToWorkspace('task-plan')}
-                    className="dashboard-card glow-blue items-center justify-center text-center p-4 border border-brand-200/20 hover:border-[#00f0ff] rounded-xl cursor-pointer hover:-translate-y-1 transition-all bg-neutral-950/40"
-                  >
-                    <Cpu size={24} className="text-[#00a2ff] mb-2" />
-                    <div style={{ color: '#fff' }} className="font-extrabold text-[10px] font-mono leading-tight">AI Task Splitter</div>
-                    <div style={{ color: '#64748b' }} className="text-[8px] mt-1 font-mono uppercase">Manage Backlog</div>
-                  </div>
-
-                  {/* Action 4: Marketplace */}
-                  <div
-                    onClick={() => navigateToWorkspace('marketplace')}
-                    className="dashboard-card glow-blue items-center justify-center text-center p-4 border border-brand-200/20 hover:border-[#00f0ff] rounded-xl cursor-pointer hover:-translate-y-1 transition-all bg-neutral-950/40"
-                  >
-                    <Database size={24} className="text-[#00f0ff] mb-2" />
-                    <div style={{ color: '#fff' }} className="font-extrabold text-[10px] font-mono leading-tight">Marketplace</div>
-                    <div style={{ color: '#64748b' }} className="text-[8px] mt-1 font-mono uppercase">Swap Tasks</div>
-                  </div>
-
-                  {/* Action 5: AI Mentor Chat */}
-                  <div
-                    onClick={() => navigateToWorkspace('mentor-chat')}
-                    className="dashboard-card glow-blue items-center justify-center text-center p-4 border border-brand-200/20 hover:border-[#00f0ff] rounded-xl cursor-pointer hover:-translate-y-1 transition-all bg-neutral-950/40"
-                  >
-                    <MessageSquare size={24} className="text-[#00a2ff] mb-2" />
-                    <div style={{ color: '#fff' }} className="font-extrabold text-[10px] font-mono leading-tight">AI Mentor Chat</div>
-                    <div style={{ color: '#64748b' }} className="text-[8px] mt-1 font-mono uppercase">Ask Questions</div>
-                  </div>
-
-                  {/* Action 6: GitHub */}
-                  <div
-                    onClick={() => navigateToWorkspace('github')}
-                    className="dashboard-card glow-blue items-center justify-center text-center p-4 border border-brand-200/20 hover:border-[#00f0ff] rounded-xl cursor-pointer hover:-translate-y-1 transition-all bg-neutral-950/40"
-                  >
-                    <GithubIcon size={24} className="text-white mb-2" />
-                    <div style={{ color: '#fff' }} className="font-extrabold text-[10px] font-mono leading-tight">GitHub</div>
-                    <div style={{ color: '#64748b' }} className="text-[8px] mt-1 font-mono uppercase">Source Control</div>
-                  </div>
-
-                  {/* Action 7: Analytics */}
-                  <div
-                    onClick={() => navigateToWorkspace('analytics')}
-                    className="dashboard-card glow-blue items-center justify-center text-center p-4 border border-brand-200/20 hover:border-[#00f0ff] rounded-xl cursor-pointer hover:-translate-y-1 transition-all bg-neutral-950/40"
-                  >
-                    <BarChart3 size={24} className="text-[#00a2ff] mb-2" />
-                    <div style={{ color: '#fff' }} className="font-extrabold text-[10px] font-mono leading-tight">Analytics</div>
-                    <div style={{ color: '#64748b' }} className="text-[8px] mt-1 font-mono uppercase">Telemetry</div>
-                  </div>
-
-                  {/* Action 8: Project Workspace */}
-                  <div
-                    onClick={() => {
-                      if (activeTeam) navigate(`/team/${activeTeam._id}`);
-                      else navigate('/team/create');
-                    }}
-                    className="dashboard-card glow-blue items-center justify-center text-center p-4 border border-brand-200/20 hover:border-[#00f0ff] rounded-xl cursor-pointer hover:-translate-y-1 transition-all bg-neutral-950/40"
-                  >
-                    <Wrench size={24} className="text-[#00f0ff] mb-2" />
-                    <div style={{ color: '#fff' }} className="font-extrabold text-[10px] font-mono leading-tight">Workspace</div>
-                    <div style={{ color: '#64748b' }} className="text-[8px] mt-1 font-mono uppercase">Open Editor</div>
-                  </div>
-
-                </div>
+                <button
+                  onClick={() => navigate('/profile')}
+                  className="btn-secondary text-xs w-full py-2.5 flex items-center justify-center gap-1.5 mt-4"
+                >
+                  <Settings size={13} />
+                  <span>Modify Dev Profile</span>
+                </button>
               </div>
             </div>
-          )}
+
+          </div>
         </main>
       </div>
+
+      {/* Quick AI Review Modal Overlay */}
+      {activeReviewProj && (
+        <div className="fixed inset-0 bg-neutral-950/80 backdrop-blur-xs flex items-center justify-center z-50 p-4">
+          <div className="bg-neutral-100 border border-neutral-300 rounded-2xl shadow-2xl p-6 max-w-lg w-full flex flex-col gap-4 animate-slide-up relative text-left">
+            
+            <button
+              onClick={() => setActiveReviewProj(null)}
+              className="absolute top-4 right-4 bg-transparent border-0 text-neutral-400 hover:text-neutral-800 font-extrabold text-sm cursor-pointer"
+            >
+              ✕
+            </button>
+
+            <div>
+              <span className="text-[9px] font-black tracking-widest text-neutral-600 font-mono">QUICK AI PITCH VERDICT</span>
+              <h2 className="text-lg font-black text-neutral-800 mt-0.5">{activeReviewProj.projectName}</h2>
+            </div>
+
+            <div className="grid grid-cols-2 gap-4 bg-brand-100 p-3 rounded-xl border border-brand-200">
+              <div className="flex flex-col gap-0.5">
+                <span className="text-[8px] text-neutral-500 uppercase font-bold">Feasibility Rating</span>
+                <span className="text-base font-black text-neutral-800 font-mono">{activeReviewProj.projectReview?.feasibilityScore || '8.5'}/10</span>
+              </div>
+              <div className="flex flex-col gap-0.5">
+                <span className="text-[8px] text-neutral-500 uppercase font-bold">Consensus Stack</span>
+                <span className="text-xs font-bold text-neutral-600 font-mono truncate">
+                  {activeReviewProj.finalTechStack?.frontend || 'React'} • {activeReviewProj.finalTechStack?.backend || 'Express'}
+                </span>
+              </div>
+            </div>
+
+            {/* Alignment and Risks */}
+            <div className="flex flex-col gap-3">
+              <div className="flex flex-col gap-1">
+                <span className="text-[8px] text-neutral-450 uppercase font-bold">Alignment Statement:</span>
+                <p className="text-xs text-neutral-350 leading-relaxed italic">
+                  "{activeReviewProj.projectReview?.problemSolutionAlignment || 'Problem statement aligns nicely with the prototype design.'}"
+                </p>
+              </div>
+
+              {activeReviewProj.projectReview?.projectRisks?.length > 0 && (
+                <div className="flex flex-col gap-1 border-t border-brand-200/5 pt-2">
+                  <span className="text-[8px] text-neutral-450 uppercase font-bold">Identified Feasibility Risks:</span>
+                  <div className="flex flex-col gap-1 text-[11px]">
+                    {activeReviewProj.projectReview.projectRisks.slice(0, 3).map((r, i) => (
+                      <div key={i} className="flex gap-1.5 items-start text-rose-350 leading-tight">
+                        <AlertTriangle size={12} className="shrink-0 mt-0.5 text-rose-500" />
+                        <span>{r}</span>
+                      </div>
+                    ))}
+                  </div>
+                </div>
+              )}
+            </div>
+
+            <div className="flex justify-end gap-2 border-t border-brand-200/10 pt-4 mt-2">
+              <button
+                onClick={() => setActiveReviewProj(null)}
+                className="btn-secondary text-xs py-1.5 px-3"
+              >
+                Close
+              </button>
+              <button
+                onClick={() => {
+                  const id = activeReviewProj._id;
+                  setActiveReviewProj(null);
+                  navigate(`/workspace/${id}`);
+                }}
+                className="btn-primary text-xs py-1.5 px-3"
+              >
+                Open Project Workspace
+              </button>
+            </div>
+
+          </div>
+        </div>
+      )}
+
     </div>
   );
 };

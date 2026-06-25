@@ -354,18 +354,18 @@ const TaskMarketplace = ({ projectId, teamId, onRefreshProject }) => {
       )}
 
       {/* Intro Banner */}
-      <div className="bg-gradient-to-r from-indigo-900 to-slate-900 rounded-2xl p-6 border border-indigo-950 shadow-md relative overflow-hidden text-white">
-        <div className="absolute top-0 right-0 w-32 h-32 bg-indigo-500/10 rounded-full blur-2xl"></div>
+      <div className="bg-neutral-100 border border-neutral-200 rounded-2xl p-6 shadow-md relative overflow-hidden">
+        <div className="absolute top-0 right-0 w-32 h-32 bg-brand-500/10 rounded-full blur-2xl"></div>
         <div className="relative z-10 flex flex-col md:flex-row md:items-center justify-between gap-4">
           <div>
             <div className="flex items-center gap-2 mb-2">
-              <span className="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full text-[9px] font-extrabold uppercase bg-indigo-950/60 border border-indigo-500/30 text-indigo-300">
+              <span className="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full text-[9px] font-extrabold uppercase bg-brand-200/20 border border-brand-200 text-brand-400">
                 <ShoppingBag size={10} /> Task Marketplace
               </span>
-              <span className="text-[10px] font-bold uppercase tracking-wider text-slate-400">Negotiation & Claim Center</span>
+              <span className="text-[10px] font-bold uppercase tracking-wider text-neutral-550">Negotiation & Claim Center</span>
             </div>
-            <h2 className="text-xl md:text-2xl font-extrabold tracking-tight">Collaborative Task Marketplace</h2>
-            <p className="text-xs text-slate-300 mt-1 max-w-[650px] leading-relaxed">
+            <h2 className="text-xl md:text-2xl font-extrabold tracking-tight text-neutral-800">Collaborative Task Marketplace</h2>
+            <p className="text-xs text-neutral-500 mt-1 max-w-[650px] leading-relaxed">
               Negotiate tasks with teammates, claim open work items, swap assignments, and request assistance. 
               The AI Technical Manager evaluates all requests, with final approvals determined by the Squad Leader.
             </p>

@@ -21,14 +21,14 @@ import {
 const StatCard = ({ icon: Icon, label, value, color = 'text-neutral-400', sub }) => (
   <div 
     className="flex flex-col gap-1.5 p-3.5 rounded-xl border shadow-3xs"
-    style={{ backgroundColor: 'rgba(4, 8, 23, 0.4)', borderColor: 'rgba(0, 240, 255, 0.15)' }}
+    style={{ backgroundColor: 'var(--color-neutral-100)', borderColor: 'var(--color-neutral-200)' }}
   >
     <div className="flex items-center gap-1.5 text-neutral-500">
       <Icon size={13} className={color} />
-      <div className="text-[9px] font-black uppercase tracking-widest text-neutral-400" style={{ color: 'rgba(0, 240, 255, 0.6)' }}>{label}</div>
+      <div className="text-[9px] font-black uppercase tracking-widest text-neutral-500">{label}</div>
     </div>
     <div className={`text-xl font-extrabold font-mono leading-none ${color}`}>{value}</div>
-    {sub && <div className="text-[9px] font-medium" style={{ color: 'rgba(0, 240, 255, 0.4)' }}>{sub}</div>}
+    {sub && <div className="text-[9px] font-medium text-neutral-500">{sub}</div>}
   </div>
 );
 
@@ -210,7 +210,7 @@ const ConnectForm = ({ projectId, isOwner, onConnected }) => {
 
 const LanguageBar = ({ languages }) => {
   const entries = Object.entries(languages || {});
-  if (entries.length === 0) return <div className="text-xs italic" style={{ color: 'rgba(0, 240, 255, 0.5)' }}>No language data</div>;
+  if (entries.length === 0) return <div className="text-xs italic text-neutral-500">No language data</div>;
 
   const total = entries.reduce((s, [, v]) => s + v, 0);
   const colors = ['bg-blue-500', 'bg-emerald-500', 'bg-orange-500', 'bg-purple-500', 'bg-pink-500', 'bg-yellow-500', 'bg-cyan-500'];
@@ -231,7 +231,7 @@ const LanguageBar = ({ languages }) => {
         {entries.slice(0, 7).map(([lang, bytes], i) => (
           <div key={lang} className="flex items-center gap-1">
             <div className={`w-2 h-2 rounded-full ${colors[i % colors.length]}`} />
-            <div className="text-[9px] font-semibold" style={{ color: 'rgba(0, 240, 255, 0.7)' }}>{lang} {(bytes / total * 100).toFixed(0)}%</div>
+            <div className="text-[9px] font-semibold text-neutral-600">{lang} {(bytes / total * 100).toFixed(0)}%</div>
           </div>
         ))}
       </div>
@@ -241,7 +241,7 @@ const LanguageBar = ({ languages }) => {
 
 // ─── Main Component ───────────────────────────────────────────────────────────
 
-const GitHubPanel = ({ projectId, isOwner }) => {
+const GitHubPanel = ({ projectId, isOwner, initialTab }) => {
   const [analytics, setAnalytics] = useState(null);
   const [realityCheck, setRealityCheck] = useState(null);
   const [loading, setLoading] = useState(true);
@@ -252,6 +252,12 @@ const GitHubPanel = ({ projectId, isOwner }) => {
   const [activeTab, setActiveTab] = useState('overview');
   const [showConnectForm, setShowConnectForm] = useState(false);
   const [expandedAlert, setExpandedAlert] = useState(null);
+
+  useEffect(() => {
+    if (initialTab) {
+      setActiveTab(initialTab);
+    }
+  }, [initialTab]);
 
   const fetchAnalytics = useCallback(async (quiet = false) => {
     try {
@@ -337,10 +343,10 @@ const GitHubPanel = ({ projectId, isOwner }) => {
     return (
       <div 
         className="flex flex-col items-center justify-center py-20 gap-3 border rounded-2xl shadow-xs"
-        style={{ backgroundColor: '#040817', borderColor: 'rgba(0, 240, 255, 0.15)' }}
+        style={{ backgroundColor: 'var(--color-neutral-100)', borderColor: 'var(--color-neutral-200)' }}
       >
-        <RefreshCw size={28} className="animate-spin text-brand-400" />
-        <div className="text-xs font-semibold" style={{ color: 'rgba(0, 240, 255, 0.6)' }}>Loading GitHub analytics...</div>
+        <RefreshCw size={28} className="animate-spin text-brand-500" />
+        <div className="text-xs font-semibold text-neutral-500">Loading GitHub analytics...</div>
       </div>
     );
   }
@@ -350,34 +356,34 @@ const GitHubPanel = ({ projectId, isOwner }) => {
     return (
       <div 
         className="border rounded-2xl shadow-xs overflow-hidden animate-slide-up"
-        style={{ backgroundColor: '#040817', borderColor: 'rgba(0, 240, 255, 0.15)' }}
+        style={{ backgroundColor: 'var(--color-neutral-100)', borderColor: 'var(--color-neutral-200)' }}
       >
         {/* Header */}
         <div 
           className="flex items-center justify-between px-5 py-4 border-b"
           style={{
-            background: 'linear-gradient(to right, #040817, #070e2e)',
-            borderColor: 'rgba(0, 240, 255, 0.15)'
+            background: 'linear-gradient(to right, var(--color-neutral-100), var(--color-neutral-200))',
+            borderColor: 'var(--color-neutral-200)'
           }}
         >
           <div className="flex items-center gap-3">
             <div 
               className="w-9 h-9 rounded-xl flex items-center justify-center border"
-              style={{ backgroundColor: 'rgba(255, 255, 255, 0.05)', borderColor: 'rgba(0, 240, 255, 0.15)' }}
+              style={{ backgroundColor: 'rgba(255, 255, 255, 0.05)', borderColor: 'var(--color-neutral-200)' }}
             >
-              <GitMerge size={18} className="text-white" />
+              <GitMerge size={18} className="text-neutral-800" />
             </div>
             <div>
-              <div className="text-[9px] font-black uppercase tracking-widest block" style={{ color: 'rgba(0, 240, 255, 0.6)' }}>Repository Integration</div>
-              <div className="text-sm font-bold leading-tight" style={{ color: '#ffffff' }}>GitHub Copilot</div>
+              <div className="text-[9px] font-black uppercase tracking-widest block text-neutral-500">Repository Integration</div>
+              <div className="text-sm font-bold leading-tight text-neutral-800">GitHub Copilot</div>
             </div>
           </div>
           <div 
             className="px-2.5 py-1 rounded-full text-[9px] font-bold border"
             style={{
               backgroundColor: 'rgba(255, 255, 255, 0.05)',
-              borderColor: 'rgba(255, 255, 255, 0.15)',
-              color: 'rgba(0, 240, 255, 0.7)'
+              borderColor: 'var(--color-neutral-200)',
+              color: 'var(--color-neutral-600)'
             }}
           >
             Not Connected
@@ -390,11 +396,11 @@ const GitHubPanel = ({ projectId, isOwner }) => {
             className="border rounded-xl p-5 mb-6"
             style={{
               background: 'linear-gradient(to bottom right, rgba(0, 240, 255, 0.03), rgba(168, 85, 247, 0.03))',
-              borderColor: 'rgba(0, 240, 255, 0.15)'
+              borderColor: 'var(--color-neutral-200)'
             }}
           >
-            <div className="text-xs font-bold mb-3 flex items-center gap-2" style={{ color: '#ffffff' }}>
-              <Sparkles size={14} className="text-brand-400" />
+            <div className="text-xs font-bold mb-3 flex items-center gap-2 text-neutral-800">
+              <Sparkles size={14} className="text-brand-500" />
               Connect GitHub to unlock AI-powered insights
             </div>
             <div className="grid grid-cols-2 gap-2">
@@ -406,8 +412,8 @@ const GitHubPanel = ({ projectId, isOwner }) => {
                 { icon: Zap, label: 'AI reality checks' },
                 { icon: GitBranch, label: 'Branch activity' }
               ].map(({ icon: Icon, label }) => (
-                <div key={label} className="flex items-center gap-2 text-xs" style={{ color: 'rgba(0, 240, 255, 0.7)' }}>
-                  <Icon size={12} className="text-brand-400 shrink-0" />
+                <div key={label} className="flex items-center gap-2 text-xs text-neutral-500">
+                  <Icon size={12} className="text-brand-500 shrink-0" />
                   <div>{label}</div>
                 </div>
               ))}
@@ -419,8 +425,8 @@ const GitHubPanel = ({ projectId, isOwner }) => {
             <ConnectForm projectId={projectId} isOwner={isOwner} onConnected={() => fetchAnalytics()} />
           ) : (
             <div className="flex flex-col items-center justify-center py-8 text-center gap-3">
-              <Lock size={28} className="text-neutral-400" />
-              <div className="text-xs" style={{ color: 'rgba(0, 240, 255, 0.6)' }}>Ask the Team Owner to connect a GitHub repository.</div>
+              <Lock size={28} className="text-neutral-500" />
+              <div className="text-xs text-neutral-500">Ask the Team Owner to connect a GitHub repository.</div>
             </div>
           )}
         </div>
@@ -443,32 +449,31 @@ const GitHubPanel = ({ projectId, isOwner }) => {
   return (
     <div 
       className="border rounded-2xl shadow-xs overflow-hidden animate-slide-up"
-      style={{ backgroundColor: '#040817', borderColor: 'rgba(0, 240, 255, 0.15)' }}
+      style={{ backgroundColor: 'var(--color-neutral-100)', borderColor: 'var(--color-neutral-200)' }}
     >
       {/* ── Header ── */}
       <div 
         className="flex flex-col sm:flex-row items-start sm:items-center justify-between px-5 py-4 border-b gap-3"
         style={{
-          background: 'linear-gradient(to right, #040817, #070e2e)',
-          borderColor: 'rgba(0, 240, 255, 0.15)'
+          background: 'linear-gradient(to right, var(--color-neutral-100), var(--color-neutral-200))',
+          borderColor: 'var(--color-neutral-200)'
         }}
       >
         <div className="flex items-center gap-3">
           <div 
             className="w-9 h-9 rounded-xl flex items-center justify-center border"
-            style={{ backgroundColor: 'rgba(255, 255, 255, 0.05)', borderColor: 'rgba(0, 240, 255, 0.15)' }}
+            style={{ backgroundColor: 'rgba(255, 255, 255, 0.05)', borderColor: 'var(--color-neutral-200)' }}
           >
-            <GitMerge size={18} className="text-white" />
+            <GitMerge size={18} className="text-neutral-800" />
           </div>
           <div>
-            <div className="text-[9px] font-black uppercase tracking-widest block" style={{ color: 'rgba(0, 240, 255, 0.6)' }}>GitHub Repository</div>
-            <div className="text-sm font-bold leading-tight flex items-center gap-2" style={{ color: '#ffffff' }}>
+            <div className="text-[9px] font-black uppercase tracking-widest block text-neutral-500">GitHub Repository</div>
+            <div className="text-sm font-bold leading-tight flex items-center gap-2 text-neutral-800">
               <a
                 href={a.repositoryUrl}
                 target="_blank"
                 rel="noopener noreferrer"
-                className="hover:text-brand-300 transition-colors flex items-center gap-1"
-                style={{ color: '#ffffff' }}
+                className="hover:text-brand-300 transition-colors flex items-center gap-1 text-neutral-800"
               >
                 {a.owner}/{a.repository}
                 <ExternalLink size={11} className="opacity-70 text-cyan-400" />
@@ -486,18 +491,18 @@ const GitHubPanel = ({ projectId, isOwner }) => {
                 id="github-sync-btn"
                 onClick={handleManualSync}
                 disabled={syncLoading}
-                className="flex items-center gap-1.5 px-3 py-1.5 bg-white/10 hover:bg-white/20 text-white text-xs font-semibold rounded-xl border border-white/10 cursor-pointer transition-all"
+                className="flex items-center gap-1.5 px-3 py-1.5 bg-neutral-200 hover:bg-neutral-300 text-neutral-800 text-xs font-semibold rounded-xl border border-neutral-300 cursor-pointer transition-all"
               >
-                <RefreshCw size={12} className={syncLoading ? 'animate-spin text-white' : 'text-white'} />
-                <span className="hidden sm:inline text-white">Sync</span>
+                <RefreshCw size={12} className={syncLoading ? 'animate-spin text-neutral-800' : 'text-neutral-800'} />
+                <span className="hidden sm:inline text-neutral-800">Sync</span>
               </button>
               <button
                 onClick={handleDisconnect}
                 disabled={disconnectLoading}
-                className="flex items-center gap-1.5 px-3 py-1.5 bg-red-500/20 hover:bg-red-500/30 text-red-300 text-xs font-semibold rounded-xl border border-red-500/20 cursor-pointer transition-all"
+                className="flex items-center gap-1.5 px-3 py-1.5 bg-red-500/10 hover:bg-red-500/20 text-red-500 text-xs font-semibold rounded-xl border border-red-500/30 cursor-pointer transition-all"
               >
-                <Link2Off size={12} className="text-red-300" />
-                <span className="hidden sm:inline text-red-300">Disconnect</span>
+                <Link2Off size={12} className="text-red-500" />
+                <span className="hidden sm:inline text-red-500">Disconnect</span>
               </button>
             </>
           )}
@@ -508,13 +513,13 @@ const GitHubPanel = ({ projectId, isOwner }) => {
       <div 
         className="px-5 py-2 text-[9px] font-mono flex items-center justify-between border-b"
         style={{
-          backgroundColor: 'rgba(2, 4, 15, 0.6)',
-          borderColor: 'rgba(0, 240, 255, 0.12)'
+          backgroundColor: 'var(--color-brand-100)',
+          borderColor: 'var(--color-neutral-200)'
         }}
       >
-        <div style={{ color: 'rgba(0, 240, 255, 0.5)' }}>Branch: <span style={{ color: '#ffffff' }}>{a.defaultBranch}</span></div>
-        <div style={{ color: 'rgba(0, 240, 255, 0.5)' }}>Last synced: <span style={{ color: '#ffffff' }}>{a.lastSyncedAt ? new Date(a.lastSyncedAt).toLocaleTimeString() : 'Never'}</span></div>
-        <div style={{ color: 'rgba(0, 240, 255, 0.5)' }}>Visibility: <span style={{ color: '#ffffff' }} className="capitalize">{a.repositoryVisibility || 'unknown'}</span></div>
+        <div style={{ color: 'var(--color-neutral-500)' }}>Branch: <span style={{ color: 'var(--color-neutral-800)' }}>{a.defaultBranch}</span></div>
+        <div style={{ color: 'var(--color-neutral-500)' }}>Last synced: <span style={{ color: 'var(--color-neutral-800)' }}>{a.lastSyncedAt ? new Date(a.lastSyncedAt).toLocaleTimeString() : 'Never'}</span></div>
+        <div style={{ color: 'var(--color-neutral-500)' }}>Visibility: <span style={{ color: 'var(--color-neutral-800)' }} className="capitalize">{a.repositoryVisibility || 'unknown'}</span></div>
       </div>
 
       {/* Repository Alerts */}
@@ -544,7 +549,7 @@ const GitHubPanel = ({ projectId, isOwner }) => {
       {/* Tabs */}
       <div 
         className="flex gap-1 border-b px-4 pt-4 overflow-x-auto"
-        style={{ borderColor: 'rgba(0, 240, 255, 0.15)' }}
+        style={{ borderColor: 'var(--tab-border-color, rgba(0, 240, 255, 0.15))' }}
       >
         {tabs.map(tab => {
           const isActive = activeTab === tab.id;
@@ -554,15 +559,15 @@ const GitHubPanel = ({ projectId, isOwner }) => {
               onClick={() => setActiveTab(tab.id)}
               className="flex items-center gap-1.5 px-4 py-2.5 text-xs font-bold transition-all duration-200 cursor-pointer whitespace-nowrap border-t border-x rounded-t-xl"
               style={{
-                backgroundColor: isActive ? 'rgba(0, 240, 255, 0.08)' : 'transparent',
-                borderColor: isActive ? 'rgba(0, 240, 255, 0.3)' : 'transparent',
-                color: isActive ? '#ffffff' : 'rgba(0, 240, 255, 0.55)',
-                borderBottom: isActive ? '1px solid #040817' : '1px solid transparent',
+                backgroundColor: isActive ? 'var(--tab-active-bg, rgba(0, 240, 255, 0.08))' : 'transparent',
+                borderColor: isActive ? 'var(--tab-active-border, rgba(0, 240, 255, 0.3))' : 'transparent',
+                color: isActive ? 'var(--tab-active-text, #ffffff)' : 'var(--tab-inactive-text, rgba(0, 240, 255, 0.55))',
+                borderBottom: isActive ? '1px solid var(--tab-active-bottom-border, #040817)' : '1px solid transparent',
                 marginBottom: '-1px',
                 zIndex: isActive ? 10 : 1
               }}
             >
-              <tab.icon size={13} style={{ color: isActive ? '#00f0ff' : 'rgba(0, 240, 255, 0.45)' }} />
+              <tab.icon size={13} style={{ color: isActive ? 'var(--tab-active-icon, #00f0ff)' : 'var(--tab-inactive-icon, rgba(0, 240, 255, 0.45))' }} />
               {tab.label}
             </button>
           );
@@ -607,21 +612,21 @@ const GitHubPanel = ({ projectId, isOwner }) => {
               {/* Last commit */}
               <div 
                 className="flex flex-col gap-3 p-4 border rounded-xl"
-                style={{ backgroundColor: 'rgba(4, 8, 23, 0.4)', borderColor: 'rgba(0, 240, 255, 0.15)' }}
+                style={{ backgroundColor: 'var(--color-neutral-100)', borderColor: 'var(--color-neutral-200)' }}
               >
-                <div className="text-[9px] font-black uppercase tracking-widest flex items-center gap-1.5" style={{ color: 'rgba(0, 240, 255, 0.6)' }}>
-                  <GitCommitHorizontal size={11} style={{ color: '#00f0ff' }} /> Last Commit
+                <div className="text-[9px] font-black uppercase tracking-widest flex items-center gap-1.5 text-neutral-500">
+                  <GitCommitHorizontal size={11} className="text-brand-300" /> Last Commit
                 </div>
                 <div className="flex flex-col gap-1">
-                  <div className="text-xs font-semibold leading-snug line-clamp-2" style={{ color: '#ffffff' }}>
+                  <div className="text-xs font-semibold leading-snug line-clamp-2 text-neutral-800">
                     {a.commitSummary?.lastCommitMessage || 'No commits yet'}
                   </div>
-                  <div className="text-[10px]" style={{ color: 'rgba(0, 240, 255, 0.5)' }}>
-                    by <span className="font-semibold" style={{ color: '#ffffff' }}>{a.commitSummary?.lastCommitAuthor || '—'}</span>
+                  <div className="text-[10px] text-neutral-500">
+                    by <span className="font-semibold text-neutral-800">{a.commitSummary?.lastCommitAuthor || '—'}</span>
                     {a.commitSummary?.lastCommitAt && ` · ${new Date(a.commitSummary.lastCommitAt).toLocaleString()}`}
                   </div>
                 </div>
-                <div className="flex gap-3 text-[10px]" style={{ color: 'rgba(0, 240, 255, 0.5)' }}>
+                <div className="flex gap-3 text-[10px] text-neutral-500">
                   <span className="font-semibold">{a.commitSummary?.last7Days || 0} commits last 7 days</span>
                   <span>·</span>
                   <span className="font-semibold">{stats.branchCount || 0} branches</span>
@@ -631,10 +636,10 @@ const GitHubPanel = ({ projectId, isOwner }) => {
               {/* Languages */}
               <div 
                 className="flex flex-col gap-3 p-4 border rounded-xl"
-                style={{ backgroundColor: 'rgba(4, 8, 23, 0.4)', borderColor: 'rgba(0, 240, 255, 0.15)' }}
+                style={{ backgroundColor: 'var(--color-neutral-100)', borderColor: 'var(--color-neutral-200)' }}
               >
-                <div className="text-[9px] font-black uppercase tracking-widest flex items-center gap-1.5" style={{ color: 'rgba(0, 240, 255, 0.6)' }}>
-                  <Code2 size={11} className="text-purple-400" /> Languages
+                <div className="text-[9px] font-black uppercase tracking-widest flex items-center gap-1.5 text-neutral-500">
+                  <Code2 size={11} className="text-purple-500" /> Languages
                 </div>
                 <LanguageBar languages={a.languages} />
               </div>
@@ -643,10 +648,10 @@ const GitHubPanel = ({ projectId, isOwner }) => {
             {/* Health Indicators */}
             <div 
               className="flex flex-col gap-3 p-4 border rounded-xl"
-              style={{ backgroundColor: 'rgba(4, 8, 23, 0.4)', borderColor: 'rgba(0, 240, 255, 0.15)' }}
+              style={{ backgroundColor: 'var(--color-neutral-100)', borderColor: 'var(--color-neutral-200)' }}
             >
-              <div className="text-[9px] font-black uppercase tracking-widest flex items-center gap-1.5" style={{ color: 'rgba(0, 240, 255, 0.6)' }}>
-                <Shield size={11} style={{ color: '#00f0ff' }} /> Health Indicators
+              <div className="text-[9px] font-black uppercase tracking-widest flex items-center gap-1.5 text-neutral-500">
+                <Shield size={11} className="text-brand-300" /> Health Indicators
               </div>
               <div className="grid grid-cols-2 sm:grid-cols-3 gap-2">
                 {Object.entries(a.healthIndicators || {}).map(([key, value]) => {
@@ -661,11 +666,11 @@ const GitHubPanel = ({ projectId, isOwner }) => {
                       }}
                     >
                       {isGood ? (
-                        <CheckCircle2 size={12} className="shrink-0 mt-0.5 text-emerald-400" />
+                        <CheckCircle2 size={12} className="shrink-0 mt-0.5 text-emerald-500" />
                       ) : (
-                        <XCircle size={12} className="shrink-0 mt-0.5 text-red-400" />
+                        <XCircle size={12} className="shrink-0 mt-0.5 text-red-500" />
                       )}
-                      <div className="font-medium" style={{ color: isGood ? '#34d399' : '#f87171' }}>
+                      <div className={`font-medium ${isGood ? 'text-emerald-600' : 'text-red-500'}`}>
                         {value}
                       </div>
                     </div>
@@ -680,10 +685,10 @@ const GitHubPanel = ({ projectId, isOwner }) => {
                 {a.openPullRequests?.length > 0 && (
                   <div 
                     className="flex flex-col gap-2 p-4 border rounded-xl"
-                    style={{ backgroundColor: 'rgba(4, 8, 23, 0.4)', borderColor: 'rgba(0, 240, 255, 0.15)' }}
+                    style={{ backgroundColor: 'var(--color-neutral-100)', borderColor: 'var(--color-neutral-200)' }}
                   >
-                    <div className="text-[9px] font-black uppercase tracking-widest flex items-center gap-1.5" style={{ color: 'rgba(0, 240, 255, 0.6)' }}>
-                      <GitPullRequest size={11} className="text-emerald-400" /> Open Pull Requests ({a.openPullRequests.length})
+                    <div className="text-[9px] font-black uppercase tracking-widest flex items-center gap-1.5 text-neutral-500">
+                      <GitPullRequest size={11} className="text-emerald-500" /> Open Pull Requests ({a.openPullRequests.length})
                     </div>
                     {a.openPullRequests.slice(0, 5).map(pr => (
                       <a 
@@ -691,10 +696,9 @@ const GitHubPanel = ({ projectId, isOwner }) => {
                         href={pr.url} 
                         target="_blank" 
                         rel="noopener noreferrer"
-                        className="flex items-center gap-2 text-xs hover:text-brand-300 transition-colors"
-                        style={{ color: 'rgba(0, 240, 255, 0.85)' }}
+                        className="flex items-center gap-2 text-xs hover:text-brand-300 transition-colors text-neutral-800"
                       >
-                        <GitPullRequest size={11} className="text-emerald-400 shrink-0" />
+                        <GitPullRequest size={11} className="text-emerald-500 shrink-0" />
                         <span className="truncate">#{pr.number} {pr.title}</span>
                       </a>
                     ))}
@@ -703,10 +707,10 @@ const GitHubPanel = ({ projectId, isOwner }) => {
                 {a.openIssues?.length > 0 && (
                   <div 
                     className="flex flex-col gap-2 p-4 border rounded-xl"
-                    style={{ backgroundColor: 'rgba(4, 8, 23, 0.4)', borderColor: 'rgba(0, 240, 255, 0.15)' }}
+                    style={{ backgroundColor: 'var(--color-neutral-100)', borderColor: 'var(--color-neutral-200)' }}
                   >
-                    <div className="text-[9px] font-black uppercase tracking-widest flex items-center gap-1.5" style={{ color: 'rgba(0, 240, 255, 0.6)' }}>
-                      <AlertCircle size={11} className="text-orange-400" /> Open Issues ({a.openIssues.length})
+                    <div className="text-[9px] font-black uppercase tracking-widest flex items-center gap-1.5 text-neutral-500">
+                      <AlertCircle size={11} className="text-orange-500" /> Open Issues ({a.openIssues.length})
                     </div>
                     {a.openIssues.slice(0, 5).map(issue => (
                       <a 
@@ -714,10 +718,9 @@ const GitHubPanel = ({ projectId, isOwner }) => {
                         href={issue.url} 
                         target="_blank" 
                         rel="noopener noreferrer"
-                        className="flex items-center gap-2 text-xs hover:text-brand-300 transition-colors"
-                        style={{ color: 'rgba(0, 240, 255, 0.85)' }}
+                        className="flex items-center gap-2 text-xs hover:text-brand-300 transition-colors text-neutral-800"
                       >
-                        <AlertCircle size={11} className="text-orange-400 shrink-0" />
+                        <AlertCircle size={11} className="text-orange-500 shrink-0" />
                         <span className="truncate">#{issue.number} {issue.title}</span>
                       </a>
                     ))}
@@ -732,39 +735,38 @@ const GitHubPanel = ({ projectId, isOwner }) => {
         {activeTab === 'commits' && (
           <div className="flex flex-col gap-4 animate-slide-up">
             <div className="flex items-center justify-between">
-              <div className="text-xs font-bold" style={{ color: '#ffffff' }}>Recent Commits</div>
-              <div className="text-[9px] font-semibold" style={{ color: 'rgba(0, 240, 255, 0.6)' }}>{a.recentCommits?.length || 0} shown</div>
+              <div className="text-xs font-bold text-neutral-800">Recent Commits</div>
+              <div className="text-[9px] font-semibold text-neutral-500">{a.recentCommits?.length || 0} shown</div>
             </div>
             {!a.recentCommits || a.recentCommits.length === 0 ? (
-              <div className="text-center py-10 text-xs" style={{ color: 'rgba(0, 240, 255, 0.5)' }}>No commits found in repository.</div>
+              <div className="text-center py-10 text-xs text-neutral-500">No commits found in repository.</div>
             ) : (
               <div 
                 className="flex flex-col gap-0 border rounded-xl overflow-hidden divide-y"
-                style={{ borderColor: 'rgba(0, 240, 255, 0.15)', divideColor: 'rgba(0, 240, 255, 0.1)' }}
+                style={{ borderColor: 'var(--color-neutral-200)', divideColor: 'var(--color-neutral-200)' }}
               >
                 {a.recentCommits.map((commit, i) => (
                   <div 
                     key={commit.sha || i} 
-                    className="flex items-start gap-3 p-3 transition-colors hover:bg-white/5"
+                    className="flex items-start gap-3 p-3 transition-colors hover:bg-neutral-100/5"
                   >
                     <div 
                       className="w-6 h-6 rounded-full flex items-center justify-center border shrink-0 mt-0.5"
-                      style={{ backgroundColor: 'rgba(255, 255, 255, 0.05)', borderColor: 'rgba(0, 240, 255, 0.15)' }}
+                      style={{ backgroundColor: 'rgba(255, 255, 255, 0.05)', borderColor: 'var(--color-neutral-200)' }}
                     >
-                      <GitCommitHorizontal size={10} className="text-neutral-400" />
+                      <GitCommitHorizontal size={10} className="text-neutral-500" />
                     </div>
                     <div className="flex-1 min-w-0">
-                      <div className="text-xs font-semibold truncate" style={{ color: '#ffffff' }}>{commit.message}</div>
-                      <div className="text-[10px] mt-0.5" style={{ color: 'rgba(0, 240, 255, 0.5)' }}>
-                        <span className="font-semibold" style={{ color: 'rgba(0, 240, 255, 0.85)' }}>{commit.author}</span>
+                      <div className="text-xs font-semibold truncate text-neutral-800">{commit.message}</div>
+                      <div className="text-[10px] mt-0.5 text-neutral-500">
+                        <span className="font-semibold text-neutral-600">{commit.author}</span>
                         {commit.date && ` · ${new Date(commit.date).toLocaleDateString()}`}
                         {commit.sha && (
                           <a 
                             href={commit.url} 
                             target="_blank" 
                             rel="noopener noreferrer"
-                            className="ml-2 font-mono hover:underline"
-                            style={{ color: '#00f0ff' }}
+                            className="ml-2 font-mono hover:underline text-brand-300"
                           >
                             {commit.sha.substring(0, 7)}
                           </a>
@@ -781,9 +783,9 @@ const GitHubPanel = ({ projectId, isOwner }) => {
         {/* ── CONTRIBUTORS TAB ── */}
         {activeTab === 'contributors' && (
           <div className="flex flex-col gap-4 animate-slide-up">
-            <div className="text-xs font-bold" style={{ color: '#ffffff' }}>Contributor Activity</div>
+            <div className="text-xs font-bold text-neutral-800">Contributor Activity</div>
             {!a.contributors || a.contributors.length === 0 ? (
-              <div className="text-center py-10 text-xs" style={{ color: 'rgba(0, 240, 255, 0.5)' }}>No contributor data available.</div>
+              <div className="text-center py-10 text-xs text-neutral-500">No contributor data available.</div>
             ) : (
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
                 {a.contributors.map((c, i) => {
@@ -793,8 +795,8 @@ const GitHubPanel = ({ projectId, isOwner }) => {
                       key={c.login || i} 
                       className="flex items-center gap-3 p-3.5 rounded-xl border"
                       style={{
-                        backgroundColor: isActive ? 'rgba(16, 185, 129, 0.04)' : 'rgba(4, 8, 23, 0.3)',
-                        borderColor: isActive ? 'rgba(16, 185, 129, 0.2)' : 'rgba(0, 240, 255, 0.15)'
+                        backgroundColor: isActive ? 'rgba(16, 185, 129, 0.04)' : 'var(--color-neutral-100)',
+                        borderColor: isActive ? 'rgba(16, 185, 129, 0.2)' : 'var(--color-neutral-200)'
                       }}
                     >
                       {c.avatar ? (
@@ -802,14 +804,14 @@ const GitHubPanel = ({ projectId, isOwner }) => {
                           src={c.avatar} 
                           alt={c.login} 
                           className="w-9 h-9 rounded-full shrink-0 border" 
-                          style={{ borderColor: 'rgba(0, 240, 255, 0.2)' }}
+                          style={{ borderColor: 'var(--color-neutral-200)' }}
                         />
                       ) : (
                         <div 
                           className="w-9 h-9 rounded-full flex items-center justify-center shrink-0 border"
-                          style={{ backgroundColor: 'rgba(255, 255, 255, 0.05)', borderColor: 'rgba(0, 240, 255, 0.2)' }}
+                          style={{ backgroundColor: 'rgba(255, 255, 255, 0.05)', borderColor: 'var(--color-neutral-200)' }}
                         >
-                          <Users size={16} className="text-neutral-400" />
+                          <Users size={16} className="text-neutral-500" />
                         </div>
                       )}
                       <div className="flex-1 min-w-0">
@@ -818,34 +820,28 @@ const GitHubPanel = ({ projectId, isOwner }) => {
                             href={c.profileUrl} 
                             target="_blank" 
                             rel="noopener noreferrer"
-                            className="text-xs font-bold truncate hover:text-brand-300 transition-colors"
-                            style={{ color: '#ffffff' }}
+                            className="text-xs font-bold truncate hover:text-brand-300 transition-colors text-neutral-800"
                           >
                             {c.login}
                           </a>
                           {isActive && (
                             <div 
-                              className="px-1.5 py-0.5 rounded-full text-[8px] font-bold border shrink-0"
-                              style={{
-                                backgroundColor: 'rgba(16, 185, 129, 0.08)',
-                                borderColor: 'rgba(16, 185, 129, 0.3)',
-                                color: '#34d399'
-                              }}
+                              className="px-1.5 py-0.5 rounded-full text-[8px] font-bold border shrink-0 bg-emerald-500/10 border-emerald-500/30 text-emerald-600"
                             >
                               Active
                             </div>
                           )}
                         </div>
-                        <div className="flex items-center gap-3 mt-0.5 text-[10px]" style={{ color: 'rgba(0, 240, 255, 0.5)' }}>
+                        <div className="flex items-center gap-3 mt-0.5 text-[10px] text-neutral-500">
                           <span className="font-semibold">{c.commits} commits</span>
                           {c.recentCommits > 0 && (
-                            <span className="font-semibold" style={{ color: '#34d399' }}>
+                            <span className="font-semibold text-emerald-650">
                               +{c.recentCommits} today
                             </span>
                           )}
                         </div>
                         {c.lastActive && (
-                          <div className="text-[9px] mt-0.5" style={{ color: 'rgba(0, 240, 255, 0.4)' }}>
+                          <div className="text-[9px] mt-0.5 text-neutral-500">
                             Last active: {new Date(c.lastActive).toLocaleDateString()}
                           </div>
                         )}
@@ -863,9 +859,9 @@ const GitHubPanel = ({ projectId, isOwner }) => {
           <div className="flex flex-col gap-5 animate-slide-up">
             <div className="flex items-center justify-between">
               <div>
-                <div className="text-xs font-bold" style={{ color: '#ffffff' }}>AI Repository Analysis</div>
+                <div className="text-xs font-bold text-neutral-800">AI Repository Analysis</div>
                 {a.aiAnalysisGeneratedAt && (
-                  <div className="text-[9px] mt-0.5" style={{ color: 'rgba(0, 240, 255, 0.4)' }}>
+                  <div className="text-[9px] mt-0.5 text-neutral-500">
                     Generated: {new Date(a.aiAnalysisGeneratedAt).toLocaleString()}
                   </div>
                 )}
@@ -875,7 +871,7 @@ const GitHubPanel = ({ projectId, isOwner }) => {
                 onClick={handleAIAnalysis}
                 disabled={analysisLoading}
                 className="flex items-center gap-1.5 px-3 py-1.5 bg-gradient-to-r from-brand-600 to-purple-600 text-white text-xs font-bold rounded-xl cursor-pointer hover:opacity-90 transition-opacity shadow-sm border"
-                style={{ borderColor: 'rgba(0, 240, 255, 0.2)' }}
+                style={{ borderColor: 'var(--color-neutral-200)' }}
               >
                 {analysisLoading ? <RefreshCw size={12} className="animate-spin text-white" /> : <Sparkles size={12} className="text-white" />}
                 <span className="text-white">{aiAnalysis ? 'Re-Analyze' : 'Run Analysis'}</span>
@@ -885,12 +881,12 @@ const GitHubPanel = ({ projectId, isOwner }) => {
             {!aiAnalysis ? (
               <div 
                 className="flex flex-col items-center justify-center py-12 gap-4 text-center border rounded-xl"
-                style={{ backgroundColor: 'rgba(4, 8, 23, 0.4)', borderColor: 'rgba(0, 240, 255, 0.15)' }}
+                style={{ backgroundColor: 'var(--color-neutral-100)', borderColor: 'var(--color-neutral-200)' }}
               >
-                <Sparkles size={28} className="text-brand-400" />
+                <Sparkles size={28} className="text-brand-500" />
                 <div>
-                  <div className="text-xs font-bold" style={{ color: '#ffffff' }}>No AI Analysis Yet</div>
-                  <div className="text-[11px] mt-1 max-w-xs" style={{ color: 'rgba(0, 240, 255, 0.5)' }}>
+                  <div className="text-xs font-bold text-neutral-800">No AI Analysis Yet</div>
+                  <div className="text-[11px] mt-1 max-w-xs text-neutral-500">
                     Run the AI analysis to get repository insights, detect inactive members, and compare planned vs actual work.
                   </div>
                 </div>
@@ -901,17 +897,17 @@ const GitHubPanel = ({ projectId, isOwner }) => {
                 <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
                   <div 
                     className="p-4 border rounded-xl"
-                    style={{ backgroundColor: 'rgba(4, 8, 23, 0.4)', borderColor: 'rgba(0, 240, 255, 0.15)' }}
+                    style={{ backgroundColor: 'var(--color-neutral-100)', borderColor: 'var(--color-neutral-200)' }}
                   >
-                    <div className="text-[9px] font-black uppercase tracking-widest block mb-2" style={{ color: 'rgba(0, 240, 255, 0.6)' }}>Repository Health</div>
+                    <div className="text-[9px] font-black uppercase tracking-widest block mb-2 text-neutral-500">Repository Health</div>
                     <HealthBadge status={aiAnalysis.repositoryHealth} />
                   </div>
                   <div 
                     className="p-4 border rounded-xl"
-                    style={{ backgroundColor: 'rgba(4, 8, 23, 0.4)', borderColor: 'rgba(0, 240, 255, 0.15)' }}
+                    style={{ backgroundColor: 'var(--color-neutral-100)', borderColor: 'var(--color-neutral-200)' }}
                   >
-                    <div className="text-[9px] font-black uppercase tracking-widest block mb-2" style={{ color: 'rgba(0, 240, 255, 0.6)' }}>Development Status</div>
-                    <div className="text-xs font-semibold" style={{ color: '#ffffff' }}>{aiAnalysis.developmentStatus}</div>
+                    <div className="text-[9px] font-black uppercase tracking-widest block mb-2 text-neutral-500">Development Status</div>
+                    <div className="text-xs font-semibold text-neutral-800">{aiAnalysis.developmentStatus}</div>
                   </div>
                 </div>
 
@@ -925,13 +921,13 @@ const GitHubPanel = ({ projectId, isOwner }) => {
                     <div 
                       key={label} 
                       className="p-3 border rounded-xl flex flex-col gap-1.5"
-                      style={{ backgroundColor: 'rgba(4, 8, 23, 0.4)', borderColor: 'rgba(0, 240, 255, 0.15)' }}
+                      style={{ backgroundColor: 'var(--color-neutral-100)', borderColor: 'var(--color-neutral-200)' }}
                     >
                       <div className="flex items-center gap-1 text-neutral-500">
                         <Icon size={12} style={{ color: iconColor }} />
-                        <div className="text-[8px] font-black uppercase tracking-widest" style={{ color: 'rgba(0, 240, 255, 0.5)' }}>{label}</div>
+                        <div className="text-[8px] font-black uppercase tracking-widest text-neutral-500">{label}</div>
                       </div>
-                      <div className="text-[10px] font-semibold leading-snug" style={{ color: '#ffffff' }}>{value || '—'}</div>
+                      <div className="text-[10px] font-semibold leading-snug text-neutral-800">{value || '—'}</div>
                     </div>
                   ))}
                 </div>
@@ -942,8 +938,8 @@ const GitHubPanel = ({ projectId, isOwner }) => {
                     className="p-4 border rounded-xl"
                     style={{ backgroundColor: 'rgba(245, 158, 11, 0.05)', borderColor: 'rgba(245, 158, 11, 0.2)' }}
                   >
-                    <div className="text-[9px] font-black uppercase tracking-widest mb-2 flex items-center gap-1.5" style={{ color: '#fbbf24' }}>
-                      <AlertTriangle size={11} style={{ color: '#fbbf24' }} /> Inactive Members
+                    <div className="text-[9px] font-black uppercase tracking-widest mb-2 flex items-center gap-1.5 text-amber-600">
+                      <AlertTriangle size={11} className="text-amber-500" /> Inactive Members
                     </div>
                     <div className="flex flex-wrap gap-2">
                       {aiAnalysis.inactiveMembers.map(m => (
@@ -953,7 +949,7 @@ const GitHubPanel = ({ projectId, isOwner }) => {
                           style={{
                             backgroundColor: 'rgba(245, 158, 11, 0.08)',
                             borderColor: 'rgba(245, 158, 11, 0.3)',
-                            color: '#fbbf24'
+                            color: '#d97706'
                           }}
                         >
                           {m}
@@ -969,13 +965,13 @@ const GitHubPanel = ({ projectId, isOwner }) => {
                     className="p-4 border rounded-xl"
                     style={{ backgroundColor: 'rgba(239, 68, 68, 0.05)', borderColor: 'rgba(239, 68, 68, 0.2)' }}
                   >
-                    <div className="text-[9px] font-black uppercase tracking-widest mb-2 flex items-center gap-1.5" style={{ color: '#f87171' }}>
-                      <XCircle size={11} style={{ color: '#f87171' }} /> Missing Components
+                    <div className="text-[9px] font-black uppercase tracking-widest mb-2 flex items-center gap-1.5 text-red-500">
+                      <XCircle size={11} className="text-red-500" /> Missing Components
                     </div>
                     <ul className="flex flex-col gap-1.5">
                       {aiAnalysis.missingComponents.map((c, i) => (
-                        <li key={i} className="flex items-start gap-2 text-xs" style={{ color: '#f87171' }}>
-                          <XCircle size={11} className="shrink-0 mt-0.5 text-red-400" />
+                        <li key={i} className="flex items-start gap-2 text-xs text-red-500">
+                          <XCircle size={11} className="shrink-0 mt-0.5 text-red-500" />
                           <div>{c}</div>
                         </li>
                       ))}
@@ -989,12 +985,12 @@ const GitHubPanel = ({ projectId, isOwner }) => {
                     className="p-4 border rounded-xl"
                     style={{ backgroundColor: 'rgba(245, 158, 11, 0.05)', borderColor: 'rgba(245, 158, 11, 0.2)' }}
                   >
-                    <div className="text-[9px] font-black uppercase tracking-widest mb-2 flex items-center gap-1.5" style={{ color: '#fbbf24' }}>
-                      <AlertTriangle size={11} style={{ color: '#fbbf24' }} /> Warnings
+                    <div className="text-[9px] font-black uppercase tracking-widest mb-2 flex items-center gap-1.5 text-amber-600">
+                      <AlertTriangle size={11} className="text-amber-500" /> Warnings
                     </div>
                     <ul className="flex flex-col gap-1.5">
                       {aiAnalysis.repositoryWarnings.map((w, i) => (
-                        <li key={i} className="flex items-start gap-2 text-xs" style={{ color: '#fbbf24' }}>
+                        <li key={i} className="flex items-start gap-2 text-xs text-amber-600">
                           <AlertTriangle size={11} className="shrink-0 mt-0.5 text-amber-500" />
                           <div>{w}</div>
                         </li>
@@ -1007,14 +1003,14 @@ const GitHubPanel = ({ projectId, isOwner }) => {
                 {aiAnalysis.recommendations?.length > 0 && (
                   <div 
                     className="p-4 border rounded-xl"
-                    style={{ backgroundColor: 'rgba(0, 240, 255, 0.03)', borderColor: 'rgba(0, 240, 255, 0.2)' }}
+                    style={{ backgroundColor: 'var(--color-brand-100)', borderColor: 'var(--color-neutral-200)' }}
                   >
-                    <div className="text-[9px] font-black uppercase tracking-widest mb-3 flex items-center gap-1.5" style={{ color: '#00f0ff' }}>
-                      <Zap size={11} style={{ color: '#00f0ff' }} /> AI Recommendations
+                    <div className="text-[9px] font-black uppercase tracking-widest mb-3 flex items-center gap-1.5 text-brand-300">
+                      <Zap size={11} className="text-brand-300" /> AI Recommendations
                     </div>
                     <ul className="flex flex-col gap-2">
                       {aiAnalysis.recommendations.map((r, i) => (
-                        <li key={i} className="flex items-start gap-2 text-xs leading-snug" style={{ color: '#ffffff' }}>
+                        <li key={i} className="flex items-start gap-2 text-xs leading-snug text-neutral-800">
                           <Zap size={11} className="shrink-0 mt-0.5 text-brand-500" />
                           <div>{r}</div>
                         </li>
@@ -1027,12 +1023,12 @@ const GitHubPanel = ({ projectId, isOwner }) => {
                 {aiAnalysis.reasoning && (
                   <div 
                     className="p-4 border rounded-xl"
-                    style={{ backgroundColor: 'rgba(4, 8, 23, 0.4)', borderColor: 'rgba(0, 240, 255, 0.15)' }}
+                    style={{ backgroundColor: 'var(--color-neutral-100)', borderColor: 'var(--color-neutral-200)' }}
                   >
-                    <div className="text-[9px] font-black uppercase tracking-widest mb-2 flex items-center gap-1.5" style={{ color: 'rgba(0, 240, 255, 0.6)' }}>
-                      <Sparkles size={11} style={{ color: '#00f0ff' }} /> AI Reasoning
+                    <div className="text-[9px] font-black uppercase tracking-widest mb-2 flex items-center gap-1.5 text-neutral-500">
+                      <Sparkles size={11} className="text-brand-300" /> AI Reasoning
                     </div>
-                    <div className="text-xs leading-relaxed" style={{ color: 'rgba(255, 255, 255, 0.8)' }}>{aiAnalysis.reasoning}</div>
+                    <div className="text-xs leading-relaxed text-neutral-800">{aiAnalysis.reasoning}</div>
                   </div>
                 )}
               </div>
@@ -1045,17 +1041,16 @@ const GitHubPanel = ({ projectId, isOwner }) => {
           <div className="flex flex-col gap-4 animate-slide-up">
             <div className="flex items-center justify-between">
               <div>
-                <div className="text-xs font-bold" style={{ color: '#ffffff' }}>Project Reality Check</div>
-                <div className="text-[9px] mt-0.5" style={{ color: 'rgba(0, 240, 255, 0.5)' }}>Comparing Task Plan vs actual GitHub commit activity</div>
+                <div className="text-xs font-bold text-neutral-800">Project Reality Check</div>
+                <div className="text-[9px] mt-0.5 text-neutral-500">Comparing Task Plan vs actual GitHub commit activity</div>
               </div>
               <button
                 onClick={fetchRealityCheck}
                 disabled={realityLoading}
-                className="flex items-center gap-1.5 px-3 py-1.5 bg-neutral-900 text-white text-xs font-bold rounded-xl cursor-pointer hover:bg-neutral-800 transition-colors border"
-                style={{ borderColor: 'rgba(0, 240, 255, 0.2)' }}
+                className="flex items-center gap-1.5 px-3 py-1.5 bg-neutral-200 hover:bg-neutral-300 text-neutral-800 text-xs font-bold rounded-xl cursor-pointer transition-colors border border-neutral-300"
               >
-                <RefreshCw size={12} className={realityLoading ? 'animate-spin text-white' : 'text-white'} />
-                <span className="text-white">Refresh</span>
+                <RefreshCw size={12} className={realityLoading ? 'animate-spin text-neutral-800' : 'text-neutral-800'} />
+                <span className="text-neutral-800">Refresh</span>
               </button>
             </div>
 
@@ -1064,7 +1059,7 @@ const GitHubPanel = ({ projectId, isOwner }) => {
                 <RefreshCw size={24} className="animate-spin text-brand-500" />
               </div>
             ) : !realityCheck || !realityCheck.realityChecks ? (
-              <div className="text-center py-10 text-xs" style={{ color: 'rgba(0, 240, 255, 0.5)' }}>
+              <div className="text-center py-10 text-xs text-neutral-500">
                 No task plan found. Generate a task plan to enable Reality Check.
               </div>
             ) : (
@@ -1072,20 +1067,19 @@ const GitHubPanel = ({ projectId, isOwner }) => {
                 {/* Summary row */}
                 <div className="grid grid-cols-3 sm:grid-cols-6 gap-2">
                   {[
-                    { label: 'Verified', value: realityCheck.summary?.verified || 0, bg: 'rgba(16, 185, 129, 0.08)', border: 'rgba(16, 185, 129, 0.25)', text: '#34d399' },
-                    { label: 'Warnings', value: realityCheck.summary?.warnings || 0, bg: 'rgba(245, 158, 11, 0.08)', border: 'rgba(245, 158, 11, 0.25)', text: '#fbbf24' },
-                    { label: 'Active', value: realityCheck.summary?.active || 0, bg: 'rgba(59, 130, 246, 0.08)', border: 'rgba(59, 130, 246, 0.25)', text: '#60a5fa' },
-                    { label: 'No Activity', value: realityCheck.summary?.noActivity || 0, bg: 'rgba(249, 115, 22, 0.08)', border: 'rgba(249, 115, 22, 0.25)', text: '#ff781f' },
-                    { label: 'Ahead', value: realityCheck.summary?.ahead || 0, bg: 'rgba(168, 85, 247, 0.08)', border: 'rgba(168, 85, 247, 0.25)', text: '#c084fc' },
-                    { label: 'Not Started', value: realityCheck.summary?.notStarted || 0, bg: 'rgba(156, 163, 175, 0.08)', border: 'rgba(156, 163, 175, 0.25)', text: '#9ca3af' }
-                  ].map(({ label, value, bg, border, text }) => (
+                    { label: 'Verified', value: realityCheck.summary?.verified || 0, bg: 'rgba(16, 185, 129, 0.08)', border: 'rgba(16, 185, 129, 0.25)', textClass: 'text-emerald-500' },
+                    { label: 'Warnings', value: realityCheck.summary?.warnings || 0, bg: 'rgba(245, 158, 11, 0.08)', border: 'rgba(245, 158, 11, 0.25)', textClass: 'text-amber-500' },
+                    { label: 'Active', value: realityCheck.summary?.active || 0, bg: 'rgba(59, 130, 246, 0.08)', border: 'rgba(59, 130, 246, 0.25)', textClass: 'text-blue-500' },
+                    { label: 'No Activity', value: realityCheck.summary?.noActivity || 0, bg: 'rgba(249, 115, 22, 0.08)', border: 'rgba(249, 115, 22, 0.25)', textClass: 'text-orange-500' },
+                    { label: 'Ahead', value: realityCheck.summary?.ahead || 0, bg: 'rgba(168, 85, 247, 0.08)', border: 'rgba(168, 85, 247, 0.25)', textClass: 'text-purple-500' },
+                    { label: 'Not Started', value: realityCheck.summary?.notStarted || 0, bg: 'rgba(156, 163, 175, 0.08)', border: 'rgba(156, 163, 175, 0.25)', textClass: 'text-neutral-500' }
+                  ].map(({ label, value, bg, border, textClass }) => (
                     <div 
                       key={label} 
-                      className="p-2.5 rounded-xl border flex flex-col items-center justify-center text-center gap-1"
+                      className={`p-2.5 rounded-xl border flex flex-col items-center justify-center text-center gap-1 ${textClass}`}
                       style={{
                         backgroundColor: bg,
-                        borderColor: border,
-                        color: text
+                        borderColor: border
                       }}
                     >
                       <div className="text-lg font-extrabold font-mono leading-none">{value}</div>
@@ -1097,14 +1091,14 @@ const GitHubPanel = ({ projectId, isOwner }) => {
                 {/* Task list */}
                 <div 
                   className="flex flex-col gap-0 border rounded-xl overflow-hidden divide-y"
-                  style={{ borderColor: 'rgba(0, 240, 255, 0.15)', divideColor: 'rgba(0, 240, 255, 0.1)' }}
+                  style={{ borderColor: 'var(--color-neutral-200)', divideColor: 'var(--color-neutral-200)' }}
                 >
                   {realityCheck.realityChecks.map((item, i) => {
                     const isWarning = item.verdict === 'Warning';
                     return (
                       <div 
                         key={i} 
-                        className="flex items-start gap-3 p-3.5 transition-colors hover:bg-white/5"
+                        className="flex items-start gap-3 p-3.5 transition-colors hover:bg-neutral-100/5"
                         style={{
                           backgroundColor: isWarning ? 'rgba(245, 158, 11, 0.04)' : 'transparent'
                         }}
@@ -1112,28 +1106,28 @@ const GitHubPanel = ({ projectId, isOwner }) => {
                         <div className="flex flex-col gap-1 flex-1 min-w-0">
                           <div className="flex items-center gap-2 flex-wrap">
                             <VerdictBadge verdict={item.verdict} />
-                            <div className="text-[10px] font-semibold" style={{ color: 'rgba(0, 240, 255, 0.7)' }}>{item.member}</div>
+                            <div className="text-[10px] font-semibold text-neutral-500">{item.member}</div>
                             <div 
                               className="text-[9px] px-1.5 py-0.5 rounded border"
                               style={{
                                 backgroundColor: 'rgba(255, 255, 255, 0.05)',
-                                borderColor: 'rgba(0, 240, 255, 0.15)',
-                                color: 'rgba(0, 240, 255, 0.7)'
+                                borderColor: 'var(--color-neutral-200)',
+                                color: 'var(--color-neutral-600)'
                               }}
                             >
                               {item.taskStatus}
                             </div>
                           </div>
-                          <div className="text-xs font-semibold mt-0.5 leading-snug" style={{ color: '#ffffff' }}>{item.task}</div>
-                          <div className="text-[10px] mt-0.5" style={{ color: 'rgba(0, 240, 255, 0.6)' }}>{item.message}</div>
+                          <div className="text-xs font-semibold mt-0.5 leading-snug text-neutral-800">{item.task}</div>
+                          <div className="text-[10px] mt-0.5 text-neutral-500">{item.message}</div>
                         </div>
                         {item.relatedCommitCount > 0 && (
                           <div 
                             className="text-[9px] font-bold px-2 py-0.5 rounded-full border shrink-0 mt-1"
                             style={{
-                              backgroundColor: 'rgba(0, 240, 255, 0.08)',
-                              borderColor: 'rgba(0, 240, 255, 0.25)',
-                              color: '#00f0ff'
+                              backgroundColor: 'var(--color-brand-100)',
+                              borderColor: 'var(--color-neutral-200)',
+                              color: 'var(--color-brand-300)'
                             }}
                           >
                             {item.relatedCommitCount} commit{item.relatedCommitCount > 1 ? 's' : ''}
@@ -1144,7 +1138,7 @@ const GitHubPanel = ({ projectId, isOwner }) => {
                   })}
                 </div>
 
-                <div className="text-[9px] font-medium text-center" style={{ color: 'rgba(0, 240, 255, 0.4)' }}>
+                <div className="text-[9px] font-medium text-center text-neutral-500">
                   Last synced: {realityCheck.lastSyncedAt ? new Date(realityCheck.lastSyncedAt).toLocaleString() : 'Never'}
                 </div>
               </>

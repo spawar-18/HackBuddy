@@ -1047,20 +1047,19 @@ const HackathonCommandCenter = ({ projectId, onBack }) => {
                     </p>
                   )}
                 </div>
-
                 {/* Pitch Advice */}
                 {aiReport.judgePreparationTips && aiReport.judgePreparationTips.length > 0 && (
-                  <div className="flex flex-col gap-2 bg-neutral-950 text-white rounded-2xl p-4 relative overflow-hidden shadow-sm">
+                  <div className="flex flex-col gap-2 bg-neutral-100 border border-neutral-200 rounded-2xl p-4 relative overflow-hidden shadow-sm">
                     <div className="absolute inset-0 opacity-[0.025]" style={{ backgroundImage: 'radial-gradient(circle, white 1px, transparent 1px)', backgroundSize: '16px 16px' }}></div>
                     <div className="flex items-center gap-1.5 relative z-10 mb-1">
-                      <Award size={14} className="text-orange-400 animate-pulse" />
-                      <span className="text-[9px] font-black text-orange-400 uppercase tracking-widest">JUDGE DAY PITCH ADVICE</span>
+                      <Award size={14} className="text-orange-500 animate-pulse" />
+                      <span className="text-[9px] font-black text-orange-500 uppercase tracking-widest">JUDGE DAY PITCH ADVICE</span>
                     </div>
                     <div className="flex flex-col gap-2 relative z-10">
                       {aiReport.judgePreparationTips.map((tip, idx) => (
-                        <div key={idx} className="flex items-start gap-2.5 text-[11px] leading-relaxed text-neutral-300">
-                          <ArrowUpRight size={12} className="shrink-0 mt-0.5 text-orange-400" />
-                          <span>{tip}</span>
+                        <div key={idx} className="flex items-start gap-2.5 text-[11px] leading-relaxed">
+                          <ArrowUpRight size={12} className="shrink-0 mt-0.5 text-orange-500" />
+                          <span className="text-neutral-800">{tip}</span>
                         </div>
                       ))}
                     </div>

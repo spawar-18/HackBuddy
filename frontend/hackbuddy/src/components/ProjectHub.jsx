@@ -1318,6 +1318,12 @@ const ProjectHub = ({ teamId, initialView }) => {
     }
   }, [teamId]);
 
+  useEffect(() => {
+    if (initialView) {
+      setView(initialView);
+    }
+  }, [initialView]);
+
   // Sync edit form fields when entering edit view
   const enterEditMode = () => {
     if (project) {
@@ -2064,11 +2070,9 @@ const ProjectHub = ({ teamId, initialView }) => {
           <div className="flex flex-col gap-6 animate-slide-up">
             {/* ═══ Header Banner ═══ */}
             <div 
-              className="relative overflow-hidden rounded-2xl p-6 shadow-lg"
+              className="relative overflow-hidden rounded-2xl p-6 shadow-lg border border-neutral-200"
               style={{ 
-                backgroundColor: '#040817', 
-                borderColor: 'rgba(0, 240, 255, 0.25)',
-                borderWidth: '1px',
+                backgroundColor: 'var(--color-neutral-100)', 
                 boxShadow: '0 0 20px rgba(0, 240, 255, 0.08)'
               }}
             >

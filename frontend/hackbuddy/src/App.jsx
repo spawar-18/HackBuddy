@@ -5,6 +5,7 @@ import Login from './pages/Login';
 import Register from './pages/Register';
 import Profile from './pages/Profile';
 import Dashboard from './pages/Dashboard';
+import ProjectWorkspace from './pages/ProjectWorkspace';
 import CreateTeam from './pages/CreateTeam';
 import JoinTeam from './pages/JoinTeam';
 import TeamDetails from './pages/TeamDetails';
@@ -43,6 +44,14 @@ function App() {
               element={
                 <ProtectedRoute>
                   <Dashboard />
+                </ProtectedRoute>
+              } 
+            />
+            <Route 
+              path="/workspace/:projectId" 
+              element={
+                <ProtectedRoute>
+                  <ProjectWorkspace />
                 </ProtectedRoute>
               } 
             />

@@ -29,6 +29,20 @@
   --color-neutral-950: #ffffff;
 }
 
+:root {
+  --text-color: #00f0ff;
+  --text-hover-color: #ffffff;
+  --text-shadow-hover: 0 0 8px #00f0ff, 0 0 15px rgba(0, 240, 255, 0.6);
+  --tab-border-color: rgba(0, 240, 255, 0.15);
+  --tab-active-bg: rgba(0, 240, 255, 0.08);
+  --tab-active-border: rgba(0, 240, 255, 0.3);
+  --tab-active-text: #ffffff;
+  --tab-active-bottom-border: #040817;
+  --tab-active-icon: #00f0ff;
+  --tab-inactive-text: rgba(0, 240, 255, 0.55);
+  --tab-inactive-icon: rgba(0, 240, 255, 0.45);
+}
+
 /* Base resets & typography */
 body {
   @apply bg-brand-50 text-neutral-900 font-sans min-h-screen antialiased selection:bg-brand-200 selection:text-brand-800;
@@ -56,7 +70,7 @@ td,
 dd,
 dt,
 time {
-  color: #00f0ff !important;
+  color: var(--text-color);
   transition: all 0.2s ease-in-out;
 }
 
@@ -72,8 +86,8 @@ span:hover,
 li:hover,
 a:hover,
 label:hover {
-  color: #ffffff !important;
-  text-shadow: 0 0 8px #00f0ff, 0 0 15px rgba(0, 240, 255, 0.6);
+  color: var(--text-hover-color) !important;
+  text-shadow: var(--text-shadow-hover);
   cursor: pointer;
 }
 
@@ -689,56 +703,58 @@ textarea:focus {
 }
 
 /* Extra overrides for specific UI components with white backgrounds inside cards */
-.px-2.py-0\.5.text-\[11px\].font-medium.bg-white,
-.px-3.py-1.text-xs.font-bold.bg-white,
-[class*="group-hover:text-"],
-[class*="group-hover:border-"] {
+html:not(.light) .px-2.py-0\.5.text-\[11px\].font-medium.bg-white,
+html:not(.light) .px-3.py-1.text-xs.font-bold.bg-white {
   background-color: #030616 !important;
-  color: #0f172a !important;
+  color: #00f0ff !important;
   border-color: rgba(0, 240, 255, 0.2) !important;
 }
 
 /* ============================================
    LIGHT MODE OVERRIDES (html.light class)
    ============================================ */
+html.light {
+  --color-brand-50: #f8fafc;
+  --color-brand-100: rgba(37, 99, 235, 0.08);
+  --color-brand-200: rgba(37, 99, 235, 0.15);
+  --color-brand-300: #2563eb;
+  --color-brand-400: #1d4ed8;
+  --color-brand-500: #1e40af;
+  --color-brand-600: #1e3a8a;
+  --color-brand-700: #172554;
+  --color-brand-800: #1e293b;
+  --color-brand-900: #0f172a;
+
+  --color-neutral-50: #f8fafc;
+  --color-neutral-100: #ffffff;
+  --color-neutral-200: #e2e8f0;
+  --color-neutral-300: #cbd5e1;
+  --color-neutral-400: #64748b;
+  --color-neutral-500: #64748b;
+  --color-neutral-600: #475569;
+  --color-neutral-700: #334155;
+  --color-neutral-800: #1e293b;
+  --color-neutral-900: #0f172a;
+  --color-neutral-950: #020617;
+
+  --text-color: #1e293b;
+  --text-hover-color: #0f172a;
+  --text-shadow-hover: none;
+  --tab-border-color: #cbd5e1;
+  --tab-active-bg: rgba(37, 99, 235, 0.08);
+  --tab-active-border: rgba(37, 99, 235, 0.2);
+  --tab-active-text: #1e3a8a;
+  --tab-active-bottom-border: #ffffff;
+  --tab-active-icon: #2563eb;
+  --tab-inactive-text: #64748b;
+  --tab-inactive-icon: #94a3b8;
+}
+
 html.light body {
   background-color: #f8fafc !important;
   background-image: radial-gradient(rgba(0, 0, 0, 0.04) 1px, transparent 1px) !important;
   background-size: 24px 24px !important;
   color: #1e293b !important;
-}
-
-html.light h1,
-html.light h2,
-html.light h3,
-html.light h4,
-html.light h5,
-html.light h6,
-html.light p,
-html.light span,
-html.light label,
-html.light li,
-html.light a,
-html.light th,
-html.light td,
-html.light dd,
-html.light dt,
-html.light time {
-  color: #1e293b !important;
-  text-shadow: none !important;
-}
-
-html.light h1:hover,
-html.light h2:hover,
-html.light h3:hover,
-html.light h4:hover,
-html.light p:hover,
-html.light span:hover,
-html.light li:hover,
-html.light a:hover,
-html.light label:hover {
-  color: #0f172a !important;
-  text-shadow: none !important;
 }
 
 html.light ::-webkit-scrollbar-track {
