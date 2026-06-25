@@ -413,6 +413,14 @@ const Dashboard = () => {
             </button>
 
             <button
+              onClick={() => navigate('/chat')}
+              className="menu-item w-full bg-transparent border-0 cursor-pointer text-left flex items-center gap-3 py-2.5"
+            >
+              <MessageSquare size={16} />
+              <span>Open Chat</span>
+            </button>
+
+            <button
               onClick={() => navigate('/team/create')}
               className="btn-primary mt-6 w-full flex items-center justify-center gap-2 text-xs py-2 shadow-xs cursor-pointer"
             >
