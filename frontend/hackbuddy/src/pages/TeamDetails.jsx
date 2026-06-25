@@ -14,7 +14,7 @@ import TeamAnalysis from '../components/TeamAnalysis';
 import ProjectHub from '../components/ProjectHub';
 import { 
   ArrowLeft, Copy, Check, Users, Shield, Mail, Code, 
-  Terminal, AlertTriangle, RefreshCw, LogOut, Trash2 
+  Terminal, AlertTriangle, RefreshCw, LogOut, Trash2, MessageSquare 
 } from 'lucide-react';
 
 const TeamDetails = () => {
@@ -330,6 +330,14 @@ const TeamDetails = () => {
                 <h1 className="text-xl font-extrabold text-neutral-900 tracking-tight">{team.teamName}</h1>
                 <p className="text-xs text-neutral-500 mt-1.5 leading-relaxed">{team.description || 'No description provided for this team.'}</p>
               </div>
+
+              <button
+                onClick={() => navigate('/chat')}
+                className="btn-primary w-full py-2.5 text-xs flex items-center justify-center gap-2"
+              >
+                <MessageSquare size={14} />
+                <span>Open Team Chat</span>
+              </button>
 
               <div className="flex flex-col gap-4">
                 {/* Invite Code */}

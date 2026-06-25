@@ -380,6 +380,13 @@ const ProjectWorkspace = () => {
             {renderSidebarItem('github', 'GitHub Intelligence', GitBranch)}
             {renderSidebarItem('reality', 'Repository Intelligence', Eye)}
             {renderSidebarItem('chat', 'AI Mentor Chat', MessageSquare)}
+            <button
+              onClick={() => navigate('/chat')}
+              className="menu-item w-full bg-transparent border-0 cursor-pointer text-left flex items-center gap-3 py-2 text-neutral-600"
+            >
+              <Users size={16} />
+              <span>Live Team Chat</span>
+            </button>
             {renderSidebarItem('judge', 'Judge Simulator', Award)}
             {renderSidebarItem('settings', 'Workspace Settings', Wrench)}
           </div>

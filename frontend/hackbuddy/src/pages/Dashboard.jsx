@@ -417,7 +417,7 @@ const Dashboard = () => {
               className="menu-item w-full bg-transparent border-0 cursor-pointer text-left flex items-center gap-3 py-2.5"
             >
               <MessageSquare size={16} />
-              <span>Open Chat</span>
+              <span>Team Chat</span>
             </button>
 
             <button
@@ -583,33 +583,44 @@ const Dashboard = () => {
                   </div>
                 )}
 
-                {/* Empty state: No Projects */}
-                {teams.length > 0 && activeProjectsList.length === 0 && (
-                  <div className="dashboard-card glow-blue p-8 items-center text-center justify-center gap-4 bg-neutral-900/20 border-dashed border-neutral-700">
-                    <div className="w-12 h-12 rounded-full bg-brand-200/10 flex items-center justify-center border border-brand-200/20 text-[#00f0ff]">
-                      <FolderGit2 size={22} />
-                    </div>
-                    <div>
-                      <h3 className="text-sm font-bold text-white">No active projects configured</h3>
-                      <p className="text-xs text-neutral-400 mt-1 max-w-sm mx-auto leading-relaxed">
-                        You have joined squads, but no projects are configured. Setup your hackathon tracks, features, and repo link.
-                      </p>
-                    </div>
-                    <button
-                      onClick={() => navigate(`/team/${teams[0]._id}`)}
-                      className="btn-primary text-xs py-1.5 px-3"
-                    >
-                      Create Project Profile
-                    </button>
-                  </div>
-                )}
-
-                {/* Grid of Compact Project Cards */}
-                {activeProjectsList.length > 0 && (
+                {/* Grid of Compact Project Cards & Squads without projects */}
+                {teams.length > 0 && (
                   <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                     {teams.map((team) => {
                       const proj = projects[team._id];
-                      if (!proj) return null;
+                      
+                      if (!proj) {
+                        return (
+                          <div
+                            key={team._id}
+                            className="dashboard-card glow-blue p-4 flex flex-col justify-between border-t-2 border-t-amber-500/50 hover:-translate-y-1 transition-all"
+                          >
+                            <div className="flex justify-between items-start gap-3">
+                              <div className="min-w-0">
+                                <h3 className="text-xs font-extrabold text-white truncate font-mono">{team.teamName}</h3>
+                                <span className="text-[9px] text-amber-500 font-bold uppercase block mt-0.5">No Project Setup</span>
+                              </div>
+                              <div className="w-8 h-8 rounded-full bg-amber-500/10 flex items-center justify-center border border-amber-500/20 text-amber-400 font-mono text-xs font-bold">
+                                ?
+                              </div>
+                            </div>
+
+                            <p className="text-xs text-neutral-400 mt-2 leading-relaxed">
+                              This squad has been created, but no project profile has been initialized yet. Setup the project profile to unlock AI Command Center.
+                            </p>
+
+                            {/* Footer Actions */}
+                            <div className="flex justify-end items-center border-t border-brand-200/10 pt-3 mt-4">
+                              <button
+                                onClick={() => navigate(`/team/${team._id}`)}
+                                className="text-[9px] font-bold bg-amber-500 hover:bg-amber-400 text-neutral-950 px-3 py-1.5 rounded-md border border-amber-500 transition-all cursor-pointer uppercase tracking-wider font-mono shadow-2xs"
+                              >
+                                Setup Project Profile
+                              </button>
+                            </div>
+                          </div>
+                        );
+                      }
 
                       // Calculate completion percentage
                       let totalTasks = 0, completedTasks = 0;
@@ -705,7 +716,7 @@ const Dashboard = () => {
                   <span>AI Operational Control & Quick Actions</span>
                 </span>
                 
-                <div className="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-8 gap-3 w-full">
+                 <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-5 lg:grid-cols-9 gap-3 w-full">
                   {[
                     { label: 'Create Team', sub: 'New Squad', icon: Users, act: () => navigate('/team/create'), color: 'text-indigo-400' },
                     { label: 'Join Team', sub: 'Link Invite', icon: UserCheck, act: () => navigate('/team/join'), color: 'text-[#00f0ff]' },
@@ -725,6 +736,7 @@ const Dashboard = () => {
                       if (currentProjectId) navigate(`/workspace/${currentProjectId}`, { state: { activeTab: 'chat' } });
                       else toast.error('Setup project first.');
                     }, color: 'text-violet-400' },
+                    { label: 'Team Chat', sub: 'Live Chat', icon: MessageSquare, act: () => navigate('/chat'), color: 'text-sky-400' },
                     { label: 'Task Splitter', sub: 'Sync roadmap', icon: Cpu, act: () => {
                       if (currentProjectId) navigate(`/workspace/${currentProjectId}`, { state: { activeTab: 'splitter' } });
                       else toast.error('Setup project first.');
