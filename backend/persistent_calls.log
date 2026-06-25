@@ -637,190 +637,66 @@
 [2026-06-25T13:12:35.306Z] Active request from user: id=6a265746b1a1c29afedf3e69, name=Sahil Ojha, email=ojharamakant48@gmail.com, endpoint=/api/projects/6a390f1a1b4929bad5c6d652/hackathon/notifications
 [2026-06-25T13:13:05.526Z] Active request from user: id=6a265746b1a1c29afedf3e69, name=Sahil Ojha, email=ojharamakant48@gmail.com, endpoint=/api/projects/6a390f1a1b4929bad5c6d652/hackathon/notifications
 [2026-06-25T13:13:35.558Z] Active request from user: id=6a265746b1a1c29afedf3e69, name=Sahil Ojha, email=ojharamakant48@gmail.com, endpoint=/api/projects/6a390f1a1b4929bad5c6d652/hackathon/notifications
-[2026-06-25T13:14:11.552Z] Active request from user: id=6a265746b1a1c29afedf3e69, name=Sahil Ojha, email=ojharamakant48@gmail.com, endpoint=/api/projects/6a390f1a1b4929bad5c6d652/hackathon/notifications
-[2026-06-25T13:15:11.525Z] Active request from user: id=6a265746b1a1c29afedf3e69, name=Sahil Ojha, email=ojharamakant48@gmail.com, endpoint=/api/projects/6a390f1a1b4929bad5c6d652/hackathon/notifications
-[2026-06-25T13:16:06.889Z] Active request from user: id=6a265746b1a1c29afedf3e69, name=Sahil Ojha, email=ojharamakant48@gmail.com, endpoint=/api/projects/6a390f1a1b4929bad5c6d652/hackathon/notifications
-[2026-06-25T13:16:35.529Z] Active request from user: id=6a265746b1a1c29afedf3e69, name=Sahil Ojha, email=ojharamakant48@gmail.com, endpoint=/api/projects/6a390f1a1b4929bad5c6d652/hackathon/notifications
-[2026-06-25T13:17:05.546Z] Active request from user: id=6a265746b1a1c29afedf3e69, name=Sahil Ojha, email=ojharamakant48@gmail.com, endpoint=/api/projects/6a390f1a1b4929bad5c6d652/hackathon/notifications
-[2026-06-25T13:18:11.514Z] Active request from user: id=6a265746b1a1c29afedf3e69, name=Sahil Ojha, email=ojharamakant48@gmail.com, endpoint=/api/projects/6a390f1a1b4929bad5c6d652/hackathon/notifications
-[2026-06-25T13:19:11.517Z] Active request from user: id=6a265746b1a1c29afedf3e69, name=Sahil Ojha, email=ojharamakant48@gmail.com, endpoint=/api/projects/6a390f1a1b4929bad5c6d652/hackathon/notifications
-[2026-06-25T13:20:11.546Z] Active request from user: id=6a265746b1a1c29afedf3e69, name=Sahil Ojha, email=ojharamakant48@gmail.com, endpoint=/api/projects/6a390f1a1b4929bad5c6d652/hackathon/notifications
-[2026-06-25T13:21:11.538Z] Active request from user: id=6a265746b1a1c29afedf3e69, name=Sahil Ojha, email=ojharamakant48@gmail.com, endpoint=/api/projects/6a390f1a1b4929bad5c6d652/hackathon/notifications
-[2026-06-25T13:22:11.534Z] Active request from user: id=6a265746b1a1c29afedf3e69, name=Sahil Ojha, email=ojharamakant48@gmail.com, endpoint=/api/projects/6a390f1a1b4929bad5c6d652/hackathon/notifications
-[2026-06-25T13:23:11.526Z] Active request from user: id=6a265746b1a1c29afedf3e69, name=Sahil Ojha, email=ojharamakant48@gmail.com, endpoint=/api/projects/6a390f1a1b4929bad5c6d652/hackathon/notifications
-[2026-06-25T13:24:11.541Z] Active request from user: id=6a265746b1a1c29afedf3e69, name=Sahil Ojha, email=ojharamakant48@gmail.com, endpoint=/api/projects/6a390f1a1b4929bad5c6d652/hackathon/notifications
-[2026-06-25T13:25:11.539Z] Active request from user: id=6a265746b1a1c29afedf3e69, name=Sahil Ojha, email=ojharamakant48@gmail.com, endpoint=/api/projects/6a390f1a1b4929bad5c6d652/hackathon/notifications
-[2026-06-25T13:26:11.543Z] Active request from user: id=6a265746b1a1c29afedf3e69, name=Sahil Ojha, email=ojharamakant48@gmail.com, endpoint=/api/projects/6a390f1a1b4929bad5c6d652/hackathon/notifications
-[2026-06-25T13:27:11.534Z] Active request from user: id=6a265746b1a1c29afedf3e69, name=Sahil Ojha, email=ojharamakant48@gmail.com, endpoint=/api/projects/6a390f1a1b4929bad5c6d652/hackathon/notifications
-[2026-06-25T13:28:11.614Z] Active request from user: id=6a265746b1a1c29afedf3e69, name=Sahil Ojha, email=ojharamakant48@gmail.com, endpoint=/api/projects/6a390f1a1b4929bad5c6d652/hackathon/notifications
-[2026-06-25T13:29:11.571Z] Active request from user: id=6a265746b1a1c29afedf3e69, name=Sahil Ojha, email=ojharamakant48@gmail.com, endpoint=/api/projects/6a390f1a1b4929bad5c6d652/hackathon/notifications
-[2026-06-25T13:30:11.523Z] Active request from user: id=6a265746b1a1c29afedf3e69, name=Sahil Ojha, email=ojharamakant48@gmail.com, endpoint=/api/projects/6a390f1a1b4929bad5c6d652/hackathon/notifications
-[2026-06-25T13:31:11.533Z] Active request from user: id=6a265746b1a1c29afedf3e69, name=Sahil Ojha, email=ojharamakant48@gmail.com, endpoint=/api/projects/6a390f1a1b4929bad5c6d652/hackathon/notifications
-[2026-06-25T13:32:11.527Z] Active request from user: id=6a265746b1a1c29afedf3e69, name=Sahil Ojha, email=ojharamakant48@gmail.com, endpoint=/api/projects/6a390f1a1b4929bad5c6d652/hackathon/notifications
-[2026-06-25T13:33:11.523Z] Active request from user: id=6a265746b1a1c29afedf3e69, name=Sahil Ojha, email=ojharamakant48@gmail.com, endpoint=/api/projects/6a390f1a1b4929bad5c6d652/hackathon/notifications
-[2026-06-25T13:34:11.528Z] Active request from user: id=6a265746b1a1c29afedf3e69, name=Sahil Ojha, email=ojharamakant48@gmail.com, endpoint=/api/projects/6a390f1a1b4929bad5c6d652/hackathon/notifications
-[2026-06-25T13:35:11.560Z] Active request from user: id=6a265746b1a1c29afedf3e69, name=Sahil Ojha, email=ojharamakant48@gmail.com, endpoint=/api/projects/6a390f1a1b4929bad5c6d652/hackathon/notifications
-[2026-06-25T13:35:24.719Z] Active request from user: id=6a265746b1a1c29afedf3e69, name=Sahil Ojha, email=ojharamakant48@gmail.com, endpoint=/api/user/profile
-[2026-06-25T13:35:24.772Z] Active request from user: id=6a265746b1a1c29afedf3e69, name=Sahil Ojha, email=ojharamakant48@gmail.com, endpoint=/api/user/profile
-[2026-06-25T13:35:24.802Z] getMyTeams called by user: 6a265746b1a1c29afedf3e69
-[2026-06-25T13:35:24.827Z] Active request from user: id=6a265746b1a1c29afedf3e69, name=Sahil Ojha, email=ojharamakant48@gmail.com, endpoint=/api/user/profile
-[2026-06-25T13:35:24.864Z] Active request from user: id=6a265746b1a1c29afedf3e69, name=Sahil Ojha, email=ojharamakant48@gmail.com, endpoint=/api/team/my-teams
-[2026-06-25T13:35:24.882Z] Active request from user: id=6a265746b1a1c29afedf3e69, name=Sahil Ojha, email=ojharamakant48@gmail.com, endpoint=/api/user/profile
-[2026-06-25T13:35:24.915Z] getMyTeams called by user: 6a265746b1a1c29afedf3e69
-[2026-06-25T13:35:24.960Z] Active request from user: id=6a265746b1a1c29afedf3e69, name=Sahil Ojha, email=ojharamakant48@gmail.com, endpoint=/api/team/my-teams
-[2026-06-25T13:35:25.008Z] Active request from user: id=6a265746b1a1c29afedf3e69, name=Sahil Ojha, email=ojharamakant48@gmail.com, endpoint=/api/project/team/6a390e011b4929bad5c6d64d
-[2026-06-25T13:35:25.011Z] Active request from user: id=6a265746b1a1c29afedf3e69, name=Sahil Ojha, email=ojharamakant48@gmail.com, endpoint=/api/project/team/6a3925fe5d71e86ea882c3cb
-[2026-06-25T13:35:25.037Z] Active request from user: id=6a265746b1a1c29afedf3e69, name=Sahil Ojha, email=ojharamakant48@gmail.com, endpoint=/api/project/team/6a3ad6dfee899979c52f7816
-[2026-06-25T13:35:25.045Z] Active request from user: id=6a265746b1a1c29afedf3e69, name=Sahil Ojha, email=ojharamakant48@gmail.com, endpoint=/api/project/team/6a3ad641c0b9fc7aa496a90f
-[2026-06-25T13:35:25.063Z] Active request from user: id=6a265746b1a1c29afedf3e69, name=Sahil Ojha, email=ojharamakant48@gmail.com, endpoint=/api/project/team/6a3ade6cb85814ce17284608
-[2026-06-25T13:35:25.153Z] Active request from user: id=6a265746b1a1c29afedf3e69, name=Sahil Ojha, email=ojharamakant48@gmail.com, endpoint=/api/project/team/6a390e011b4929bad5c6d64d
-[2026-06-25T13:35:25.166Z] Active request from user: id=6a265746b1a1c29afedf3e69, name=Sahil Ojha, email=ojharamakant48@gmail.com, endpoint=/api/project/team/6a3ad6dfee899979c52f7816
-[2026-06-25T13:35:25.186Z] Active request from user: id=6a265746b1a1c29afedf3e69, name=Sahil Ojha, email=ojharamakant48@gmail.com, endpoint=/api/project/team/6a3925fe5d71e86ea882c3cb
-[2026-06-25T13:35:25.190Z] Active request from user: id=6a265746b1a1c29afedf3e69, name=Sahil Ojha, email=ojharamakant48@gmail.com, endpoint=/api/project/team/6a3ad641c0b9fc7aa496a90f
-[2026-06-25T13:35:25.215Z] Active request from user: id=6a265746b1a1c29afedf3e69, name=Sahil Ojha, email=ojharamakant48@gmail.com, endpoint=/api/project/team/6a3ade6cb85814ce17284608
-[2026-06-25T13:35:25.249Z] Active request from user: id=6a265746b1a1c29afedf3e69, name=Sahil Ojha, email=ojharamakant48@gmail.com, endpoint=/api/projects/6a390f1a1b4929bad5c6d652/hackathon/notifications
-[2026-06-25T13:35:25.376Z] Active request from user: id=6a265746b1a1c29afedf3e69, name=Sahil Ojha, email=ojharamakant48@gmail.com, endpoint=/api/projects/6a390f1a1b4929bad5c6d652/hackathon/notifications
-[2026-06-25T13:35:55.525Z] Active request from user: id=6a265746b1a1c29afedf3e69, name=Sahil Ojha, email=ojharamakant48@gmail.com, endpoint=/api/projects/6a390f1a1b4929bad5c6d652/hackathon/notifications
-[2026-06-25T13:36:25.526Z] Active request from user: id=6a265746b1a1c29afedf3e69, name=Sahil Ojha, email=ojharamakant48@gmail.com, endpoint=/api/projects/6a390f1a1b4929bad5c6d652/hackathon/notifications
-[2026-06-25T13:36:55.529Z] Active request from user: id=6a265746b1a1c29afedf3e69, name=Sahil Ojha, email=ojharamakant48@gmail.com, endpoint=/api/projects/6a390f1a1b4929bad5c6d652/hackathon/notifications
-[2026-06-25T13:37:25.525Z] Active request from user: id=6a265746b1a1c29afedf3e69, name=Sahil Ojha, email=ojharamakant48@gmail.com, endpoint=/api/projects/6a390f1a1b4929bad5c6d652/hackathon/notifications
-[2026-06-25T13:37:55.527Z] Active request from user: id=6a265746b1a1c29afedf3e69, name=Sahil Ojha, email=ojharamakant48@gmail.com, endpoint=/api/projects/6a390f1a1b4929bad5c6d652/hackathon/notifications
-[2026-06-25T13:38:25.526Z] Active request from user: id=6a265746b1a1c29afedf3e69, name=Sahil Ojha, email=ojharamakant48@gmail.com, endpoint=/api/projects/6a390f1a1b4929bad5c6d652/hackathon/notifications
-[2026-06-25T13:39:11.541Z] Active request from user: id=6a265746b1a1c29afedf3e69, name=Sahil Ojha, email=ojharamakant48@gmail.com, endpoint=/api/projects/6a390f1a1b4929bad5c6d652/hackathon/notifications
-[2026-06-25T13:40:11.531Z] Active request from user: id=6a265746b1a1c29afedf3e69, name=Sahil Ojha, email=ojharamakant48@gmail.com, endpoint=/api/projects/6a390f1a1b4929bad5c6d652/hackathon/notifications
-[2026-06-25T13:41:11.544Z] Active request from user: id=6a265746b1a1c29afedf3e69, name=Sahil Ojha, email=ojharamakant48@gmail.com, endpoint=/api/projects/6a390f1a1b4929bad5c6d652/hackathon/notifications
-[2026-06-25T13:42:11.516Z] Active request from user: id=6a265746b1a1c29afedf3e69, name=Sahil Ojha, email=ojharamakant48@gmail.com, endpoint=/api/projects/6a390f1a1b4929bad5c6d652/hackathon/notifications
-[2026-06-25T13:43:11.565Z] Active request from user: id=6a265746b1a1c29afedf3e69, name=Sahil Ojha, email=ojharamakant48@gmail.com, endpoint=/api/projects/6a390f1a1b4929bad5c6d652/hackathon/notifications
-[2026-06-25T13:43:39.370Z] Active request from user: id=6a265746b1a1c29afedf3e69, name=Sahil Ojha, email=ojharamakant48@gmail.com, endpoint=/api/projects/6a390f1a1b4929bad5c6d652/hackathon/notifications
-[2026-06-25T13:43:55.540Z] Active request from user: id=6a265746b1a1c29afedf3e69, name=Sahil Ojha, email=ojharamakant48@gmail.com, endpoint=/api/projects/6a390f1a1b4929bad5c6d652/hackathon/notifications
-[2026-06-25T13:44:25.540Z] Active request from user: id=6a265746b1a1c29afedf3e69, name=Sahil Ojha, email=ojharamakant48@gmail.com, endpoint=/api/projects/6a390f1a1b4929bad5c6d652/hackathon/notifications
-[2026-06-25T13:44:48.351Z] Active request from user: id=6a265746b1a1c29afedf3e69, name=Sahil Ojha, email=ojharamakant48@gmail.com, endpoint=/api/project/6a390f1a1b4929bad5c6d652
-[2026-06-25T13:44:48.437Z] getMyTeams called by user: 6a265746b1a1c29afedf3e69
-[2026-06-25T13:44:48.453Z] Active request from user: id=6a265746b1a1c29afedf3e69, name=Sahil Ojha, email=ojharamakant48@gmail.com, endpoint=/api/project/6a390f1a1b4929bad5c6d652
-[2026-06-25T13:44:48.485Z] Active request from user: id=6a265746b1a1c29afedf3e69, name=Sahil Ojha, email=ojharamakant48@gmail.com, endpoint=/api/team/my-teams
-[2026-06-25T13:44:48.523Z] getMyTeams called by user: 6a265746b1a1c29afedf3e69
-[2026-06-25T13:44:48.575Z] Active request from user: id=6a265746b1a1c29afedf3e69, name=Sahil Ojha, email=ojharamakant48@gmail.com, endpoint=/api/team/my-teams
-[2026-06-25T13:44:48.586Z] Active request from user: id=6a265746b1a1c29afedf3e69, name=Sahil Ojha, email=ojharamakant48@gmail.com, endpoint=/api/project/team/6a390e011b4929bad5c6d64d
-[2026-06-25T13:44:48.594Z] Active request from user: id=6a265746b1a1c29afedf3e69, name=Sahil Ojha, email=ojharamakant48@gmail.com, endpoint=/api/project/team/6a3925fe5d71e86ea882c3cb
-[2026-06-25T13:44:48.598Z] Active request from user: id=6a265746b1a1c29afedf3e69, name=Sahil Ojha, email=ojharamakant48@gmail.com, endpoint=/api/project/team/6a3ad641c0b9fc7aa496a90f
-[2026-06-25T13:44:48.608Z] Active request from user: id=6a265746b1a1c29afedf3e69, name=Sahil Ojha, email=ojharamakant48@gmail.com, endpoint=/api/project/team/6a3ad6dfee899979c52f7816
-[2026-06-25T13:44:48.610Z] Active request from user: id=6a265746b1a1c29afedf3e69, name=Sahil Ojha, email=ojharamakant48@gmail.com, endpoint=/api/project/team/6a3ade6cb85814ce17284608
-[2026-06-25T13:44:48.676Z] Active request from user: id=6a265746b1a1c29afedf3e69, name=Sahil Ojha, email=ojharamakant48@gmail.com, endpoint=/api/project/team/6a3925fe5d71e86ea882c3cb
-[2026-06-25T13:44:48.680Z] Active request from user: id=6a265746b1a1c29afedf3e69, name=Sahil Ojha, email=ojharamakant48@gmail.com, endpoint=/api/project/team/6a390e011b4929bad5c6d64d
-[2026-06-25T13:44:48.692Z] Active request from user: id=6a265746b1a1c29afedf3e69, name=Sahil Ojha, email=ojharamakant48@gmail.com, endpoint=/api/project/team/6a3ad641c0b9fc7aa496a90f
-[2026-06-25T13:44:48.703Z] Active request from user: id=6a265746b1a1c29afedf3e69, name=Sahil Ojha, email=ojharamakant48@gmail.com, endpoint=/api/project/team/6a3ad6dfee899979c52f7816
-[2026-06-25T13:44:48.706Z] Active request from user: id=6a265746b1a1c29afedf3e69, name=Sahil Ojha, email=ojharamakant48@gmail.com, endpoint=/api/project/team/6a3ade6cb85814ce17284608
-[2026-06-25T13:44:48.726Z] Active request from user: id=6a265746b1a1c29afedf3e69, name=Sahil Ojha, email=ojharamakant48@gmail.com, endpoint=/api/projects/6a390f1a1b4929bad5c6d652/hackathon/dashboard
-[2026-06-25T13:44:48.971Z] Active request from user: id=6a265746b1a1c29afedf3e69, name=Sahil Ojha, email=ojharamakant48@gmail.com, endpoint=/api/project/team/6a390e011b4929bad5c6d64d
-[2026-06-25T13:44:48.974Z] Active request from user: id=6a265746b1a1c29afedf3e69, name=Sahil Ojha, email=ojharamakant48@gmail.com, endpoint=/api/projects/6a390f1a1b4929bad5c6d652/hackathon/dashboard
-[2026-06-25T13:44:49.083Z] Active request from user: id=6a265746b1a1c29afedf3e69, name=Sahil Ojha, email=ojharamakant48@gmail.com, endpoint=/api/project/team/6a390e011b4929bad5c6d64d
-[2026-06-25T13:47:27.317Z] Active request from user: id=6a265746b1a1c29afedf3e69, name=Sahil Ojha, email=ojharamakant48@gmail.com, endpoint=/api/user/profile
-[2026-06-25T13:47:27.367Z] Active request from user: id=6a265746b1a1c29afedf3e69, name=Sahil Ojha, email=ojharamakant48@gmail.com, endpoint=/api/user/profile
-[2026-06-25T13:47:27.438Z] Active request from user: id=6a265746b1a1c29afedf3e69, name=Sahil Ojha, email=ojharamakant48@gmail.com, endpoint=/api/project/6a390f1a1b4929bad5c6d652
-[2026-06-25T13:47:27.532Z] getMyTeams called by user: 6a265746b1a1c29afedf3e69
-[2026-06-25T13:47:27.543Z] Active request from user: id=6a265746b1a1c29afedf3e69, name=Sahil Ojha, email=ojharamakant48@gmail.com, endpoint=/api/project/6a390f1a1b4929bad5c6d652
-[2026-06-25T13:47:27.568Z] Active request from user: id=6a265746b1a1c29afedf3e69, name=Sahil Ojha, email=ojharamakant48@gmail.com, endpoint=/api/team/my-teams
-[2026-06-25T13:47:27.629Z] getMyTeams called by user: 6a265746b1a1c29afedf3e69
-[2026-06-25T13:47:27.697Z] Active request from user: id=6a265746b1a1c29afedf3e69, name=Sahil Ojha, email=ojharamakant48@gmail.com, endpoint=/api/team/my-teams
-[2026-06-25T13:47:27.948Z] Active request from user: id=6a265746b1a1c29afedf3e69, name=Sahil Ojha, email=ojharamakant48@gmail.com, endpoint=/api/project/team/6a390e011b4929bad5c6d64d
-[2026-06-25T13:47:27.965Z] Active request from user: id=6a265746b1a1c29afedf3e69, name=Sahil Ojha, email=ojharamakant48@gmail.com, endpoint=/api/project/team/6a3ad641c0b9fc7aa496a90f
-[2026-06-25T13:47:27.967Z] Active request from user: id=6a265746b1a1c29afedf3e69, name=Sahil Ojha, email=ojharamakant48@gmail.com, endpoint=/api/project/team/6a3925fe5d71e86ea882c3cb
-[2026-06-25T13:47:27.973Z] Active request from user: id=6a265746b1a1c29afedf3e69, name=Sahil Ojha, email=ojharamakant48@gmail.com, endpoint=/api/project/team/6a3ad6dfee899979c52f7816
-[2026-06-25T13:47:27.984Z] Active request from user: id=6a265746b1a1c29afedf3e69, name=Sahil Ojha, email=ojharamakant48@gmail.com, endpoint=/api/project/team/6a3ade6cb85814ce17284608
-[2026-06-25T13:47:28.105Z] Active request from user: id=6a265746b1a1c29afedf3e69, name=Sahil Ojha, email=ojharamakant48@gmail.com, endpoint=/api/project/team/6a3925fe5d71e86ea882c3cb
-[2026-06-25T13:47:28.116Z] Active request from user: id=6a265746b1a1c29afedf3e69, name=Sahil Ojha, email=ojharamakant48@gmail.com, endpoint=/api/project/team/6a3ad6dfee899979c52f7816
-[2026-06-25T13:47:28.120Z] Active request from user: id=6a265746b1a1c29afedf3e69, name=Sahil Ojha, email=ojharamakant48@gmail.com, endpoint=/api/project/team/6a3ad641c0b9fc7aa496a90f
-[2026-06-25T13:47:28.124Z] Active request from user: id=6a265746b1a1c29afedf3e69, name=Sahil Ojha, email=ojharamakant48@gmail.com, endpoint=/api/project/team/6a3ade6cb85814ce17284608
-[2026-06-25T13:47:28.145Z] Active request from user: id=6a265746b1a1c29afedf3e69, name=Sahil Ojha, email=ojharamakant48@gmail.com, endpoint=/api/project/team/6a390e011b4929bad5c6d64d
-[2026-06-25T13:47:28.162Z] Active request from user: id=6a265746b1a1c29afedf3e69, name=Sahil Ojha, email=ojharamakant48@gmail.com, endpoint=/api/projects/6a390f1a1b4929bad5c6d652/hackathon/dashboard
-[2026-06-25T13:47:28.447Z] Active request from user: id=6a265746b1a1c29afedf3e69, name=Sahil Ojha, email=ojharamakant48@gmail.com, endpoint=/api/projects/6a390f1a1b4929bad5c6d652/hackathon/dashboard
-[2026-06-25T13:47:28.518Z] Active request from user: id=6a265746b1a1c29afedf3e69, name=Sahil Ojha, email=ojharamakant48@gmail.com, endpoint=/api/project/team/6a390e011b4929bad5c6d64d
-[2026-06-25T13:47:28.610Z] Active request from user: id=6a265746b1a1c29afedf3e69, name=Sahil Ojha, email=ojharamakant48@gmail.com, endpoint=/api/project/team/6a390e011b4929bad5c6d64d
-[2026-06-25T14:01:38.755Z] Active request from user: id=6a265746b1a1c29afedf3e69, name=Sahil Ojha, email=ojharamakant48@gmail.com, endpoint=/api/user/profile
-[2026-06-25T14:01:38.800Z] Active request from user: id=6a265746b1a1c29afedf3e69, name=Sahil Ojha, email=ojharamakant48@gmail.com, endpoint=/api/user/profile
-[2026-06-25T14:01:38.822Z] Active request from user: id=6a265746b1a1c29afedf3e69, name=Sahil Ojha, email=ojharamakant48@gmail.com, endpoint=/api/project/6a390f1a1b4929bad5c6d652
-[2026-06-25T14:01:38.912Z] getMyTeams called by user: 6a265746b1a1c29afedf3e69
-[2026-06-25T14:01:38.945Z] Active request from user: id=6a265746b1a1c29afedf3e69, name=Sahil Ojha, email=ojharamakant48@gmail.com, endpoint=/api/team/my-teams
-[2026-06-25T14:01:38.959Z] Active request from user: id=6a265746b1a1c29afedf3e69, name=Sahil Ojha, email=ojharamakant48@gmail.com, endpoint=/api/project/6a390f1a1b4929bad5c6d652
-[2026-06-25T14:01:39.036Z] getMyTeams called by user: 6a265746b1a1c29afedf3e69
-[2026-06-25T14:01:39.045Z] Active request from user: id=6a265746b1a1c29afedf3e69, name=Sahil Ojha, email=ojharamakant48@gmail.com, endpoint=/api/project/team/6a390e011b4929bad5c6d64d
-[2026-06-25T14:01:39.062Z] Active request from user: id=6a265746b1a1c29afedf3e69, name=Sahil Ojha, email=ojharamakant48@gmail.com, endpoint=/api/project/team/6a3ad6dfee899979c52f7816
-[2026-06-25T14:01:39.068Z] Active request from user: id=6a265746b1a1c29afedf3e69, name=Sahil Ojha, email=ojharamakant48@gmail.com, endpoint=/api/project/team/6a3925fe5d71e86ea882c3cb
-[2026-06-25T14:01:39.072Z] Active request from user: id=6a265746b1a1c29afedf3e69, name=Sahil Ojha, email=ojharamakant48@gmail.com, endpoint=/api/project/team/6a3ad641c0b9fc7aa496a90f
-[2026-06-25T14:01:39.085Z] Active request from user: id=6a265746b1a1c29afedf3e69, name=Sahil Ojha, email=ojharamakant48@gmail.com, endpoint=/api/project/team/6a3ade6cb85814ce17284608
-[2026-06-25T14:01:39.093Z] Active request from user: id=6a265746b1a1c29afedf3e69, name=Sahil Ojha, email=ojharamakant48@gmail.com, endpoint=/api/team/my-teams
-[2026-06-25T14:01:39.166Z] Active request from user: id=6a265746b1a1c29afedf3e69, name=Sahil Ojha, email=ojharamakant48@gmail.com, endpoint=/api/project/team/6a390e011b4929bad5c6d64d
-[2026-06-25T14:01:39.173Z] Active request from user: id=6a265746b1a1c29afedf3e69, name=Sahil Ojha, email=ojharamakant48@gmail.com, endpoint=/api/project/team/6a3925fe5d71e86ea882c3cb
-[2026-06-25T14:01:39.197Z] Active request from user: id=6a265746b1a1c29afedf3e69, name=Sahil Ojha, email=ojharamakant48@gmail.com, endpoint=/api/project/team/6a3ade6cb85814ce17284608
-[2026-06-25T14:01:39.203Z] Active request from user: id=6a265746b1a1c29afedf3e69, name=Sahil Ojha, email=ojharamakant48@gmail.com, endpoint=/api/project/team/6a3ad6dfee899979c52f7816
-[2026-06-25T14:01:39.208Z] Active request from user: id=6a265746b1a1c29afedf3e69, name=Sahil Ojha, email=ojharamakant48@gmail.com, endpoint=/api/project/team/6a3ad641c0b9fc7aa496a90f
-[2026-06-25T14:01:39.221Z] Active request from user: id=6a265746b1a1c29afedf3e69, name=Sahil Ojha, email=ojharamakant48@gmail.com, endpoint=/api/projects/6a390f1a1b4929bad5c6d652/hackathon/dashboard
-[2026-06-25T14:01:39.404Z] Active request from user: id=6a265746b1a1c29afedf3e69, name=Sahil Ojha, email=ojharamakant48@gmail.com, endpoint=/api/projects/6a390f1a1b4929bad5c6d652/hackathon/dashboard
-[2026-06-25T14:01:39.453Z] Active request from user: id=6a265746b1a1c29afedf3e69, name=Sahil Ojha, email=ojharamakant48@gmail.com, endpoint=/api/project/team/6a390e011b4929bad5c6d64d
-[2026-06-25T14:01:39.533Z] Active request from user: id=6a265746b1a1c29afedf3e69, name=Sahil Ojha, email=ojharamakant48@gmail.com, endpoint=/api/project/team/6a390e011b4929bad5c6d64d
-[2026-06-25T14:01:40.389Z] Active request from user: id=6a265746b1a1c29afedf3e69, name=Sahil Ojha, email=ojharamakant48@gmail.com, endpoint=/api/user/profile
-[2026-06-25T14:01:40.422Z] Active request from user: id=6a265746b1a1c29afedf3e69, name=Sahil Ojha, email=ojharamakant48@gmail.com, endpoint=/api/project/6a390f1a1b4929bad5c6d652
-[2026-06-25T14:01:40.434Z] Active request from user: id=6a265746b1a1c29afedf3e69, name=Sahil Ojha, email=ojharamakant48@gmail.com, endpoint=/api/user/profile
-[2026-06-25T14:01:40.516Z] getMyTeams called by user: 6a265746b1a1c29afedf3e69
-[2026-06-25T14:01:40.569Z] Active request from user: id=6a265746b1a1c29afedf3e69, name=Sahil Ojha, email=ojharamakant48@gmail.com, endpoint=/api/project/6a390f1a1b4929bad5c6d652
-[2026-06-25T14:01:40.573Z] Active request from user: id=6a265746b1a1c29afedf3e69, name=Sahil Ojha, email=ojharamakant48@gmail.com, endpoint=/api/team/my-teams
-[2026-06-25T14:01:40.660Z] getMyTeams called by user: 6a265746b1a1c29afedf3e69
-[2026-06-25T14:01:40.669Z] Active request from user: id=6a265746b1a1c29afedf3e69, name=Sahil Ojha, email=ojharamakant48@gmail.com, endpoint=/api/project/team/6a390e011b4929bad5c6d64d
-[2026-06-25T14:01:40.674Z] Active request from user: id=6a265746b1a1c29afedf3e69, name=Sahil Ojha, email=ojharamakant48@gmail.com, endpoint=/api/project/team/6a3925fe5d71e86ea882c3cb
-[2026-06-25T14:01:40.682Z] Active request from user: id=6a265746b1a1c29afedf3e69, name=Sahil Ojha, email=ojharamakant48@gmail.com, endpoint=/api/project/team/6a3ad641c0b9fc7aa496a90f
-[2026-06-25T14:01:40.688Z] Active request from user: id=6a265746b1a1c29afedf3e69, name=Sahil Ojha, email=ojharamakant48@gmail.com, endpoint=/api/project/team/6a3ad6dfee899979c52f7816
-[2026-06-25T14:01:40.694Z] Active request from user: id=6a265746b1a1c29afedf3e69, name=Sahil Ojha, email=ojharamakant48@gmail.com, endpoint=/api/project/team/6a3ade6cb85814ce17284608
-[2026-06-25T14:01:40.705Z] Active request from user: id=6a265746b1a1c29afedf3e69, name=Sahil Ojha, email=ojharamakant48@gmail.com, endpoint=/api/team/my-teams
-[2026-06-25T14:01:40.784Z] Active request from user: id=6a265746b1a1c29afedf3e69, name=Sahil Ojha, email=ojharamakant48@gmail.com, endpoint=/api/project/team/6a3ade6cb85814ce17284608
-[2026-06-25T14:01:40.788Z] Active request from user: id=6a265746b1a1c29afedf3e69, name=Sahil Ojha, email=ojharamakant48@gmail.com, endpoint=/api/project/team/6a3925fe5d71e86ea882c3cb
-[2026-06-25T14:01:40.798Z] Active request from user: id=6a265746b1a1c29afedf3e69, name=Sahil Ojha, email=ojharamakant48@gmail.com, endpoint=/api/project/team/6a3ad6dfee899979c52f7816
-[2026-06-25T14:01:40.807Z] Active request from user: id=6a265746b1a1c29afedf3e69, name=Sahil Ojha, email=ojharamakant48@gmail.com, endpoint=/api/project/team/6a3ad641c0b9fc7aa496a90f
-[2026-06-25T14:01:40.817Z] Active request from user: id=6a265746b1a1c29afedf3e69, name=Sahil Ojha, email=ojharamakant48@gmail.com, endpoint=/api/project/team/6a390e011b4929bad5c6d64d
-[2026-06-25T14:01:40.821Z] Active request from user: id=6a265746b1a1c29afedf3e69, name=Sahil Ojha, email=ojharamakant48@gmail.com, endpoint=/api/projects/6a390f1a1b4929bad5c6d652/hackathon/dashboard
-[2026-06-25T14:01:41.052Z] Active request from user: id=6a265746b1a1c29afedf3e69, name=Sahil Ojha, email=ojharamakant48@gmail.com, endpoint=/api/projects/6a390f1a1b4929bad5c6d652/hackathon/dashboard
-[2026-06-25T14:01:41.076Z] Active request from user: id=6a265746b1a1c29afedf3e69, name=Sahil Ojha, email=ojharamakant48@gmail.com, endpoint=/api/project/team/6a390e011b4929bad5c6d64d
-[2026-06-25T14:01:41.178Z] Active request from user: id=6a265746b1a1c29afedf3e69, name=Sahil Ojha, email=ojharamakant48@gmail.com, endpoint=/api/project/team/6a390e011b4929bad5c6d64d
-[2026-06-25T14:02:45.791Z] Active request from user: id=6a265746b1a1c29afedf3e69, name=Sahil Ojha, email=ojharamakant48@gmail.com, endpoint=/api/user/profile
-[2026-06-25T14:02:45.805Z] Active request from user: id=6a265746b1a1c29afedf3e69, name=Sahil Ojha, email=ojharamakant48@gmail.com, endpoint=/api/user/profile
-[2026-06-25T14:02:45.841Z] Active request from user: id=6a265746b1a1c29afedf3e69, name=Sahil Ojha, email=ojharamakant48@gmail.com, endpoint=/api/project/6a390f1a1b4929bad5c6d652
-[2026-06-25T14:02:45.906Z] getMyTeams called by user: 6a265746b1a1c29afedf3e69
-[2026-06-25T14:02:45.921Z] Active request from user: id=6a265746b1a1c29afedf3e69, name=Sahil Ojha, email=ojharamakant48@gmail.com, endpoint=/api/project/6a390f1a1b4929bad5c6d652
-[2026-06-25T14:02:45.933Z] Active request from user: id=6a265746b1a1c29afedf3e69, name=Sahil Ojha, email=ojharamakant48@gmail.com, endpoint=/api/team/my-teams
-[2026-06-25T14:02:46.004Z] getMyTeams called by user: 6a265746b1a1c29afedf3e69
-[2026-06-25T14:02:46.030Z] Active request from user: id=6a265746b1a1c29afedf3e69, name=Sahil Ojha, email=ojharamakant48@gmail.com, endpoint=/api/project/team/6a3ad6dfee899979c52f7816
-[2026-06-25T14:02:46.032Z] Active request from user: id=6a265746b1a1c29afedf3e69, name=Sahil Ojha, email=ojharamakant48@gmail.com, endpoint=/api/project/team/6a3ade6cb85814ce17284608
-[2026-06-25T14:02:46.035Z] Active request from user: id=6a265746b1a1c29afedf3e69, name=Sahil Ojha, email=ojharamakant48@gmail.com, endpoint=/api/project/team/6a3ad641c0b9fc7aa496a90f
-[2026-06-25T14:02:46.036Z] Active request from user: id=6a265746b1a1c29afedf3e69, name=Sahil Ojha, email=ojharamakant48@gmail.com, endpoint=/api/project/team/6a3925fe5d71e86ea882c3cb
-[2026-06-25T14:02:46.038Z] Active request from user: id=6a265746b1a1c29afedf3e69, name=Sahil Ojha, email=ojharamakant48@gmail.com, endpoint=/api/project/team/6a390e011b4929bad5c6d64d
-[2026-06-25T14:02:46.039Z] Active request from user: id=6a265746b1a1c29afedf3e69, name=Sahil Ojha, email=ojharamakant48@gmail.com, endpoint=/api/team/my-teams
-[2026-06-25T14:02:46.096Z] Active request from user: id=6a265746b1a1c29afedf3e69, name=Sahil Ojha, email=ojharamakant48@gmail.com, endpoint=/api/project/team/6a3ad6dfee899979c52f7816
-[2026-06-25T14:02:46.098Z] Active request from user: id=6a265746b1a1c29afedf3e69, name=Sahil Ojha, email=ojharamakant48@gmail.com, endpoint=/api/project/team/6a3ade6cb85814ce17284608
-[2026-06-25T14:02:46.099Z] Active request from user: id=6a265746b1a1c29afedf3e69, name=Sahil Ojha, email=ojharamakant48@gmail.com, endpoint=/api/project/team/6a3ad641c0b9fc7aa496a90f
-[2026-06-25T14:02:46.101Z] Active request from user: id=6a265746b1a1c29afedf3e69, name=Sahil Ojha, email=ojharamakant48@gmail.com, endpoint=/api/project/team/6a3925fe5d71e86ea882c3cb
-[2026-06-25T14:02:46.106Z] Active request from user: id=6a265746b1a1c29afedf3e69, name=Sahil Ojha, email=ojharamakant48@gmail.com, endpoint=/api/project/team/6a390e011b4929bad5c6d64d
-[2026-06-25T14:02:46.131Z] Active request from user: id=6a265746b1a1c29afedf3e69, name=Sahil Ojha, email=ojharamakant48@gmail.com, endpoint=/api/projects/6a390f1a1b4929bad5c6d652/hackathon/dashboard
-[2026-06-25T14:02:46.326Z] Active request from user: id=6a265746b1a1c29afedf3e69, name=Sahil Ojha, email=ojharamakant48@gmail.com, endpoint=/api/projects/6a390f1a1b4929bad5c6d652/hackathon/dashboard
-[2026-06-25T14:02:46.375Z] Active request from user: id=6a265746b1a1c29afedf3e69, name=Sahil Ojha, email=ojharamakant48@gmail.com, endpoint=/api/project/team/6a390e011b4929bad5c6d64d
-[2026-06-25T14:02:46.466Z] Active request from user: id=6a265746b1a1c29afedf3e69, name=Sahil Ojha, email=ojharamakant48@gmail.com, endpoint=/api/project/team/6a390e011b4929bad5c6d64d
-[2026-06-25T16:02:19.460Z] Active request from user: id=6a265746b1a1c29afedf3e69, name=Sahil Ojha, email=ojharamakant48@gmail.com, endpoint=/api/user/profile
-[2026-06-25T16:02:19.494Z] Active request from user: id=6a265746b1a1c29afedf3e69, name=Sahil Ojha, email=ojharamakant48@gmail.com, endpoint=/api/user/profile
-[2026-06-25T16:02:19.696Z] Active request from user: id=6a265746b1a1c29afedf3e69, name=Sahil Ojha, email=ojharamakant48@gmail.com, endpoint=/api/project/6a390f1a1b4929bad5c6d652
-[2026-06-25T16:02:19.755Z] getMyTeams called by user: 6a265746b1a1c29afedf3e69
-[2026-06-25T16:02:19.782Z] Active request from user: id=6a265746b1a1c29afedf3e69, name=Sahil Ojha, email=ojharamakant48@gmail.com, endpoint=/api/project/6a390f1a1b4929bad5c6d652
-[2026-06-25T16:02:19.806Z] Active request from user: id=6a265746b1a1c29afedf3e69, name=Sahil Ojha, email=ojharamakant48@gmail.com, endpoint=/api/team/my-teams
-[2026-06-25T16:02:19.885Z] Active request from user: id=6a265746b1a1c29afedf3e69, name=Sahil Ojha, email=ojharamakant48@gmail.com, endpoint=/api/project/team/6a3925fe5d71e86ea882c3cb
-[2026-06-25T16:02:19.890Z] getMyTeams called by user: 6a265746b1a1c29afedf3e69
-[2026-06-25T16:02:19.895Z] Active request from user: id=6a265746b1a1c29afedf3e69, name=Sahil Ojha, email=ojharamakant48@gmail.com, endpoint=/api/project/team/6a3ad641c0b9fc7aa496a90f
-[2026-06-25T16:02:19.916Z] Active request from user: id=6a265746b1a1c29afedf3e69, name=Sahil Ojha, email=ojharamakant48@gmail.com, endpoint=/api/project/team/6a3ad6dfee899979c52f7816
-[2026-06-25T16:02:19.932Z] Active request from user: id=6a265746b1a1c29afedf3e69, name=Sahil Ojha, email=ojharamakant48@gmail.com, endpoint=/api/project/team/6a3ade6cb85814ce17284608
-[2026-06-25T16:02:19.949Z] Active request from user: id=6a265746b1a1c29afedf3e69, name=Sahil Ojha, email=ojharamakant48@gmail.com, endpoint=/api/team/my-teams
-[2026-06-25T16:02:20.389Z] Active request from user: id=6a265746b1a1c29afedf3e69, name=Sahil Ojha, email=ojharamakant48@gmail.com, endpoint=/api/project/team/6a3925fe5d71e86ea882c3cb
-[2026-06-25T16:02:20.391Z] Active request from user: id=6a265746b1a1c29afedf3e69, name=Sahil Ojha, email=ojharamakant48@gmail.com, endpoint=/api/project/team/6a390e011b4929bad5c6d64d
-[2026-06-25T16:02:20.416Z] Active request from user: id=6a265746b1a1c29afedf3e69, name=Sahil Ojha, email=ojharamakant48@gmail.com, endpoint=/api/project/team/6a3ad6dfee899979c52f7816
-[2026-06-25T16:02:20.437Z] Active request from user: id=6a265746b1a1c29afedf3e69, name=Sahil Ojha, email=ojharamakant48@gmail.com, endpoint=/api/project/team/6a3ade6cb85814ce17284608
-[2026-06-25T16:02:20.441Z] Active request from user: id=6a265746b1a1c29afedf3e69, name=Sahil Ojha, email=ojharamakant48@gmail.com, endpoint=/api/project/team/6a390e011b4929bad5c6d64d
-[2026-06-25T16:02:20.563Z] Active request from user: id=6a265746b1a1c29afedf3e69, name=Sahil Ojha, email=ojharamakant48@gmail.com, endpoint=/api/projects/6a390f1a1b4929bad5c6d652/hackathon/dashboard
-[2026-06-25T16:02:20.568Z] Active request from user: id=6a265746b1a1c29afedf3e69, name=Sahil Ojha, email=ojharamakant48@gmail.com, endpoint=/api/project/team/6a3ad641c0b9fc7aa496a90f
-[2026-06-25T16:02:21.493Z] Active request from user: id=6a265746b1a1c29afedf3e69, name=Sahil Ojha, email=ojharamakant48@gmail.com, endpoint=/api/projects/6a390f1a1b4929bad5c6d652/hackathon/dashboard
-[2026-06-25T16:02:21.542Z] Active request from user: id=6a265746b1a1c29afedf3e69, name=Sahil Ojha, email=ojharamakant48@gmail.com, endpoint=/api/project/team/6a390e011b4929bad5c6d64d
-[2026-06-25T16:02:21.955Z] Active request from user: id=6a265746b1a1c29afedf3e69, name=Sahil Ojha, email=ojharamakant48@gmail.com, endpoint=/api/project/team/6a390e011b4929bad5c6d64d
+[2026-06-25T17:04:42.012Z] getMyTeams called by user: 6a3d53f454d4b3f9b2a09c68
+[2026-06-25T17:04:42.087Z] Active request from user: id=6a3d48f5eeeaa02b1441dcb4, name=sakzz, email=sak@gmail.com, endpoint=/api/team-chat/6a3d4f5e54d4b3f9b2a09c66/messages?limit=100
+[2026-06-25T17:04:42.102Z] Active request from user: id=6a3d53f454d4b3f9b2a09c68, name=SP, email=sp@xyz.com, endpoint=/api/user/profile
+[2026-06-25T17:04:42.117Z] Active request from user: id=6a3d53f454d4b3f9b2a09c68, name=SP, email=sp@xyz.com, endpoint=/api/team/my-teams
+[2026-06-25T17:04:42.186Z] Active request from user: id=6a3d53f454d4b3f9b2a09c68, name=SP, email=sp@xyz.com, endpoint=/api/project/team/6a3ade6cb85814ce17284608
+[2026-06-25T17:04:42.194Z] Active request from user: id=6a3d53f454d4b3f9b2a09c68, name=SP, email=sp@xyz.com, endpoint=/api/project/team/6a3d4f5e54d4b3f9b2a09c66
+[2026-06-25T17:04:44.401Z] Active request from user: id=6a3d48f5eeeaa02b1441dcb4, name=sakzz, email=sak@gmail.com, endpoint=/api/team-chat/6a3d4f5e54d4b3f9b2a09c66/messages?since=2026-06-25T16%3A17%3A37.129Z&limit=50
+[2026-06-25T17:04:46.356Z] Active request from user: id=6a3d48f5eeeaa02b1441dcb4, name=sakzz, email=sak@gmail.com, endpoint=/api/team-chat/6a3d4f5e54d4b3f9b2a09c66/messages?since=2026-06-25T16%3A17%3A37.129Z&limit=50
+[2026-06-25T17:04:48.366Z] Active request from user: id=6a3d48f5eeeaa02b1441dcb4, name=sakzz, email=sak@gmail.com, endpoint=/api/team-chat/6a3d4f5e54d4b3f9b2a09c66/messages?since=2026-06-25T16%3A17%3A37.129Z&limit=50
+[2026-06-25T17:04:50.409Z] Active request from user: id=6a3d48f5eeeaa02b1441dcb4, name=sakzz, email=sak@gmail.com, endpoint=/api/team-chat/6a3d4f5e54d4b3f9b2a09c66/messages?since=2026-06-25T16%3A17%3A37.129Z&limit=50
+[2026-06-25T17:04:52.371Z] Active request from user: id=6a3d48f5eeeaa02b1441dcb4, name=sakzz, email=sak@gmail.com, endpoint=/api/team-chat/6a3d4f5e54d4b3f9b2a09c66/messages?since=2026-06-25T16%3A17%3A37.129Z&limit=50
+[2026-06-25T17:05:04.378Z] Active request from user: id=6a3d48f5eeeaa02b1441dcb4, name=sakzz, email=sak@gmail.com, endpoint=/api/team-chat/6a3d4f5e54d4b3f9b2a09c66/messages?since=2026-06-25T16%3A17%3A37.129Z&limit=50
+[2026-06-25T17:05:22.753Z] Active request from user: id=6a3d48f5eeeaa02b1441dcb4, name=sakzz, email=sak@gmail.com, endpoint=/api/team-chat/6a3d4f5e54d4b3f9b2a09c66/messages?since=2026-06-25T16%3A17%3A37.129Z&limit=50
+[2026-06-25T17:05:23.406Z] Active request from user: id=6a3d48f5eeeaa02b1441dcb4, name=sakzz, email=sak@gmail.com, endpoint=/api/team-chat/6a3d4f5e54d4b3f9b2a09c66/messages?since=2026-06-25T16%3A17%3A37.129Z&limit=50
+[2026-06-25T17:05:25.407Z] Active request from user: id=6a3d48f5eeeaa02b1441dcb4, name=sakzz, email=sak@gmail.com, endpoint=/api/team-chat/6a3d4f5e54d4b3f9b2a09c66/messages?since=2026-06-25T16%3A17%3A37.129Z&limit=50
+[2026-06-25T17:05:27.399Z] Active request from user: id=6a3d48f5eeeaa02b1441dcb4, name=sakzz, email=sak@gmail.com, endpoint=/api/team-chat/6a3d4f5e54d4b3f9b2a09c66/messages?since=2026-06-25T16%3A17%3A37.129Z&limit=50
+[2026-06-25T17:05:29.416Z] Active request from user: id=6a3d48f5eeeaa02b1441dcb4, name=sakzz, email=sak@gmail.com, endpoint=/api/team-chat/6a3d4f5e54d4b3f9b2a09c66/messages?since=2026-06-25T16%3A17%3A37.129Z&limit=50
+[2026-06-25T17:05:31.411Z] Active request from user: id=6a3d48f5eeeaa02b1441dcb4, name=sakzz, email=sak@gmail.com, endpoint=/api/team-chat/6a3d4f5e54d4b3f9b2a09c66/messages?since=2026-06-25T16%3A17%3A37.129Z&limit=50
+[2026-06-25T17:05:33.541Z] Active request from user: id=6a3d48f5eeeaa02b1441dcb4, name=sakzz, email=sak@gmail.com, endpoint=/api/team-chat/6a3d4f5e54d4b3f9b2a09c66/messages?since=2026-06-25T16%3A17%3A37.129Z&limit=50
+[2026-06-25T17:05:35.409Z] Active request from user: id=6a3d48f5eeeaa02b1441dcb4, name=sakzz, email=sak@gmail.com, endpoint=/api/team-chat/6a3d4f5e54d4b3f9b2a09c66/messages?since=2026-06-25T16%3A17%3A37.129Z&limit=50
+[2026-06-25T17:05:38.377Z] Active request from user: id=6a3d48f5eeeaa02b1441dcb4, name=sakzz, email=sak@gmail.com, endpoint=/api/team-chat/6a3d4f5e54d4b3f9b2a09c66/messages?since=2026-06-25T16%3A17%3A37.129Z&limit=50
+[2026-06-25T17:05:40.356Z] Active request from user: id=6a3d48f5eeeaa02b1441dcb4, name=sakzz, email=sak@gmail.com, endpoint=/api/team-chat/6a3d4f5e54d4b3f9b2a09c66/messages?since=2026-06-25T16%3A17%3A37.129Z&limit=50
+[2026-06-25T17:05:42.380Z] Active request from user: id=6a3d48f5eeeaa02b1441dcb4, name=sakzz, email=sak@gmail.com, endpoint=/api/team-chat/6a3d4f5e54d4b3f9b2a09c66/messages?since=2026-06-25T16%3A17%3A37.129Z&limit=50
+[2026-06-25T17:05:44.364Z] Active request from user: id=6a3d48f5eeeaa02b1441dcb4, name=sakzz, email=sak@gmail.com, endpoint=/api/team-chat/6a3d4f5e54d4b3f9b2a09c66/messages?since=2026-06-25T16%3A17%3A37.129Z&limit=50
+[2026-06-25T17:05:46.364Z] Active request from user: id=6a3d48f5eeeaa02b1441dcb4, name=sakzz, email=sak@gmail.com, endpoint=/api/team-chat/6a3d4f5e54d4b3f9b2a09c66/messages?since=2026-06-25T16%3A17%3A37.129Z&limit=50
+[2026-06-25T17:05:48.375Z] Active request from user: id=6a3d48f5eeeaa02b1441dcb4, name=sakzz, email=sak@gmail.com, endpoint=/api/team-chat/6a3d4f5e54d4b3f9b2a09c66/messages?since=2026-06-25T16%3A17%3A37.129Z&limit=50
+[2026-06-25T17:05:50.400Z] Active request from user: id=6a3d48f5eeeaa02b1441dcb4, name=sakzz, email=sak@gmail.com, endpoint=/api/team-chat/6a3d4f5e54d4b3f9b2a09c66/messages?since=2026-06-25T16%3A17%3A37.129Z&limit=50
+[2026-06-25T17:05:52.370Z] Active request from user: id=6a3d48f5eeeaa02b1441dcb4, name=sakzz, email=sak@gmail.com, endpoint=/api/team-chat/6a3d4f5e54d4b3f9b2a09c66/messages?since=2026-06-25T16%3A17%3A37.129Z&limit=50
+[2026-06-25T17:05:54.373Z] Active request from user: id=6a3d48f5eeeaa02b1441dcb4, name=sakzz, email=sak@gmail.com, endpoint=/api/team-chat/6a3d4f5e54d4b3f9b2a09c66/messages?since=2026-06-25T16%3A17%3A37.129Z&limit=50
+[2026-06-25T17:05:56.363Z] Active request from user: id=6a3d48f5eeeaa02b1441dcb4, name=sakzz, email=sak@gmail.com, endpoint=/api/team-chat/6a3d4f5e54d4b3f9b2a09c66/messages?since=2026-06-25T16%3A17%3A37.129Z&limit=50
+[2026-06-25T17:05:58.362Z] Active request from user: id=6a3d48f5eeeaa02b1441dcb4, name=sakzz, email=sak@gmail.com, endpoint=/api/team-chat/6a3d4f5e54d4b3f9b2a09c66/messages?since=2026-06-25T16%3A17%3A37.129Z&limit=50
+[2026-06-25T17:06:00.364Z] Active request from user: id=6a3d48f5eeeaa02b1441dcb4, name=sakzz, email=sak@gmail.com, endpoint=/api/team-chat/6a3d4f5e54d4b3f9b2a09c66/messages?since=2026-06-25T16%3A17%3A37.129Z&limit=50
+[2026-06-25T17:06:02.402Z] Active request from user: id=6a3d48f5eeeaa02b1441dcb4, name=sakzz, email=sak@gmail.com, endpoint=/api/team-chat/6a3d4f5e54d4b3f9b2a09c66/messages?since=2026-06-25T16%3A17%3A37.129Z&limit=50
+[2026-06-25T17:06:04.412Z] Active request from user: id=6a3d48f5eeeaa02b1441dcb4, name=sakzz, email=sak@gmail.com, endpoint=/api/team-chat/6a3d4f5e54d4b3f9b2a09c66/messages?since=2026-06-25T16%3A17%3A37.129Z&limit=50
+[2026-06-25T17:06:06.364Z] Active request from user: id=6a3d48f5eeeaa02b1441dcb4, name=sakzz, email=sak@gmail.com, endpoint=/api/team-chat/6a3d4f5e54d4b3f9b2a09c66/messages?since=2026-06-25T16%3A17%3A37.129Z&limit=50
+[2026-06-25T17:06:08.350Z] Active request from user: id=6a3d48f5eeeaa02b1441dcb4, name=sakzz, email=sak@gmail.com, endpoint=/api/team-chat/6a3d4f5e54d4b3f9b2a09c66/messages?since=2026-06-25T16%3A17%3A37.129Z&limit=50
+[2026-06-25T17:06:10.367Z] Active request from user: id=6a3d48f5eeeaa02b1441dcb4, name=sakzz, email=sak@gmail.com, endpoint=/api/team-chat/6a3d4f5e54d4b3f9b2a09c66/messages?since=2026-06-25T16%3A17%3A37.129Z&limit=50
+[2026-06-25T17:06:12.384Z] Active request from user: id=6a3d48f5eeeaa02b1441dcb4, name=sakzz, email=sak@gmail.com, endpoint=/api/team-chat/6a3d4f5e54d4b3f9b2a09c66/messages?since=2026-06-25T16%3A17%3A37.129Z&limit=50
+[2026-06-25T17:06:14.365Z] Active request from user: id=6a3d48f5eeeaa02b1441dcb4, name=sakzz, email=sak@gmail.com, endpoint=/api/team-chat/6a3d4f5e54d4b3f9b2a09c66/messages?since=2026-06-25T16%3A17%3A37.129Z&limit=50
+[2026-06-25T17:06:16.365Z] Active request from user: id=6a3d48f5eeeaa02b1441dcb4, name=sakzz, email=sak@gmail.com, endpoint=/api/team-chat/6a3d4f5e54d4b3f9b2a09c66/messages?since=2026-06-25T16%3A17%3A37.129Z&limit=50
+[2026-06-25T17:06:18.381Z] Active request from user: id=6a3d48f5eeeaa02b1441dcb4, name=sakzz, email=sak@gmail.com, endpoint=/api/team-chat/6a3d4f5e54d4b3f9b2a09c66/messages?since=2026-06-25T16%3A17%3A37.129Z&limit=50
+[2026-06-25T17:06:20.370Z] Active request from user: id=6a3d48f5eeeaa02b1441dcb4, name=sakzz, email=sak@gmail.com, endpoint=/api/team-chat/6a3d4f5e54d4b3f9b2a09c66/messages?since=2026-06-25T16%3A17%3A37.129Z&limit=50
+[2026-06-25T17:06:22.428Z] Active request from user: id=6a3d48f5eeeaa02b1441dcb4, name=sakzz, email=sak@gmail.com, endpoint=/api/team-chat/6a3d4f5e54d4b3f9b2a09c66/messages?since=2026-06-25T16%3A17%3A37.129Z&limit=50
+[2026-06-25T17:06:24.377Z] Active request from user: id=6a3d48f5eeeaa02b1441dcb4, name=sakzz, email=sak@gmail.com, endpoint=/api/team-chat/6a3d4f5e54d4b3f9b2a09c66/messages?since=2026-06-25T16%3A17%3A37.129Z&limit=50
+[2026-06-25T17:06:26.370Z] Active request from user: id=6a3d48f5eeeaa02b1441dcb4, name=sakzz, email=sak@gmail.com, endpoint=/api/team-chat/6a3d4f5e54d4b3f9b2a09c66/messages?since=2026-06-25T16%3A17%3A37.129Z&limit=50
+[2026-06-25T17:06:28.369Z] Active request from user: id=6a3d48f5eeeaa02b1441dcb4, name=sakzz, email=sak@gmail.com, endpoint=/api/team-chat/6a3d4f5e54d4b3f9b2a09c66/messages?since=2026-06-25T16%3A17%3A37.129Z&limit=50
+[2026-06-25T17:06:30.370Z] Active request from user: id=6a3d48f5eeeaa02b1441dcb4, name=sakzz, email=sak@gmail.com, endpoint=/api/team-chat/6a3d4f5e54d4b3f9b2a09c66/messages?since=2026-06-25T16%3A17%3A37.129Z&limit=50
+[2026-06-25T17:06:32.365Z] Active request from user: id=6a3d48f5eeeaa02b1441dcb4, name=sakzz, email=sak@gmail.com, endpoint=/api/team-chat/6a3d4f5e54d4b3f9b2a09c66/messages?since=2026-06-25T16%3A17%3A37.129Z&limit=50
+[2026-06-25T17:06:34.359Z] Active request from user: id=6a3d48f5eeeaa02b1441dcb4, name=sakzz, email=sak@gmail.com, endpoint=/api/team-chat/6a3d4f5e54d4b3f9b2a09c66/messages?since=2026-06-25T16%3A17%3A37.129Z&limit=50
+[2026-06-25T17:06:36.372Z] Active request from user: id=6a3d48f5eeeaa02b1441dcb4, name=sakzz, email=sak@gmail.com, endpoint=/api/team-chat/6a3d4f5e54d4b3f9b2a09c66/messages?since=2026-06-25T16%3A17%3A37.129Z&limit=50
+[2026-06-25T17:07:04.382Z] Active request from user: id=6a3d48f5eeeaa02b1441dcb4, name=sakzz, email=sak@gmail.com, endpoint=/api/team-chat/6a3d4f5e54d4b3f9b2a09c66/messages?since=2026-06-25T16%3A17%3A37.129Z&limit=50
+[2026-06-25T17:08:04.375Z] Active request from user: id=6a3d48f5eeeaa02b1441dcb4, name=sakzz, email=sak@gmail.com, endpoint=/api/team-chat/6a3d4f5e54d4b3f9b2a09c66/messages?since=2026-06-25T16%3A17%3A37.129Z&limit=50
+[2026-06-25T17:09:04.380Z] Active request from user: id=6a3d48f5eeeaa02b1441dcb4, name=sakzz, email=sak@gmail.com, endpoint=/api/team-chat/6a3d4f5e54d4b3f9b2a09c66/messages?since=2026-06-25T16%3A17%3A37.129Z&limit=50
+[2026-06-25T17:10:04.372Z] Active request from user: id=6a3d48f5eeeaa02b1441dcb4, name=sakzz, email=sak@gmail.com, endpoint=/api/team-chat/6a3d4f5e54d4b3f9b2a09c66/messages?since=2026-06-25T16%3A17%3A37.129Z&limit=50
+[2026-06-25T17:11:04.381Z] Active request from user: id=6a3d48f5eeeaa02b1441dcb4, name=sakzz, email=sak@gmail.com, endpoint=/api/team-chat/6a3d4f5e54d4b3f9b2a09c66/messages?since=2026-06-25T16%3A17%3A37.129Z&limit=50
+[2026-06-25T17:12:04.402Z] Active request from user: id=6a3d48f5eeeaa02b1441dcb4, name=sakzz, email=sak@gmail.com, endpoint=/api/team-chat/6a3d4f5e54d4b3f9b2a09c66/messages?since=2026-06-25T16%3A17%3A37.129Z&limit=50
+[2026-06-25T17:13:04.410Z] Active request from user: id=6a3d48f5eeeaa02b1441dcb4, name=sakzz, email=sak@gmail.com, endpoint=/api/team-chat/6a3d4f5e54d4b3f9b2a09c66/messages?since=2026-06-25T16%3A17%3A37.129Z&limit=50
+[2026-06-25T17:14:04.373Z] Active request from user: id=6a3d48f5eeeaa02b1441dcb4, name=sakzz, email=sak@gmail.com, endpoint=/api/team-chat/6a3d4f5e54d4b3f9b2a09c66/messages?since=2026-06-25T16%3A17%3A37.129Z&limit=50
+[2026-06-25T17:15:04.378Z] Active request from user: id=6a3d48f5eeeaa02b1441dcb4, name=sakzz, email=sak@gmail.com, endpoint=/api/team-chat/6a3d4f5e54d4b3f9b2a09c66/messages?since=2026-06-25T16%3A17%3A37.129Z&limit=50
+[2026-06-25T17:16:04.364Z] Active request from user: id=6a3d48f5eeeaa02b1441dcb4, name=sakzz, email=sak@gmail.com, endpoint=/api/team-chat/6a3d4f5e54d4b3f9b2a09c66/messages?since=2026-06-25T16%3A17%3A37.129Z&limit=50
+[2026-06-25T17:17:04.368Z] Active request from user: id=6a3d48f5eeeaa02b1441dcb4, name=sakzz, email=sak@gmail.com, endpoint=/api/team-chat/6a3d4f5e54d4b3f9b2a09c66/messages?since=2026-06-25T16%3A17%3A37.129Z&limit=50
+[2026-06-25T17:18:04.397Z] Active request from user: id=6a3d48f5eeeaa02b1441dcb4, name=sakzz, email=sak@gmail.com, endpoint=/api/team-chat/6a3d4f5e54d4b3f9b2a09c66/messages?since=2026-06-25T16%3A17%3A37.129Z&limit=50
+[2026-06-25T17:19:04.383Z] Active request from user: id=6a3d48f5eeeaa02b1441dcb4, name=sakzz, email=sak@gmail.com, endpoint=/api/team-chat/6a3d4f5e54d4b3f9b2a09c66/messages?since=2026-06-25T16%3A17%3A37.129Z&limit=50

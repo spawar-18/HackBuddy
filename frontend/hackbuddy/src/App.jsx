@@ -11,6 +11,7 @@ import JoinTeam from './pages/JoinTeam';
 import TeamDetails from './pages/TeamDetails';
 import JoinTeamByLink from './pages/JoinTeamByLink';
 import ProtectedRoute from './components/ProtectedRoute';
+import Chat from './components/Chat';
 import { Toaster } from 'react-hot-toast';
 
 function App() {
@@ -80,6 +81,16 @@ function App() {
               } 
             />
             <Route path="/join/:inviteCode" element={<JoinTeamByLink />} />
+
+            {/* Chat Route */}
+            <Route
+              path="/chat"
+              element={
+                <ProtectedRoute>
+                  <Chat />
+                </ProtectedRoute>
+              }
+            />
 
             {/* Redirects */}
             <Route path="*" element={<Navigate to="/dashboard" replace />} />
