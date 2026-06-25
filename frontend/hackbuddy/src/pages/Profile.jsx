@@ -458,7 +458,7 @@ const Profile = () => {
               </>
             ) : (
               <>
-                {user?.profileCompleted ? 'Save Changes' : 'Initialize Flight Deck'}
+                {user?.profileCompleted ? 'Save Changes' : 'Proceed to Dashboard'}
               </>
             )}
           </button>
