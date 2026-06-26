@@ -255,19 +255,22 @@ const TechStackConsensus = ({ projectId, onBack }) => {
   return (
     <div className="flex flex-col gap-6 animate-slide-up">
       {/* Top Navigation / Breadcrumbs */}
-      <div className="flex justify-between items-center bg-neutral-900 border border-neutral-800 p-5 rounded-2xl shadow-md relative overflow-hidden">
-        <div className="absolute inset-0 opacity-[0.03]" style={{ backgroundImage: 'radial-gradient(circle, white 1px, transparent 1px)', backgroundSize: '16px 16px' }}></div>
-        <div className="absolute -top-10 -right-10 w-32 h-32 bg-emerald-500/10 rounded-full blur-2xl"></div>
+      <div className="flex justify-between items-center p-5 rounded-2xl shadow-md relative overflow-hidden" style={{ backgroundColor: '#040817', border: '1px solid rgba(0, 240, 255, 0.25)' }}>
+        <div className="absolute inset-0 opacity-[0.03]" style={{ backgroundImage: 'radial-gradient(circle, rgba(0,240,255,1) 1px, transparent 1px)', backgroundSize: '16px 16px' }}></div>
+        <div className="absolute -top-10 -right-10 w-32 h-32 rounded-full blur-2xl" style={{ backgroundColor: 'rgba(16, 185, 129, 0.08)' }}></div>
         <div className="relative z-10">
-          <span className="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full text-[9px] font-bold uppercase tracking-wider bg-emerald-950/50 border border-emerald-500/30 text-emerald-400">
+          <span className="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full text-[9px] font-bold uppercase tracking-wider" style={{ backgroundColor: 'rgba(6, 78, 59, 0.4)', border: '1px solid rgba(16, 185, 129, 0.3)', color: '#34d399' }}>
             <Layers size={10} /> Collaboration Layer
           </span>
-          <h2 className="text-xl font-extrabold text-white tracking-tight mt-1.5">AI Tech Stack Consensus Engine</h2>
-          <p className="text-[11px] text-neutral-400 mt-1">Select, vote, debate, and analyze technology readiness as a cohesive team</p>
+          <h2 className="text-xl font-extrabold tracking-tight mt-1.5" style={{ color: '#00f0ff' }}>AI Tech Stack Consensus Engine</h2>
+          <p className="text-[11px] mt-1" style={{ color: 'rgba(0, 240, 255, 0.55)' }}>Select, vote, debate, and analyze technology readiness as a cohesive team</p>
         </div>
         <button
           onClick={onBack}
-          className="relative z-10 flex items-center justify-center gap-1.5 px-3 py-1.5 rounded-lg bg-neutral-800 hover:bg-neutral-750 text-neutral-300 hover:text-white text-xs font-semibold cursor-pointer border border-neutral-700 transition-colors shrink-0"
+          className="relative z-10 flex items-center justify-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-semibold cursor-pointer transition-colors shrink-0"
+          style={{ backgroundColor: 'rgba(4, 8, 23, 0.8)', border: '1px solid rgba(0, 240, 255, 0.25)', color: 'rgba(0, 240, 255, 0.7)' }}
+          onMouseEnter={e => { e.currentTarget.style.color = '#00f0ff'; e.currentTarget.style.borderColor = 'rgba(0, 240, 255, 0.5)'; }}
+          onMouseLeave={e => { e.currentTarget.style.color = 'rgba(0, 240, 255, 0.7)'; e.currentTarget.style.borderColor = 'rgba(0, 240, 255, 0.25)'; }}
         >
           <ArrowLeft size={13} /> Back
         </button>
@@ -522,14 +525,14 @@ const TechStackConsensus = ({ projectId, onBack }) => {
                     {/* Confidence Slider/Inputs */}
                     <div className="flex flex-col gap-2.5">
                       <span className="text-[10px] font-bold text-neutral-500 uppercase tracking-wider">Confidence Scores (1-10)</span>
-                      <div className="grid grid-cols-1 sm:grid-cols-5 gap-3.5">
+                      <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-5 gap-3">
                         {['frontend', 'backend', 'database', 'ai', 'deployment'].map(cat => {
                           const score = confidenceScores[cat];
                           const label = getConfidenceLabel(score);
                           return (
-                            <div key={cat} className="flex flex-col gap-2 p-3 bg-neutral-50 border border-neutral-200 rounded-xl relative">
-                              <span className="text-[10px] font-bold text-neutral-450 uppercase tracking-widest">{cat}</span>
-                              <div className="flex items-center justify-between mt-1">
+                            <div key={cat} className="flex flex-col gap-2 p-3 bg-neutral-50 border border-neutral-200 rounded-xl">
+                              <span className="text-[10px] font-bold text-neutral-450 uppercase tracking-widest capitalize">{cat}</span>
+                              <div className="flex items-center gap-1.5 flex-wrap">
                                 <input
                                   type="number"
                                   min="1"
@@ -539,9 +542,9 @@ const TechStackConsensus = ({ projectId, onBack }) => {
                                     const val = Math.max(1, Math.min(10, parseInt(e.target.value) || 1));
                                     setConfidenceScores({ ...confidenceScores, [cat]: val });
                                   }}
-                                  className="form-input text-xs py-1 px-1.5 w-12 font-bold font-mono text-center shrink-0"
+                                  className="form-input text-xs py-1 px-1.5 w-11 font-bold font-mono text-center shrink-0"
                                 />
-                                <span className={`text-[9px] font-bold px-1.5 py-0.5 rounded border ${label.color} shrink-0`}>
+                                <span className={`text-[9px] font-bold px-1.5 py-0.5 rounded border leading-tight ${label.color}`}>
                                   {label.text}
                                 </span>
                               </div>
@@ -551,7 +554,7 @@ const TechStackConsensus = ({ projectId, onBack }) => {
                                 max="10"
                                 value={score}
                                 onChange={e => setConfidenceScores({ ...confidenceScores, [cat]: parseInt(e.target.value) })}
-                                className="w-full mt-2 accent-brand-500 cursor-pointer h-1.5 bg-neutral-200 rounded-lg appearance-none"
+                                className="w-full accent-brand-500 cursor-pointer h-1.5 bg-neutral-200 rounded-lg appearance-none"
                               />
                             </div>
                           );
