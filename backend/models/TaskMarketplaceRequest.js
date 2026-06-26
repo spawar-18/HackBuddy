@@ -130,7 +130,7 @@ const MockRequestModel = {
 
 const ModelProxy = new Proxy(MongoRequest, {
   get(target, prop) {
-    if (mongoose.connection.readyState === 1) {
+    if (process.env.MONGO_URI || mongoose.connection.readyState === 1) {
       return Reflect.get(target, prop);
     }
     if (prop in MockRequestModel) {
@@ -139,7 +139,7 @@ const ModelProxy = new Proxy(MongoRequest, {
     return Reflect.get(target, prop);
   },
   construct(target, argumentsList) {
-    if (mongoose.connection.readyState === 1) {
+    if (process.env.MONGO_URI || mongoose.connection.readyState === 1) {
       return Reflect.construct(target, argumentsList);
     }
     return createMockRequestInstance(argumentsList[0] || {});

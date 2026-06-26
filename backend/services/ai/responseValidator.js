@@ -1,108 +1,208 @@
+const JSONRepairService = require('./JSONRepairService');
+
 /**
  * ResponseValidator
- * Handles cleaning, tag stripping, JSON repairing, and structural validation
- * of responses returned by the Gemini API.
+ * Validates and normalizes provider responses against required fields.
+ * Ensures no provider-specific formats leak to the frontend.
  */
-
-/**
- * Strip think tags from reasoning models (e.g. Qwen, deepseek, or other LLMs).
- * @param {string} text - Raw AI response text
- * @returns {string} Text with think blocks removed
- */
-const stripThinkTags = (text) => {
-  if (!text) return '';
-  // Remove all <think>...</think> blocks (including multiline)
-  let cleaned = text.replace(/<think>[\s\S]*?<\/think>/gi, '').trim();
-  // Also handle unclosed <think> tags (model cut off before closing)
-  cleaned = cleaned.replace(/<think>[\s\S]*/gi, '').trim();
-  return cleaned;
-};
-
-/**
- * Attempt to repair truncated JSON by balancing braces and brackets.
- * Useful when max_tokens cuts the response mid-JSON.
- * @param {string} jsonStr - Potentially truncated JSON string
- * @returns {string} Repaired JSON string
- */
-const repairTruncatedJson = (jsonStr) => {
-  let openBraces = 0;
-  let openBrackets = 0;
-  let inString = false;
-  let escape = false;
-
-  for (let i = 0; i < jsonStr.length; i++) {
-    const ch = jsonStr[i];
-    if (escape) { escape = false; continue; }
-    if (ch === '\\') { escape = true; continue; }
-    if (ch === '"') { inString = !inString; continue; }
-    if (inString) continue;
-    if (ch === '{') openBraces++;
-    else if (ch === '}') openBraces--;
-    else if (ch === '[') openBrackets++;
-    else if (ch === ']') openBrackets--;
+class ResponseValidator {
+  constructor() {
+    this.schemas = {
+      analyzeTeam: {
+        required: ['readinessScore', 'strengths', 'skillGaps', 'recommendedRoles'],
+        defaults: { readinessScore: 5.0, strengths: [], skillGaps: [], recommendedRoles: [] }
+      },
+      analyzeProject: {
+        required: [
+          'feasibilityScore', 'problemSolutionAlignment', 'projectRisks', 'missingSkills',
+          'mustBuildFeatures', 'optionalFeatures', 'featuresToRemove', 'improvementSuggestions',
+          'reasoning', 'judgePerspective', 'executionStrategy'
+        ],
+        defaults: {
+          feasibilityScore: 5.0,
+          architectureScore: 60.0,
+          scalabilityScore: 60.0,
+          innovationScore: 60.0,
+          businessValueScore: 60.0,
+          radarAnalysis: { architecture: 60, scalability: 60, completeness: 60, innovation: 60, businessValue: 60 },
+          priorityMatrix: [],
+          strengths: [],
+          weaknesses: [],
+          missingSkills: [],
+          riskTimeline: [],
+          featureCoverage: [],
+          roadmap: [],
+          problemSolutionAlignment: '',
+          projectRisks: [],
+          mustBuildFeatures: [],
+          optionalFeatures: [],
+          featuresToRemove: [],
+          improvementSuggestions: [],
+          reasoning: '',
+          judgePerspective: '',
+          executionStrategy: []
+        }
+      },
+      generateTaskPlan: {
+        required: [
+          'projectTasks', 'assignments', 'workloadDistribution', 'executionOrder',
+          'criticalTasks', 'recommendedFocus', 'warnings'
+        ],
+        defaults: {
+          projectTasks: { coreFeatures: [], technicalTasks: [], deploymentTasks: [] },
+          assignments: [],
+          workloadDistribution: [],
+          executionOrder: [],
+          criticalTasks: [],
+          recommendedFocus: [],
+          warnings: []
+        }
+      },
+      getMarketplaceRecommendation: {
+        required: ['recommendation', 'confidenceScore', 'reason'],
+        defaults: { recommendation: 'Approve', confidenceScore: 80, reason: '' }
+      },
+      analyzeTechStack: {
+        required: [
+          'readinessScore', 'consensusScore', 'strengths', 'risks', 'recommendedChanges',
+          'recommendedStack', 'reasoning', 'finalRecommendation'
+        ],
+        defaults: {
+          readinessScore: 50,
+          consensusScore: 50,
+          strengths: [],
+          risks: [],
+          recommendedChanges: [],
+          recommendedStack: { frontend: [], backend: [], database: [], ai: [], deployment: [] },
+          reasoning: '',
+          finalRecommendation: ''
+        }
+      },
+      analyzeHackathonCommandCenter: {
+        required: [
+          'overallStatus', 'riskLevel', 'completionPrediction', 'currentFocus',
+          'tasksToPostpone', 'reasoning', 'judgePreparationTips', 'executionStrategy'
+        ],
+        defaults: {
+          overallStatus: 'On Track',
+          riskLevel: 'Medium',
+          completionPrediction: 'Analysis incomplete.',
+          currentFocus: [],
+          tasksToPostpone: [],
+          reasoning: '',
+          judgePreparationTips: [],
+          executionStrategy: [],
+          winningProbability: 50,
+          alerts: [],
+          dynamicScopeCutSuggestions: [],
+          productivityTrend: 'Stable',
+          burndownVelocity: 0,
+          readinessScores: { judge: 50, deployment: 50, demo: 50, testing: 50 }
+        }
+      },
+      analyzeGitHubRepository: {
+        required: [
+          'repositoryHealth', 'developmentStatus', 'documentationStatus', 'testingStatus',
+          'deploymentStatus', 'inactiveMembers', 'missingComponents', 'repositoryWarnings',
+          'recommendations', 'reasoning'
+        ],
+        defaults: {
+          repositoryHealth: 'Healthy',
+          developmentStatus: 'Active',
+          documentationStatus: 'Good',
+          testingStatus: 'No tests detected',
+          deploymentStatus: 'Missing configuration',
+          inactiveMembers: [],
+          missingComponents: [],
+          repositoryWarnings: [],
+          recommendations: [],
+          reasoning: '',
+          developerProductivity: [],
+          codeComplexity: 'Medium',
+          mergeRisk: 'Low',
+          heatmap: []
+        }
+      },
+      verifyTaskWithAI: {
+        required: ['verificationStatus', 'confidence', 'matchedFiles', 'matchedCommits', 'reasoning', 'missingEvidence', 'recommendation'],
+        defaults: {
+          verificationStatus: 'Needs Manual Review',
+          confidence: 50,
+          matchedFiles: [],
+          matchedCommits: [],
+          reasoning: 'No validation logic succeeded.',
+          missingEvidence: [],
+          recommendation: 'Check that files are correctly added and commits are descriptive.'
+        }
+      },
+      winningProbability: {
+        required: ['winningProbability', 'keyDifferentiators', 'risksToResolve', 'suggestions'],
+        defaults: {
+          winningProbability: 50,
+          keyDifferentiators: [],
+          risksToResolve: [],
+          suggestions: []
+        }
+      },
+      extractSkills: {
+        required: ['skills'],
+        defaults: {
+          skills: []
+        }
+      }
+    };
   }
 
-  // If we're inside a string, close it
-  let repaired = jsonStr;
-  if (inString) repaired += '"';
+  /**
+   * Validates, cleans, repairs, and normalizes AI response.
+   * @param {string} text - Raw AI response
+   * @param {string} moduleName - Module name
+   * @returns {object|string} Normalized JSON object, or raw text if not JSON module
+   */
+  validateAndNormalize(text, moduleName) {
+    // If the module is chatWithMentor, it expects raw markdown text, not JSON
+    if (moduleName === 'chatWithMentor') {
+      if (!text || typeof text !== 'string') return 'I am sorry, I encountered an issue generating a response.';
+      return JSONRepairService.stripThinkTags(text);
+    }
 
-  // Close any unclosed brackets/braces
-  while (openBrackets > 0) { repaired += ']'; openBrackets--; }
-  while (openBraces > 0) { repaired += '}'; openBraces--; }
+    const schema = this.schemas[moduleName];
+    if (!schema) {
+      // If no schema defined, try to parse JSON anyway or return text
+      try {
+        return JSONRepairService.repairAndParse(text);
+      } catch (e) {
+        return text;
+      }
+    }
 
-  return repaired;
-};
-
-/**
- * Cleans the response, finds the JSON block, repairs if necessary, parses, and returns the object.
- * @param {string} responseText - Text returned by the model
- * @param {Array<string>} [requiredKeys] - Keys that must be present
- * @param {object} [defaultValues] - Defaults for missing keys
- * @returns {object} Parsed JSON analysis
- */
-const validateAndParseJson = (responseText, requiredKeys = [], defaultValues = {}) => {
-  const stripped = stripThinkTags(responseText);
-  
-  // Find first '{' and last '}'
-  const firstBrace = stripped.indexOf('{');
-  if (firstBrace === -1) {
-    console.error('Failed to parse AI response: No JSON object found. Response:', responseText.substring(0, 500));
-    throw new Error('Invalid AI JSON response: No JSON object found in response');
-  }
-  
-  let cleanText = stripped.substring(firstBrace);
-  const lastBrace = cleanText.lastIndexOf('}');
-  if (lastBrace !== -1) {
-    cleanText = cleanText.substring(0, lastBrace + 1);
-  }
-
-  let parsed;
-  try {
-    parsed = JSON.parse(cleanText.trim());
-  } catch (parseErr) {
     try {
-      console.log('Failed to parse JSON directly. Trying to repair truncated JSON...');
-      const repaired = repairTruncatedJson(cleanText.trim());
-      parsed = JSON.parse(repaired);
-    } catch (repairErr) {
-      console.error('Failed to parse AI response as JSON even after repair attempt. Raw response:', responseText);
-      throw new Error('Invalid AI JSON response: The response could not be parsed as JSON');
+      const parsed = JSONRepairService.repairAndParse(text);
+      
+      // Normalize: check required fields and fill defaults
+      const normalized = { ...schema.defaults };
+      
+      Object.keys(schema.defaults).forEach(key => {
+        if (parsed[key] !== undefined && parsed[key] !== null) {
+          // Type matching (basic checks)
+          if (Array.isArray(schema.defaults[key])) {
+            normalized[key] = Array.isArray(parsed[key]) ? parsed[key] : [parsed[key]];
+          } else if (typeof schema.defaults[key] === 'object') {
+            normalized[key] = (typeof parsed[key] === 'object' && !Array.isArray(parsed[key])) 
+              ? { ...schema.defaults[key], ...parsed[key] } 
+              : parsed[key];
+          } else {
+            normalized[key] = parsed[key];
+          }
+        }
+      });
+
+      return normalized;
+    } catch (err) {
+      console.warn(`[ResponseValidator] Failed to parse/validate for ${moduleName}: ${err.message}. Returning default state.`);
+      return schema.defaults;
     }
   }
+}
 
-  // Ensure required keys exist and fallback to defaultValues if missing
-  requiredKeys.forEach(key => {
-    if (!(key in parsed)) {
-      console.warn(`Warning: Missing required field: ${key}. Supplying default.`);
-      parsed[key] = defaultValues[key] !== undefined ? defaultValues[key] : null;
-    }
-  });
-
-  return parsed;
-};
-
-module.exports = {
-  stripThinkTags,
-  repairTruncatedJson,
-  validateAndParseJson
-};
+module.exports = new ResponseValidator();

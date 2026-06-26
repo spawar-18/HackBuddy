@@ -785,7 +785,9 @@ const TaskMarketplace = ({ projectId, teamId, onRefreshProject }) => {
                         )}
 
                         {/* Owner Decision Action Box */}
-                        {marketplaceData.isOwner ? (
+                        {((req.requestType === 'SWAP' || req.requestType === 'COLLABORATOR') 
+                          ? (user && user.name && req.targetUser && user.name.toLowerCase() === req.targetUser.toLowerCase()) 
+                          : marketplaceData.isOwner) ? (
                           <div className="flex gap-3 mt-2 border-t border-neutral-100 pt-4">
                             <button
                               type="button"
@@ -808,7 +810,9 @@ const TaskMarketplace = ({ projectId, teamId, onRefreshProject }) => {
                           <div className="mt-2 border-t border-neutral-100 pt-4 text-center">
                             <span className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-neutral-50 text-[11px] font-semibold text-neutral-500 border">
                               <Shield size={12} className="text-neutral-400" />
-                              Waiting for owner's final decision approval
+                              {(req.requestType === 'SWAP' || req.requestType === 'COLLABORATOR') 
+                                ? `Waiting for ${req.targetUser}'s decision approval` 
+                                : `Waiting for owner's final decision approval`}
                             </span>
                           </div>
                         )}

@@ -50,65 +50,15 @@ const projectSchema = new mongoose.Schema({
     default: Date.now
   },
   projectReview: {
-    feasibilityScore: Number,
-    problemSolutionAlignment: String,
-    projectRisks: [String],
-    missingSkills: [String],
-    mustBuildFeatures: [String],
-    optionalFeatures: [String],
-    featuresToRemove: [String],
-    improvementSuggestions: [String],
-    reasoning: String,
-    judgePerspective: String,
-    executionStrategy: [String]
+    type: mongoose.Schema.Types.Mixed,
+    default: null
   },
   projectReviewGeneratedAt: {
     type: Date
   },
   taskPlan: {
-    projectTasks: {
-      coreFeatures: [String],
-      technicalTasks: [String],
-      deploymentTasks: [String]
-    },
-    assignments: [{
-      member: String,
-      skills: [String],
-      assignedTasks: [{
-        task: String,
-        status: {
-          type: String,
-          enum: ['Not Started', 'In Progress', 'Completed'],
-          default: 'Not Started'
-        },
-        assignedTo: {
-          type: String,
-          default: ''
-        },
-        collaborators: {
-          type: [String],
-          default: []
-        },
-        marketplaceStatus: {
-          type: String,
-          enum: ['Locked', 'Available', 'SwapRequested', 'ClaimRequested', 'ReassignmentRequested'],
-          default: 'Locked'
-        },
-        updatedAt: {
-          type: Date,
-          default: Date.now
-        }
-      }],
-      reason: String
-    }],
-    workloadDistribution: [{
-      member: String,
-      percentage: Number
-    }],
-    executionOrder: [String],
-    criticalTasks: [String],
-    recommendedFocus: [String],
-    warnings: [String]
+    type: mongoose.Schema.Types.Mixed,
+    default: null
   },
   taskPlanGeneratedAt: {
     type: Date

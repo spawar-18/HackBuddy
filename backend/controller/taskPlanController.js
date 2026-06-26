@@ -183,7 +183,7 @@ exports.regenerateTaskPlan = async (req, res) => {
 
 // @desc    Update status of a specific assigned task
 // @route   PATCH /api/projects/:projectId/task-plan/task-status
-// @access  Private (team members only)
+// @access  Private (only the assigned member can update their own tasks)
 exports.updateTaskStatus = async (req, res) => {
   try {
     const { projectId } = req.params;
@@ -203,14 +203,23 @@ exports.updateTaskStatus = async (req, res) => {
       return res.status(404).json({ success: false, message: 'Project not found' });
     }
 
-    const team = await Team.findById(project.teamId);
+    const team = await Team.findById(project.teamId).populate('members', 'name');
     if (!team) {
       return res.status(404).json({ success: false, message: 'Team not found' });
     }
 
-    const isMember = team.members.some(member => isSameUser(member, req.user.id));
-    if (!isMember) {
-      return res.status(403).json({ success: false, message: 'Access denied' });
+    // Verify the requesting user is a team member
+    const requestingMember = team.members.find(member => isSameUser(member, req.user.id));
+    if (!requestingMember) {
+      return res.status(403).json({ success: false, message: 'Access denied: You are not a member of this team' });
+    }
+
+    // Enforce ownership: only the assigned member can update their own tasks
+    if (requestingMember.name !== memberName) {
+      return res.status(403).json({
+        success: false,
+        message: `Access denied: You can only update your own tasks. You are logged in as "${requestingMember.name}", not "${memberName}".`
+      });
     }
 
     if (!project.taskPlan || !project.taskPlan.assignments) {

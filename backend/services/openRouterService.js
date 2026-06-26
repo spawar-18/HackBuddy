@@ -1,4 +1,4 @@
-const geminiService = require('./ai/geminiService');
+const AIEngine = require('./ai/AIEngine');
 
 /**
  * Extracts technical skills from resume text using Google Gemini API via official GenAI SDK.
@@ -6,46 +6,23 @@ const geminiService = require('./ai/geminiService');
  * @returns {Promise<string[]>} List of extracted skills
  */
 const extractSkillsFromResume = async (resumeText) => {
-  const prompt = `Analyze the following resume.
-Extract ONLY technical skills.
-Include only:
-Programming Languages
-Frameworks
-Libraries
-Databases
-Cloud Platforms
-DevOps Tools
-AI/ML Technologies
-Tools and Technologies
-
-Exclude:
-Communication Skills
-Leadership
-Teamwork
-Soft Skills
-Languages spoken
-
-Resume:
-${resumeText}`;
+  const prompt = `Resume:\n${resumeText}`;
 
   try {
-    console.log('[openRouterService] Executing Gemini skill extraction from resume...');
-    const rawResult = await geminiService.executePrompt({
-      contents: prompt,
-      systemInstruction: 'You are a technical recruiter. Extract technical skills from the resume and return valid JSON.',
-      schemaName: 'extractSkills',
-      isJson: true,
-      endpointName: 'extractSkills'
+    console.log('[openRouterService] Executing skill extraction via central AIEngine...');
+    const parsed = await AIEngine.executeAI({
+      projectId: null,
+      module: 'extractSkills',
+      userInput: prompt
     });
 
-    const parsed = JSON.parse(rawResult.trim());
     if (parsed && Array.isArray(parsed.skills)) {
       return parsed.skills.map(s => s.trim()).filter(s => s.length > 0);
     }
     
     throw new Error('AI response did not contain a skills array');
   } catch (error) {
-    console.error('[openRouterService] Gemini skill extraction failed, falling back to mock:', error.message);
+    console.error('[openRouterService] Skill extraction failed, falling back to mock:', error.message);
     return mockSkillExtraction(resumeText);
   }
 };

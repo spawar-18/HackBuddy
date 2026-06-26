@@ -480,7 +480,7 @@ exports.getMarketplace = async (req, res) => {
   }
 };
 
-// @desc    Approve request (Owner only)
+// @desc    Approve request
 // @route   PATCH /api/marketplace/:requestId/approve
 // @access  Private
 exports.approveRequest = async (req, res) => {
@@ -497,21 +497,33 @@ exports.approveRequest = async (req, res) => {
       return res.status(404).json({ success: false, message: 'Project not found' });
     }
 
-    const team = await Team.findById(project.teamId);
+    const team = await Team.findById(project.teamId).populate('members', 'name');
     if (!team) {
       return res.status(404).json({ success: false, message: 'Team not found' });
     }
 
-    // Only team owner can approve
-    const isOwner = isSameUser(team.createdBy, req.user.id);
-    if (!isOwner) {
-      return res.status(403).json({ success: false, message: 'Unauthorized: Only the team owner can approve marketplace requests' });
+    const { requestType, targetUser } = request;
+
+    if (requestType === 'SWAP' || requestType === 'COLLABORATOR') {
+      const targetMember = team.members.find(member => member.name && member.name.toLowerCase() === targetUser.toLowerCase());
+      if (!targetMember) {
+        return res.status(404).json({ success: false, message: `Target member (${targetUser}) not found in the team` });
+      }
+      const isTargetUser = isSameUser(targetMember._id, req.user.id);
+      if (!isTargetUser) {
+        return res.status(403).json({ success: false, message: `Unauthorized: Only ${targetUser} can approve this request` });
+      }
+    } else {
+      const isOwner = isSameUser(team.createdBy, req.user.id);
+      if (!isOwner) {
+        return res.status(403).json({ success: false, message: 'Unauthorized: Only the team owner can approve this marketplace request' });
+      }
     }
 
     request.status = 'Approved';
     await request.save();
 
-    const { requestType, taskId, requestedBy, targetUser, targetTaskId } = request;
+    const { taskId, requestedBy, targetTaskId } = request;
 
     if (requestType === 'REASSIGNMENT') {
       // Find the task inside requestedBy assignments and set to Available
@@ -603,9 +615,9 @@ exports.approveRequest = async (req, res) => {
       } else if (requestType === 'CLAIM') {
         msg = `✅ [MARKETPLACE ALERT] Owner approved ${requestedBy}'s request to claim task "${taskId}". Ownership has been transferred successfully!`;
       } else if (requestType === 'SWAP') {
-        msg = `✅ [MARKETPLACE ALERT] Owner approved task swap between ${requestedBy} (task: "${taskId}") and ${targetUser} (task: "${targetTaskId}"). Task ownerships have been exchanged!`;
+        msg = `✅ [MARKETPLACE ALERT] ${targetUser} approved task swap with ${requestedBy} (task: "${taskId}" ↔️ "${targetTaskId}"). Task ownerships have been exchanged!`;
       } else if (requestType === 'COLLABORATOR') {
-        msg = `✅ [MARKETPLACE ALERT] Owner approved adding ${targetUser} as a collaborator to assist ${requestedBy} on task: "${taskId}"!`;
+        msg = `✅ [MARKETPLACE ALERT] ${targetUser} approved request to collaborate with ${requestedBy} on task: "${taskId}"!`;
       }
       if (msg) {
         await ProjectChat.create({
@@ -626,7 +638,7 @@ exports.approveRequest = async (req, res) => {
   }
 };
 
-// @desc    Reject request (Owner only)
+// @desc    Reject request
 // @route   PATCH /api/marketplace/:requestId/reject
 // @access  Private
 exports.rejectRequest = async (req, res) => {
@@ -643,22 +655,34 @@ exports.rejectRequest = async (req, res) => {
       return res.status(404).json({ success: false, message: 'Project not found' });
     }
 
-    const team = await Team.findById(project.teamId);
+    const team = await Team.findById(project.teamId).populate('members', 'name');
     if (!team) {
       return res.status(404).json({ success: false, message: 'Team not found' });
     }
 
-    // Only owner can reject
-    const isOwner = isSameUser(team.createdBy, req.user.id);
-    if (!isOwner) {
-      return res.status(403).json({ success: false, message: 'Unauthorized' });
+    const { requestType, targetUser } = request;
+
+    if (requestType === 'SWAP' || requestType === 'COLLABORATOR') {
+      const targetMember = team.members.find(member => member.name && member.name.toLowerCase() === targetUser.toLowerCase());
+      if (!targetMember) {
+        return res.status(404).json({ success: false, message: `Target member (${targetUser}) not found in the team` });
+      }
+      const isTargetUser = isSameUser(targetMember._id, req.user.id);
+      if (!isTargetUser) {
+        return res.status(403).json({ success: false, message: `Unauthorized: Only ${targetUser} can reject this request` });
+      }
+    } else {
+      const isOwner = isSameUser(team.createdBy, req.user.id);
+      if (!isOwner) {
+        return res.status(403).json({ success: false, message: 'Unauthorized: Only the team owner can reject this marketplace request' });
+      }
     }
 
     request.status = 'Rejected';
     await request.save();
 
     // Revert marketplace statuses
-    const { requestType, taskId, requestedBy, targetUser, targetTaskId } = request;
+    const { taskId, requestedBy, targetTaskId } = request;
 
     if (requestType === 'REASSIGNMENT' || requestType === 'CLAIM' || requestType === 'COLLABORATOR') {
       project.taskPlan.assignments.forEach(assign => {
@@ -686,11 +710,17 @@ exports.rejectRequest = async (req, res) => {
 
     // Chat Notification
     try {
+      let msg = '';
+      if (requestType === 'SWAP' || requestType === 'COLLABORATOR') {
+        msg = `❌ [MARKETPLACE ALERT] ${targetUser} rejected the ${requestType} request for task "${taskId}" by ${requestedBy}.`;
+      } else {
+        msg = `❌ [MARKETPLACE ALERT] Owner rejected the ${requestType} request for task "${taskId}" by ${requestedBy}.`;
+      }
       await ProjectChat.create({
         projectId: request.projectId,
         userId: req.user.id,
         role: 'assistant',
-        message: `❌ [MARKETPLACE ALERT] Owner rejected the ${requestType} request for task "${taskId}" by ${requestedBy}.`
+        message: msg
       });
     } catch (chatErr) {
       console.error('Failed to save rejection chat notification:', chatErr);
