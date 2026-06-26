@@ -1,4 +1,4 @@
-const LoggingService = require('./LoggingService');
+const LoggingService = require('./loggingService');
 
 /**
  * HealthMonitor

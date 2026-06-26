@@ -1,6 +1,6 @@
 const HealthMonitor = require('./HealthMonitor');
 const AnalyticsService = require('./AnalyticsService');
-const LoggingService = require('./LoggingService');
+const LoggingService = require('./loggingService');
 const RetryService = require('./RetryService');
 
 const GLMProvider = require('./GLMProvider');

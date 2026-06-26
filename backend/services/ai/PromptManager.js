@@ -1,4 +1,4 @@
-const PromptVersionManager = require('./PromptVersionManager');
+const PromptVersionManager = require('./promptVersionManager');
 
 /**
  * PromptManager
