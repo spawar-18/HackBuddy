@@ -696,7 +696,7 @@ const TaskMarketplace = ({ projectId, teamId, onRefreshProject }) => {
                           <div className="bg-gradient-to-b from-purple-50/30 to-purple-50/10 border border-purple-200/60 rounded-2xl p-4.5 flex flex-col gap-3.5">
                             <div className="flex justify-between items-center border-b border-purple-100 pb-2.5">
                               <span className="text-[10px] font-extrabold text-purple-700 uppercase tracking-widest flex items-center gap-1.5">
-                                <Cpu size={14} className="text-purple-600 animate-pulse" /> Qwen Decision Recommendation
+                                <Cpu size={14} className="text-purple-600 animate-pulse" /> AI Decision Recommendation
                               </span>
                               <span className={`inline-flex items-center gap-1 px-2.5 py-0.5 rounded-md text-[10px] font-black uppercase ${
                                 req.aiRecommendation.recommendation === 'Approve'

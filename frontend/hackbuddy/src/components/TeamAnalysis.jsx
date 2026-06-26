@@ -110,7 +110,6 @@ const TeamAnalysis = ({ teamId }) => {
             <p className="text-xs text-neutral-400 mt-0.5">Skill gaps & recommended roles report</p>
           </div>
         </div>
-        <span className="inline-flex items-center px-2 py-0.5 rounded-full text-[9px] font-bold bg-brand-50 border border-brand-100 text-brand-700 uppercase tracking-wider">Qwen 35B</span>
       </div>
 
       {/* Error state */}
@@ -145,7 +144,7 @@ const TeamAnalysis = ({ teamId }) => {
           <div>
             <h3 className="text-sm font-semibold text-neutral-900">{loadingText}</h3>
             <p className="text-xs text-neutral-400 mt-1 max-w-[280px] mx-auto leading-relaxed">
-              Qwen is executing skill assessment mapping. Please hold on.
+              AI Copilot is executing skill assessment mapping. Please hold on.
             </p>
           </div>
           <button className="btn-primary w-full" disabled>
