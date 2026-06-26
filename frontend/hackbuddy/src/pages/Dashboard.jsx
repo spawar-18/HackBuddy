@@ -13,7 +13,7 @@ import {
   User, MessageSquare, Award, TrendingUp, GitBranch,
   ArrowUpRight, Sparkles, ListTodo, CheckCircle2,
   PlayCircle, Code, Share2, Wrench, Shield, Plus,
-  Activity, BarChart3, Database, Eye, ExternalLink
+  Activity, BarChart3, Database, Eye, ExternalLink, Menu, X
 } from 'lucide-react';
 
 // ─── SVG Chart Helpers for Premium Dashboard ───
@@ -97,6 +97,8 @@ const Dashboard = () => {
     const saved = localStorage.getItem('hackbuddy-theme');
     return saved ? saved === 'dark' : true;
   });
+
+  const [mobileNavOpen, setMobileNavOpen] = useState(false);
 
   useEffect(() => {
     if (isDark) {
@@ -285,14 +287,30 @@ const Dashboard = () => {
 
   return (
     <div className="dashboard-container">
+      {/* Mobile sidebar overlay */}
+      {mobileNavOpen && (
+        <div
+          className="mobile-sidebar-overlay active"
+          onClick={() => setMobileNavOpen(false)}
+        />
+      )}
+
       {/* Top Navigation Header */}
       <header className="dashboard-header">
         <div className="flex items-center gap-3">
+          {/* Hamburger – mobile only */}
+          <button
+            className="mobile-menu-btn"
+            onClick={() => setMobileNavOpen(prev => !prev)}
+            aria-label="Toggle navigation"
+          >
+            {mobileNavOpen ? <X size={16} /> : <Menu size={16} />}
+          </button>
           <div className="w-8 h-8 rounded-lg bg-neutral-950 text-white flex items-center justify-center text-sm font-bold shadow-xs">H</div>
           <span className="font-extrabold text-lg tracking-tight font-sans text-neutral-900">
             Hack<span className="text-brand-500">Buddy</span>
           </span>
-          <span className="status-badge badge-active ml-2.5 text-[10px] flex items-center gap-1">
+          <span className="status-badge badge-active ml-2.5 text-[10px] hidden sm:flex items-center gap-1">
             <span className="status-pulse bg-emerald-500"></span>
             PERSONAL CONSOLE
           </span>
@@ -391,10 +409,10 @@ const Dashboard = () => {
       {/* Main Layout Area */}
       <div className="dashboard-body">
         {/* Left Sidebar */}
-        <aside className="dashboard-sidebar font-sans">
+        <aside className={`dashboard-sidebar font-sans${mobileNavOpen ? ' mobile-open' : ''}`}>
           <div className="sidebar-menu flex flex-col gap-1.5 w-full">
             <button
-              onClick={() => navigate('/dashboard')}
+              onClick={() => { navigate('/dashboard'); setMobileNavOpen(false); }}
               className="menu-item w-full bg-transparent border-0 cursor-pointer text-left flex items-center gap-3 py-2.5 active font-bold text-white shadow-sm"
             >
               <LayoutDashboard size={16} />
@@ -403,7 +421,7 @@ const Dashboard = () => {
 
 
             <button
-              onClick={() => navigate('/chat')}
+              onClick={() => { navigate('/chat'); setMobileNavOpen(false); }}
               className="menu-item w-full bg-transparent border-0 cursor-pointer text-left flex items-center gap-3 py-2.5"
             >
               <MessageSquare size={16} />
@@ -411,21 +429,21 @@ const Dashboard = () => {
             </button>
 
             <button
-              onClick={() => navigate('/team/create')}
+              onClick={() => { navigate('/team/create'); setMobileNavOpen(false); }}
               className="btn-primary mt-6 w-full flex items-center justify-center gap-2 text-xs py-2 shadow-xs cursor-pointer"
             >
               <Plus size={14} />
               <span>Create Team</span>
             </button>
             <button
-              onClick={() => navigate('/team/join')}
+              onClick={() => { navigate('/team/join'); setMobileNavOpen(false); }}
               className="btn-secondary mt-2 w-full flex items-center justify-center gap-2 text-xs py-2 cursor-pointer"
             >
               <Users size={14} />
               <span>Join Team</span>
             </button>
             <button
-              onClick={() => navigate('/profile')}
+              onClick={() => { navigate('/profile'); setMobileNavOpen(false); }}
               className="btn-secondary mt-2 w-full flex items-center justify-center gap-2 text-xs py-2 cursor-pointer"
             >
               <User size={14} />

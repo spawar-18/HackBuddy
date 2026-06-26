@@ -19,7 +19,7 @@ import {
   Flame, ShieldCheck, AlertTriangle, Zap, Sun, Moon,
   User, MessageSquare, Award, TrendingUp, GitBranch,
   ArrowUpRight, Sparkles, Plus, Activity, Database, Wrench, ArrowLeft, Copy, Check,
-  Shield, Mail, Code
+  Shield, Mail, Code, Menu, X
 } from 'lucide-react';
 import HackathonCommandCenter from '../components/HackathonCommandCenter';
 import ProjectHub from '../components/ProjectHub';
@@ -87,6 +87,7 @@ const ProjectWorkspace = () => {
     return location.state?.activeTab || 'overview';
   });
 
+  const [mobileNavOpen, setMobileNavOpen] = useState(false);
   const [showNotifications, setShowNotifications] = useState(false);
   const [notifications, setNotifications] = useState([]);
   const [unreadCount, setUnreadCount] = useState(0);
@@ -306,7 +307,7 @@ const ProjectWorkspace = () => {
     return (
       <button
         key={tabId}
-        onClick={() => setActiveTab(tabId)}
+        onClick={() => { setActiveTab(tabId); setMobileNavOpen(false); }}
         className={`menu-item w-full bg-transparent border-0 cursor-pointer text-left flex items-center gap-3 py-2 ${
           isActive ? 'active font-bold text-white shadow-sm' : ''
         }`}
@@ -328,19 +329,35 @@ const ProjectWorkspace = () => {
 
   return (
     <div className="dashboard-container">
+      {/* Mobile sidebar overlay */}
+      {mobileNavOpen && (
+        <div
+          className="mobile-sidebar-overlay active"
+          onClick={() => setMobileNavOpen(false)}
+        />
+      )}
+
       {/* Top Navigation Header */}
       <header className="dashboard-header">
         <div className="flex items-center gap-3">
+          {/* Hamburger – mobile only */}
+          <button
+            className="mobile-menu-btn"
+            onClick={() => setMobileNavOpen(prev => !prev)}
+            aria-label="Toggle navigation"
+          >
+            {mobileNavOpen ? <X size={16} /> : <Menu size={16} />}
+          </button>
           <div className="w-8 h-8 rounded-lg bg-neutral-950 text-white flex items-center justify-center text-sm font-bold shadow-xs">H</div>
           <span className="font-extrabold text-lg tracking-tight font-sans text-neutral-900">
             Hack<span className="text-brand-500">Buddy</span>
           </span>
-          <span className="status-badge badge-active ml-2.5 text-[10px] flex items-center gap-1">
+          <span className="status-badge badge-active ml-2.5 text-[10px] hidden sm:flex items-center gap-1">
             <span className="status-pulse bg-emerald-500"></span>
             WORKSPACE
           </span>
           {inviteCode && (
-            <span className="status-badge badge-active ml-2 text-[10px] flex items-center gap-1.5 font-mono">
+            <span className="status-badge badge-active ml-2 text-[10px] hidden md:flex items-center gap-1.5 font-mono">
               INVITE CODE: <span className="code-val font-black text-[#00f0ff]">{inviteCode}</span>
               <button
                 onClick={() => copyInviteCode(inviteCode)}
@@ -356,7 +373,7 @@ const ProjectWorkspace = () => {
         {/* Project Selector dropdown */}
         {activeProjectsList.length > 0 && (
           <div className="flex items-center gap-2 bg-neutral-100 border border-neutral-200 px-3.5 py-1.5 rounded-xl shadow-2xs">
-            <span className="text-[10px] font-bold text-neutral-450 uppercase tracking-widest">Workspace:</span>
+            <span className="text-[10px] font-bold text-neutral-450 uppercase tracking-widest hidden sm:inline">Workspace:</span>
             <select
               value={projectId}
               onChange={(e) => {
@@ -398,10 +415,10 @@ const ProjectWorkspace = () => {
       {/* Main Layout Area */}
       <div className="dashboard-body">
         {/* Left Navigation Sidebar */}
-        <aside className="dashboard-sidebar font-sans">
+        <aside className={`dashboard-sidebar font-sans${mobileNavOpen ? ' mobile-open' : ''}`}>
           <div className="sidebar-menu flex flex-col gap-1 w-full">
             <button
-              onClick={() => navigate('/dashboard')}
+              onClick={() => { navigate('/dashboard'); setMobileNavOpen(false); }}
               className="menu-item w-full bg-transparent border-0 cursor-pointer text-left flex items-center gap-3 py-2 text-neutral-600 mb-4 border-b border-brand-200/25 pb-3"
             >
               <ArrowLeft size={16} />
