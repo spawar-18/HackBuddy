@@ -319,7 +319,7 @@ const Dashboard = () => {
         {/* Current Project Selector Dropdown */}
         {activeProjectsList.length > 0 && (
           <div className="flex items-center gap-2 bg-neutral-100 border border-neutral-200 px-3 py-1.5 rounded-xl shadow-2xs">
-            <span className="text-[10px] font-bold text-neutral-450 uppercase tracking-widest">Active Workspace:</span>
+            <span className="text-[10px] font-bold text-neutral-450 uppercase tracking-widest hidden sm:inline">Active Workspace:</span>
             <select
               value={currentProjectId || ''}
               onChange={(e) => {
