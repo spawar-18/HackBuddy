@@ -177,7 +177,7 @@ const parseRisk = (risk) => {
   
   const lower = clean.toLowerCase();
   
-  if (lower.includes('ai') || lower.includes('llm') || lower.includes('gpt') || lower.includes('model') || lower.includes('qwen') || lower.includes('openai')) {
+  if (lower.includes('ai') || lower.includes('llm') || lower.includes('gpt') || lower.includes('model') || lower.includes('openai')) {
     category = 'AI & LLM';
     icon = 'cpu';
   } else if (lower.includes('database') || lower.includes('db') || lower.includes('mongodb') || lower.includes('sql') || lower.includes('schema') || lower.includes('data')) {
@@ -518,7 +518,7 @@ const generateArchitectureCards = (project, review) => {
         card.suggestion = 'Create simpler document/relational structures to avoid join overhead.';
       }
     } else if (card.id === 'ai') {
-      hasRisk = risks.includes('ai') || risks.includes('llm') || risks.includes('model') || risks.includes('token') || risks.includes('prompt') || risks.includes('openai') || risks.includes('qwen');
+      hasRisk = risks.includes('ai') || risks.includes('llm') || risks.includes('model') || risks.includes('token') || risks.includes('prompt') || risks.includes('openai');
       if (hasRisk) {
         card.status = 'Attention';
         card.strength = 'AI request routing pathways have been established.';
