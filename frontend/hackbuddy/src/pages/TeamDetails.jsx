@@ -344,7 +344,7 @@ const TeamDetails = () => {
                 <div className="flex flex-col gap-1.5">
                   <span className="input-label">INVITE CODE</span>
                   <div className="flex items-center justify-between p-3 bg-neutral-50 border border-neutral-200 rounded-lg font-mono text-sm">
-                    <span className="font-bold text-neutral-900 tracking-wider">{team.inviteCode}</span>
+                    <span className="code-val font-bold text-neutral-900 tracking-wider">{team.inviteCode}</span>
                     <button
                       onClick={() => copyToClipboard(team.inviteCode, 'code')}
                       className="p-1 hover:bg-neutral-200 rounded text-neutral-400 hover:text-neutral-700 cursor-pointer transition-colors"

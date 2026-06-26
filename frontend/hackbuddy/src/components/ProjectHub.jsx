@@ -17,7 +17,7 @@ import {
   Play, CheckCircle, Clock, ArrowLeft, Save, AlertTriangle, RefreshCw, Cpu,
   Layers, Users, Activity, Zap, BarChart3, GitBranch, Target, Star, ShieldAlert,
   ShoppingBag, ChevronDown, ChevronUp, Check, Info, Lightbulb, Ban, Award, 
-  ArrowUpRight, HelpCircle, ShieldCheck, Compass
+  ArrowUpRight, HelpCircle, ShieldCheck, Compass, X
 } from 'lucide-react';
 import TaskMarketplace from './TaskMarketplace';
 import TechStackConsensus from './TechStackConsensus';
@@ -1266,6 +1266,43 @@ const ProjectHub = ({ teamId, initialView }) => {
   const [activeTaskPlanTab, setActiveTaskPlanTab] = useState('roadmap');
   const [hoveredMember, setHoveredMember] = useState(null);
   const messagesContainerRef = useRef(null);
+  const [quickFeatureInput, setQuickFeatureInput] = useState('');
+  const [quickFeatureSaving, setQuickFeatureSaving] = useState(false);
+
+  const handleQuickAddFeature = async () => {
+    const trimmed = quickFeatureInput.trim();
+    if (!trimmed || !project) return;
+    const updated = [...(project.featuresToBuild || []), trimmed];
+    setQuickFeatureSaving(true);
+    try {
+      const res = await updateProject(project._id, { featuresToBuild: updated });
+      if (res.success) {
+        setProject(prev => ({ ...prev, featuresToBuild: updated }));
+        setQuickFeatureInput('');
+        toast.success('Feature added!');
+      }
+    } catch (err) {
+      console.error('Failed to add feature:', err);
+      toast.error('Failed to add feature.');
+    } finally {
+      setQuickFeatureSaving(false);
+    }
+  };
+
+  const handleQuickRemoveFeature = async (idx) => {
+    if (!project) return;
+    const updated = (project.featuresToBuild || []).filter((_, i) => i !== idx);
+    try {
+      const res = await updateProject(project._id, { featuresToBuild: updated });
+      if (res.success) {
+        setProject(prev => ({ ...prev, featuresToBuild: updated }));
+        toast.success('Feature removed.');
+      }
+    } catch (err) {
+      console.error('Failed to remove feature:', err);
+      toast.error('Failed to remove feature.');
+    }
+  };
 
   // Auto-scroll chat window
   useEffect(() => {
@@ -1773,16 +1810,44 @@ const ProjectHub = ({ teamId, initialView }) => {
             <div className="flex flex-col gap-2">
               {project.featuresToBuild && project.featuresToBuild.length > 0 ? (
                 project.featuresToBuild.map((feature, idx) => (
-                  <div key={idx} className="flex items-center gap-2.5 bg-neutral-50 border border-neutral-200/60 rounded-lg px-3 py-2 text-xs font-medium text-neutral-700">
+                  <div key={idx} className="flex items-center gap-2.5 bg-neutral-50 border border-neutral-200/60 rounded-lg px-3 py-2 text-xs font-medium text-neutral-700 group">
                     <ListTodo size={14} className="text-brand-500 shrink-0" />
-                    <span>{feature}</span>
+                    <span className="flex-1">{feature}</span>
+                    <button
+                      onClick={() => handleQuickRemoveFeature(idx)}
+                      className="opacity-0 group-hover:opacity-100 p-0.5 rounded hover:bg-red-50 text-red-400 hover:text-red-600 bg-transparent border-0 cursor-pointer transition-all"
+                      title="Remove feature"
+                    >
+                      <X size={12} />
+                    </button>
                   </div>
                 ))
               ) : (
                 <p className="text-xs text-neutral-400 italic">
-                  No features configured yet. Click Edit Project to add features.
+                  No features configured yet. Add one below.
                 </p>
               )}
+
+              {/* Inline Add Feature */}
+              <div className="flex items-center gap-2 mt-1">
+                <input
+                  type="text"
+                  value={quickFeatureInput}
+                  onChange={e => setQuickFeatureInput(e.target.value)}
+                  onKeyDown={e => e.key === 'Enter' && handleQuickAddFeature()}
+                  placeholder="Add a feature... (press Enter)"
+                  className="flex-1 bg-neutral-50 border border-neutral-200 border-dashed rounded-lg px-3 py-2 text-xs text-neutral-700 placeholder-neutral-400 focus:outline-none focus:border-brand-400 focus:bg-white transition-all"
+                  disabled={quickFeatureSaving}
+                />
+                <button
+                  onClick={handleQuickAddFeature}
+                  disabled={quickFeatureSaving || !quickFeatureInput.trim()}
+                  className="shrink-0 p-2 rounded-lg bg-brand-500 hover:bg-brand-600 text-white border-0 cursor-pointer transition-colors disabled:opacity-40 disabled:cursor-not-allowed flex items-center justify-center"
+                  title="Add feature"
+                >
+                  {quickFeatureSaving ? <RefreshCw size={12} className="animate-spin" /> : <Plus size={12} />}
+                </button>
+              </div>
             </div>
           </div>
 

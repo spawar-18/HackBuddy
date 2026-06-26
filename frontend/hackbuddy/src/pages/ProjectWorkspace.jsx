@@ -18,160 +18,13 @@ import {
   UserCheck, RefreshCw, FolderGit2, Play,
   Flame, ShieldCheck, AlertTriangle, Zap, Sun, Moon,
   User, MessageSquare, Award, TrendingUp, GitBranch,
-  ArrowUpRight, Sparkles, Plus, Activity, Database, Wrench, Eye, ArrowLeft
+  ArrowUpRight, Sparkles, Plus, Activity, Database, Wrench, Eye, ArrowLeft, Copy, Check
 } from 'lucide-react';
 import HackathonCommandCenter from '../components/HackathonCommandCenter';
 import ProjectHub from '../components/ProjectHub';
 import GitHubPanel from '../components/GitHubPanel';
 import TaskMarketplace from '../components/TaskMarketplace';
 
-// ─── Judge Simulator Sub-component ───
-const JudgeSimulator = ({ project, commandCenterData }) => {
-  const [simulatedInnovation, setSimulatedInnovation] = useState(8.0);
-  const [simulatedPracticality, setSimulatedPracticality] = useState(7.5);
-  const [simulatedComplexity, setSimulatedComplexity] = useState(8.5);
-  const [simulatedPresentation, setSimulatedPresentation] = useState(8.0);
-  const [customQuery, setCustomQuery] = useState('');
-  const [feedbackLog, setFeedbackLog] = useState([
-    { type: 'AI system', msg: 'Judge Simulator loaded with project context.' }
-  ]);
-  const [simulating, setSimulating] = useState(false);
-
-  // Sync with project feasibility review initially
-  useEffect(() => {
-    if (project?.projectReview?.feasibilityScore) {
-      const score = project.projectReview.feasibilityScore;
-      setSimulatedInnovation(Math.min(10, Math.max(1, score * 0.9)));
-      setSimulatedPracticality(Math.min(10, Math.max(1, score * 1.05)));
-      setSimulatedComplexity(Math.min(10, Math.max(1, score * 0.85)));
-      setSimulatedPresentation(Math.min(10, Math.max(1, score * 0.95)));
-    }
-  }, [project]);
-
-  const simulatedAverage = Math.round(((simulatedInnovation + simulatedPracticality + simulatedComplexity + simulatedPresentation) / 4) * 10) / 10;
-
-  const handleSimulatePitch = () => {
-    setSimulating(true);
-    setFeedbackLog(prev => [...prev, { type: 'System', msg: 'Initiating presentation and pitch evaluation run...' }]);
-    
-    setTimeout(() => {
-      let advice = 'Highlight the working prototype first. Make sure your problem statement connects directly with your demonstration.';
-      if (simulatedAverage >= 8.5) {
-        advice = 'Excellent score projection! Focus on business scaling potential and unique AI agents capability during the Q&A session.';
-      } else if (simulatedAverage >= 7.0) {
-        advice = 'Stable prototype. Make sure you clearly articulate the tech stack consensus advantages and how you split tasks.';
-      } else {
-        advice = 'High risk of demo failure. Ensure you remove non-essential features and prioritize testing your core APIs.';
-      }
-      
-      setFeedbackLog(prev => [
-        ...prev,
-        { type: 'Verdict', msg: `Simulation output: Projected average score: ${simulatedAverage}/10.` },
-        { type: 'Mentor Advice', msg: advice }
-      ]);
-      setSimulating(false);
-    }, 1500);
-  };
-
-  return (
-    <div className="flex flex-col gap-6 animate-slide-up">
-      <div className="bg-neutral-100 border border-neutral-200 rounded-2xl p-6 shadow-lg">
-        <h2 className="text-base font-extrabold text-white flex items-center gap-2 mb-2">
-          <Award size={18} className="text-orange-500 animate-pulse" />
-          Judge Pitch & Score Simulator
-        </h2>
-        <p className="text-xs text-neutral-400 max-w-xl">
-          Simulate how judges will rate your hackathon MVP based on innovation, technology complexity, presentation, and practicality. Drag sliders to adjust parameters.
-        </p>
-
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-8 mt-6">
-          {/* Sliders */}
-          <div className="flex flex-col gap-4">
-            {[
-              { label: 'Innovation Metric', val: simulatedInnovation, set: setSimulatedInnovation, color: 'text-indigo-400' },
-              { label: 'Technical Complexity', val: simulatedComplexity, set: setSimulatedComplexity, color: 'text-violet-400' },
-              { label: 'Practicality & Usability', val: simulatedPracticality, set: setSimulatedPracticality, color: 'text-emerald-400' },
-              { label: 'Presentation & Demo Flow', val: simulatedPresentation, set: setSimulatedPresentation, color: 'text-amber-400' }
-            ].map(m => (
-              <div key={m.label} className="flex flex-col gap-1.5 text-xs text-left">
-                <div className="flex justify-between font-bold">
-                  <span className={m.color}>{m.label}</span>
-                  <span className="font-mono text-white">{m.val.toFixed(1)}/10</span>
-                </div>
-                <input
-                  type="range"
-                  min="1"
-                  max="10"
-                  step="0.1"
-                  value={m.val}
-                  onChange={e => m.set(parseFloat(e.target.value))}
-                  className="w-full cursor-pointer accent-[#00f0ff] bg-neutral-900 border-0 h-1.5 rounded-lg appearance-none"
-                />
-              </div>
-            ))}
-
-            <button
-              onClick={handleSimulatePitch}
-              disabled={simulating}
-              className="btn-primary text-xs py-2 px-4 shadow-sm w-fit mt-2 flex items-center gap-2 cursor-pointer"
-            >
-              {simulating ? <RefreshCw className="animate-spin" size={14} /> : <Zap size={14} />}
-              <span>Simulate Pitch & Demo</span>
-            </button>
-          </div>
-
-          {/* Projection Indicator & Output Logs */}
-          <div className="flex flex-col gap-4">
-            <div className="bg-neutral-900/60 p-4 border border-[#00f0ff]/10 rounded-xl flex items-center gap-6">
-              <div className="relative flex items-center justify-center w-24 h-24 shrink-0">
-                <svg className="w-full h-full transform -rotate-90">
-                  <circle cx="48" cy="48" r="38" stroke="rgba(0, 240, 255, 0.08)" strokeWidth="6" fill="transparent" />
-                  <circle
-                    cx="48"
-                    cy="48"
-                    r="38"
-                    stroke="#00f0ff"
-                    strokeWidth="6"
-                    fill="transparent"
-                    strokeDasharray={2 * Math.PI * 38}
-                    strokeDashoffset={2 * Math.PI * 38 - (simulatedAverage * 10 / 100) * 2 * Math.PI * 38}
-                    strokeLinecap="round"
-                    style={{ transition: 'stroke-dashoffset 0.5s ease' }}
-                  />
-                </svg>
-                <div className="absolute flex flex-col items-center justify-center">
-                  <span className="text-xl font-extrabold text-[#00f0ff] font-mono">{simulatedAverage.toFixed(1)}</span>
-                  <span className="text-[8px] uppercase tracking-widest text-neutral-500">/ 10</span>
-                </div>
-              </div>
-              <div className="text-left flex flex-col gap-1">
-                <span className="text-xs font-bold text-white uppercase tracking-wider">Projected Average Rating</span>
-                <span className={`text-[10px] font-extrabold uppercase px-2 py-0.5 rounded-md border w-fit font-mono ${
-                  simulatedAverage >= 8.0 ? 'bg-emerald-500/10 text-emerald-400 border-emerald-500/20' :
-                  simulatedAverage >= 6.0 ? 'bg-amber-500/10 text-amber-400 border-amber-500/20' :
-                  'bg-rose-500/10 text-rose-400 border-rose-500/20'
-                }`}>
-                  {simulatedAverage >= 8.0 ? 'DEMO CRITICAL APPROVED' : simulatedAverage >= 6.0 ? 'AVERAGE READY' : 'RISKY BACKLOG'}
-                </span>
-              </div>
-            </div>
-
-            {/* Sim Logs */}
-            <div className="bg-neutral-950 p-3 rounded-xl border border-brand-200/10 text-[11px] h-40 overflow-y-auto font-mono text-left flex flex-col gap-2">
-              <span className="text-[8px] text-neutral-500 uppercase tracking-wider font-bold">Simulator Output Logs:</span>
-              {feedbackLog.map((log, i) => (
-                <div key={i} className="leading-relaxed border-b border-brand-200/5 pb-1">
-                  <span className="text-brand-400 font-extrabold font-mono uppercase">[{log.type}]: </span>
-                  <span className="text-neutral-300">{log.msg}</span>
-                </div>
-              ))}
-            </div>
-          </div>
-        </div>
-      </div>
-    </div>
-  );
-};
 
 const ProjectWorkspace = () => {
   const { projectId } = useParams();
@@ -186,6 +39,21 @@ const ProjectWorkspace = () => {
   const [teams, setTeams] = useState([]);
   const [projects, setProjects] = useState({});
   const [commandCenterData, setCommandCenterData] = useState(null);
+  const [copiedCode, setCopiedCode] = useState(false);
+
+  const currentTeam = teams.find(t => t._id === project?.teamId || t._id === project?.teamId?._id);
+  const inviteCode = currentTeam?.inviteCode;
+
+  const copyInviteCode = async (code) => {
+    try {
+      await navigator.clipboard.writeText(code);
+      setCopiedCode(true);
+      toast.success('Invite code copied!');
+      setTimeout(() => setCopiedCode(false), 2000);
+    } catch (err) {
+      console.error('Failed to copy code: ', err);
+    }
+  };
   
   const [activeTab, setActiveTab] = useState(() => {
     return location.state?.activeTab || 'overview';
@@ -315,6 +183,18 @@ const ProjectWorkspace = () => {
             <span className="status-pulse bg-emerald-500"></span>
             WORKSPACE
           </span>
+          {inviteCode && (
+            <span className="status-badge badge-active ml-2 text-[10px] flex items-center gap-1.5 font-mono">
+              INVITE CODE: <span className="code-val font-black text-[#00f0ff]">{inviteCode}</span>
+              <button
+                onClick={() => copyInviteCode(inviteCode)}
+                className="p-0.5 hover:bg-neutral-200/50 dark:hover:bg-neutral-800 rounded bg-transparent border-0 cursor-pointer text-neutral-400 hover:text-neutral-750 dark:hover:text-neutral-200 flex items-center justify-center transition-colors"
+                title="Copy Invite Code"
+              >
+                {copiedCode ? <Check size={10} className="text-emerald-500" /> : <Copy size={10} />}
+              </button>
+            </span>
+          )}
         </div>
 
         {/* Project Selector dropdown */}
@@ -387,7 +267,6 @@ const ProjectWorkspace = () => {
               <Users size={16} />
               <span>Live Team Chat</span>
             </button>
-            {renderSidebarItem('judge', 'Judge Simulator', Award)}
             {renderSidebarItem('settings', 'Workspace Settings', Wrench)}
           </div>
 
@@ -449,9 +328,6 @@ const ProjectWorkspace = () => {
             <ProjectHub teamId={project.teamId} initialView="mentor-chat" />
           )}
 
-          {activeTab === 'judge' && project && (
-            <JudgeSimulator project={project} commandCenterData={commandCenterData} />
-          )}
 
           {activeTab === 'settings' && project && (
             <ProjectHub teamId={project.teamId} initialView="edit" />

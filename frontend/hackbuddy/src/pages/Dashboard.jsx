@@ -401,16 +401,6 @@ const Dashboard = () => {
               <span>Personal Console</span>
             </button>
 
-            <button
-              onClick={() => {
-                if (currentProjectId) navigate(`/workspace/${currentProjectId}`);
-                else toast.error('Create a project to open the workspace.');
-              }}
-              className="menu-item w-full bg-transparent border-0 cursor-pointer text-left flex items-center gap-3 py-2.5"
-            >
-              <Wrench size={16} />
-              <span>Project Workspaces</span>
-            </button>
 
             <button
               onClick={() => navigate('/chat')}
@@ -672,10 +662,6 @@ const Dashboard = () => {
                               {proj.status}
                             </span>
                             
-                            <span className="text-[8px] font-bold px-1.5 py-0.5 rounded-md border border-[#00f0ff]/20 bg-[#00f0ff]/10 text-[#00f0ff] font-mono">
-                              Win: {winningProb}%
-                            </span>
-
                             <span className="text-[8px] font-bold px-1.5 py-0.5 rounded-md border border-purple-500/20 bg-purple-500/10 text-purple-400 font-mono">
                               Health: {Math.round(feasibility * 10)}%
                             </span>
@@ -707,59 +693,6 @@ const Dashboard = () => {
                     })}
                   </div>
                 )}
-              </div>
-
-              {/* Quick Actions Grid */}
-              <div className="flex flex-col gap-3 text-left">
-                <span className="text-[10px] font-black uppercase tracking-widest text-[#00f0ff] flex items-center gap-2">
-                  <Wrench size={14} className="text-[#00f0ff]" />
-                  <span>AI Operational Control & Quick Actions</span>
-                </span>
-                
-                 <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-5 lg:grid-cols-9 gap-3 w-full">
-                  {[
-                    { label: 'Create Team', sub: 'New Squad', icon: Users, act: () => navigate('/team/create'), color: 'text-indigo-400' },
-                    { label: 'Join Team', sub: 'Link Invite', icon: UserCheck, act: () => navigate('/team/join'), color: 'text-[#00f0ff]' },
-                    { label: 'Create Project', sub: 'Init Backlog', icon: Plus, act: () => {
-                      if (teams.length > 0) navigate(`/team/${teams[0]._id}`);
-                      else navigate('/team/create');
-                    }, color: 'text-emerald-400' },
-                    { label: 'AI Review', sub: 'Risk Analysis', icon: ShieldCheck, act: () => {
-                      if (currentProjectId) navigate(`/workspace/${currentProjectId}`, { state: { activeTab: 'review' } });
-                      else toast.error('Setup project first.');
-                    }, color: 'text-brand-400' },
-                    { label: 'Open Shop', sub: 'Marketplace', icon: Database, act: () => {
-                      if (currentProjectId) navigate(`/workspace/${currentProjectId}`, { state: { activeTab: 'marketplace' } });
-                      else toast.error('Setup project first.');
-                    }, color: 'text-[#00f0ff]' },
-                    { label: 'AI Mentor', sub: 'Advisor chat', icon: MessageSquare, act: () => {
-                      if (currentProjectId) navigate(`/workspace/${currentProjectId}`, { state: { activeTab: 'chat' } });
-                      else toast.error('Setup project first.');
-                    }, color: 'text-violet-400' },
-                    { label: 'Team Chat', sub: 'Live Chat', icon: MessageSquare, act: () => navigate('/chat'), color: 'text-sky-400' },
-                    { label: 'Task Splitter', sub: 'Sync roadmap', icon: Cpu, act: () => {
-                      if (currentProjectId) navigate(`/workspace/${currentProjectId}`, { state: { activeTab: 'splitter' } });
-                      else toast.error('Setup project first.');
-                    }, color: 'text-purple-400' },
-                    { label: 'GitHub Sync', sub: 'Git status', icon: GitBranch, act: () => {
-                      if (currentProjectId) navigate(`/workspace/${currentProjectId}`, { state: { activeTab: 'github' } });
-                      else toast.error('Setup project first.');
-                    }, color: 'text-white' }
-                  ].map(a => {
-                    const ActIcon = a.icon;
-                    return (
-                      <div
-                        key={a.label}
-                        onClick={a.act}
-                        className="dashboard-card glow-blue items-center justify-center text-center p-3 border border-brand-200/20 hover:border-[#00f0ff] rounded-xl cursor-pointer hover:-translate-y-1 transition-all bg-neutral-950/40"
-                      >
-                        <ActIcon size={20} className={`${a.color} mb-1.5`} />
-                        <span className="font-extrabold text-[9px] font-mono leading-tight text-white block">{a.label}</span>
-                        <span className="text-[7px] text-neutral-500 font-mono uppercase block mt-0.5">{a.sub}</span>
-                      </div>
-                    );
-                  })}
-                </div>
               </div>
 
               {/* Recent Activity Log */}
