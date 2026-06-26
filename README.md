@@ -104,14 +104,13 @@ Instead of switching between multiple tools, teams manage their entire workflow 
 
 ```text
 hackbuddy/
-├── client/
-│   ├── public/
+├── frontend/
 │   └── src/
 │       ├── components/
 │       ├── pages/
 │       └── utils/
 │
-├── server/
+├── backend/
 │   ├── controllers/
 │   ├── middleware/
 │   ├── models/
