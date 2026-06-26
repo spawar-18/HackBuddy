@@ -100,24 +100,25 @@ Instead of switching between multiple tools, teams manage their entire workflow 
 
 ---
 
-# 📁 Project Structure
+## 📁 Project Structure
 
+```text
 hackbuddy/
+├── client/
+│   ├── public/
+│   └── src/
+│       ├── components/
+│       ├── pages/
+│       └── utils/
 │
-├── frontend/
-│   ├── src/
-│   │   ├── components/
-│   │   ├── pages/
-│   │   └── utils/
-│   └── public/
-│
-├── backend/server
+├── server/
 │   ├── controllers/
+│   ├── middleware/
 │   ├── models/
-│   ├── routes/
-│   └── middleware/
+│   └── routes/
 │
 └── README.md
+```
 
 
 # 👥 Team
