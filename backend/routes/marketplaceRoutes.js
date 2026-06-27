@@ -5,6 +5,7 @@ const {
   requestReassignment,
   requestSwap,
   requestCollaborator,
+  requestHelp,
   claimTask,
   getMarketplace,
   approveRequest,
@@ -15,6 +16,7 @@ const {
 router.post('/tasks/request-reassignment', authMiddleware, requestReassignment);
 router.post('/tasks/request-swap', authMiddleware, requestSwap);
 router.post('/tasks/request-collaborator', authMiddleware, requestCollaborator);
+router.post('/tasks/request-help', authMiddleware, requestHelp);
 router.post('/tasks/claim-task', authMiddleware, claimTask);
 
 // Marketplace query routes

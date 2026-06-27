@@ -7,6 +7,39 @@ const conversationMemorySchema = new mongoose.Schema({
     required: true,
     unique: true
   },
+  userId: {
+    type: mongoose.Schema.Types.ObjectId,
+    ref: 'User',
+    default: null
+  },
+  conversationId: {
+    type: String,
+    default: ''
+  },
+  messages: {
+    type: [mongoose.Schema.Types.Mixed],
+    default: []
+  },
+  currentImplementation: {
+    type: String,
+    default: ''
+  },
+  currentDebuggingSession: {
+    type: String,
+    default: ''
+  },
+  currentFeature: {
+    type: String,
+    default: ''
+  },
+  currentApis: {
+    type: [String],
+    default: []
+  },
+  currentDeploymentIssue: {
+    type: String,
+    default: ''
+  },
   architectureDecisions: {
     type: [String],
     default: []
@@ -22,6 +55,30 @@ const conversationMemorySchema = new mongoose.Schema({
   previousAiAdvice: {
     type: [String],
     default: []
+  },
+  currentBlockers: {
+    type: [String],
+    default: []
+  },
+  completedTasks: {
+    type: [String],
+    default: []
+  },
+  recentRecommendations: {
+    type: [String],
+    default: []
+  },
+  currentSprint: {
+    type: String,
+    default: ''
+  },
+  hackathonStage: {
+    type: String,
+    default: ''
+  },
+  githubStatus: {
+    type: String,
+    default: ''
   },
   importantDiscussions: {
     type: [String],
@@ -46,10 +103,24 @@ const createMockMemoryInstance = (data) => {
   return {
     _id: data._id || 'mock_mem_' + Math.random().toString(36).substring(2, 11),
     projectId: data.projectId,
+    userId: data.userId || null,
+    conversationId: data.conversationId || '',
+    messages: data.messages || [],
+    currentImplementation: data.currentImplementation || '',
+    currentDebuggingSession: data.currentDebuggingSession || '',
+    currentFeature: data.currentFeature || '',
+    currentApis: data.currentApis || [],
+    currentDeploymentIssue: data.currentDeploymentIssue || '',
     architectureDecisions: data.architectureDecisions || [],
     techStackDecisions: data.techStackDecisions || [],
     projectMilestones: data.projectMilestones || [],
     previousAiAdvice: data.previousAiAdvice || [],
+    currentBlockers: data.currentBlockers || [],
+    completedTasks: data.completedTasks || [],
+    recentRecommendations: data.recentRecommendations || [],
+    currentSprint: data.currentSprint || '',
+    hackathonStage: data.hackathonStage || '',
+    githubStatus: data.githubStatus || '',
     importantDiscussions: data.importantDiscussions || [],
     summary: data.summary || '',
     lastUpdated: data.lastUpdated || new Date(),
@@ -58,10 +129,24 @@ const createMockMemoryInstance = (data) => {
       const serialized = {
         _id: this._id,
         projectId: this.projectId,
+        userId: this.userId,
+        conversationId: this.conversationId,
+        messages: this.messages,
+        currentImplementation: this.currentImplementation,
+        currentDebuggingSession: this.currentDebuggingSession,
+        currentFeature: this.currentFeature,
+        currentApis: this.currentApis,
+        currentDeploymentIssue: this.currentDeploymentIssue,
         architectureDecisions: this.architectureDecisions,
         techStackDecisions: this.techStackDecisions,
         projectMilestones: this.projectMilestones,
         previousAiAdvice: this.previousAiAdvice,
+        currentBlockers: this.currentBlockers,
+        completedTasks: this.completedTasks,
+        recentRecommendations: this.recentRecommendations,
+        currentSprint: this.currentSprint,
+        hackathonStage: this.hackathonStage,
+        githubStatus: this.githubStatus,
         importantDiscussions: this.importantDiscussions,
         summary: this.summary,
         lastUpdated: new Date()

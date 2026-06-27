@@ -3,7 +3,9 @@ const Team = require('../models/Team');
 const User = require('../models/User');
 const TaskMarketplaceRequest = require('../models/TaskMarketplaceRequest');
 const ProjectChat = require('../models/ProjectChat');
+const Notification = require('../models/Notification');
 const { getMarketplaceRecommendation } = require('../services/aiService');
+const { recalculateTaskPlanMetrics } = require('../services/taskExecutionService');
 
 // Helper to compare Mongo User IDs
 const isSameUser = (id1, id2) => {
@@ -12,19 +14,74 @@ const isSameUser = (id1, id2) => {
   return s1 === s2;
 };
 
-// Helper to recalculate workload distribution based on task counts
-const recalculateWorkloads = (assignments) => {
-  const allTasks = assignments.flatMap(a => a.assignedTasks || []);
-  const totalCount = allTasks.length;
-  if (totalCount === 0) {
-    return assignments.map(a => ({ member: a.member, percentage: 0 }));
+const findMemberByName = (team, name) => {
+  if (!name) return null;
+  return (team.members || []).find(member => member.name && member.name.toLowerCase() === String(name).toLowerCase());
+};
+
+const findTaskInPlan = (taskPlan, taskId, ownerName = null) => {
+  let found = null;
+  (taskPlan?.assignments || []).forEach(assignment => {
+    if (found) return;
+    if (ownerName && assignment.member !== ownerName) return;
+    const index = (assignment.assignedTasks || []).findIndex(task => task.id === taskId || task.task === taskId || task.taskName === taskId);
+    if (index !== -1) {
+      found = { assignment, task: assignment.assignedTasks[index], index };
+    }
+  });
+  return found;
+};
+
+const appendTaskAudit = (task, action, actor, details = {}) => {
+  task.auditTrail = task.auditTrail || [];
+  task.auditTrail.push({
+    action,
+    actor,
+    at: new Date().toISOString(),
+    ...details
+  });
+};
+
+const appendMarketplaceActivity = (project, activity) => {
+  project.taskPlan.marketplace = project.taskPlan.marketplace || {};
+  project.taskPlan.marketplace.activityLog = project.taskPlan.marketplace.activityLog || [];
+  project.taskPlan.marketplace.history = project.taskPlan.marketplace.history || [];
+  const entry = { at: new Date().toISOString(), ...activity };
+  project.taskPlan.marketplace.activityLog.push(entry);
+  project.taskPlan.marketplace.history.push(entry);
+};
+
+const invalidateCommandCenter = (project) => {
+  project.commandCenterReport = null;
+  project.commandCenterReportGeneratedAt = null;
+};
+
+const createTargetedNotification = async ({ projectId, team, targetUser, message, actorId }) => {
+  const targetMember = findMemberByName(team, targetUser);
+  await Notification.create({
+    projectId,
+    userId: targetMember?._id || null,
+    message,
+    type: 'Marketplace'
+  });
+
+  if (!targetMember && actorId) {
+    await Notification.create({
+      projectId,
+      userId: actorId,
+      message: `Marketplace notification could not find selected member "${targetUser}".`,
+      type: 'Marketplace'
+    });
   }
-  return assignments.map(a => {
-    const count = (a.assignedTasks || []).length;
-    return {
-      member: a.member,
-      percentage: Math.round((count / totalCount) * 100)
-    };
+};
+
+const createRequesterNotification = async ({ projectId, team, requesterName, message }) => {
+  const requester = findMemberByName(team, requesterName);
+  await Notification.create({
+    projectId,
+    userId: requester?._id || null,
+    message,
+    type: 'Marketplace'
   });
 };
 
@@ -58,15 +115,12 @@ exports.requestReassignment = async (req, res) => {
     const requestedBy = requestingUser.name;
 
     // Verify task ownership
-    const assignment = project.taskPlan.assignments.find(a => a.member === requestedBy);
-    if (!assignment) {
+    const found = findTaskInPlan(project.taskPlan, taskId, requestedBy);
+    if (!found) {
       return res.status(400).json({ success: false, message: `No tasks assigned to you (${requestedBy})` });
     }
 
-    const taskEntry = assignment.assignedTasks.find(t => t.task === taskId);
-    if (!taskEntry) {
-      return res.status(404).json({ success: false, message: `Task not found in your assignments: ${taskId}` });
-    }
+    const taskEntry = found.task;
 
     if (taskEntry.marketplaceStatus && taskEntry.marketplaceStatus !== 'Locked') {
       return res.status(400).json({ success: false, message: 'Task is already in a marketplace workflow' });
@@ -102,6 +156,13 @@ exports.requestReassignment = async (req, res) => {
       status: 'Pending',
       aiRecommendation
     });
+    request.activityLog.push({
+      action: 'Created',
+      actor: requestedBy,
+      at: new Date().toISOString(),
+      details: 'Requested task release to marketplace'
+    });
+    await request.save();
 
     // Chat Notification
     try {
@@ -117,8 +178,25 @@ exports.requestReassignment = async (req, res) => {
 
     // Update task plan
     taskEntry.marketplaceStatus = 'ReassignmentRequested';
+    appendTaskAudit(taskEntry, 'ReassignmentRequested', requestedBy, { reason });
+    appendMarketplaceActivity(project, {
+      action: 'ReassignmentRequested',
+      taskId,
+      requestedBy,
+      reason
+    });
+    invalidateCommandCenter(project);
     project.markModified('taskPlan');
+    project.markModified('commandCenterReport');
     await project.save();
+
+    await createTargetedNotification({
+      projectId,
+      team,
+      targetUser: team.members.find(member => isSameUser(member._id, team.createdBy))?.name,
+      actorId: req.user.id,
+      message: `${requestedBy} requested release of "${taskId}". Review the marketplace workflow.`
+    });
 
     res.status(201).json({ success: true, message: 'Reassignment request created', request });
   } catch (error) {
@@ -157,24 +235,22 @@ exports.requestSwap = async (req, res) => {
     const requestedBy = requestingUser.name;
 
     // Verify own task
-    const myAssignment = project.taskPlan.assignments.find(a => a.member === requestedBy);
-    if (!myAssignment) {
-      return res.status(400).json({ success: false, message: 'No assignments found for you' });
-    }
-    const myTaskEntry = myAssignment.assignedTasks.find(t => t.task === taskId);
-    if (!myTaskEntry) {
+    const myFound = findTaskInPlan(project.taskPlan, taskId, requestedBy);
+    if (!myFound) {
       return res.status(404).json({ success: false, message: 'Task not found in your assignments' });
     }
+    const myTaskEntry = myFound.task;
 
     // Verify target task
     const targetAssignment = project.taskPlan.assignments.find(a => a.member === targetUser);
     if (!targetAssignment) {
       return res.status(400).json({ success: false, message: `No assignments found for target: ${targetUser}` });
     }
-    const targetTaskEntry = targetAssignment.assignedTasks.find(t => t.task === targetTaskId);
-    if (!targetTaskEntry) {
+    const targetFound = findTaskInPlan(project.taskPlan, targetTaskId, targetUser);
+    if (!targetFound) {
       return res.status(404).json({ success: false, message: `Task not found in target's assignments: ${targetTaskId}` });
     }
+    const targetTaskEntry = targetFound.task;
 
     if (myTaskEntry.marketplaceStatus !== 'Locked' || targetTaskEntry.marketplaceStatus !== 'Locked') {
       return res.status(400).json({ success: false, message: 'One or both tasks are already pending request' });
@@ -212,6 +288,13 @@ exports.requestSwap = async (req, res) => {
       status: 'Pending',
       aiRecommendation
     });
+    request.activityLog.push({
+      action: 'Created',
+      actor: requestedBy,
+      at: new Date().toISOString(),
+      details: `Requested swap with ${targetUser}`
+    });
+    await request.save();
 
     // Chat Notification
     try {
@@ -227,8 +310,27 @@ exports.requestSwap = async (req, res) => {
 
     myTaskEntry.marketplaceStatus = 'SwapRequested';
     targetTaskEntry.marketplaceStatus = 'SwapRequested';
+    appendTaskAudit(myTaskEntry, 'SwapRequested', requestedBy, { targetUser, targetTaskId, reason });
+    appendTaskAudit(targetTaskEntry, 'SwapRequested', requestedBy, { targetUser, sourceTaskId: taskId, reason });
+    appendMarketplaceActivity(project, {
+      action: 'SwapRequested',
+      taskId,
+      targetTaskId,
+      requestedBy,
+      targetUser
+    });
+    invalidateCommandCenter(project);
     project.markModified('taskPlan');
+    project.markModified('commandCenterReport');
     await project.save();
+
+    await createTargetedNotification({
+      projectId,
+      team,
+      targetUser,
+      actorId: req.user.id,
+      message: `${requestedBy} requested a task swap: "${taskId}" for "${targetTaskId}".`
+    });
 
     res.status(201).json({ success: true, message: 'Swap request created', request });
   } catch (error) {
@@ -300,13 +402,20 @@ exports.requestCollaborator = async (req, res) => {
     const request = await TaskMarketplaceRequest.create({
       projectId,
       taskId,
-      requestType: 'COLLABORATOR',
+      requestType: 'COLLABORATION',
       requestedBy,
       targetUser,
       reason,
       status: 'Pending',
       aiRecommendation
     });
+    request.activityLog.push({
+      action: 'Created',
+      actor: requestedBy,
+      at: new Date().toISOString(),
+      details: `Requested collaboration from ${targetUser}`
+    });
+    await request.save();
 
     // Chat Notification
     try {
@@ -320,9 +429,27 @@ exports.requestCollaborator = async (req, res) => {
       console.error('Failed to save project chat notification:', chatErr);
     }
 
-    taskEntry.marketplaceStatus = 'ClaimRequested'; // reuse status for pending claim/collaborator
+    taskEntry.marketplaceStatus = 'CollaborationRequested';
+    appendTaskAudit(taskEntry, 'CollaborationRequested', requestedBy, { targetUser, reason });
+    appendMarketplaceActivity(project, {
+      action: 'CollaborationRequested',
+      taskId,
+      requestedBy,
+      targetUser,
+      reason
+    });
+    invalidateCommandCenter(project);
     project.markModified('taskPlan');
+    project.markModified('commandCenterReport');
     await project.save();
+
+    await createTargetedNotification({
+      projectId,
+      team,
+      targetUser,
+      actorId: req.user.id,
+      message: `${requestedBy} requested collaboration on "${taskId}".`
+    });
 
     res.status(201).json({ success: true, message: 'Collaborator request created', request });
   } catch (error) {
@@ -402,6 +529,13 @@ exports.claimTask = async (req, res) => {
       status: 'Pending',
       aiRecommendation
     });
+    request.activityLog.push({
+      action: 'Created',
+      actor: requestedBy,
+      at: new Date().toISOString(),
+      details: 'Requested ownership of available task'
+    });
+    await request.save();
 
     // Chat Notification
     try {
@@ -416,12 +550,140 @@ exports.claimTask = async (req, res) => {
     }
 
     foundTask.marketplaceStatus = 'ClaimRequested';
+    appendTaskAudit(foundTask, 'ClaimRequested', requestedBy, { reason });
+    appendMarketplaceActivity(project, {
+      action: 'ClaimRequested',
+      taskId,
+      requestedBy,
+      reason
+    });
+    invalidateCommandCenter(project);
     project.markModified('taskPlan');
+    project.markModified('commandCenterReport');
     await project.save();
+
+    await createTargetedNotification({
+      projectId,
+      team,
+      targetUser: team.members.find(member => isSameUser(member._id, team.createdBy))?.name,
+      actorId: req.user.id,
+      message: `${requestedBy} requested to claim "${taskId}".`
+    });
 
     res.status(201).json({ success: true, message: 'Claim request created successfully', request });
   } catch (error) {
     console.error(error);
+    res.status(500).json({ success: false, message: error.message || 'Server error' });
+  }
+};
+
+// @desc    Request implementation help from a selected teammate
+// @route   POST /api/tasks/request-help
+// @access  Private
+exports.requestHelp = async (req, res) => {
+  try {
+    const { projectId, taskId, targetUser, reason, currentBlockers = [], estimatedEffort = 0 } = req.body;
+
+    if (!projectId || !taskId || !targetUser || !reason) {
+      return res.status(400).json({ success: false, message: 'projectId, taskId, targetUser, and reason are required' });
+    }
+
+    const project = await Project.findOne({ _id: projectId });
+    if (!project) return res.status(404).json({ success: false, message: 'Project not found' });
+
+    const team = await Team.findById(project.teamId).populate('members', 'name skills');
+    if (!team) return res.status(404).json({ success: false, message: 'Team not found' });
+
+    const requestingUser = await User.findById(req.user.id);
+    const requestedBy = requestingUser.name;
+    const isMember = team.members.some(member => isSameUser(member, req.user.id));
+    if (!isMember) return res.status(403).json({ success: false, message: 'Access denied' });
+
+    const taskFound = findTaskInPlan(project.taskPlan, taskId, requestedBy);
+    if (!taskFound) {
+      return res.status(404).json({ success: false, message: 'Task not found in your assignments' });
+    }
+
+    const targetMember = findMemberByName(team, targetUser);
+    if (!targetMember) {
+      return res.status(404).json({ success: false, message: `Target member (${targetUser}) not found` });
+    }
+
+    const taskEntry = taskFound.task;
+    const teamSkills = {};
+    team.members.forEach(m => { teamSkills[m.name] = m.skills || []; });
+    const currentWorkload = {};
+    project.taskPlan.workloadDistribution?.forEach(w => { currentWorkload[w.member] = w.percentage; });
+
+    let aiRecommendation = { recommendation: 'Approve', confidenceScore: 82, reason: 'Help request is reasonable for unblocking delivery.' };
+    try {
+      aiRecommendation = await getMarketplaceRecommendation({
+        task: taskId,
+        requestType: 'HELP',
+        requestedBy,
+        targetUser,
+        reason,
+        currentBlockers,
+        estimatedEffort,
+        teamSkills,
+        currentWorkload
+      });
+    } catch (err) {
+      console.error('AI help recommendation failed:', err.message);
+    }
+
+    const request = await TaskMarketplaceRequest.create({
+      projectId,
+      taskId,
+      requestType: 'HELP',
+      requestedBy,
+      targetUser,
+      reason,
+      currentBlockers,
+      estimatedEffort: Number(estimatedEffort || taskEntry.estimatedHours || 0),
+      status: 'Pending',
+      aiRecommendation,
+      activityLog: [{
+        action: 'Created',
+        actor: requestedBy,
+        at: new Date().toISOString(),
+        details: `Requested help from ${targetUser}`
+      }]
+    });
+
+    taskEntry.marketplaceStatus = 'HelpRequested';
+    appendTaskAudit(taskEntry, 'HelpRequested', requestedBy, { targetUser, reason, currentBlockers });
+    appendMarketplaceActivity(project, {
+      action: 'HelpRequested',
+      taskId,
+      requestedBy,
+      targetUser,
+      reason
+    });
+    invalidateCommandCenter(project);
+    project.markModified('taskPlan');
+    project.markModified('commandCenterReport');
+    await project.save();
+
+    await createTargetedNotification({
+      projectId,
+      team,
+      targetUser,
+      actorId: req.user.id,
+      message: `${requestedBy} requested help on "${taskId}". Blockers: ${(currentBlockers || []).join(', ') || reason}`
+    });
+
+    await createTargetedNotification({
+      projectId,
+      team,
+      targetUser: team.members.find(member => isSameUser(member._id, team.createdBy))?.name,
+      actorId: req.user.id,
+      message: `${requestedBy} opened a help request for "${taskId}" with ${targetUser}.`
+    });
+
+    return res.status(201).json({ success: true, message: 'Help request created', request });
+  } catch (error) {
+    console.error('requestHelp error:', error);
     res.status(500).json({ success: false, message: error.message || 'Server error' });
   }
 };
@@ -438,7 +700,7 @@ exports.getMarketplace = async (req, res) => {
       return res.status(404).json({ success: false, message: 'Project not found' });
     }
 
-    const team = await Team.findById(project.teamId);
+    const team = await Team.findById(project.teamId).populate('members', 'name skills');
     if (!team) {
       return res.status(404).json({ success: false, message: 'Team not found' });
     }
@@ -450,6 +712,8 @@ exports.getMarketplace = async (req, res) => {
 
     // Get all requests for project
     const requests = await TaskMarketplaceRequest.find({ projectId });
+    const currentUser = await User.findById(req.user.id);
+    const currentUserName = currentUser?.name || '';
 
     // Collect available tasks
     const availableTasks = [];
@@ -469,9 +733,31 @@ exports.getMarketplace = async (req, res) => {
     res.status(200).json({
       success: true,
       requests,
+      incomingRequests: requests.filter(req =>
+        req.status === 'Pending' &&
+        req.targetUser &&
+        currentUserName &&
+        req.targetUser.toLowerCase() === currentUserName.toLowerCase()
+      ),
+      outgoingRequests: requests.filter(req =>
+        currentUserName &&
+        req.requestedBy &&
+        req.requestedBy.toLowerCase() === currentUserName.toLowerCase()
+      ),
+      history: requests.filter(req => req.status !== 'Pending'),
       availableTasks,
       assignments: project.taskPlan?.assignments || [],
       workloadDistribution: project.taskPlan?.workloadDistribution || [],
+      dependencyGraph: project.taskPlan?.dependencyGraph || { nodes: [], edges: [] },
+      epics: project.taskPlan?.epics || [],
+      marketplace: project.taskPlan?.marketplace || {},
+      filters: {
+        features: project.featuresToBuild || [],
+        priorities: ['High', 'Medium', 'Low'],
+        statuses: ['Not Started', 'In Progress', 'Blocked', 'Completed'],
+        skills: Array.from(new Set((team.members || []).flatMap(member => member.skills || []))),
+        owners: (team.members || []).map(member => member.name)
+      },
       isOwner: isSameUser(team.createdBy, req.user.id)
     });
   } catch (error) {
@@ -503,8 +789,9 @@ exports.approveRequest = async (req, res) => {
     }
 
     const { requestType, targetUser } = request;
+    const targetDecisionTypes = ['SWAP', 'COLLABORATOR', 'COLLABORATION', 'HELP'];
 
-    if (requestType === 'SWAP' || requestType === 'COLLABORATOR') {
+    if (targetDecisionTypes.includes(requestType)) {
       const targetMember = team.members.find(member => member.name && member.name.toLowerCase() === targetUser.toLowerCase());
       if (!targetMember) {
         return res.status(404).json({ success: false, message: `Target member (${targetUser}) not found in the team` });
@@ -521,6 +808,14 @@ exports.approveRequest = async (req, res) => {
     }
 
     request.status = 'Approved';
+    request.decisionBy = req.user.id;
+    request.approvedAt = new Date();
+    request.activityLog = request.activityLog || [];
+    request.activityLog.push({
+      action: 'Approved',
+      actor: team.members.find(member => isSameUser(member._id, req.user.id))?.name || 'Unknown',
+      at: new Date().toISOString()
+    });
     await request.save();
 
     const { taskId, requestedBy, targetTaskId } = request;
@@ -583,9 +878,11 @@ exports.approveRequest = async (req, res) => {
           // Swap references
           reqAssign.assignedTasks[reqTaskIdx] = tarTask;
           tarAssign.assignedTasks[tarTaskIdx] = reqTask;
+          appendTaskAudit(reqTask, 'OwnershipTransferred', targetUser, { from: requestedBy, to: targetUser });
+          appendTaskAudit(tarTask, 'OwnershipTransferred', requestedBy, { from: targetUser, to: requestedBy });
         }
       }
-    } else if (requestType === 'COLLABORATOR') {
+    } else if (requestType === 'COLLABORATOR' || requestType === 'COLLABORATION' || requestType === 'HELP') {
       // Add collaborator to requestedBy's task
       const assignment = project.taskPlan.assignments.find(a => a.member === requestedBy);
       if (assignment) {
@@ -598,14 +895,42 @@ exports.approveRequest = async (req, res) => {
           if (!taskEntry.collaborators.includes(targetUser)) {
             taskEntry.collaborators.push(targetUser);
           }
+          taskEntry.sharedProgress = taskEntry.sharedProgress || [];
+          taskEntry.sharedProgress.push({
+            primaryOwner: requestedBy,
+            collaborator: targetUser,
+            contributionPercent: requestType === 'HELP' ? 20 : 40,
+            status: 'Active',
+            startedAt: new Date().toISOString()
+          });
+          appendTaskAudit(taskEntry, requestType === 'HELP' ? 'HelpAccepted' : 'CollaborationStarted', targetUser, {
+            requestedBy,
+            estimatedEffort: request.estimatedEffort || taskEntry.estimatedHours || 0
+          });
         }
       }
     }
 
     // Recalculate workload distributions
-    project.taskPlan.workloadDistribution = recalculateWorkloads(project.taskPlan.assignments);
+    project.taskPlan = recalculateTaskPlanMetrics(project.taskPlan);
+    appendMarketplaceActivity(project, {
+      action: 'RequestApproved',
+      requestId: request._id,
+      requestType,
+      taskId,
+      requestedBy,
+      targetUser
+    });
+    invalidateCommandCenter(project);
     project.markModified('taskPlan');
+    project.markModified('commandCenterReport');
     await project.save();
+    request.impact = {
+      ...(request.impact || {}),
+      workloadDelta: project.taskPlan.workloadDistribution || [],
+      commandCenterInvalidated: true
+    };
+    await request.save();
 
     // Chat Notification
     try {
@@ -630,6 +955,13 @@ exports.approveRequest = async (req, res) => {
     } catch (chatErr) {
       console.error('Failed to save approval chat notification:', chatErr);
     }
+
+    await createRequesterNotification({
+      projectId: request.projectId,
+      team,
+      requesterName: requestedBy,
+      message: `${requestType} request for "${taskId}" was approved.`
+    });
 
     res.status(200).json({ success: true, message: 'Request approved and assignments updated', request });
   } catch (error) {
@@ -661,8 +993,9 @@ exports.rejectRequest = async (req, res) => {
     }
 
     const { requestType, targetUser } = request;
+    const targetDecisionTypes = ['SWAP', 'COLLABORATOR', 'COLLABORATION', 'HELP'];
 
-    if (requestType === 'SWAP' || requestType === 'COLLABORATOR') {
+    if (targetDecisionTypes.includes(requestType)) {
       const targetMember = team.members.find(member => member.name && member.name.toLowerCase() === targetUser.toLowerCase());
       if (!targetMember) {
         return res.status(404).json({ success: false, message: `Target member (${targetUser}) not found in the team` });
@@ -679,16 +1012,25 @@ exports.rejectRequest = async (req, res) => {
     }
 
     request.status = 'Rejected';
+    request.decisionBy = req.user.id;
+    request.rejectedAt = new Date();
+    request.activityLog = request.activityLog || [];
+    request.activityLog.push({
+      action: 'Rejected',
+      actor: team.members.find(member => isSameUser(member._id, req.user.id))?.name || 'Unknown',
+      at: new Date().toISOString()
+    });
     await request.save();
 
     // Revert marketplace statuses
     const { taskId, requestedBy, targetTaskId } = request;
 
-    if (requestType === 'REASSIGNMENT' || requestType === 'CLAIM' || requestType === 'COLLABORATOR') {
+    if (requestType === 'REASSIGNMENT' || requestType === 'CLAIM' || requestType === 'COLLABORATOR' || requestType === 'COLLABORATION' || requestType === 'HELP') {
       project.taskPlan.assignments.forEach(assign => {
         const entry = assign.assignedTasks.find(t => t.task === taskId);
         if (entry) {
           entry.marketplaceStatus = requestType === 'CLAIM' ? 'Available' : 'Locked';
+          appendTaskAudit(entry, 'MarketplaceRequestRejected', targetUser || 'Owner', { requestType, requestedBy });
         }
       });
     } else if (requestType === 'SWAP') {
@@ -705,7 +1047,18 @@ exports.rejectRequest = async (req, res) => {
       }
     }
 
+    project.taskPlan = recalculateTaskPlanMetrics(project.taskPlan);
+    appendMarketplaceActivity(project, {
+      action: 'RequestRejected',
+      requestId: request._id,
+      requestType,
+      taskId,
+      requestedBy,
+      targetUser
+    });
+    invalidateCommandCenter(project);
     project.markModified('taskPlan');
+    project.markModified('commandCenterReport');
     await project.save();
 
     // Chat Notification
@@ -725,6 +1078,13 @@ exports.rejectRequest = async (req, res) => {
     } catch (chatErr) {
       console.error('Failed to save rejection chat notification:', chatErr);
     }
+
+    await createRequesterNotification({
+      projectId: request.projectId,
+      team,
+      requesterName: requestedBy,
+      message: `${requestType} request for "${taskId}" was rejected.`
+    });
 
     res.status(200).json({ success: true, message: 'Request rejected', request });
   } catch (error) {

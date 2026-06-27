@@ -92,10 +92,10 @@ export const AuthProvider = ({ children }) => {
   };
 
   // GitHub OAuth Login
-  const githubLoginUser = async (code) => {
+  const githubLoginUser = async (code, redirectUri) => {
     setLoading(true);
     try {
-      const response = await api.post('/auth/github', { code });
+      const response = await api.post('/auth/github', { code, redirectUri });
       const { token, user: userData } = response.data;
       localStorage.setItem('token', token);
       setUser(userData);

@@ -10,6 +10,7 @@ import {
   requestReassignment,
   requestSwap,
   requestCollaborator,
+  requestHelp,
   claimTask,
   getMarketplace,
   approveMarketplaceRequest,
@@ -22,9 +23,14 @@ const TaskMarketplace = ({ projectId, teamId, onRefreshProject }) => {
   const [activeTab, setActiveTab] = useState('my-tasks'); // 'my-tasks', 'marketplace', 'pending-requests'
   const [marketplaceData, setMarketplaceData] = useState({
     requests: [],
+    incomingRequests: [],
+    outgoingRequests: [],
+    history: [],
     availableTasks: [],
     assignments: [],
     workloadDistribution: [],
+    epics: [],
+    filters: {},
     isOwner: false
   });
   const [team, setTeam] = useState(null);
@@ -35,13 +41,16 @@ const TaskMarketplace = ({ projectId, teamId, onRefreshProject }) => {
   const [actionStatus, setActionStatus] = useState('');
 
   // Modals state
-  const [activeModal, setActiveModal] = useState(null); // 'reassign', 'swap', 'collab', 'claim'
+  const [activeModal, setActiveModal] = useState(null); // 'reassign', 'swap', 'collab', 'help', 'claim'
   const [selectedTask, setSelectedTask] = useState(null);
   
   // Form values
   const [reason, setReason] = useState('');
   const [targetMember, setTargetMember] = useState('');
   const [targetTask, setTargetTask] = useState('');
+  const [blockers, setBlockers] = useState('');
+  const [filterFeature, setFilterFeature] = useState('All');
+  const [filterStatus, setFilterStatus] = useState('All');
 
   // Fetch all marketplace data and team details
   const fetchMarketplaceData = async (showLoading = true) => {
@@ -55,9 +64,14 @@ const TaskMarketplace = ({ projectId, teamId, onRefreshProject }) => {
       if (resMarket.success) {
         setMarketplaceData({
           requests: resMarket.requests || [],
+          incomingRequests: resMarket.incomingRequests || [],
+          outgoingRequests: resMarket.outgoingRequests || [],
+          history: resMarket.history || [],
           availableTasks: resMarket.availableTasks || [],
           assignments: resMarket.assignments || [],
           workloadDistribution: resMarket.workloadDistribution || [],
+          epics: resMarket.epics || [],
+          filters: resMarket.filters || {},
           isOwner: resMarket.isOwner
         });
       }
@@ -107,6 +121,7 @@ const TaskMarketplace = ({ projectId, teamId, onRefreshProject }) => {
     setReason('');
     setTargetMember('');
     setTargetTask('');
+    setBlockers('');
     setActiveModal(type);
   };
 
@@ -116,6 +131,7 @@ const TaskMarketplace = ({ projectId, teamId, onRefreshProject }) => {
     setReason('');
     setTargetMember('');
     setTargetTask('');
+    setBlockers('');
   };
 
   // Create Reassignment Request
@@ -182,6 +198,39 @@ const TaskMarketplace = ({ projectId, teamId, onRefreshProject }) => {
       }
     } catch (err) {
       toast.error(err.response?.data?.message || 'Collaborator request failed');
+    } finally {
+      setActionLoading(false);
+    }
+  };
+
+  const handleHelpSubmit = async (e) => {
+    e.preventDefault();
+    if (!targetMember) return toast.error('Please select a teammate');
+    if (!reason.trim()) return toast.error('Please describe the help needed');
+
+    try {
+      setActionStatus('Creating Help Request...');
+      setActionLoading(true);
+      const currentBlockers = blockers
+        .split('\n')
+        .map(item => item.trim())
+        .filter(Boolean);
+      const res = await requestHelp(
+        projectId,
+        selectedTask.task,
+        targetMember,
+        reason.trim(),
+        currentBlockers,
+        selectedTask.estimatedHours || 0
+      );
+      if (res.success) {
+        toast.success('Help request sent to selected teammate!');
+        closeRequestModal();
+        await fetchMarketplaceData(false);
+        if (onRefreshProject) onRefreshProject();
+      }
+    } catch (err) {
+      toast.error(err.response?.data?.message || 'Help request failed');
     } finally {
       setActionLoading(false);
     }
@@ -271,7 +320,7 @@ const TaskMarketplace = ({ projectId, teamId, onRefreshProject }) => {
       countMap[requestedBy] = (countMap[requestedBy] || 0) + 1;
     } else if (requestType === 'SWAP') {
       // Swapping tasks doesn't change task counts, so predicted workloads remain identical
-    } else if (requestType === 'COLLABORATOR') {
+    } else if (requestType === 'COLLABORATOR' || requestType === 'COLLABORATION' || requestType === 'HELP') {
       // Collaborator doesn't change ownership, counts remain identical
     }
 
@@ -293,14 +342,18 @@ const TaskMarketplace = ({ projectId, teamId, onRefreshProject }) => {
       'Available': 'bg-emerald-50 text-emerald-700 border-emerald-200 animate-pulse',
       'SwapRequested': 'bg-violet-50 text-violet-700 border-violet-200',
       'ClaimRequested': 'bg-blue-50 text-blue-700 border-blue-200',
-      'ReassignmentRequested': 'bg-amber-50 text-amber-700 border-amber-200'
+      'ReassignmentRequested': 'bg-amber-50 text-amber-700 border-amber-200',
+      'CollaborationRequested': 'bg-indigo-50 text-indigo-700 border-indigo-200',
+      'HelpRequested': 'bg-rose-50 text-rose-700 border-rose-200'
     };
     const labels = {
       'Locked': 'Assigned',
       'Available': 'Open for Claim',
       'SwapRequested': 'Swap Pending',
       'ClaimRequested': 'Claim Pending',
-      'ReassignmentRequested': 'Release Pending'
+      'ReassignmentRequested': 'Release Pending',
+      'CollaborationRequested': 'Collab Pending',
+      'HelpRequested': 'Help Pending'
     };
     return (
       <span className={`inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full text-[10px] font-bold border ${badges[status] || badges['Locked']}`}>
@@ -309,9 +362,9 @@ const TaskMarketplace = ({ projectId, teamId, onRefreshProject }) => {
     );
   };
 
-  const getPriorityBadge = (taskText) => {
+  const getPriorityBadge = (taskText, explicitPriority) => {
     // Determine priority mock based on task text
-    let priority = 'Medium';
+    let priority = explicitPriority || 'Medium';
     let color = 'bg-blue-50 text-blue-700 border-blue-150';
     if (taskText.toLowerCase().includes('deploy') || taskText.toLowerCase().includes('database') || taskText.toLowerCase().includes('auth')) {
       priority = 'High';
@@ -326,6 +379,14 @@ const TaskMarketplace = ({ projectId, teamId, onRefreshProject }) => {
       </span>
     );
   };
+
+  const filteredMyTasks = useMemo(() => {
+    return myTasks.filter(task => {
+      const featureOk = filterFeature === 'All' || task.featureName === filterFeature || task.epic === filterFeature;
+      const statusOk = filterStatus === 'All' || task.status === filterStatus || task.marketplaceStatus === filterStatus;
+      return featureOk && statusOk;
+    });
+  }, [myTasks, filterFeature, filterStatus]);
 
   const pendingRequestsCount = useMemo(() => {
     return marketplaceData.requests.filter(r => r.status === 'Pending').length;
@@ -415,22 +476,68 @@ const TaskMarketplace = ({ projectId, teamId, onRefreshProject }) => {
             </span>
           )}
         </button>
+
+        {[
+          { id: 'incoming', label: 'Incoming', count: marketplaceData.incomingRequests?.length || 0, icon: MessageSquare },
+          { id: 'outgoing', label: 'Outgoing', count: marketplaceData.outgoingRequests?.length || 0, icon: Play },
+          { id: 'history', label: 'History', count: marketplaceData.history?.length || 0, icon: Clock }
+        ].map(({ id, label, count, icon: Icon }) => (
+          <button
+            key={id}
+            onClick={() => setActiveTab(id)}
+            className={`flex items-center gap-2 px-4 py-2 text-xs font-bold uppercase tracking-wider rounded-lg transition-all duration-200 cursor-pointer shrink-0 ${
+              activeTab === id
+                ? 'bg-white text-neutral-900 shadow-xs border border-neutral-200/60 font-black'
+                : 'text-neutral-550 hover:text-neutral-800'
+            }`}
+          >
+            <Icon size={13} className={activeTab === id ? 'text-blue-600' : 'text-neutral-450'} />
+            <span>{label}</span>
+            {count > 0 && (
+              <span className="inline-flex items-center justify-center px-1.5 py-0.5 ml-0.5 rounded-full text-[9px] font-black bg-blue-600 text-white leading-none">
+                {count}
+              </span>
+            )}
+          </button>
+        ))}
       </div>
 
       {/* Tab Contents */}
       {activeTab === 'my-tasks' && (
         <div className="flex flex-col gap-4 animate-slide-up">
-          <div className="flex justify-between items-center">
+          <div className="flex flex-col md:flex-row md:justify-between md:items-center gap-3">
             <div>
               <h3 className="text-xs font-bold text-neutral-500 uppercase tracking-wider">My Assigned Tasks</h3>
               <p className="text-xs text-neutral-400 mt-0.5">Manage, reassign, swap, or request help for your tasks</p>
             </div>
-            <span className="text-[10px] font-bold px-2 py-1 bg-indigo-55/60 text-indigo-700 rounded-md border border-indigo-100 font-mono">
-              {myTasks.length} Assigned
-            </span>
+            <div className="flex flex-wrap items-center gap-2">
+              <select
+                value={filterFeature}
+                onChange={(e) => setFilterFeature(e.target.value)}
+                className="input-field text-xs py-2 pr-8"
+              >
+                <option value="All">All Features</option>
+                {(marketplaceData.filters?.features || []).map(feature => (
+                  <option key={feature} value={feature}>{feature}</option>
+                ))}
+              </select>
+              <select
+                value={filterStatus}
+                onChange={(e) => setFilterStatus(e.target.value)}
+                className="input-field text-xs py-2 pr-8"
+              >
+                <option value="All">All Status</option>
+                {['Not Started', 'In Progress', 'Blocked', 'Completed', 'Locked', 'HelpRequested', 'CollaborationRequested'].map(status => (
+                  <option key={status} value={status}>{status}</option>
+                ))}
+              </select>
+              <span className="text-[10px] font-bold px-2 py-1 bg-indigo-55/60 text-indigo-700 rounded-md border border-indigo-100 font-mono">
+                {filteredMyTasks.length} Shown
+              </span>
+            </div>
           </div>
 
-          {myTasks.length === 0 ? (
+          {filteredMyTasks.length === 0 ? (
             <div className="text-center py-12 px-4 bg-white border border-neutral-200 rounded-2xl flex flex-col items-center gap-3 shadow-2xs">
               <div className="w-12 h-12 rounded-full bg-neutral-50 flex items-center justify-center text-neutral-400 border border-neutral-200">
                 <Star size={22} />
@@ -444,7 +551,7 @@ const TaskMarketplace = ({ projectId, teamId, onRefreshProject }) => {
             </div>
           ) : (
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-              {myTasks.map((task, idx) => {
+              {filteredMyTasks.map((task, idx) => {
                 const status = task.marketplaceStatus || 'Locked';
                 const isLocked = status === 'Locked';
                 const taskStatus = task.status || 'Not Started';
@@ -453,7 +560,7 @@ const TaskMarketplace = ({ projectId, teamId, onRefreshProject }) => {
                   <div key={idx} className="bg-white border border-neutral-200 rounded-2xl p-5 hover:shadow-md hover:border-indigo-200 transition-all duration-300 flex flex-col justify-between gap-4 shadow-2xs group">
                     <div className="flex flex-col gap-2.5">
                       <div className="flex items-center justify-between gap-2">
-                        {getPriorityBadge(task.task)}
+                        {getPriorityBadge(task.task, task.priority)}
                         {getStatusBadge(status)}
                       </div>
                       
@@ -461,8 +568,44 @@ const TaskMarketplace = ({ projectId, teamId, onRefreshProject }) => {
                         {task.task}
                       </h4>
 
+                      <div className="grid grid-cols-2 gap-2 text-[10px]">
+                        <div className="bg-neutral-50 border border-neutral-150 rounded-lg px-2.5 py-2">
+                          <span className="block text-neutral-400 font-bold uppercase">Epic</span>
+                          <span className="font-semibold text-neutral-700">{task.epic || task.featureName || 'General'}</span>
+                        </div>
+                        <div className="bg-neutral-50 border border-neutral-150 rounded-lg px-2.5 py-2">
+                          <span className="block text-neutral-400 font-bold uppercase">Skill Match</span>
+                          <span className="font-semibold text-neutral-700">{task.compatibilityScore || 50}%</span>
+                        </div>
+                      </div>
+
+                      {(task.suggestedTechnologies?.length > 0 || task.suggestedSkills?.length > 0) && (
+                        <div className="flex flex-wrap gap-1.5">
+                          {(task.suggestedTechnologies || task.suggestedSkills || []).slice(0, 5).map(item => (
+                            <span key={item} className="px-2 py-0.5 rounded-md bg-blue-50 text-blue-700 border border-blue-100 text-[9px] font-bold">
+                              {item}
+                            </span>
+                          ))}
+                        </div>
+                      )}
+
+                      {task.acceptanceCriteria?.length > 0 && (
+                        <div className="bg-emerald-50/30 border border-emerald-100 rounded-xl p-3">
+                          <span className="text-[9px] font-black text-emerald-700 uppercase tracking-wider">Acceptance Criteria</span>
+                          <ul className="mt-1.5 flex flex-col gap-1">
+                            {task.acceptanceCriteria.slice(0, 3).map((item, itemIdx) => (
+                              <li key={itemIdx} className="text-[10px] text-emerald-800 leading-normal flex gap-1.5">
+                                <Check size={10} className="shrink-0 mt-0.5" /> {item}
+                              </li>
+                            ))}
+                          </ul>
+                        </div>
+                      )}
+
                       <div className="flex flex-wrap gap-2 text-[10px] text-neutral-405 font-bold uppercase tracking-wider mt-1 border-t border-neutral-100 pt-3">
                         <span>Task Status: <strong className={taskStatus === 'Completed' ? 'text-emerald-600' : taskStatus === 'In Progress' ? 'text-amber-600' : 'text-neutral-500'}>{taskStatus}</strong></span>
+                        <span className="border-l border-neutral-200 pl-2">Hours: {task.estimatedHours || 0}</span>
+                        <span className="border-l border-neutral-200 pl-2">Type: {task.category || 'Task'}</span>
                         {task.collaborators && task.collaborators.length > 0 && (
                           <span className="text-indigo-600 border-l border-neutral-200 pl-2">
                             Collaborators: {task.collaborators.join(', ')}
@@ -472,7 +615,7 @@ const TaskMarketplace = ({ projectId, teamId, onRefreshProject }) => {
                     </div>
 
                     {isLocked ? (
-                      <div className="grid grid-cols-3 gap-2 mt-2 border-t border-neutral-100 pt-3">
+                      <div className="grid grid-cols-2 md:grid-cols-4 gap-2 mt-2 border-t border-neutral-100 pt-3">
                         <button
                           type="button"
                           onClick={() => openRequestModal('reassign', task)}
@@ -496,6 +639,14 @@ const TaskMarketplace = ({ projectId, teamId, onRefreshProject }) => {
                         >
                           <UserPlus size={11} />
                           Add Collab
+                        </button>
+                        <button
+                          type="button"
+                          onClick={() => openRequestModal('help', task)}
+                          className="flex items-center justify-center gap-1.5 py-2 px-2 rounded-lg bg-rose-50 hover:bg-rose-100 text-rose-700 text-[10px] font-bold border border-rose-200 hover:border-rose-300 cursor-pointer transition-all duration-200"
+                        >
+                          <HelpCircle size={11} />
+                          Need Help
                         </button>
                       </div>
                     ) : (

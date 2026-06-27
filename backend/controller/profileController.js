@@ -47,16 +47,21 @@ exports.updateProfile = async (req, res) => {
     
     await user.save();
 
-    // Auto-invalidate team analysis for all teams this user belongs to
+    // Auto-invalidate team analysis and cache for all teams this user belongs to
     try {
       const Team = require('../models/Team');
       const Project = require('../models/Project');
+      const CacheManager = require('../services/ai/CacheManager');
       const userTeams = await Team.find({ members: user._id });
       for (const team of userTeams) {
         team.analysis = null;
         team.analysisGeneratedAt = null;
         team.analysisVersion = (team.analysisVersion || 0) + 1;
         await team.save();
+      }
+      const projects = await Project.find({ teamId: { $in: userTeams.map(t => t._id) } });
+      for (const proj of projects) {
+        CacheManager.invalidate(proj._id);
       }
       await Project.updateMany(
         { teamId: { $in: userTeams.map(t => t._id) } },

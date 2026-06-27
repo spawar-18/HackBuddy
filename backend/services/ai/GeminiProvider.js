@@ -56,7 +56,7 @@ class GeminiProvider {
       sdkContents = sdkContents;
     } else if (Array.isArray(sdkContents)) {
       sdkContents = sdkContents.map(item => ({
-        role: item.role || 'user',
+        role: item.role === 'assistant' ? 'model' : (item.role || 'user'),
         parts: Array.isArray(item.parts) ? item.parts : [{ text: item.message || item.text || JSON.stringify(item) }]
       }));
     }

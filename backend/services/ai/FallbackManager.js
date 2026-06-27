@@ -21,10 +21,17 @@ class FallbackManager {
         return mockFallbacks.generateMockAnalysis(userInput);
       
       case 'analyzeProject':
-        return mockFallbacks.generateMockProjectReview(userInput);
+        // Use the full ContextBuilder-built projectContext if available (it has more detail from DB),
+        // otherwise fall back to the userInput contextString from the controller
+        return mockFallbacks.generateMockProjectReview(contextDetails.projectContext || userInput);
       
       case 'chatWithMentor':
-        return mockFallbacks.generateMockChatResponse(userInput, contextDetails.projectContext || '');
+        return {
+          answer: mockFallbacks.generateMockChatResponse(userInput, contextDetails.projectContext || ''),
+          confidence: 55,
+          recommendations: [],
+          memoryUpdates: {}
+        };
       
       case 'generateTaskPlan':
         // Members list could be passed in context details

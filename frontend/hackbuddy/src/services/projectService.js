@@ -153,6 +153,28 @@ export const requestCollaborator = async (projectId, taskId, targetUser, reason)
 };
 
 /**
+ * Request task help from a selected teammate.
+ * @param {string} projectId
+ * @param {string} taskId
+ * @param {string} targetUser
+ * @param {string} reason
+ * @param {Array<string>} currentBlockers
+ * @param {number} estimatedEffort
+ * @returns {Promise<Object>}
+ */
+export const requestHelp = async (projectId, taskId, targetUser, reason, currentBlockers = [], estimatedEffort = 0) => {
+  const response = await api.post('/tasks/request-help', {
+    projectId,
+    taskId,
+    targetUser,
+    reason,
+    currentBlockers,
+    estimatedEffort
+  });
+  return response.data;
+};
+
+/**
  * Claim available task.
  * @param {string} projectId 
  * @param {string} taskId 

@@ -12,7 +12,7 @@ const taskMarketplaceRequestSchema = new mongoose.Schema({
   },
   requestType: {
     type: String,
-    enum: ['REASSIGNMENT', 'CLAIM', 'SWAP', 'COLLABORATOR'],
+    enum: ['REASSIGNMENT', 'CLAIM', 'SWAP', 'COLLABORATOR', 'COLLABORATION', 'HELP'],
     required: true
   },
   requestedBy: {
@@ -31,10 +31,53 @@ const taskMarketplaceRequestSchema = new mongoose.Schema({
     type: String,
     default: ''
   },
+  currentBlockers: {
+    type: [String],
+    default: []
+  },
+  estimatedEffort: {
+    type: Number,
+    default: 0
+  },
+  suggestedMember: {
+    type: String,
+    default: ''
+  },
   status: {
     type: String,
-    enum: ['Pending', 'Approved', 'Rejected', 'Cancelled'],
+    enum: ['Pending', 'Approved', 'Rejected', 'Cancelled', 'SuggestedAlternative'],
     default: 'Pending'
+  },
+  decisionBy: {
+    type: mongoose.Schema.Types.ObjectId,
+    ref: 'User',
+    default: null
+  },
+  approvedAt: {
+    type: Date,
+    default: null
+  },
+  rejectedAt: {
+    type: Date,
+    default: null
+  },
+  impact: {
+    workloadDelta: {
+      type: mongoose.Schema.Types.Mixed,
+      default: {}
+    },
+    riskDelta: {
+      type: Number,
+      default: 0
+    },
+    commandCenterInvalidated: {
+      type: Boolean,
+      default: false
+    }
+  },
+  activityLog: {
+    type: [mongoose.Schema.Types.Mixed],
+    default: []
   },
   aiRecommendation: {
     recommendation: {
@@ -69,7 +112,15 @@ const createMockRequestInstance = (data) => {
     targetUser: data.targetUser || '',
     targetTaskId: data.targetTaskId || '',
     reason: data.reason || '',
+    currentBlockers: data.currentBlockers || [],
+    estimatedEffort: data.estimatedEffort || 0,
+    suggestedMember: data.suggestedMember || '',
     status: data.status || 'Pending',
+    decisionBy: data.decisionBy || null,
+    approvedAt: data.approvedAt || null,
+    rejectedAt: data.rejectedAt || null,
+    impact: data.impact || { workloadDelta: {}, riskDelta: 0, commandCenterInvalidated: false },
+    activityLog: data.activityLog || [],
     aiRecommendation: data.aiRecommendation || { recommendation: '', confidenceScore: 0, reason: '' },
     createdAt: data.createdAt || new Date(),
     updatedAt: data.updatedAt || new Date(),
@@ -85,7 +136,15 @@ const createMockRequestInstance = (data) => {
         targetUser: this.targetUser,
         targetTaskId: this.targetTaskId,
         reason: this.reason,
+        currentBlockers: this.currentBlockers,
+        estimatedEffort: this.estimatedEffort,
+        suggestedMember: this.suggestedMember,
         status: this.status,
+        decisionBy: this.decisionBy,
+        approvedAt: this.approvedAt,
+        rejectedAt: this.rejectedAt,
+        impact: this.impact,
+        activityLog: this.activityLog,
         aiRecommendation: this.aiRecommendation,
         createdAt: this.createdAt,
         updatedAt: this.updatedAt

@@ -39,81 +39,62 @@ class AIProviderManager {
    * @returns {Promise<{text: string, providerUsed: string}>}
    */
   async executeWithFailover(payload) {
+    return this.executeWithRouting(payload, {
+      module: payload.schemaName || payload.endpointName,
+      route: ['GLMProvider', 'DeepSeekProvider', 'GeminiProvider'],
+      timeoutMs: 45000,
+      maxRetries: 1
+    });
+  }
+
+  /**
+   * Executes prompt payloads using the module-specific intelligent route.
+   * Validation errors are treated as provider failures so malformed JSON,
+   * missing fields, hallucinated keys, and empty responses trigger retry and
+   * failover transparently.
+   * @param {object} payload
+   * @param {object} options
+   * @param {string[]} options.route
+   * @param {function} [options.validate]
+   * @returns {Promise<{text: string, providerUsed: string, normalized: any}>}
+   */
+  async executeWithRouting(payload, options = {}) {
+    const {
+      route = ['GLMProvider', 'DeepSeekProvider', 'GeminiProvider'],
+      timeoutMs = 45000,
+      maxRetries = 1,
+      validate = null
+    } = options;
+
     let fallbackCount = 0;
-    
-    // 1. ATTEMPT GLM-5.2 (Primary)
-    const glm = this.providers.get('GLMProvider');
-    if (glm && HealthMonitor.isAvailable('GLMProvider')) {
-      const start = Date.now();
-      try {
-        console.log('[AIProviderManager] Pipeline Stage 1: Running GLM-5.2...');
-        const responseText = await RetryService.executeWithRetry(
-          () => glm.execute(payload),
-          { maxRetries: 0, timeoutMs: 30000 } // No retry to avoid concurrency lockout
-        );
-        const latencyMs = Date.now() - start;
 
-        // Success tracking
-        HealthMonitor.reportSuccess('GLMProvider');
-        const tokenUsage = this.estimateTokens(payload, responseText);
-        
-        AnalyticsService.trackCall({
-          provider: 'GLMProvider',
-          success: true,
-          latencyMs,
-          tokens: tokenUsage,
-          fallbackCount
-        });
+    for (const providerName of route) {
+      const provider = this.providers.get(providerName);
 
-        LoggingService.logCall({
-          provider: 'GLMProvider',
-          modelName: glm.getModelName(),
-          promptVersion: payload.promptVersion,
-          latencyMs,
-          tokenUsage,
-          endpoint: payload.endpointName,
-          fallbackCount
-        });
-
-        return { text: responseText, providerUsed: 'GLMProvider' };
-      } catch (err) {
-        console.warn(`[AIProviderManager] GLM-5.2 failed: ${err.message}. Progressing pipeline...`);
-        HealthMonitor.reportFailure('GLMProvider', err.message);
-        
-        const latencyMs = Date.now() - start;
-        AnalyticsService.trackCall({
-          provider: 'GLMProvider',
-          success: false,
-          latencyMs,
-          error: err.message,
-          fallbackCount
-        });
-        
+      if (!provider || !HealthMonitor.isAvailable(providerName)) {
+        console.log(`[AIProviderManager] ${providerName} unavailable. Skipping.`);
         fallbackCount++;
+        continue;
       }
-    } else {
-      console.log('[AIProviderManager] GLM-5.2 is marked unhealthy. Skipping to next stage.');
-      fallbackCount++;
-    }
 
-    // 2. ATTEMPT DeepSeek-V4-Pro (Fallback 1)
-    const deepseek = this.providers.get('DeepSeekProvider');
-    if (deepseek && HealthMonitor.isAvailable('DeepSeekProvider')) {
       const start = Date.now();
       try {
-        console.log('[AIProviderManager] Pipeline Stage 2: Running DeepSeek-V4-Pro...');
-        // Standard execution for DeepSeek
+        console.log(`[AIProviderManager] Running ${payload.endpointName} via ${providerName} (${provider.getModelName()})`);
         const responseText = await RetryService.executeWithRetry(
-          () => deepseek.execute(payload),
-          { maxRetries: 0, timeoutMs: 45000 }
+          async () => {
+            const text = await provider.execute(payload);
+            const normalized = validate ? validate(text) : text;
+            return { text, normalized };
+          },
+          { maxRetries, timeoutMs, delayMs: 750 }
         );
+
         const latencyMs = Date.now() - start;
+        const tokenUsage = this.estimateTokens(payload, responseText.text);
 
-        HealthMonitor.reportSuccess('DeepSeekProvider');
-        const tokenUsage = this.estimateTokens(payload, responseText);
-
+        HealthMonitor.reportSuccess(providerName);
         AnalyticsService.trackCall({
-          provider: 'DeepSeekProvider',
+          provider: providerName,
           success: true,
           latencyMs,
           tokens: tokenUsage,
@@ -121,82 +102,51 @@ class AIProviderManager {
         });
 
         LoggingService.logCall({
-          provider: 'DeepSeekProvider',
-          modelName: deepseek.getModelName(),
+          provider: providerName,
+          modelName: provider.getModelName(),
           promptVersion: payload.promptVersion,
           latencyMs,
           tokenUsage,
           endpoint: payload.endpointName,
-          fallbackCount
+          fallbackCount,
+          fallback: fallbackCount > 0,
+          module: payload.schemaName,
+          cost: this.estimateCost(providerName, tokenUsage)
         });
 
-        return { text: responseText, providerUsed: 'DeepSeekProvider' };
+        return {
+          text: responseText.text,
+          normalized: responseText.normalized,
+          providerUsed: providerName
+        };
       } catch (err) {
-        console.warn(`[AIProviderManager] DeepSeek-V4-Pro failed: ${err.message}. Progressing pipeline...`);
-        HealthMonitor.reportFailure('DeepSeekProvider', err.message);
-
         const latencyMs = Date.now() - start;
+        console.warn(`[AIProviderManager] ${providerName} failed for ${payload.endpointName}: ${err.message}`);
+        HealthMonitor.reportFailure(providerName, err.message);
         AnalyticsService.trackCall({
-          provider: 'DeepSeekProvider',
+          provider: providerName,
           success: false,
           latencyMs,
           error: err.message,
           fallbackCount
+        });
+
+        LoggingService.logCall({
+          provider: providerName,
+          modelName: provider.getModelName(),
+          promptVersion: payload.promptVersion,
+          latencyMs,
+          tokenUsage: { promptTokens: 0, completionTokens: 0, totalTokens: 0 },
+          errors: err.message,
+          retries: maxRetries,
+          endpoint: payload.endpointName,
+          fallbackCount,
+          fallback: fallbackCount > 0,
+          module: payload.schemaName,
+          cost: 0
         });
 
         fallbackCount++;
-      }
-    } else {
-      console.log('[AIProviderManager] DeepSeek-V4-Pro is marked unhealthy. Skipping to next stage.');
-      fallbackCount++;
-    }
-
-    // 3. ATTEMPT Gemini 2.5 Flash (Fallback 2)
-    const gemini = this.providers.get('GeminiProvider');
-    if (gemini && HealthMonitor.isAvailable('GeminiProvider')) {
-      const start = Date.now();
-      try {
-        console.log('[AIProviderManager] Pipeline Stage 3: Running Gemini 2.5 Flash...');
-        const responseText = await RetryService.executeWithRetry(
-          () => gemini.execute(payload),
-          { maxRetries: 0, timeoutMs: 45000 }
-        );
-        const latencyMs = Date.now() - start;
-
-        HealthMonitor.reportSuccess('GeminiProvider');
-        const tokenUsage = this.estimateTokens(payload, responseText);
-
-        AnalyticsService.trackCall({
-          provider: 'GeminiProvider',
-          success: true,
-          latencyMs,
-          tokens: tokenUsage,
-          fallbackCount
-        });
-
-        LoggingService.logCall({
-          provider: 'GeminiProvider',
-          modelName: gemini.getModelName(),
-          promptVersion: payload.promptVersion,
-          latencyMs,
-          tokenUsage,
-          endpoint: payload.endpointName,
-          fallbackCount
-        });
-
-        return { text: responseText, providerUsed: 'GeminiProvider' };
-      } catch (err) {
-        console.error(`[AIProviderManager] Gemini 2.5 Flash failed: ${err.message}. Pipeline exhausted.`);
-        HealthMonitor.reportFailure('GeminiProvider', err.message);
-
-        const latencyMs = Date.now() - start;
-        AnalyticsService.trackCall({
-          provider: 'GeminiProvider',
-          success: false,
-          latencyMs,
-          error: err.message,
-          fallbackCount
-        });
       }
     }
 
@@ -221,6 +171,16 @@ class AIProviderManager {
       completionTokens,
       totalTokens: promptTokens + completionTokens
     };
+  }
+
+  estimateCost(providerName, tokenUsage) {
+    const ratesPer1k = {
+      GLMProvider: 0.0002,
+      DeepSeekProvider: 0.0003,
+      GeminiProvider: 0.00015
+    };
+    const rate = ratesPer1k[providerName] || 0;
+    return Number(((tokenUsage.totalTokens || 0) / 1000 * rate).toFixed(6));
   }
 }
 

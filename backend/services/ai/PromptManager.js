@@ -14,9 +14,10 @@ class PromptManager {
    * @param {Array} [params.history] - Chat history
    * @returns {object} Prompt payload
    */
-  buildPrompt(moduleName, { projectContext = '', userInput = '', history = [] }) {
+  buildPrompt(moduleName, { projectContext = '', userInput = '', history = [], memory = null, metadata = {} }) {
     const systemInstruction = PromptVersionManager.getSystemPrompt(moduleName);
     const version = PromptVersionManager.getVersion(moduleName);
+    const promptMetadata = PromptVersionManager.getPromptMetadata(moduleName);
 
     let formattedUserInput = '';
     if (userInput && typeof userInput === 'object') {
@@ -25,14 +26,17 @@ class PromptManager {
       formattedUserInput = userInput;
     }
 
+    const memoryContext = this.formatMemory(memory);
+
     const developerPrompt = PromptVersionManager.getDeveloperPrompt(moduleName, {
       projectContext: projectContext || 'No context available.',
       teamContext: projectContext || 'No context available.',
       userInput: formattedUserInput,
+      memoryContext,
       history: '' // history is handled natively below
     });
 
-    const isJson = moduleName !== 'chatWithMentor';
+    const isJson = true;
     
     let finalContents = developerPrompt;
 
@@ -61,10 +65,35 @@ class PromptManager {
       contents: finalContents,
       systemInstruction,
       isJson,
+      temperature: moduleName === 'chatWithMentor' ? 0.4 : 0.0,
       schemaName: moduleName,
       promptVersion: version,
-      endpointName: moduleName
+      promptMetadata,
+      endpointName: moduleName,
+      requestMetadata: metadata
     };
+  }
+
+  formatMemory(memory) {
+    if (!memory) return 'No mentor memory recorded yet.';
+
+    return JSON.stringify({
+      summary: memory.summary || '',
+      hackathonStage: memory.hackathonStage || '',
+      currentSprint: memory.currentSprint || '',
+      githubStatus: memory.githubStatus || '',
+      currentBlockers: memory.currentBlockers || [],
+      completedTasks: memory.completedTasks || [],
+      recentRecommendations: memory.recentRecommendations || memory.previousAiAdvice || [],
+      architectureDecisions: memory.architectureDecisions || [],
+      techStackDecisions: memory.techStackDecisions || [],
+      projectMilestones: memory.projectMilestones || [],
+      currentImplementation: memory.currentImplementation || '',
+      currentDebuggingSession: memory.currentDebuggingSession || '',
+      currentFeature: memory.currentFeature || '',
+      currentApis: memory.currentApis || [],
+      currentDeploymentIssue: memory.currentDeploymentIssue || ''
+    }, null, 2);
   }
 }
 

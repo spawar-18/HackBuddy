@@ -1,6 +1,10 @@
 const Project = require('../models/Project');
 const Team = require('../models/Team');
 const { generateTaskPlanWithAI } = require('../services/aiService');
+const {
+  buildTaskPlan,
+  recalculateTaskPlanMetrics
+} = require('../services/taskExecutionService');
 
 // Helper to compare user IDs
 const isSameUser = (id1, id2) => {
@@ -13,7 +17,8 @@ const isSameUser = (id1, id2) => {
  * Build project context string for AI
  */
 const buildContextString = (project, team) => {
-  let ctx = `Project Name: ${project.projectName}
+  let ctx = `Project ID: ${project._id}
+Project Name: ${project.projectName}
 Track: ${project.track || 'Not specified'}
 Duration: ${project.duration || 'Not specified'}
 Problem Statement: ${project.problemStatement}
@@ -89,14 +94,28 @@ exports.generateTaskPlan = async (req, res) => {
 
     // 5. Build context string
     const contextString = buildContextString(project, team);
+    const existingWorkloads = {};
+    project.taskPlan?.workloadDistribution?.forEach(item => {
+      existingWorkloads[item.member] = item.remainingHours || item.assignedHours || 0;
+    });
+
     const members = team.members.map(m => ({
       name: m.name,
-      skills: m.skills || []
+      skills: m.skills || [],
+      experienceLevel: m.experienceLevel,
+      preferredTechnologies: m.preferredTechnologies || [],
+      currentWorkload: existingWorkloads[m.name] || 0
     }));
 
     // 6. Call AI Service
     console.log(`Running AI Task Plan generation for project: ${project.projectName}...`);
-    const taskPlanData = await generateTaskPlanWithAI(contextString, members);
+    const aiTaskPlanData = await generateTaskPlanWithAI(contextString, members);
+    const taskPlanData = buildTaskPlan({
+      project,
+      teamMembers: members,
+      aiPlan: aiTaskPlanData,
+      hackathonTimeline: project.duration || null
+    });
 
     // 7. Save task plan in project
     project.taskPlan = taskPlanData;
@@ -154,13 +173,27 @@ exports.regenerateTaskPlan = async (req, res) => {
     }
 
     const contextString = buildContextString(project, team);
+    const existingWorkloads = {};
+    project.taskPlan?.workloadDistribution?.forEach(item => {
+      existingWorkloads[item.member] = item.remainingHours || item.assignedHours || 0;
+    });
+
     const members = team.members.map(m => ({
       name: m.name,
-      skills: m.skills || []
+      skills: m.skills || [],
+      experienceLevel: m.experienceLevel,
+      preferredTechnologies: m.preferredTechnologies || [],
+      currentWorkload: existingWorkloads[m.name] || 0
     }));
 
     console.log(`Regenerating AI Task Plan for project: ${project.projectName}...`);
-    const taskPlanData = await generateTaskPlanWithAI(contextString, members);
+    const aiTaskPlanData = await generateTaskPlanWithAI(contextString, members);
+    const taskPlanData = buildTaskPlan({
+      project,
+      teamMembers: members,
+      aiPlan: aiTaskPlanData,
+      hackathonTimeline: project.duration || null
+    });
 
     // Overwrite old task plan
     project.taskPlan = taskPlanData;
@@ -187,13 +220,13 @@ exports.regenerateTaskPlan = async (req, res) => {
 exports.updateTaskStatus = async (req, res) => {
   try {
     const { projectId } = req.params;
-    const { memberName, taskName, status } = req.body;
+    const { memberName, taskName, status, progress, blocker } = req.body;
 
     if (!memberName || !taskName || !status) {
       return res.status(400).json({ success: false, message: 'memberName, taskName, and status are required' });
     }
 
-    const validStatuses = ['Not Started', 'In Progress', 'Completed'];
+    const validStatuses = ['Not Started', 'In Progress', 'Completed', 'Blocked'];
     if (!validStatuses.includes(status)) {
       return res.status(400).json({ success: false, message: `Invalid status. Must be one of: ${validStatuses.join(', ')}` });
     }
@@ -214,14 +247,6 @@ exports.updateTaskStatus = async (req, res) => {
       return res.status(403).json({ success: false, message: 'Access denied: You are not a member of this team' });
     }
 
-    // Enforce ownership: only the assigned member can update their own tasks
-    if (requestingMember.name !== memberName) {
-      return res.status(403).json({
-        success: false,
-        message: `Access denied: You can only update your own tasks. You are logged in as "${requestingMember.name}", not "${memberName}".`
-      });
-    }
-
     if (!project.taskPlan || !project.taskPlan.assignments) {
       return res.status(400).json({ success: false, message: 'No task plan exists for this project' });
     }
@@ -238,12 +263,53 @@ exports.updateTaskStatus = async (req, res) => {
       return res.status(404).json({ success: false, message: `Task not found: ${taskName}` });
     }
 
-    // Update status
+    const isPrimaryOwner = requestingMember.name === memberName || requestingMember.name === taskEntry.primaryOwner;
+    const isCollaborator = (taskEntry.collaborators || []).some(name => String(name).toLowerCase() === requestingMember.name.toLowerCase());
+    if (!isPrimaryOwner && !isCollaborator) {
+      return res.status(403).json({
+        success: false,
+        message: `Access denied: Only the primary owner or approved collaborators can update "${taskName}".`
+      });
+    }
+
+    // Update status and progress metadata.
     taskEntry.status = status;
+    if (progress !== undefined) {
+      taskEntry.progress = Math.max(0, Math.min(100, Number(progress) || 0));
+    } else if (status === 'Completed') {
+      taskEntry.progress = 100;
+    } else if (status === 'In Progress' && !taskEntry.progress) {
+      taskEntry.progress = 25;
+    }
+    if (blocker) {
+      taskEntry.currentBlockers = Array.from(new Set([...(taskEntry.currentBlockers || []), blocker]));
+    }
+    taskEntry.auditTrail = taskEntry.auditTrail || [];
+    taskEntry.auditTrail.push({
+      action: 'StatusUpdated',
+      actor: requestingMember.name,
+      status,
+      progress: taskEntry.progress || 0,
+      at: new Date().toISOString()
+    });
+    if (isCollaborator && !isPrimaryOwner) {
+      taskEntry.contributionHistory = taskEntry.contributionHistory || [];
+      taskEntry.contributionHistory.push({
+        member: requestingMember.name,
+        contributionPercent: Number(progress || 0),
+        note: blocker || `Updated status to ${status}`,
+        at: new Date().toISOString()
+      });
+    }
     taskEntry.updatedAt = new Date();
+
+    project.taskPlan = recalculateTaskPlanMetrics(project.taskPlan);
+    project.commandCenterReport = null;
+    project.commandCenterReportGeneratedAt = null;
 
     // Mark as modified for mongoose (nested objects need explicit marking)
     project.markModified('taskPlan');
+    project.markModified('commandCenterReport');
     await project.save();
 
     res.status(200).json({

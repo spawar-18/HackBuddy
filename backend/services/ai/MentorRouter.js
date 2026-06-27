@@ -1,0 +1,37 @@
+const { PROVIDERS } = require('./aiModuleConfig');
+
+const TOPIC_ROUTES = {
+  github: [PROVIDERS.DEEPSEEK, PROVIDERS.GLM, PROVIDERS.GEMINI],
+  code_review: [PROVIDERS.DEEPSEEK, PROVIDERS.GLM, PROVIDERS.GEMINI],
+  ai_integration: [PROVIDERS.GLM, PROVIDERS.GEMINI, PROVIDERS.DEEPSEEK],
+  architecture: [PROVIDERS.GLM, PROVIDERS.DEEPSEEK, PROVIDERS.GEMINI],
+  deployment: [PROVIDERS.GLM, PROVIDERS.DEEPSEEK, PROVIDERS.GEMINI],
+  command_center: [PROVIDERS.GLM, PROVIDERS.DEEPSEEK, PROVIDERS.GEMINI],
+  authentication: [PROVIDERS.GLM, PROVIDERS.DEEPSEEK, PROVIDERS.GEMINI],
+  database: [PROVIDERS.GLM, PROVIDERS.DEEPSEEK, PROVIDERS.GEMINI],
+  frontend: [PROVIDERS.GLM, PROVIDERS.DEEPSEEK, PROVIDERS.GEMINI],
+  backend: [PROVIDERS.GLM, PROVIDERS.DEEPSEEK, PROVIDERS.GEMINI],
+  tasks: [PROVIDERS.GLM, PROVIDERS.DEEPSEEK, PROVIDERS.GEMINI],
+  vision: [PROVIDERS.GEMINI, PROVIDERS.GLM, PROVIDERS.DEEPSEEK],
+  security: [PROVIDERS.DEEPSEEK, PROVIDERS.GLM, PROVIDERS.GEMINI],
+  testing: [PROVIDERS.DEEPSEEK, PROVIDERS.GLM, PROVIDERS.GEMINI],
+  general_project: [PROVIDERS.GLM, PROVIDERS.DEEPSEEK, PROVIDERS.GEMINI]
+};
+
+const PROVIDER_LABELS = {
+  GLMProvider: 'GLM',
+  DeepSeekProvider: 'DeepSeek',
+  GeminiProvider: 'Gemini'
+};
+
+class MentorRouter {
+  getRoute(topic = 'general_project') {
+    return TOPIC_ROUTES[topic] || TOPIC_ROUTES.general_project;
+  }
+
+  getProviderLabel(providerName) {
+    return PROVIDER_LABELS[providerName] || providerName;
+  }
+}
+
+module.exports = new MentorRouter();

@@ -22,9 +22,22 @@ class LoggingService {
       tokenUsage: data.tokenUsage || { promptTokens: 0, completionTokens: 0, totalTokens: 0 },
       errors: data.errors || null,
       retries: data.retries || 0,
+      cost: data.cost || 0,
+      fallback: Boolean(data.fallback || data.fallbackCount > 0),
+      module: data.module || data.endpoint || 'unknown',
+      duration: data.latencyMs || 0,
       responseTime: data.latencyMs || 0,
       endpoint: data.endpoint || 'unknown',
-      fallbackCount: data.fallbackCount || 0
+      fallbackCount: data.fallbackCount || 0,
+      // Telemetry fields for V2 Refactor
+      retrievedContext: data.retrievedContext || data.contextSections || [],
+      intent: data.intent || data.topic || 'unknown',
+      conversationId: data.conversationId || null,
+      projectId: data.projectId || null,
+      userId: data.userId || null,
+      qualityScore: data.qualityScore || data.confidence || 0,
+      cacheHit: Boolean(data.cacheHit),
+      responseLength: data.responseLength || 0
     };
 
     try {

@@ -52,73 +52,133 @@ const generateMockAnalysis = (teamDataString) => {
 };
 
 /**
- * Generates mock project review for fallback/testing
+ * Generates a dynamic mock project review for fallback/testing.
+ * Parses the actual project context string to produce context-aware output.
  */
 const generateMockProjectReview = (projectContextString) => {
-  const durationMatch = (projectContextString || '').match(/Duration:\s*(\d+)\s*hours?/i) || (projectContextString || '').match(/Duration:\s*(\d+)/i);
+  const ctx = projectContextString || '';
+
+  // --- Parse key fields from context ---
+  const durationMatch = ctx.match(/(?:Planned\s+)?Duration:\s*(\d+)\s*hours?/i) || ctx.match(/Duration:\s*(\d+)/i);
   const hours = durationMatch ? parseInt(durationMatch[1], 10) : 24;
 
+  const projectNameMatch = ctx.match(/Project Name:\s*(.*)/i);
+  const projectName = projectNameMatch ? projectNameMatch[1].trim() : 'this project';
+
+  const trackMatch = ctx.match(/Track:\s*(.*)/i);
+  const track = trackMatch ? trackMatch[1].trim() : '';
+
+  const problemMatch = ctx.match(/Problem Statement:\s*([\s\S]*?)(?=\n(?:Description|Features|Track|Team|---)|$)/i);
+  const problemStatement = problemMatch ? problemMatch[1].trim().substring(0, 150) : '';
+
+  // Extract features from context (handles both "Features to Build:" bullet list style)
+  const featuresBlockMatch = ctx.match(/Features to Build:\s*([\s\S]*?)(?=\n(?:Team|---|\n\n)|$)/i);
+  let parsedFeatures = [];
+  if (featuresBlockMatch) {
+    parsedFeatures = featuresBlockMatch[1]
+      .split('\n')
+      .map(l => l.replace(/^[\s\-*•]+/, '').trim())
+      .filter(l => l.length > 2);
+  }
+
+  // Extract team members and skills
+  const memberLines = [];
+  const memberRegex = /[-•]?\s*([A-Za-z][A-Za-z\s]+?)\s*\((?:Role:\s*[^|]+?\|?\s*)?Skills?:\s*([^)]+)\)/gi;
+  let memberMatch;
+  while ((memberMatch = memberRegex.exec(ctx)) !== null) {
+    memberLines.push({ name: memberMatch[1].trim(), skills: memberMatch[2].trim() });
+  }
+
+  // Derive must-build features (first 3 features if available)
+  const mustBuildFeatures = parsedFeatures.length > 0
+    ? parsedFeatures.slice(0, Math.min(3, parsedFeatures.length))
+    : ['Core feature implementation', 'User interface', 'API integration'];
+
+  // Derive optional features (remaining features after must-build)
+  const optionalFeatures = parsedFeatures.length > 3
+    ? parsedFeatures.slice(3, Math.min(6, parsedFeatures.length))
+    : ['Advanced analytics', 'Export and reporting tools'];
+
+  // Derive featuresToRemove (anything beyond 6 features is risky in a hackathon)
+  const featuresToRemove = parsedFeatures.length > 6
+    ? parsedFeatures.slice(6)
+    : ['Non-essential integrations not directly tied to the demo flow'];
+
+  // Build problem-solution alignment string based on parsed data
+  const psa = problemStatement
+    ? `The solution directly addresses: "${problemStatement.substring(0, 100)}...". The feature set is well-aligned but scope must be managed for the ${hours}-hour window.`
+    : `The proposed solution aligns with the project goals. The core features address the key pain points, but the technical scope should be reviewed against the ${hours}-hour hackathon duration.`;
+
+  // Extract unique skills from team members
+  const allSkills = memberLines.flatMap(m => m.skills.split(/,\s*/)).map(s => s.trim()).filter(Boolean);
+  const uniqueSkills = [...new Set(allSkills)];
+
+  // Derive missing skills based on project track
+  let missingSkills = ['Cloud infrastructure configuration', 'Production deployment pipeline'];
+  if (track.toLowerCase().includes('ai') || track.toLowerCase().includes('ml')) {
+    missingSkills = ['ML model optimization', 'GPU resource provisioning'];
+  } else if (track.toLowerCase().includes('web') || track.toLowerCase().includes('devtool')) {
+    missingSkills = ['CI/CD pipeline setup', 'Performance profiling'];
+  } else if (track.toLowerCase().includes('mobile')) {
+    missingSkills = ['Mobile app deployment (App Store/Play Store)', 'Device testing across form factors'];
+  }
+
+  // Execution strategy based on hours
   let executionStrategy = [];
   if (hours <= 12) {
     executionStrategy = [
-      '1. Setup minimal database schemas and mockup endpoints immediately.',
-      '2. Develop the absolute core feature flow on frontend and backend (freeze optional features).',
-      '3. Deploy to production early (e.g. within 6 hours) to test hosting connectivity.',
-      '4. Polish key presentation views and record a backup demo walkthrough.'
+      `1. Immediately set up the project skeleton: DB schemas, basic routes, and auth boilerplate.`,
+      `2. Implement must-build features only: ${mustBuildFeatures.slice(0, 2).join(', ')}.`,
+      `3. Deploy to a cloud provider within the first 6 hours. Test end-to-end flow.`,
+      `4. Record a backup demo video. Focus the last 2 hours on pitch and slide preparation.`
     ];
   } else if (hours <= 24) {
     executionStrategy = [
-      '1. Database & Route Setup: Build schemas and core REST APIs (first 4 hours).',
-      '2. AI Service Hookup: Connect LLM APIs and set up parser/repaired JSON parsing (hours 4-10).',
-      '3. UI Development: Build responsive dashboard panels, lists, and loading indicators (hours 10-18).',
-      '4. Integration, Testing, Deployment and demo pitch rehearsals (final 6 hours).'
+      `1. Hours 0-4: Database setup, project scaffolding, and auth routes.`,
+      `2. Hours 4-12: Implement core features: ${mustBuildFeatures.join(', ')}.`,
+      `3. Hours 12-20: Build out the frontend UI, connect APIs, and wire state.`,
+      `4. Hours 20-24: Integration testing, deployment, and demo rehearsal.`
     ];
   } else if (hours <= 48) {
     executionStrategy = [
-      '1. Architecture Design & Setup: Establish DB schemas, routers, and test files (first 8 hours).',
-      '2. Core API & State Sync: Implement complete controllers, team sync hooks, and validations (hours 8-20).',
-      '3. Frontend Assembly & Custom Styling: Design premium glassmorphism layouts, lists, and forms (hours 20-36).',
-      '4. Rigorous manual testing, deployments, git-sync verification, and demo day slide preparation (final 12 hours).'
+      `1. Hours 0-8: Architecture planning, DB schemas, and route scaffolding.`,
+      `2. Hours 8-24: Core backend controllers, API services, and validation layers.`,
+      `3. Hours 24-40: Frontend component build, API wiring, and styling (glassmorphism / responsive).`,
+      `4. Hours 40-${hours}: Integration testing, cloud deployment, demo slides, and pitch rehearsal.`
     ];
   } else {
     executionStrategy = [
-      '1. Specification & Framework Setup: Complete database schema designs and REST routes architectures (Day 1).',
-      '2. Feature Implementation Phase: Implement APIs, backend services, and front-end interface layouts (Day 2).',
-      '3. Verification & Optimization: Establish automated task verifiers, performance metrics, and caching (Day 3).',
-      '4. Deployment, styling polish, and extensive judge-day presentation rehearsal (Day 4/Final).'
+      `1. Day 1: Architecture & DB design, REST route scaffolding, and team task assignment.`,
+      `2. Day 2: Full feature implementation — core APIs, frontend components, and auth flows.`,
+      `3. Day 3: Integration, automated testing, code review, and performance optimization.`,
+      `4. Day 4: Final polish, production deployment, demo dry-run, and pitch preparation.`
     ];
   }
 
+  const projectRisks = [
+    parsedFeatures.length > 5 ? `Scope creep risk: ${parsedFeatures.length} features planned — consider trimming to ${Math.min(4, parsedFeatures.length)} for the hackathon window` : 'Scope creep if optional features are not frozen early',
+    hours < 24 ? `Extremely tight ${hours}-hour window — any integration delays will cascade` : `Integration risks if AI service or third-party APIs fail during live demo`,
+    memberLines.length === 1 ? 'Single-member team: no parallel development; plan carefully' : 'Risk of uneven workload distribution across team members'
+  ].filter(Boolean);
+
+  const improvementSuggestions = [
+    `Prioritize a working end-to-end demo flow for: ${mustBuildFeatures[0] || 'core feature'} above all else.`,
+    uniqueSkills.length > 0 ? `Leverage team strengths in ${uniqueSkills.slice(0, 3).join(', ')} for the highest-impact components.` : 'Assign tasks based on individual skill strengths to maximize output velocity.',
+    `Set a feature freeze at ${Math.round(hours * 0.75)} hours — no new features beyond that point.`,
+    `Prepare a fallback demo with mock/seed data in case live database or AI APIs become unreliable.`
+  ];
+
   return {
-    feasibilityScore: 8.5,
-    problemSolutionAlignment: 'The proposed solution aligns strongly with the problem of hackathon scope inflation. The core features address the key pain points directly, but the technical scope is slightly high for the duration.',
-    projectRisks: [
-      'AI service integration timeout risks',
-      'Incomplete feature loop on user dashboards during live presentation',
-      'Scope creep leading to unfinished components'
-    ],
-    missingSkills: [
-      'Cloud infrastructure configuration',
-      'Professional database scaling'
-    ],
-    mustBuildFeatures: [
-      'AI Project Review Core API',
-      'Form Validation and character thresholds',
-      'Loading/spinner dashboard feedback'
-    ],
-    optionalFeatures: [
-      'Team member messaging integrations',
-      'Live sync with GitHub repo commits'
-    ],
-    featuresToRemove: [
-      'Advanced LLM multi-agent fine-tuning modules'
-    ],
-    improvementSuggestions: [
-      'Focus strictly on validating problem statement text input to ensure high review accuracy.',
-      'Optimize temperature settings to 0 to yield highly deterministic responses.'
-    ],
-    reasoning: 'The technical blueprint is highly structured, and the team members possess strong full-stack skills. Postponing high-overhead features will guarantee a successful working prototype.',
-    judgePerspective: 'Judges will prioritize a functional end-to-end user loop. Avoid displaying too many disabled features on the UI during demo day.',
+    feasibilityScore: parsedFeatures.length > 8 ? 6.5 : parsedFeatures.length > 5 ? 7.5 : 8.5,
+    problemSolutionAlignment: psa,
+    projectRisks,
+    missingSkills,
+    mustBuildFeatures,
+    optionalFeatures,
+    featuresToRemove,
+    improvementSuggestions,
+    reasoning: `${projectName} has a ${parsedFeatures.length > 0 ? parsedFeatures.length + '-feature' : 'defined'} scope targeting the ${track || 'hackathon'} track over ${hours} hours. ${memberLines.length > 0 ? `The team (${memberLines.map(m => m.name).join(', ')}) brings skills in ${uniqueSkills.slice(0, 4).join(', ')}.` : ''} Focus on delivering must-build features first before touching optional ones.`,
+    judgePerspective: `Judges evaluating a ${track || 'hackathon'} project will prioritize a seamless end-to-end demo. Ensure ${mustBuildFeatures[0] || 'the core feature'} is fully functional and polished. Avoid showing disabled or incomplete UI sections. Lead with the problem statement impact.`,
     executionStrategy
   };
 };

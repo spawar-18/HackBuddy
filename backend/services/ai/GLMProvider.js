@@ -59,12 +59,18 @@ class GLMProvider {
       messages.push({ role: 'user', content: payload.contents });
     }
 
-    const response = await this.client.chat.completions.create({
+    const request = {
       model: this.modelName,
       messages,
       temperature: payload.temperature !== undefined ? payload.temperature : (payload.isJson ? 0.0 : 0.2),
-      max_tokens: 2000
-    });
+      max_tokens: 4000
+    };
+
+    if (payload.isJson) {
+      request.response_format = { type: 'json_object' };
+    }
+
+    const response = await this.client.chat.completions.create(request);
 
     const content = response.choices?.[0]?.message?.content;
     if (!content) {

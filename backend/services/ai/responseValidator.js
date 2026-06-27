@@ -16,7 +16,11 @@ class ResponseValidator {
         required: [
           'feasibilityScore', 'problemSolutionAlignment', 'projectRisks', 'missingSkills',
           'mustBuildFeatures', 'optionalFeatures', 'featuresToRemove', 'improvementSuggestions',
-          'reasoning', 'judgePerspective', 'executionStrategy'
+          'reasoning', 'judgePerspective', 'executionStrategy', 'executiveSummary',
+          'innovation', 'architecture', 'security', 'performance', 'scalability',
+          'database', 'deployment', 'ui', 'aiUsage', 'judgeScore', 'riskAnalysis',
+          'strengths', 'weaknesses', 'recommendations', 'presentationTips',
+          'investmentReadiness', 'hackathonWinningProbability', 'charts'
         ],
         defaults: {
           feasibilityScore: 5.0,
@@ -31,6 +35,8 @@ class ResponseValidator {
           missingSkills: [],
           riskTimeline: [],
           featureCoverage: [],
+          executionPlan: [],
+          judgeTips: [],
           roadmap: [],
           problemSolutionAlignment: '',
           projectRisks: [],
@@ -40,7 +46,28 @@ class ResponseValidator {
           improvementSuggestions: [],
           reasoning: '',
           judgePerspective: '',
-          executionStrategy: []
+          executionStrategy: [],
+          executiveSummary: '',
+          innovation: { score: 60, summary: '', recommendations: [] },
+          architecture: { score: 60, summary: '', recommendations: [] },
+          security: { score: 60, summary: '', risks: [], recommendations: [] },
+          performance: { score: 60, summary: '', recommendations: [] },
+          scalability: { score: 60, summary: '', recommendations: [] },
+          database: { score: 60, summary: '', recommendations: [] },
+          deployment: { score: 60, summary: '', recommendations: [] },
+          ui: { score: 60, summary: '', recommendations: [] },
+          aiUsage: { score: 60, summary: '', recommendations: [] },
+          judgeScore: 60,
+          riskAnalysis: [],
+          recommendations: [],
+          presentationTips: [],
+          investmentReadiness: { score: 50, summary: '', blockers: [] },
+          hackathonWinningProbability: 50,
+          charts: {
+            radar: [],
+            gauges: [],
+            timeline: []
+          }
         }
       },
       generateTaskPlan: {
@@ -55,7 +82,15 @@ class ResponseValidator {
           executionOrder: [],
           criticalTasks: [],
           recommendedFocus: [],
-          warnings: []
+          warnings: [],
+          milestones: [],
+          deliverables: [],
+          criticalPath: [],
+          dependencies: [],
+          epics: [],
+          dependencyGraph: { nodes: [], edges: [] },
+          marketplace: { requests: [], history: [], activityLog: [], recommendations: [] },
+          executionMetrics: {}
         }
       },
       getMarketplaceRecommendation: {
@@ -75,13 +110,27 @@ class ResponseValidator {
           recommendedChanges: [],
           recommendedStack: { frontend: [], backend: [], database: [], ai: [], deployment: [] },
           reasoning: '',
-          finalRecommendation: ''
+          finalRecommendation: '',
+          advantages: [],
+          disadvantages: [],
+          ecosystem: '',
+          learningCurve: '',
+          community: '',
+          maintenance: '',
+          performance: '',
+          aiCompatibility: '',
+          futureScalability: '',
+          alternatives: [],
+          negotiationSuggestions: [],
+          confidence: 50
         }
       },
       analyzeHackathonCommandCenter: {
         required: [
           'overallStatus', 'riskLevel', 'completionPrediction', 'currentFocus',
-          'tasksToPostpone', 'reasoning', 'judgePreparationTips', 'executionStrategy'
+          'tasksToPostpone', 'reasoning', 'judgePreparationTips', 'executionStrategy',
+          'alerts', 'predictions', 'focusAreas', 'scopeReductionSuggestions',
+          'riskScore', 'completionProbability'
         ],
         defaults: {
           overallStatus: 'On Track',
@@ -94,7 +143,13 @@ class ResponseValidator {
           executionStrategy: [],
           winningProbability: 50,
           alerts: [],
+          predictions: [],
+          focusAreas: [],
+          scopeReductionSuggestions: [],
+          riskScore: 50,
+          completionProbability: 50,
           dynamicScopeCutSuggestions: [],
+          nextBestTask: { task: '', assignedTo: '', reason: '' },
           productivityTrend: 'Stable',
           burndownVelocity: 0,
           readinessScores: { judge: 50, deployment: 50, demo: 50, testing: 50 }
@@ -120,7 +175,28 @@ class ResponseValidator {
           developerProductivity: [],
           codeComplexity: 'Medium',
           mergeRisk: 'Low',
-          heatmap: []
+          heatmap: [],
+          commits: [],
+          contributors: [],
+          issues: [],
+          branches: [],
+          pullRequests: [],
+          repositoryHealthScore: 50,
+          codeQuality: 'Unknown',
+          velocity: 'Unknown',
+          contributionHeatmap: [],
+          aiSuggestions: []
+        }
+      },
+      chatWithMentor: {
+        required: ['answer', 'confidence', 'recommendations', 'memoryUpdates'],
+        defaults: {
+          answer: 'I am sorry, I encountered an issue generating a response.',
+          confidence: 50,
+          recommendations: [],
+          followUpActions: [],
+          relatedTasks: [],
+          memoryUpdates: {}
         }
       },
       verifyTaskWithAI: {
@@ -149,6 +225,21 @@ class ResponseValidator {
         defaults: {
           skills: []
         }
+      },
+      extractMentorMemory: {
+        required: ['architectureDecisions', 'techStackDecisions', 'projectMilestones', 'previousAiAdvice'],
+        defaults: {
+          architectureDecisions: [],
+          techStackDecisions: [],
+          projectMilestones: [],
+          previousAiAdvice: [],
+          currentBlockers: [],
+          completedTasks: [],
+          recentRecommendations: [],
+          currentSprint: '',
+          hackathonStage: '',
+          githubStatus: ''
+        }
       }
     };
   }
@@ -160,10 +251,20 @@ class ResponseValidator {
    * @returns {object|string} Normalized JSON object, or raw text if not JSON module
    */
   validateAndNormalize(text, moduleName) {
-    // If the module is chatWithMentor, it expects raw markdown text, not JSON
-    if (moduleName === 'chatWithMentor') {
-      if (!text || typeof text !== 'string') return 'I am sorry, I encountered an issue generating a response.';
-      return JSONRepairService.stripThinkTags(text);
+    try {
+      return this.validateOrThrow(text, moduleName);
+    } catch (err) {
+      const schema = this.schemas[moduleName];
+      if (!schema) return text;
+      console.warn(`[ResponseValidator] Failed to parse/validate for ${moduleName}: ${err.message}. Returning default state.`);
+      if (moduleName === 'chatWithMentor') return schema.defaults.answer;
+      return schema.defaults;
+    }
+  }
+
+  validateOrThrow(text, moduleName) {
+    if (!text || (typeof text === 'string' && text.trim().length === 0)) {
+      throw new Error('Empty AI response');
     }
 
     const schema = this.schemas[moduleName];
@@ -172,36 +273,82 @@ class ResponseValidator {
       try {
         return JSONRepairService.repairAndParse(text);
       } catch (e) {
-        return text;
+        if (typeof text === 'string' && text.trim().length > 0) return text;
+        throw new Error('Empty unstructured response');
       }
     }
 
-    try {
-      const parsed = JSONRepairService.repairAndParse(text);
-      
-      // Normalize: check required fields and fill defaults
-      const normalized = { ...schema.defaults };
-      
-      Object.keys(schema.defaults).forEach(key => {
-        if (parsed[key] !== undefined && parsed[key] !== null) {
-          // Type matching (basic checks)
-          if (Array.isArray(schema.defaults[key])) {
-            normalized[key] = Array.isArray(parsed[key]) ? parsed[key] : [parsed[key]];
-          } else if (typeof schema.defaults[key] === 'object') {
-            normalized[key] = (typeof parsed[key] === 'object' && !Array.isArray(parsed[key])) 
-              ? { ...schema.defaults[key], ...parsed[key] } 
-              : parsed[key];
-          } else {
-            normalized[key] = parsed[key];
-          }
-        }
-      });
+    const parsed = typeof text === 'string' ? JSONRepairService.repairAndParse(text) : text;
+    return this.normalizeObject(parsed, moduleName, { strict: true });
+  }
 
-      return normalized;
-    } catch (err) {
-      console.warn(`[ResponseValidator] Failed to parse/validate for ${moduleName}: ${err.message}. Returning default state.`);
-      return schema.defaults;
+  normalizeObject(parsed, moduleName, { strict = false } = {}) {
+    const schema = this.schemas[moduleName];
+    if (!schema) return parsed;
+
+    if (!parsed || typeof parsed !== 'object' || Array.isArray(parsed)) {
+      throw new Error(`Invalid ${moduleName} response: expected JSON object`);
     }
+
+    const allowedKeys = new Set(Object.keys(schema.defaults));
+    const hallucinatedKeys = Object.keys(parsed).filter(key => !allowedKeys.has(key));
+    if (strict && hallucinatedKeys.length > 0) {
+      throw new Error(`Response contains unsupported keys: ${hallucinatedKeys.join(', ')}`);
+    }
+
+    const missingKeys = schema.required.filter(key => parsed[key] === undefined || parsed[key] === null || parsed[key] === '');
+    if (strict && missingKeys.length > 0) {
+      throw new Error(`Response missing required keys: ${missingKeys.join(', ')}`);
+    }
+
+    const normalized = { ...schema.defaults };
+
+    Object.keys(schema.defaults).forEach(key => {
+      if (parsed[key] !== undefined && parsed[key] !== null) {
+        if (Array.isArray(schema.defaults[key])) {
+          normalized[key] = Array.isArray(parsed[key]) ? parsed[key] : [parsed[key]];
+        } else if (typeof schema.defaults[key] === 'object') {
+          normalized[key] = (typeof parsed[key] === 'object' && !Array.isArray(parsed[key]))
+            ? { ...schema.defaults[key], ...parsed[key] }
+            : schema.defaults[key];
+        } else {
+          normalized[key] = parsed[key];
+        }
+      }
+    });
+
+    return normalized;
+  }
+
+  normalizeMentorResponse(result) {
+    const schema = this.schemas.chatWithMentor;
+    if (typeof result === 'string') {
+      return {
+        answer: result,
+        confidence: schema.defaults.confidence,
+        recommendations: [],
+        followUpActions: [],
+        relatedTasks: []
+      };
+    }
+
+    if (typeof result === 'object' && result !== null) {
+      return {
+        answer: result.answer || schema.defaults.answer,
+        confidence: result.confidence ?? schema.defaults.confidence,
+        recommendations: result.recommendations || [],
+        followUpActions: result.followUpActions || [],
+        relatedTasks: result.relatedTasks || []
+      };
+    }
+
+    return {
+      answer: schema.defaults.answer,
+      confidence: schema.defaults.confidence,
+      recommendations: [],
+      followUpActions: [],
+      relatedTasks: []
+    };
   }
 }
 

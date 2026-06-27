@@ -3,6 +3,7 @@ const Team = require('../models/Team');
 const User = require('../models/User');
 const HackathonConfig = require('../models/HackathonConfig');
 const { analyzeProjectWithAI } = require('../services/aiService');
+const CacheManager = require('../services/ai/CacheManager');
 
 // Helper to compare user IDs (handles populated user objects and ObjectIds)
 const isSameUser = (id1, id2) => {
@@ -232,6 +233,7 @@ exports.updateProject = async (req, res) => {
       // Auto-invalidate task plan when critical fields change
       project.taskPlan = null;
       project.taskPlanGeneratedAt = null;
+      CacheManager.invalidate(projectId);
     }
 
     if (status !== undefined) {
@@ -277,6 +279,7 @@ exports.deleteProject = async (req, res) => {
     }
 
     await project.deleteOne();
+    CacheManager.invalidate(projectId);
 
     res.status(200).json({
       success: true,
@@ -330,7 +333,8 @@ exports.analyzeProject = async (req, res) => {
     }
 
     // 5. Build Context
-    let contextString = `Project Name: ${project.projectName}
+    let contextString = `Project ID: ${project._id}
+Project Name: ${project.projectName}
 Track: ${project.track || 'Not specified'}
 Duration: ${hackathonDuration}
 Problem Statement: ${project.problemStatement}

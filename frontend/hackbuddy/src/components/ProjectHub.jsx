@@ -5,8 +5,6 @@ import {
   updateProject, 
   deleteProject,
   analyzeProject,
-  getChatHistory,
-  sendChatMessage,
   generateTaskPlan,
   regenerateTaskPlan,
   updateTaskStatus
@@ -19,6 +17,7 @@ import {
   ShoppingBag, ChevronDown, ChevronUp, Check, Info, Lightbulb, Ban, Award, 
   ArrowUpRight, HelpCircle, ShieldCheck, Compass, X
 } from 'lucide-react';
+import AIMentor from './AIMentor';
 import TaskMarketplace from './TaskMarketplace';
 import TechStackConsensus from './TechStackConsensus';
 import { useAuth } from '../context/AuthContext';
@@ -447,94 +446,6 @@ const calculateJudgeScores = (feasibilityScore, judgePerspectiveText) => {
     presentation,
     verdict: judgePerspectiveText || 'Focus on presenting a solid, working MVP with an emphasis on solving the core problem statement.'
   };
-};
-
-// Architecture Cards Generator
-const generateArchitectureCards = (project, review) => {
-  const reasoning = (review.reasoning || '').toLowerCase();
-  const description = (project.description || '').toLowerCase();
-  const suggestions = (review.improvementSuggestions || []).join(' ').toLowerCase();
-  const risks = (review.projectRisks || []).join(' ').toLowerCase();
-  
-  const cards = [
-    {
-      id: 'frontend',
-      name: 'Frontend Stack',
-      status: 'Validated',
-      strength: 'Responsive modular UI component framework is ready to scale.',
-      suggestion: 'Utilize client-side state management cache to prevent duplicate loads.'
-    },
-    {
-      id: 'backend',
-      name: 'Backend Core',
-      status: 'Validated',
-      strength: 'RESTful API controller layer structured with input validation schemas.',
-      suggestion: 'Ensure asynchronous request handlers have error boundary catch blocks.'
-    },
-    {
-      id: 'database',
-      name: 'Database Layer',
-      status: 'Validated',
-      strength: 'Data models optimized for document relationships and atomic updates.',
-      suggestion: 'Add index constraints on frequent query filter keys.'
-    },
-    {
-      id: 'ai',
-      name: 'AI Pipeline',
-      status: 'Validated',
-      strength: 'OpenAI/Featherless LLM pipelines configured with retry fallback buffers.',
-      suggestion: 'Add token length checks to avoid model window context truncation.'
-    },
-    {
-      id: 'deployment',
-      name: 'Deployment Devops',
-      status: 'Validated',
-      strength: 'Multi-stage container hosting and environment config pipeline ready.',
-      suggestion: 'Setup health check endpoints and setup CD push triggers.'
-    }
-  ];
-  
-  cards.forEach(card => {
-    let hasRisk = false;
-    if (card.id === 'frontend') {
-      hasRisk = risks.includes('ui') || risks.includes('frontend') || risks.includes('visual') || risks.includes('dashboard') || risks.includes('layout') || risks.includes('styling') || risks.includes('css');
-      if (hasRisk) {
-        card.status = 'Attention';
-        card.strength = 'Standard visual layouts have been planned.';
-        card.suggestion = 'Prioritize completing a single dashboard layout before building sub-views.';
-      }
-    } else if (card.id === 'backend') {
-      hasRisk = risks.includes('backend') || risks.includes('api') || risks.includes('timeout') || risks.includes('route') || risks.includes('server') || risks.includes('controller');
-      if (hasRisk) {
-        card.status = 'Attention';
-        card.strength = 'Server router logic has been prototyped.';
-        card.suggestion = 'Optimize backend handler timeouts and verify payload validations.';
-      }
-    } else if (card.id === 'database') {
-      hasRisk = risks.includes('database') || risks.includes('db') || risks.includes('mongo') || risks.includes('sql') || risks.includes('schema') || risks.includes('collection');
-      if (hasRisk) {
-        card.status = 'Attention';
-        card.strength = 'Basic database schemas have been drafted.';
-        card.suggestion = 'Create simpler document/relational structures to avoid join overhead.';
-      }
-    } else if (card.id === 'ai') {
-      hasRisk = risks.includes('ai') || risks.includes('llm') || risks.includes('model') || risks.includes('token') || risks.includes('prompt') || risks.includes('openai');
-      if (hasRisk) {
-        card.status = 'Attention';
-        card.strength = 'AI request routing pathways have been established.';
-        card.suggestion = 'Implement quick response caching or deterministic fallbacks.';
-      }
-    } else if (card.id === 'deployment') {
-      hasRisk = risks.includes('deploy') || risks.includes('hosting') || risks.includes('production') || risks.includes('aws') || risks.includes('vercel') || risks.includes('host') || risks.includes('ci');
-      if (hasRisk) {
-        card.status = 'Attention';
-        card.strength = 'Standard hosting environments identified.';
-        card.suggestion = 'Deploy a hello-world API within the first 6 hours of the hackathon.';
-      }
-    }
-  });
-  
-  return cards;
 };
 
 // Sub-Component 1: Feasibility Score Card
@@ -1197,59 +1108,6 @@ const ExecutionTimeline = ({ strategy }) => {
   );
 };
 
-// Sub-Component 11: Architecture Validation List
-const ArchitectureValidationList = ({ project, review }) => {
-  const cards = generateArchitectureCards(project, review);
-
-  return (
-    <div className="flex flex-col gap-2">
-      <span className="text-[10px] font-bold tracking-wider uppercase" style={{ color: 'rgba(0, 240, 255, 0.7)' }}>System Architecture Validation</span>
-      <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-5 gap-3">
-        {cards.map((card, idx) => {
-          const isAttention = card.status === 'Attention';
-          const badgeColor = isAttention ? '#fbbf24' : '#34d399';
-          const icon = isAttention ? <AlertTriangle size={12} /> : <ShieldCheck size={12} />;
-
-          return (
-            <div 
-              key={idx}
-              className="bg-neutral-50 border border-neutral-200 hover:border-brand-500/50 transition-all duration-300 rounded-xl p-4 flex flex-col gap-2.5 shadow-md hover:-translate-y-0.5 glow-blue"
-            >
-              <div className="flex justify-between items-center gap-2">
-                <span className="text-xs font-bold" style={{ color: '#ffffff' }}>{card.name}</span>
-                <span 
-                  className="text-[8px] font-bold px-1.5 py-0.5 rounded-md border flex items-center gap-0.5 uppercase tracking-wider font-mono"
-                  style={{ 
-                    color: badgeColor, 
-                    borderColor: `${badgeColor}30`, 
-                    backgroundColor: `${badgeColor}10` 
-                  }}
-                >
-                  {icon} {card.status}
-                </span>
-              </div>
-              <div className="flex flex-col gap-1.5 text-xs">
-                <div>
-                  <span className="text-[8px] font-bold uppercase tracking-widest block font-mono" style={{ color: '#10b981' }}>Strength</span>
-                  <p className="leading-relaxed mt-0.5" style={{ color: 'rgba(0, 240, 255, 0.85)' }}>{card.strength}</p>
-                </div>
-                <div 
-                  className="border-t pt-1.5 mt-0.5"
-                  style={{ borderColor: 'rgba(0, 240, 255, 0.12)' }}
-                >
-                  <span className="text-[8px] font-bold uppercase tracking-widest block font-mono" style={{ color: '#00f0ff' }}>Optimization</span>
-                  <p className="leading-relaxed mt-0.5" style={{ color: 'rgba(0, 240, 255, 0.65)' }}>{card.suggestion}</p>
-                </div>
-              </div>
-            </div>
-          );
-        })}
-      </div>
-    </div>
-  );
-};
-
-
 const ProjectHub = ({ teamId, initialView }) => {
   const [project, setProject] = useState(null);
   const [loading, setLoading] = useState(true);
@@ -1257,15 +1115,9 @@ const ProjectHub = ({ teamId, initialView }) => {
   const [reviewLoading, setReviewLoading] = useState(false);
   const [splitterLoading, setSplitterLoading] = useState(false);
   const [splitterStatus, setSplitterStatus] = useState('');
-  const [chatMessages, setChatMessages] = useState([]);
-  const [chatLoading, setChatLoading] = useState(false);
-  const [chatInput, setChatInput] = useState('');
-  const [chatError, setChatError] = useState(null);
-  const [historyLoading, setHistoryLoading] = useState(false);
   const [view, setView] = useState('dashboard'); // 'dashboard', 'create', 'edit'
   const [activeTaskPlanTab, setActiveTaskPlanTab] = useState('roadmap');
   const [hoveredMember, setHoveredMember] = useState(null);
-  const messagesContainerRef = useRef(null);
   const [quickFeatureInput, setQuickFeatureInput] = useState('');
   const [quickFeatureSaving, setQuickFeatureSaving] = useState(false);
 
@@ -1304,16 +1156,6 @@ const ProjectHub = ({ teamId, initialView }) => {
     }
   };
 
-  // Auto-scroll chat window
-  useEffect(() => {
-    if (messagesContainerRef.current) {
-      messagesContainerRef.current.scrollTo({
-        top: messagesContainerRef.current.scrollHeight,
-        behavior: 'smooth'
-      });
-    }
-  }, [chatMessages, chatLoading]);
-  
   // Form State
   const [projectName, setProjectName] = useState('');
   const [problemStatement, setProblemStatement] = useState('');
@@ -1553,60 +1395,6 @@ const ProjectHub = ({ teamId, initialView }) => {
     }
   };
 
-  const openMentorChat = async () => {
-    setView('mentor-chat');
-    setChatError(null);
-    try {
-      setHistoryLoading(true);
-      const res = await getChatHistory(project._id);
-      if (res.success) {
-        setChatMessages(res.messages || []);
-      }
-    } catch (err) {
-      console.error(err);
-      setChatError('Failed to load chat history. You can still send new messages.');
-    } finally {
-      setHistoryLoading(false);
-    }
-  };
-
-  const handleSendChatMessage = async (msgText) => {
-    const textToSend = msgText || chatInput;
-    if (!textToSend || !textToSend.trim()) return;
-    if (chatLoading) return;
-
-    setChatError(null);
-    setChatLoading(true);
-    
-    // Optimistic update
-    const tempUserMsg = {
-      _id: 'temp_user_' + Date.now(),
-      role: 'user',
-      message: textToSend.trim(),
-      createdAt: new Date().toISOString()
-    };
-    setChatMessages(prev => [...prev, tempUserMsg]);
-    setChatInput('');
-
-    try {
-      const res = await sendChatMessage(project._id, textToSend.trim());
-      if (res.success) {
-        // Replace temp message with saved messages
-        setChatMessages(prev => {
-          const filtered = prev.filter(m => !m._id.startsWith('temp_'));
-          return [...filtered, res.userMessage, res.assistantMessage];
-        });
-      }
-    } catch (err) {
-      console.error(err);
-      setChatError(err.response?.data?.message || 'Failed to send message to AI Mentor.');
-      // Remove temp message on failure
-      setChatMessages(prev => prev.filter(m => !m._id.startsWith('temp_')));
-    } finally {
-      setChatLoading(false);
-    }
-  };
-
   // Handle Create Submit
   const handleCreateProject = async (e) => {
     e.preventDefault();
@@ -1764,7 +1552,7 @@ const ProjectHub = ({ teamId, initialView }) => {
             {project.projectReviewGeneratedAt && (
               <button
                 type="button"
-                onClick={openMentorChat}
+                onClick={() => setView('mentor-chat')}
                 className="btn-secondary text-[10px] py-1 px-2.5 cursor-pointer w-fit border-brand-200 bg-brand-50/20 text-brand-700 hover:bg-brand-50/40"
               >
                 Open AI Mentor
@@ -2089,11 +1877,6 @@ const ProjectHub = ({ teamId, initialView }) => {
               )}
             </div>
 
-          </div>
-
-          {/* 11. System Architecture Validation Full-Width */}
-          <div className="mt-2 animate-slide-up">
-            <ArchitectureValidationList project={project} review={project.projectReview} />
           </div>
 
           <div className="flex gap-3 justify-end mt-4 pt-4 border-t border-neutral-800">
@@ -2769,141 +2552,7 @@ const ProjectHub = ({ teamId, initialView }) => {
 
       {/* AI Mentor Chat View */}
       {view === 'mentor-chat' && project && (
-        <div className="flex flex-col overflow-hidden bg-white border border-neutral-200 rounded-xl h-[550px] shadow-xs w-full">
-          {/* Header */}
-          <div className="flex justify-between items-center px-4 py-3 border-b border-neutral-100 bg-white sticky top-0 z-10 shrink-0">
-            <div className="flex items-center gap-2.5">
-              <div className="w-8 h-8 rounded-full bg-brand-50 text-brand-600 flex items-center justify-center shrink-0">
-                <Cpu size={16} />
-              </div>
-              <div>
-                <h2 className="text-sm font-bold text-neutral-900 leading-tight">AI Mentor</h2>
-                <p className="text-[10px] text-neutral-400 leading-none mt-0.5">
-                  Ask questions about your project scope, risks, pitch, and execution.
-                </p>
-              </div>
-            </div>
-            <button 
-              type="button" 
-              onClick={() => setView('dashboard')}
-              className="flex items-center gap-1 text-neutral-500 hover:text-neutral-900 text-xs font-semibold cursor-pointer border-0 bg-transparent"
-            >
-              <ArrowLeft size={12} /> Back
-            </button>
-          </div>
-
-          {/* Messages Window */}
-          <div 
-            ref={messagesContainerRef}
-            className="flex-1 overflow-y-auto p-4 flex flex-col gap-3.5 bg-neutral-50/50 min-h-0"
-          >
-            {historyLoading ? (
-              <div className="flex flex-col items-center justify-center h-full text-neutral-400">
-                <RefreshCw className="animate-spin text-brand-500 mb-2" size={20} />
-                <span className="text-xs font-semibold">Loading conversation history...</span>
-              </div>
-            ) : chatMessages.length === 0 ? (
-              <div className="flex flex-col items-center justify-center h-full text-center px-6 py-4">
-                <div className="w-12 h-12 rounded-full bg-brand-50 text-brand-600 flex items-center justify-center mb-3">
-                  <Cpu size={24} />
-                </div>
-                <h4 className="font-bold text-neutral-900 text-sm">Ask the AI Mentor anything</h4>
-                <p className="text-xs text-neutral-500 max-w-[340px] leading-relaxed mt-1 mb-3 mx-auto">
-                  The AI mentor is fully context-aware of your problem statement, deliverables, team profile, and review report.
-                </p>
-                <div className="text-[10px] text-neutral-400 font-medium italic">
-                  Try clicking one of the suggested questions below to start.
-                </div>
-              </div>
-            ) : (
-              chatMessages.map((msg) => (
-                <div 
-                  key={msg._id} 
-                  className={`flex ${msg.role === 'user' ? 'justify-end' : 'justify-start'}`}
-                >
-                  <div className={`max-w-[80%] p-3.5 rounded-2xl text-xs md:text-sm leading-relaxed shadow-3xs ${
-                    msg.role === 'user' 
-                      ? 'bg-neutral-900 text-white rounded-tr-xs' 
-                      : 'bg-white border border-neutral-200/80 text-neutral-800 rounded-tl-xs'
-                  }`}>
-                    {msg.role === 'user' ? msg.message : renderMarkdown(msg.message)}
-                    <div className={`text-[9px] mt-1.5 text-right ${msg.role === 'user' ? 'text-white/60' : 'text-neutral-400'}`}>
-                      {msg.createdAt ? new Date(msg.createdAt).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }) : 'Just now'}
-                    </div>
-                  </div>
-                </div>
-              ))
-            )}
-            
-            {/* Thinking / Typing indicator */}
-            {chatLoading && (
-              <div className="flex justify-start animate-pulse">
-                <div className="bg-white border border-neutral-200 text-neutral-800 p-3 rounded-2xl rounded-tl-xs text-xs flex items-center gap-2">
-                  <RefreshCw className="animate-spin text-brand-500" size={12} />
-                  <span className="font-semibold text-neutral-500">AI Mentor is drafting response...</span>
-                </div>
-              </div>
-            )}
-
-            {/* Error Display */}
-            {chatError && (
-              <div className="bg-red-50 border border-red-200 text-red-800 px-3 py-2 rounded-lg text-xs text-center">
-                {chatError}
-              </div>
-            )}
-          </div>
-
-          {/* Quick Action Suggested Chips */}
-          <div className="px-4 py-2 flex gap-2 overflow-x-auto border-t border-neutral-200 bg-white shrink-0 scrollbar-none">
-            {[
-              'Why is my score low?',
-              'How can we improve?',
-              'What will judges like?',
-              'Which feature should we prioritize?',
-              'What should we remove?',
-              'Can we finish on time?',
-              'What should our demo flow be?',
-              'What questions might judges ask?'
-            ].map((suggested, idx) => (
-              <button
-                key={idx}
-                type="button"
-                disabled={chatLoading}
-                onClick={() => handleSendChatMessage(suggested)}
-                className="px-3 py-1.5 bg-neutral-50 hover:bg-neutral-100 border border-neutral-200 text-xs font-semibold text-neutral-600 hover:text-neutral-900 rounded-full cursor-pointer transition-all shadow-3xs whitespace-nowrap"
-              >
-                {suggested}
-              </button>
-            ))}
-          </div>
-
-          {/* Text input area */}
-          <div className="p-3 bg-white border-t border-neutral-200 flex gap-2 items-center sticky bottom-0 z-10 shrink-0">
-            <textarea
-              rows={1}
-              disabled={chatLoading}
-              value={chatInput}
-              onChange={(e) => setChatInput(e.target.value)}
-              onKeyDown={(e) => {
-                if (e.key === 'Enter' && !e.shiftKey) {
-                  e.preventDefault();
-                  handleSendChatMessage();
-                }
-              }}
-              placeholder="Ask about your project..."
-              className="flex-1 form-input"
-              style={{ resize: 'none', maxHeight: '42px' }}
-            />
-            <button
-              type="button"
-              disabled={chatLoading || !chatInput.trim()}
-              onClick={() => handleSendChatMessage()}
-              className="btn-primary text-xs py-2 px-4 shadow-xs shrink-0 cursor-pointer"
-            >
-              Send
-            </button>
-          </div>
-        </div>
+        <AIMentor project={project} onBack={() => setView('dashboard')} />
       )}
 
       {/* Tech Stack Consensus View */}

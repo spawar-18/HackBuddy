@@ -2,6 +2,7 @@ const Team = require('../models/Team');
 const User = require('../models/User');
 const Project = require('../models/Project');
 const { generateInviteCode } = require('../utils/inviteCode');
+const CacheManager = require('../services/ai/CacheManager');
 
 // @desc    Create a new team
 // @route   POST /api/team/create
@@ -77,8 +78,12 @@ exports.joinTeam = async (req, res) => {
     
     await team.save();
 
-    // Invalidate project task plan as team membership changed
+    // Invalidate project task plan and cache as team membership changed
     try {
+      const projects = await Project.find({ teamId: team._id });
+      for (const proj of projects) {
+        CacheManager.invalidate(proj._id);
+      }
       await Project.updateMany(
         { teamId: team._id },
         { $set: { taskPlan: null, taskPlanGeneratedAt: null } }
@@ -196,8 +201,12 @@ exports.leaveTeam = async (req, res) => {
     
     await team.save();
 
-    // Invalidate project task plan as team membership changed
+    // Invalidate project task plan and cache as team membership changed
     try {
+      const projects = await Project.find({ teamId: team._id });
+      for (const proj of projects) {
+        CacheManager.invalidate(proj._id);
+      }
       await Project.updateMany(
         { teamId: team._id },
         { $set: { taskPlan: null, taskPlanGeneratedAt: null } }
@@ -255,8 +264,12 @@ exports.removeMember = async (req, res) => {
     
     await team.save();
 
-    // Invalidate project task plan as team membership changed
+    // Invalidate project task plan and cache as team membership changed
     try {
+      const projects = await Project.find({ teamId: team._id });
+      for (const proj of projects) {
+        CacheManager.invalidate(proj._id);
+      }
       await Project.updateMany(
         { teamId: team._id },
         { $set: { taskPlan: null, taskPlanGeneratedAt: null } }

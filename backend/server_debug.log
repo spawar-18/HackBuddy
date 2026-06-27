@@ -1,27 +1,3 @@
 [AIProviderManager] Registered provider: GLMProvider (zai-org/GLM-4.7-Flash)
 [AIProviderManager] Registered provider: DeepSeekProvider (deepseek-ai/DeepSeek-V4-Flash)
 [AIProviderManager] Registered provider: GeminiProvider (gemini-2.0-flash)
-Successfully connected to MongoDB Atlas
-Server is running on port 5000
-[DEBUG] getMyTeams called by user: 6a265746b1a1c29afedf3e69
-[DEBUG] getMyTeams found teams: [{"id":"6a390e011b4929bad5c6d64d","name":"Vibecoders"},{"id":"6a3925fe5d71e86ea882c3cb","name":"BugSolvers"},{"id":"6a3ad641c0b9fc7aa496a90f","name":"bugcrushers"},{"id":"6a3ad6dfee899979c52f7816","name":"CodeSmashers"},{"id":"6a3ade6cb85814ce17284608","name":"Vibers"},{"id":"6a3d4f5e54d4b3f9b2a09c66","name":"Code Wariors"},{"id":"6a3e54bae638e97fab01a2e2","name":"VibeCoders"}]
-[DEBUG] getMyTeams called by user: 6a265746b1a1c29afedf3e69
-[DEBUG] getMyTeams found teams: [{"id":"6a390e011b4929bad5c6d64d","name":"Vibecoders"},{"id":"6a3925fe5d71e86ea882c3cb","name":"BugSolvers"},{"id":"6a3ad641c0b9fc7aa496a90f","name":"bugcrushers"},{"id":"6a3ad6dfee899979c52f7816","name":"CodeSmashers"},{"id":"6a3ade6cb85814ce17284608","name":"Vibers"},{"id":"6a3d4f5e54d4b3f9b2a09c66","name":"Code Wariors"},{"id":"6a3e54bae638e97fab01a2e2","name":"VibeCoders"}]
-[aiService] Routing team readiness analysis to AIEngine...
-[AIEngine] executeAI invoked for module "analyzeTeam" and project "6a3e5723e638e97fab01a2e5"
-[AIProviderManager] Pipeline Stage 1: Running GLM-5.2...
-[AIProviderManager] Pipeline Stage 2: Running DeepSeek-V4-Pro...
-[LoggingService] Call recorded: analyzeTeam via DeepSeekProvider/deepseek-ai/DeepSeek-V4-Flash | Latency: 8273ms | Retries: 0 | Status: SUCCESS
-[DEBUG] getMyTeams called by user: 6a265746b1a1c29afedf3e69
-[DEBUG] getMyTeams found teams: [{"id":"6a390e011b4929bad5c6d64d","name":"Vibecoders"},{"id":"6a3925fe5d71e86ea882c3cb","name":"BugSolvers"},{"id":"6a3ad641c0b9fc7aa496a90f","name":"bugcrushers"},{"id":"6a3ad6dfee899979c52f7816","name":"CodeSmashers"},{"id":"6a3ade6cb85814ce17284608","name":"Vibers"},{"id":"6a3d4f5e54d4b3f9b2a09c66","name":"Code Wariors"},{"id":"6a3e54bae638e97fab01a2e2","name":"VibeCoders"}]
-[DEBUG] getMyTeams called by user: 6a265746b1a1c29afedf3e69
-[DEBUG] getMyTeams found teams: [{"id":"6a390e011b4929bad5c6d64d","name":"Vibecoders"},{"id":"6a3925fe5d71e86ea882c3cb","name":"BugSolvers"},{"id":"6a3ad641c0b9fc7aa496a90f","name":"bugcrushers"},{"id":"6a3ad6dfee899979c52f7816","name":"CodeSmashers"},{"id":"6a3ade6cb85814ce17284608","name":"Vibers"},{"id":"6a3d4f5e54d4b3f9b2a09c66","name":"Code Wariors"},{"id":"6a3e54bae638e97fab01a2e2","name":"VibeCoders"}]
-[DEBUG] getMyTeams called by user: 6a265746b1a1c29afedf3e69
-[DEBUG] getMyTeams found teams: [{"id":"6a390e011b4929bad5c6d64d","name":"Vibecoders"},{"id":"6a3925fe5d71e86ea882c3cb","name":"BugSolvers"},{"id":"6a3ad641c0b9fc7aa496a90f","name":"bugcrushers"},{"id":"6a3ad6dfee899979c52f7816","name":"CodeSmashers"},{"id":"6a3ade6cb85814ce17284608","name":"Vibers"},{"id":"6a3d4f5e54d4b3f9b2a09c66","name":"Code Wariors"},{"id":"6a3e54bae638e97fab01a2e2","name":"VibeCoders"}]
-[DEBUG] getMyTeams called by user: 6a265746b1a1c29afedf3e69
-[DEBUG] getMyTeams found teams: [{"id":"6a390e011b4929bad5c6d64d","name":"Vibecoders"},{"id":"6a3925fe5d71e86ea882c3cb","name":"BugSolvers"},{"id":"6a3ad641c0b9fc7aa496a90f","name":"bugcrushers"},{"id":"6a3ad6dfee899979c52f7816","name":"CodeSmashers"},{"id":"6a3ade6cb85814ce17284608","name":"Vibers"},{"id":"6a3d4f5e54d4b3f9b2a09c66","name":"Code Wariors"},{"id":"6a3e54bae638e97fab01a2e2","name":"VibeCoders"}]
-[aiService] Routing team readiness analysis to AIEngine...
-[AIEngine] executeAI invoked for module "analyzeTeam" and project "6a390f1a1b4929bad5c6d652"
-[AIProviderManager] Pipeline Stage 1: Running GLM-5.2...
-[AIProviderManager] Pipeline Stage 2: Running DeepSeek-V4-Pro...
-[LoggingService] Call recorded: analyzeTeam via DeepSeekProvider/deepseek-ai/DeepSeek-V4-Flash | Latency: 9073ms | Retries: 0 | Status: SUCCESS

@@ -24,7 +24,7 @@ const Login = () => {
       const processGithubLogin = async () => {
         setLoading(true);
         setError('');
-        const result = await githubLogin(code);
+        const result = await githubLogin(code, window.location.origin + '/login');
         setLoading(false);
         if (result.success) {
           navigate('/dashboard');
@@ -165,27 +165,15 @@ const Login = () => {
 
           {/* Social Row: Google and GitHub */}
           <div className="hackos-social-row">
-            {/* Google Button with Overlay */}
-            <div className="google-overlay-container">
-              <div className="google-overlay-iframe-wrapper">
-                <GoogleLogin
-                  onSuccess={handleGoogleSuccess}
-                  onError={handleGoogleError}
-                  theme="outline"
-                  shape="rectangular"
-                  size="large"
-                  width="180"
-                />
-              </div>
-              <div className="google-overlay-custom-btn">
-                <svg viewBox="0 0 24 24" width="16" height="16">
-                  <path fill="#4285F4" d="M23.745 12.27c0-.7-.06-1.4-.19-2.07H12v3.92h6.69a5.74 5.74 0 0 1-2.5 3.77v3.13h4.05c2.37-2.18 3.73-5.39 3.73-8.75z" />
-                  <path fill="#34A853" d="M12 24c3.24 0 5.97-1.08 7.96-2.91l-4.05-3.13c-1.12.75-2.56 1.2-3.91 1.2-3.02 0-5.58-2.04-6.49-4.78H1.31v3.23A12 12 0 0 0 12 24z" />
-                  <path fill="#FBBC05" d="M5.51 14.38A7.16 7.16 0 0 1 5.1 12c0-.83.14-1.64.41-2.38V6.39H1.31A12 12 0 0 0 0 12c0 2.21.6 4.3 1.31 5.61l4.2-3.23z" />
-                  <path fill="#EA4335" d="M12 4.75c1.77 0 3.35.61 4.6 1.8l3.43-3.43A11.93 11.93 0 0 0 12 0 12 12 0 0 0 1.31 6.39l4.2 3.23c.91-2.74 3.47-4.78 6.49-4.78z" />
-                </svg>
-                Google
-              </div>
+            <div className="google-login-container">
+              <GoogleLogin
+                onSuccess={handleGoogleSuccess}
+                onError={handleGoogleError}
+                theme="filled_black"
+                shape="rectangular"
+                size="large"
+                width="200"
+              />
             </div>
 
             {/* GitHub Button */}

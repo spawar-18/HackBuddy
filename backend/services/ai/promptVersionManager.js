@@ -7,7 +7,7 @@ class PromptVersionManager {
     this.versions = {
       analyzeTeam: '2.0.0',
       analyzeProject: '2.0.0',
-      chatWithMentor: '2.0.0',
+      chatWithMentor: '3.0.0',
       generateTaskPlan: '2.0.0',
       getMarketplaceRecommendation: '2.0.0',
       analyzeTechStack: '2.0.0',
@@ -15,11 +15,29 @@ class PromptVersionManager {
       analyzeGitHubRepository: '2.0.0',
       verifyTaskWithAI: '2.0.0',
       winningProbability: '2.0.0',
-      extractSkills: '2.0.0'
+      extractSkills: '2.0.0',
+      extractMentorMemory: '2.0.0'
     };
+
+    const now = '2026-06-27T00:00:00.000Z';
+    this.metadata = Object.fromEntries(
+      Object.keys(this.versions).map(moduleName => [
+        moduleName,
+        {
+          id: `hackbuddy.${moduleName}`,
+          version: this.versions[moduleName],
+          module: moduleName,
+          createdAt: now,
+          updatedAt: now,
+          expectedSchema: moduleName,
+          qualityScore: 0.92
+        }
+      ])
+    );
 
     this.systemPrompts = {
       extractSkills: 'You are a technical recruiter. Extract technical skills from the resume and return valid JSON.',
+      extractMentorMemory: 'You extract durable mentor memory from a hackathon coaching exchange. Return only valid JSON.',
       analyzeTeam: `You are an AI Hackathon Team Allocator and Recruiter.
 Analyze this hackathon team based on members and their skills.
 Assign roles based ONLY on technical skills.
@@ -35,17 +53,21 @@ Assess:
 4. Innovation & Technical Risk.
 5. Judge Perspective & Business Value.
 
-Ensure your response contains all required fields, including the original fields (feasibilityScore, mustBuildFeatures, optionalFeatures, featuresToRemove, improvementSuggestions, judgePerspective, executionStrategy) for backward compatibility, alongside the new rich fields (architectureScore, radarAnalysis, priorityMatrix, strengths, weaknesses, riskTimeline, roadmap).`,
+Ensure your response contains all required fields, including the original fields for backward compatibility and the new enterprise review fields for executive summary, security, performance, deployment, UI, AI usage, judge score, risk analysis, investment readiness, hackathon winning probability, and charts-ready JSON.`,
 
-      chatWithMentor: `You are HackVerse AI Mentor, behaving as a Senior Mentor, startup CTO, Lead Developer, and Hackathon Coach.
-You provide highly project-specific, actionable technical guidance.
-Guidelines:
-- Never give generic answers or repeat recommendations.
-- Use current project context, previous decisions, and recent tasks.
-- Keep track of what was already discussed and build on it.
-- Mention current risks, timeline constraints (current time/timer), and recommendations.
-- Give step-by-step actionable directions.
-- Answer in conversational markdown.`,
+      chatWithMentor: `You are HackBuddy AI Mentor V2 — a Senior Software Engineer, Technical Architect, Startup CTO, and Hackathon Mentor embedded inside the user's current project.
+
+You are NOT a general chatbot. You are their project's engineering copilot.
+
+Rules:
+- Understand the question, retrieve relevant context mentally, and answer with project-specific guidance.
+- Reference the current tech stack, tasks, hackathon stage, GitHub progress, and prior discussion when relevant.
+- Never answer generically. Never ignore project context. Never repeat previous answers verbatim.
+- Refuse unrelated questions politely using the refusal template when needed.
+- Keep simple answers concise. Expand for architecture, deployment, debugging, or planning questions.
+- Include reasoning, best practices, trade-offs, next steps, and risks when helpful.
+- Use markdown in the answer field: headings, bullet lists, code blocks, and tables when useful.
+- Return ONLY valid JSON matching the schema. No text outside JSON.`,
 
       generateTaskPlan: `You are a Technical Architect, CTO, and Engineering Manager.
 Break down the project scope into balanced, dependency-aware tasks.
@@ -100,6 +122,7 @@ Output JSON Schema:
 
 Ensure you output ONLY JSON matching this schema:
 {
+  "executiveSummary": "string",
   "feasibilityScore": number (1-10),
   "architectureScore": number (1-100),
   "scalabilityScore": number (1-100),
@@ -146,6 +169,26 @@ Ensure you output ONLY JSON matching this schema:
       "tasks": ["string"]
     }
   ],
+  "innovation": {"score": number, "summary": "string", "recommendations": ["string"]},
+  "architecture": {"score": number, "summary": "string", "recommendations": ["string"]},
+  "security": {"score": number, "summary": "string", "risks": ["string"], "recommendations": ["string"]},
+  "performance": {"score": number, "summary": "string", "recommendations": ["string"]},
+  "scalability": {"score": number, "summary": "string", "recommendations": ["string"]},
+  "database": {"score": number, "summary": "string", "recommendations": ["string"]},
+  "deployment": {"score": number, "summary": "string", "recommendations": ["string"]},
+  "ui": {"score": number, "summary": "string", "recommendations": ["string"]},
+  "aiUsage": {"score": number, "summary": "string", "recommendations": ["string"]},
+  "judgeScore": number,
+  "riskAnalysis": [{"risk": "string", "severity": "Low" | "Medium" | "High", "mitigation": "string"}],
+  "recommendations": ["string"],
+  "presentationTips": ["string"],
+  "investmentReadiness": {"score": number, "summary": "string", "blockers": ["string"]},
+  "hackathonWinningProbability": number,
+  "charts": {
+    "radar": [{"label": "string", "value": number}],
+    "gauges": [{"label": "string", "value": number}],
+    "timeline": [{"label": "string", "status": "string", "date": "string"}]
+  },
   "problemSolutionAlignment": "string",
   "projectRisks": ["string"],
   "mustBuildFeatures": ["string"],
@@ -160,18 +203,49 @@ Ensure you output ONLY JSON matching this schema:
       chatWithMentor: `[PROJECT CONTEXT]
 \${projectContext}
 
+[MENTOR MEMORY]
+\${memoryContext}
+
 INSTRUCTIONS:
-1. Answer the user directly using conversational markdown. Do not wrap in JSON.
-2. Behave as a senior technical coach/CTO.
-3. Review the conversation history and project memory details. Avoid repeating advice or answers already discussed.
-4. Refer to past decisions or milestones explicitly if the user asks a follow-up or related question.
-5. Provide actionable steps tailored specifically to their current stack, tasks, and code.`,
+1. Answer as a senior engineer working inside HackBuddy on THIS project.
+2. Use only the retrieved context above. Do not invent project facts.
+3. Review conversation history and mentor memory. Build on prior advice; do not repeat it.
+4. For off-topic questions, set answer to the refusal message and confidence to 100.
+5. Return ONLY valid JSON:
+{
+  "answer": "markdown string with actionable guidance",
+  "confidence": number (0-100),
+  "recommendations": ["string"],
+  "followUpActions": ["string"],
+  "relatedTasks": ["string"],
+  "memoryUpdates": {
+    "currentBlockers": ["string"],
+    "completedTasks": ["string"],
+    "recentRecommendations": ["string"],
+    "currentImplementation": "string",
+    "currentDebuggingSession": "string",
+    "currentFeature": "string",
+    "currentApis": ["string"],
+    "currentDeploymentIssue": "string"
+  }
+}
+
+Current user request:
+\${userInput}`,
 
       generateTaskPlan: `Input data:
 \${projectContext}
 
 Generate task splitting details in JSON format:
 {
+  "epics": [
+    {
+      "epic": "string",
+      "featureName": "string",
+      "estimatedHours": number,
+      "taskIds": ["string"]
+    }
+  ],
   "projectTasks": {
     "coreFeatures": ["string"],
     "technicalTasks": ["string"],
@@ -183,11 +257,23 @@ Generate task splitting details in JSON format:
       "skills": ["string"],
       "assignedTasks": [
         {
+          "id": "string",
           "task": "string",
+          "taskName": "string",
+          "featureName": "string",
+          "epic": "string",
+          "category": "Frontend" | "Backend" | "Database" | "AI" | "API" | "Testing" | "Deployment" | "Documentation",
+          "priority": "High" | "Medium" | "Low",
+          "difficulty": "Easy" | "Medium" | "Hard",
           "status": "Not Started" | "In Progress" | "Completed",
           "marketplaceStatus": "Locked" | "Available",
           "estimatedHours": number,
           "dependencies": ["string"],
+          "deliverables": ["string"],
+          "suggestedSkills": ["string"],
+          "suggestedTechnologies": ["string"],
+          "acceptanceCriteria": ["string"],
+          "compatibilityScore": number,
           "confidence": number (0-100),
           "reasoning": "string"
         }
@@ -202,6 +288,14 @@ Generate task splitting details in JSON format:
     }
   ],
   "executionOrder": ["string"],
+  "criticalPath": ["string"],
+  "dependencies": ["string"],
+  "dependencyGraph": {
+    "nodes": [{"id": "string", "label": "string", "featureName": "string", "category": "string", "owner": "string", "status": "string"}],
+    "edges": [{"from": "string", "to": "string"}]
+  },
+  "milestones": [{"name": "string", "tasks": ["string"], "estimatedHours": number}],
+  "deliverables": ["string"],
   "criticalTasks": ["string"],
   "recommendedFocus": ["string"],
   "warnings": ["string"]
@@ -240,6 +334,15 @@ JSON Schema:
   },
   "reasoning": "string",
   "finalRecommendation": "string",
+  "advantages": ["string"],
+  "disadvantages": ["string"],
+  "ecosystem": "string",
+  "learningCurve": "string",
+  "community": "string",
+  "maintenance": "string",
+  "performance": "string",
+  "aiCompatibility": "string",
+  "futureScalability": "string",
   "alternatives": [
     {
       "tech": "string",
@@ -259,12 +362,17 @@ JSON Schema:
   "overallStatus": "On Track" | "Needs Attention" | "Critical",
   "riskLevel": "Low" | "Medium" | "High",
   "completionPrediction": "string",
+  "predictions": ["string"],
+  "focusAreas": ["string"],
   "currentFocus": ["string"],
   "tasksToPostpone": ["string"],
+  "scopeReductionSuggestions": ["string"],
   "reasoning": "string",
   "judgePreparationTips": ["string"],
   "executionStrategy": ["string"],
   "winningProbability": number (0-100),
+  "riskScore": number (0-100),
+  "completionProbability": number (0-100),
   "alerts": [
     {
       "severity": "Warning" | "Critical" | "Info",
@@ -303,6 +411,14 @@ JSON Schema:
   "repositoryWarnings": ["string"],
   "recommendations": ["string"],
   "reasoning": "string",
+  "commits": [{"sha": "string", "message": "string", "author": "string", "date": "string"}],
+  "contributors": [{"name": "string", "commits": number, "impactScore": number}],
+  "issues": [{"title": "string", "status": "string", "risk": "string"}],
+  "branches": [{"name": "string", "status": "string"}],
+  "pullRequests": [{"title": "string", "status": "string", "risk": "string"}],
+  "repositoryHealthScore": number,
+  "codeQuality": "Low" | "Medium" | "High",
+  "velocity": "Slow" | "Steady" | "Fast",
   "developerProductivity": [
     {
       "developer": "string",
@@ -353,12 +469,41 @@ JSON Schema:
 JSON Schema:
 {
   "skills": ["string"]
+}`,
+
+      extractMentorMemory: `Conversation exchange:
+\${userInput}
+
+Return ONLY valid JSON matching:
+{
+  "architectureDecisions": ["string"],
+  "techStackDecisions": ["string"],
+  "projectMilestones": ["string"],
+  "previousAiAdvice": ["string"],
+  "currentBlockers": ["string"],
+  "completedTasks": ["string"],
+  "recentRecommendations": ["string"],
+  "currentSprint": "string",
+  "hackathonStage": "string",
+  "githubStatus": "string"
 }`
     };
   }
 
   getVersion(moduleName) {
     return this.versions[moduleName] || '1.0.0';
+  }
+
+  getPromptMetadata(moduleName) {
+    return this.metadata[moduleName] || {
+      id: `hackbuddy.${moduleName}`,
+      version: this.getVersion(moduleName),
+      module: moduleName,
+      createdAt: '2026-06-27T00:00:00.000Z',
+      updatedAt: '2026-06-27T00:00:00.000Z',
+      expectedSchema: moduleName,
+      qualityScore: 0.8
+    };
   }
 
   getSystemPrompt(moduleName) {

@@ -1,7 +1,12 @@
 require('dotenv').config();
+const mongoose = require('mongoose');
 const { analyzeProjectWithAI } = require('./services/aiService');
 
 async function testProjectAnalysis() {
+  const mongoUri = process.env.MONGO_URI || 'mongodb://localhost:27017/hackbuddy';
+  await mongoose.connect(mongoUri);
+  console.log('Connected to MongoDB');
+
   console.log('\n--- Testing analyzeProjectWithAI ---');
   const projectContextString = `Project Name: HackBuddy
 Track: Developer Tools
@@ -24,6 +29,9 @@ Sahil (Skills: React, Node.js, MongoDB)
     console.log(JSON.stringify(result, null, 2));
   } catch (err) {
     console.error(`Error after ${(Date.now() - start) / 1000}s:`, err.message || err);
+  } finally {
+    await mongoose.disconnect();
+    console.log('Disconnected from MongoDB');
   }
 }
 

@@ -21,6 +21,10 @@ const projectChatSchema = new mongoose.Schema({
     required: true,
     trim: true
   },
+  metadata: {
+    type: mongoose.Schema.Types.Mixed,
+    default: null
+  },
   createdAt: {
     type: Date,
     default: Date.now
@@ -37,8 +41,9 @@ const createMockChatInstance = (data) => {
     projectId: data.projectId,
     userId: data.userId,
     role: data.role,
-    message: data.message,
-    createdAt: data.createdAt || new Date(),
+        message: data.message,
+        metadata: data.metadata || null,
+        createdAt: data.createdAt || new Date(),
     updatedAt: data.updatedAt || new Date(),
     async save() {
       const index = memoryDB.findIndex(c => c._id === this._id);
@@ -48,6 +53,7 @@ const createMockChatInstance = (data) => {
         userId: this.userId,
         role: this.role,
         message: this.message,
+        metadata: this.metadata || null,
         createdAt: this.createdAt,
         updatedAt: this.updatedAt
       };

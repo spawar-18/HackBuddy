@@ -78,13 +78,24 @@ Return ONLY a valid JSON object matching this schema:
   "architectureDecisions": ["string"],
   "techStackDecisions": ["string"],
   "projectMilestones": ["string"],
-  "previousAiAdvice": ["string"]
+  "previousAiAdvice": ["string"],
+  "currentBlockers": ["string"],
+  "completedTasks": ["string"],
+  "recentRecommendations": ["string"],
+  "currentSprint": "string",
+  "hackathonStage": "string",
+  "githubStatus": "string",
+  "currentImplementation": "string",
+  "currentDebuggingSession": "string",
+  "currentFeature": "string",
+  "currentApis": ["string"],
+  "currentDeploymentIssue": "string"
 }`;
 
       let parsed = null;
       try {
         const responseJson = await executeFn({
-          module: 'verifyTaskWithAI', // Uses a JSON-only validation pipeline
+          module: 'extractMentorMemory',
           userInput: extractionPrompt
         });
         parsed = typeof responseJson === 'object' ? responseJson : JSON.parse(responseJson);
@@ -95,7 +106,15 @@ Return ONLY a valid JSON object matching this schema:
       let updated = false;
 
       if (parsed) {
-        ['architectureDecisions', 'techStackDecisions', 'projectMilestones', 'previousAiAdvice'].forEach(key => {
+        [
+          'architectureDecisions',
+          'techStackDecisions',
+          'projectMilestones',
+          'previousAiAdvice',
+          'currentBlockers',
+          'completedTasks',
+          'recentRecommendations'
+        ].forEach(key => {
           if (parsed[key] && Array.isArray(parsed[key]) && parsed[key].length > 0) {
             const cleanEntries = parsed[key].filter(entry => entry && entry.trim().length > 5);
             if (cleanEntries.length > 0) {
@@ -104,6 +123,27 @@ Return ONLY a valid JSON object matching this schema:
             }
           }
         });
+
+        [
+          'currentImplementation',
+          'currentDebuggingSession',
+          'currentFeature',
+          'currentDeploymentIssue',
+          'currentSprint',
+          'hackathonStage',
+          'githubStatus'
+        ].forEach(key => {
+          if (parsed[key] !== undefined && typeof parsed[key] === 'string' && parsed[key].trim().length > 0) {
+            memory[key] = parsed[key].trim();
+            updated = true;
+          }
+        });
+
+        if (parsed.currentApis && Array.isArray(parsed.currentApis) && parsed.currentApis.length > 0) {
+          const cleanEntries = parsed.currentApis.filter(entry => entry && entry.trim().length > 2);
+          memory.currentApis = Array.from(new Set([...(memory.currentApis || []), ...cleanEntries]));
+          updated = true;
+        }
       }
 
       // Auto-summarize
@@ -113,7 +153,7 @@ Return ONLY a valid JSON object matching this schema:
         
         if (messages && messages.length >= 4) {
           const sortedMsgs = messages.slice().reverse();
-          const summary = await ConversationSummarizer.summarize(sortedMsgs, executeFn);
+          const summary = await ConversationSummarizer.summarize(sortedMsgs);
           if (summary) {
             memory.summary = summary;
             updated = true;

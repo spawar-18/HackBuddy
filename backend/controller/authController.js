@@ -1,9 +1,8 @@
 const User = require('../models/User');
 const bcrypt = require('bcryptjs');
 const jwt = require('jsonwebtoken');
-const { OAuth2Client } = require('google-auth-library');
-
-const client = new OAuth2Client(process.env.GOOGLE_CLIENT_ID);
+const { secureFetch } = require('../utils/secureFetch');
+const { verifyGoogleIdToken } = require('../utils/googleAuth');
 
 // Generate JWT Helper
 const generateToken = (userId) => {
@@ -117,11 +116,7 @@ exports.googleLogin = async (req, res) => {
       return res.status(400).json({ message: 'Google credential token is required' });
     }
 
-    // Verify Google ID Token
-    const ticket = await client.verifyIdToken({
-      idToken: credential,
-      audience: process.env.GOOGLE_CLIENT_ID,
-    });
+    const ticket = await verifyGoogleIdToken(credential, process.env.GOOGLE_CLIENT_ID);
 
     const payload = ticket.getPayload();
     const { sub: googleId, email, name, picture: avatar } = payload;
@@ -170,14 +165,14 @@ exports.googleLogin = async (req, res) => {
 // @access  Public
 exports.githubLogin = async (req, res) => {
   try {
-    const { code } = req.body;
+    const { code, redirectUri } = req.body;
 
     if (!code) {
       return res.status(400).json({ message: 'GitHub authorization code is required' });
     }
 
     // 1. Exchange authorization code for access token
-    const tokenResponse = await fetch('https://github.com/login/oauth/access_token', {
+    const tokenResponse = await secureFetch('https://github.com/login/oauth/access_token', {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
@@ -187,6 +182,7 @@ exports.githubLogin = async (req, res) => {
         client_id: process.env.GITHUB_CLIENT_ID,
         client_secret: process.env.GITHUB_CLIENT_SECRET,
         code,
+        redirect_uri: redirectUri,
       }),
     });
 
@@ -204,7 +200,7 @@ exports.githubLogin = async (req, res) => {
     }
 
     // 2. Fetch user profile from GitHub
-    const userResponse = await fetch('https://api.github.com/user', {
+    const userResponse = await secureFetch('https://api.github.com/user', {
       headers: {
         Authorization: `Bearer ${access_token}`,
         'User-Agent': 'HackBuddy-App',
@@ -224,7 +220,7 @@ exports.githubLogin = async (req, res) => {
 
     // 3. If email is not public, fetch user emails list
     if (!email) {
-      const emailResponse = await fetch('https://api.github.com/user/emails', {
+      const emailResponse = await secureFetch('https://api.github.com/user/emails', {
         headers: {
           Authorization: `Bearer ${access_token}`,
           'User-Agent': 'HackBuddy-App',

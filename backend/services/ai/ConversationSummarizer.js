@@ -1,3 +1,5 @@
+const AIProviderManager = require('./AIProviderManager');
+
 /**
  * ConversationSummarizer
  * Focuses on summarizing user-mentor conversations to preserve token efficiency.
@@ -6,14 +8,13 @@ class ConversationSummarizer {
   /**
    * Summarizes a list of messages.
    * @param {Array} messages - Chat messages list
-   * @param {function} executeFn - Function reference to execute AI call
    * @returns {Promise<string>}
    */
-  async summarize(messages, executeFn) {
+  async summarize(messages) {
     if (!messages || messages.length === 0) return '';
 
     const historyText = messages
-      .map(m => `${m.role === 'user' ? 'User' : 'Mentor'}: ${m.message}`)
+      .map(m => `${m.role === 'user' ? 'User' : 'Mentor'}: ${m.message || m.content || ''}`)
       .join('\n');
 
     try {
@@ -22,13 +23,21 @@ class ConversationSummarizer {
 Conversation:
 ${historyText}`;
 
-      // Call executeAI through the provided executor function reference to avoid circular dependencies
-      const rawSummary = await executeFn({
-        module: 'chatWithMentor', // Uses the chatWithMentor prompt context but with a custom user prompt
-        userInput: summaryPrompt
+      const payload = {
+        contents: summaryPrompt,
+        systemInstruction: 'Provide a concise 2-sentence summary of the conversation.',
+        isJson: false,
+        promptVersion: '1.0.0',
+        endpointName: 'memory_summarization'
+      };
+
+      const result = await AIProviderManager.executeWithRouting(payload, {
+        route: ['GeminiProvider', 'DeepSeekProvider', 'GLMProvider'],
+        timeoutMs: 15000,
+        maxRetries: 1
       });
 
-      return typeof rawSummary === 'string' ? rawSummary.trim() : '';
+      return result && result.text ? result.text.trim() : '';
     } catch (err) {
       console.warn('[ConversationSummarizer] Failed to summarize chat history:', err.message);
       return '';
