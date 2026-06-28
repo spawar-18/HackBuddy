@@ -70,12 +70,24 @@ Instead of switching between multiple tools, teams manage their entire workflow 
 - Real-time communication
 - Channel-based discussions
 - Member skill tags
+- video conferencing within team
 
 ## 🐙 GitHub Intelligence
 - Commit tracking
 - Pull request monitoring
 - Repository activity
 - Development progress
+
+## Premium Members
+- Get access to pro features
+- can create unlimited teams
+- solo and team membership plans
+- RazorPay gateway integrated for payment
+
+## Feedback centre
+- Users can drop genuine feedbacks
+- Real time analysis
+- Reflected on dashboard
 
 ---
 
@@ -97,6 +109,8 @@ Instead of switching between multiple tools, teams manage their entire workflow 
 ### AI Services
 - Gemini API
 - OpenRouter API
+- GLM 5.2 API
+- DeepSeek API
 
 ---
 
