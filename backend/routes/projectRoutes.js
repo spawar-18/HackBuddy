@@ -14,9 +14,10 @@ const {
   regenerateTaskPlan,
   updateTaskStatus
 } = require('../controller/taskPlanController');
+const { checkProjectLimit } = require('../middleware/subscriptionGate');
 
 // POST /api/project - Create a new project for a team
-router.post('/', authMiddleware, createProject);
+router.post('/', authMiddleware, checkProjectLimit, createProject);
 
 // GET /api/project/team/:teamId - Get project details for a team
 router.get('/team/:teamId', authMiddleware, getProjectByTeam);

@@ -49,6 +49,9 @@ const execute = async (req, res) => {
       members: req.body.members || []
     });
 
+    const subscriptionService = require('../services/subscriptionService');
+    await subscriptionService.incrementAICount(req.user.id);
+
     return res.status(200).json({
       success: true,
       data: result

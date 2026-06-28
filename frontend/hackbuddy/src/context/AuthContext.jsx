@@ -1,11 +1,26 @@
 import { createContext, useState, useEffect, useContext } from 'react';
 import api from '../services/api';
+import { getSubscriptionStatus } from '../services/subscriptionService';
 
 const AuthContext = createContext(null);
 
 export const AuthProvider = ({ children }) => {
   const [user, setUser] = useState(null);
+  const [subscription, setSubscription] = useState(null);
+  const [limits, setLimits] = useState(null);
   const [loading, setLoading] = useState(true);
+
+  const refreshSubscription = async () => {
+    try {
+      const response = await getSubscriptionStatus();
+      if (response.success) {
+        setSubscription(response.subscription);
+        setLimits(response.limits);
+      }
+    } catch (error) {
+      console.error('Failed to load subscription status:', error);
+    }
+  };
 
   // Load user profile on startup if token exists
   useEffect(() => {
@@ -19,10 +34,14 @@ export const AuthProvider = ({ children }) => {
       try {
         const response = await api.get('/user/profile');
         setUser(response.data);
+        // Also fetch subscription status
+        await refreshSubscription();
       } catch (error) {
         console.error('Session verification failed:', error);
         localStorage.removeItem('token');
         setUser(null);
+        setSubscription(null);
+        setLimits(null);
       } finally {
         setLoading(false);
       }
@@ -39,6 +58,7 @@ export const AuthProvider = ({ children }) => {
       const { token, user: userData } = response.data;
       localStorage.setItem('token', token);
       setUser(userData);
+      await refreshSubscription();
       return { success: true };
     } catch (error) {
       console.error('Registration failed:', error);
@@ -59,6 +79,7 @@ export const AuthProvider = ({ children }) => {
       const { token, user: userData } = response.data;
       localStorage.setItem('token', token);
       setUser(userData);
+      await refreshSubscription();
       return { success: true };
     } catch (error) {
       console.error('Login failed:', error);
@@ -79,6 +100,7 @@ export const AuthProvider = ({ children }) => {
       const { token, user: userData } = response.data;
       localStorage.setItem('token', token);
       setUser(userData);
+      await refreshSubscription();
       return { success: true };
     } catch (error) {
       console.error('Google Sign-In failed:', error);
@@ -99,6 +121,7 @@ export const AuthProvider = ({ children }) => {
       const { token, user: userData } = response.data;
       localStorage.setItem('token', token);
       setUser(userData);
+      await refreshSubscription();
       return { success: true };
     } catch (error) {
       console.error('GitHub Sign-In failed:', error);
@@ -121,12 +144,15 @@ export const AuthProvider = ({ children }) => {
     <AuthContext.Provider
       value={{
         user,
+        subscription,
+        limits,
         loading,
         register: registerUser,
         login: loginUser,
         googleLogin: googleLoginUser,
         githubLogin: githubLoginUser,
-        logout: logoutUser
+        logout: logoutUser,
+        refreshSubscription
       }}
     >
       {children}

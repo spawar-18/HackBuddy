@@ -1,6 +1,7 @@
 const express = require('express');
 const router = express.Router();
 const authMiddleware = require('../middleware/auth');
+const { requireTeam } = require('../middleware/subscriptionGate');
 const {
   requestReassignment,
   requestSwap,
@@ -12,18 +13,17 @@ const {
   rejectRequest
 } = require('../controller/marketplaceController');
 
-// Task request routes
-router.post('/tasks/request-reassignment', authMiddleware, requestReassignment);
-router.post('/tasks/request-swap', authMiddleware, requestSwap);
-router.post('/tasks/request-collaborator', authMiddleware, requestCollaborator);
-router.post('/tasks/request-help', authMiddleware, requestHelp);
-router.post('/tasks/claim-task', authMiddleware, claimTask);
+// All marketplace routes require TEAM subscription
+router.post('/tasks/request-reassignment', authMiddleware, requireTeam, requestReassignment);
+router.post('/tasks/request-swap', authMiddleware, requireTeam, requestSwap);
+router.post('/tasks/request-collaborator', authMiddleware, requireTeam, requestCollaborator);
+router.post('/tasks/request-help', authMiddleware, requireTeam, requestHelp);
+router.post('/tasks/claim-task', authMiddleware, requireTeam, claimTask);
 
-// Marketplace query routes
-router.get('/projects/:projectId/marketplace', authMiddleware, getMarketplace);
+router.get('/projects/:projectId/marketplace', authMiddleware, requireTeam, getMarketplace);
 
-// Owner response routes
-router.patch('/marketplace/:requestId/approve', authMiddleware, approveRequest);
-router.patch('/marketplace/:requestId/reject', authMiddleware, rejectRequest);
+router.patch('/marketplace/:requestId/approve', authMiddleware, requireTeam, approveRequest);
+router.patch('/marketplace/:requestId/reject', authMiddleware, requireTeam, rejectRequest);
 
 module.exports = router;
+

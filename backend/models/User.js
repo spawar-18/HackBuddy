@@ -45,6 +45,11 @@ const userSchema = new mongoose.Schema({
     type: String,
     default: ''
   },
+  subscriptionPlan: {
+    type: String,
+    enum: ['FREE', 'PRO', 'TEAM'],
+    default: 'FREE'
+  },
   createdAt: {
     type: Date,
     default: Date.now
@@ -68,6 +73,7 @@ class MockUserInstance {
     this.skills = data.skills || [];
     this.profileCompleted = data.profileCompleted || false;
     this.resumeUrl = data.resumeUrl || '';
+    this.subscriptionPlan = data.subscriptionPlan || 'FREE';
     this.createdAt = data.createdAt || new Date();
   }
 
@@ -84,6 +90,7 @@ class MockUserInstance {
       skills: this.skills,
       profileCompleted: this.profileCompleted,
       resumeUrl: this.resumeUrl,
+      subscriptionPlan: this.subscriptionPlan,
       createdAt: this.createdAt
     };
     if (index !== -1) {
@@ -148,13 +155,21 @@ const MockUserModel = {
     const user = new MockUserInstance(data);
     await user.save();
     return user;
+  },
+
+  find: async (query) => {
+    return memoryDB.map(u => new MockUserInstance(u));
+  },
+
+  countDocuments: async (query) => {
+    return memoryDB.length;
   }
 };
 
 // Export a Proxy that dynamically switches between MongoDB and local in-memory DB
 const ModelProxy = new Proxy(MongoUser, {
   get(target, prop) {
-    if (process.env.MONGO_URI || mongoose.connection.readyState === 1) {
+    if (mongoose.connection.readyState === 1) {
       return Reflect.get(target, prop);
     }
     // If not connected to MongoDB, redirect target model calls to the mock database
@@ -164,7 +179,7 @@ const ModelProxy = new Proxy(MongoUser, {
     return Reflect.get(target, prop);
   },
   construct(target, argumentsList) {
-    if (process.env.MONGO_URI || mongoose.connection.readyState === 1) {
+    if (mongoose.connection.readyState === 1) {
       return Reflect.construct(target, argumentsList);
     }
     return new MockUserInstance(argumentsList[0] || {});

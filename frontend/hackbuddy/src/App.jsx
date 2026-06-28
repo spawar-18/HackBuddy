@@ -10,6 +10,7 @@ import CreateTeam from './pages/CreateTeam';
 import JoinTeam from './pages/JoinTeam';
 import TeamDetails from './pages/TeamDetails';
 import JoinTeamByLink from './pages/JoinTeamByLink';
+import Pricing from './pages/Pricing';
 import ProtectedRoute from './components/ProtectedRoute';
 import FeedbackCenter from './pages/FeedbackCenter';
 import Chat from './components/Chat';
@@ -82,6 +83,16 @@ function App() {
               } 
             />
             <Route path="/join/:inviteCode" element={<JoinTeamByLink />} />
+
+            {/* Pricing Route */}
+            <Route
+              path="/pricing"
+              element={
+                <ProtectedRoute>
+                  <Pricing />
+                </ProtectedRoute>
+              }
+            />
 
             {/* Chat Route */}
             <Route

@@ -12,8 +12,10 @@ const {
   deleteTeam
 } = require('../controller/teamController');
 
+const { checkTeamLimit } = require('../middleware/subscriptionGate');
+
 // All routes require JWT authentication
-router.post('/create', authMiddleware, createTeam);
+router.post('/create', authMiddleware, checkTeamLimit, createTeam);
 router.post('/join', authMiddleware, joinTeam);
 router.get('/my-teams', authMiddleware, getMyTeams);
 router.get('/:teamId', authMiddleware, getTeamDetails);

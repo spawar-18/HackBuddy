@@ -73,7 +73,7 @@ const GithubIcon = ({ size = 20, className = '', style = {} }) => (
 );
 
 const Dashboard = () => {
-  const { user, logout } = useAuth();
+  const { user, logout, subscription, limits } = useAuth();
   const [profileData, setProfileData] = useState(null);
   const [loadingProfile, setLoadingProfile] = useState(true);
   const [teams, setTeams] = useState([]);
@@ -459,6 +459,41 @@ const Dashboard = () => {
           </div>
 
           <div className="sidebar-menu flex flex-col gap-1 w-full border-t border-neutral-200/80 pt-4 mt-auto">
+
+            {/* Subscription Status Widget */}
+            <div className="rounded-xl border border-brand-200/50 bg-neutral-50/30 p-3 mb-3 text-left">
+              {/* Plan badge */}
+              <div className="flex items-center justify-between mb-2">
+                <span className="text-[9px] font-black uppercase tracking-widest"
+                  style={{
+                    color: subscription?.plan === 'TEAM' ? '#a855f7'
+                         : subscription?.plan === 'PRO'  ? '#00f0ff'
+                         : '#6b7280'
+                  }}>
+                  {subscription?.plan === 'TEAM' ? '🚀 Team Workspace'
+                   : subscription?.plan === 'PRO'  ? '⭐ Pro Workspace'
+                   : '🆓 Free Workspace'}
+                </span>
+                <span className="text-[8px] font-bold px-1.5 py-0.5 rounded-full bg-emerald-500/10 text-emerald-400 border border-emerald-500/20">
+                  {subscription?.status || 'active'}
+                </span>
+              </div>
+
+              {/* Team usage */}
+              <p className="text-[9px] text-neutral-400 leading-tight">
+                Teams: <span className="font-bold text-neutral-200">
+                  {limits?.teamsOwned ?? teams.length} / {limits?.maxTeams === 'Unlimited' || subscription?.plan !== 'FREE' ? 'Unlimited' : 2}
+                </span>
+              </p>
+
+              <button
+                onClick={() => navigate('/pricing')}
+                className="mt-2.5 w-full text-[9px] font-bold py-1.5 rounded-md btn-primary"
+              >
+                {subscription?.plan === 'FREE' ? 'Upgrade Workspace ⭐' : 'Manage Billing'}
+              </button>
+            </div>
+
             <a href="#docs" className="menu-item">
               <BookOpen size={16} />
               <span>Documentation</span>

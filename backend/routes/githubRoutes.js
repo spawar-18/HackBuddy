@@ -1,6 +1,7 @@
 const express = require('express');
 const router = express.Router({ mergeParams: true });
 const authMiddleware = require('../middleware/auth');
+const { requirePro } = require('../middleware/subscriptionGate');
 const {
   connectRepository,
   disconnectRepository,
@@ -11,22 +12,20 @@ const {
   getProjectRealityCheck
 } = require('../controller/githubController');
 
-// All routes are protected with auth middleware
 // Base path: /api/projects/:projectId/hackathon/github
 
-// Connection management (Owner only)
+// Connection management (Owner only) — auth only, no plan required
 router.post('/connect', authMiddleware, connectRepository);
 router.delete('/disconnect', authMiddleware, disconnectRepository);
 
-// Repository data (all members)
+// Repository status — auth only
 router.get('/status', authMiddleware, getRepositoryStatus);
-router.get('/analytics', authMiddleware, getRepositoryAnalytics);
-router.get('/reality-check', authMiddleware, getProjectRealityCheck);
 
-// Sync (Owner only)
-router.post('/sync', authMiddleware, manualSync);
-
-// AI Analysis (all members)
-router.post('/analyze', authMiddleware, triggerRepositoryAnalysis);
+// GitHub Intelligence features — require PRO or TEAM
+router.get('/analytics', authMiddleware, requirePro, getRepositoryAnalytics);
+router.get('/reality-check', authMiddleware, requirePro, getProjectRealityCheck);
+router.post('/sync', authMiddleware, requirePro, manualSync);
+router.post('/analyze', authMiddleware, requirePro, triggerRepositoryAnalysis);
 
 module.exports = router;
+
