@@ -42,6 +42,7 @@ const commandCenterRoutes = require('./routes/commandCenterRoutes');
 const githubRoutes = require('./routes/githubRoutes');
 const verificationRoutes = require('./routes/verificationRoutes');
 const aiRoutes = require('./routes/aiRoutes');
+const feedbackRoutes = require('./routes/feedbackRoutes');
 
 const app = express();
 const port = process.env.PORT || 5000;
@@ -72,6 +73,7 @@ app.use('/api/projects/:projectId/verification', verificationRoutes);
 app.use('/api/project/:projectId/verification', verificationRoutes);
 app.use('/api', marketplaceRoutes);
 app.use('/api/ai', aiRoutes);
+app.use('/api/feedback', feedbackRoutes);
 
 // Root Route (Welcome message/status)
 app.get('/', (req, res) => {

@@ -5472,3 +5472,303 @@ Prompt snippet: You are a Senior Technical Hackathon Mentor, Startup CTO, and ex
 [2026-06-27T20:03:57.761Z] Active request from user: id=6a265746b1a1c29afedf3e69, name=Sahil Ojha, email=ojharamakant48@gmail.com, endpoint=/api/projects/6a3e85e4db89e25ff2175941/hackathon/dashboard
 [2026-06-27T20:04:57.771Z] Active request from user: id=6a265746b1a1c29afedf3e69, name=Sahil Ojha, email=ojharamakant48@gmail.com, endpoint=/api/projects/6a3e85e4db89e25ff2175941/hackathon/dashboard
 [2026-06-27T20:05:57.805Z] Active request from user: id=6a265746b1a1c29afedf3e69, name=Sahil Ojha, email=ojharamakant48@gmail.com, endpoint=/api/projects/6a3e85e4db89e25ff2175941/hackathon/dashboard
+[2026-06-27T22:41:28.108Z] Active request from user: id=6a405179ba14927b0d7653ef, name=Shaurya Pawar, email=shaurya0202pawar@gmail.com, endpoint=/api/profile
+[2026-06-27T22:41:29.875Z] Active request from user: id=6a405179ba14927b0d7653ef, name=Shaurya Pawar, email=shaurya0202pawar@gmail.com, endpoint=/api/user/profile
+[2026-06-27T22:41:29.908Z] Active request from user: id=6a405179ba14927b0d7653ef, name=Shaurya Pawar, email=shaurya0202pawar@gmail.com, endpoint=/api/user/profile
+[2026-06-27T22:41:29.940Z] getMyTeams called by user: 6a405179ba14927b0d7653ef
+[2026-06-27T22:41:29.952Z] Active request from user: id=6a405179ba14927b0d7653ef, name=Shaurya Pawar, email=shaurya0202pawar@gmail.com, endpoint=/api/user/profile
+[2026-06-27T22:41:29.983Z] Active request from user: id=6a405179ba14927b0d7653ef, name=Shaurya Pawar, email=shaurya0202pawar@gmail.com, endpoint=/api/team/my-teams
+[2026-06-27T22:41:29.985Z] getMyTeams called by user: 6a405179ba14927b0d7653ef
+[2026-06-27T22:41:29.992Z] Active request from user: id=6a405179ba14927b0d7653ef, name=Shaurya Pawar, email=shaurya0202pawar@gmail.com, endpoint=/api/user/profile
+[2026-06-27T22:41:29.997Z] Active request from user: id=6a405179ba14927b0d7653ef, name=Shaurya Pawar, email=shaurya0202pawar@gmail.com, endpoint=/api/team/my-teams
+[2026-06-27T22:43:50.605Z] getMyTeams called by user: 6a405179ba14927b0d7653ef
+[2026-06-27T22:43:50.620Z] Active request from user: id=6a405179ba14927b0d7653ef, name=Shaurya Pawar, email=shaurya0202pawar@gmail.com, endpoint=/api/team/my-teams
+[2026-06-27T22:43:50.636Z] getMyTeams called by user: 6a405179ba14927b0d7653ef
+[2026-06-27T22:43:50.652Z] Active request from user: id=6a405179ba14927b0d7653ef, name=Shaurya Pawar, email=shaurya0202pawar@gmail.com, endpoint=/api/team/my-teams
+[2026-06-27T22:44:06.655Z] getMyTeams called by user: 6a405179ba14927b0d7653ef
+[2026-06-27T22:44:06.677Z] Active request from user: id=6a405179ba14927b0d7653ef, name=Shaurya Pawar, email=shaurya0202pawar@gmail.com, endpoint=/api/user/profile
+[2026-06-27T22:44:06.687Z] Active request from user: id=6a405179ba14927b0d7653ef, name=Shaurya Pawar, email=shaurya0202pawar@gmail.com, endpoint=/api/team/my-teams
+[2026-06-27T22:44:06.692Z] getMyTeams called by user: 6a405179ba14927b0d7653ef
+[2026-06-27T22:44:06.713Z] Active request from user: id=6a405179ba14927b0d7653ef, name=Shaurya Pawar, email=shaurya0202pawar@gmail.com, endpoint=/api/team/my-teams
+[2026-06-27T22:44:06.724Z] Active request from user: id=6a405179ba14927b0d7653ef, name=Shaurya Pawar, email=shaurya0202pawar@gmail.com, endpoint=/api/user/profile
+[2026-06-27T23:00:26.884Z] getMyTeams called by user: 6a405179ba14927b0d7653ef
+[2026-06-27T23:00:26.893Z] Active request from user: id=6a405179ba14927b0d7653ef, name=Shaurya Pawar, email=shaurya0202pawar@gmail.com, endpoint=/api/user/profile
+[2026-06-27T23:00:26.898Z] Active request from user: id=6a405179ba14927b0d7653ef, name=Shaurya Pawar, email=shaurya0202pawar@gmail.com, endpoint=/api/team/my-teams
+[2026-06-27T23:00:26.910Z] getMyTeams called by user: 6a405179ba14927b0d7653ef
+[2026-06-27T23:00:26.915Z] Active request from user: id=6a405179ba14927b0d7653ef, name=Shaurya Pawar, email=shaurya0202pawar@gmail.com, endpoint=/api/user/profile
+[2026-06-27T23:00:26.921Z] Active request from user: id=6a405179ba14927b0d7653ef, name=Shaurya Pawar, email=shaurya0202pawar@gmail.com, endpoint=/api/team/my-teams
+[2026-06-27T23:00:41.630Z] getMyTeams called by user: 6a405179ba14927b0d7653ef
+[2026-06-27T23:00:41.637Z] Active request from user: id=6a405179ba14927b0d7653ef, name=Shaurya Pawar, email=shaurya0202pawar@gmail.com, endpoint=/api/user/profile
+[2026-06-27T23:00:41.648Z] getMyTeams called by user: 6a405179ba14927b0d7653ef
+[2026-06-27T23:00:41.652Z] Active request from user: id=6a405179ba14927b0d7653ef, name=Shaurya Pawar, email=shaurya0202pawar@gmail.com, endpoint=/api/team/my-teams
+[2026-06-27T23:00:41.653Z] Active request from user: id=6a405179ba14927b0d7653ef, name=Shaurya Pawar, email=shaurya0202pawar@gmail.com, endpoint=/api/user/profile
+[2026-06-27T23:00:41.664Z] Active request from user: id=6a405179ba14927b0d7653ef, name=Shaurya Pawar, email=shaurya0202pawar@gmail.com, endpoint=/api/team/my-teams
+[2026-06-27T23:03:31.441Z] Active request from user: id=6a3d53f454d4b3f9b2a09c68, name=SP, email=sp@xyz.com, endpoint=/api/user/profile
+[2026-06-27T23:03:31.462Z] Active request from user: id=6a3d53f454d4b3f9b2a09c68, name=SP, email=sp@xyz.com, endpoint=/api/user/profile
+[2026-06-27T23:03:31.543Z] getMyTeams called by user: 6a3d53f454d4b3f9b2a09c68
+[2026-06-27T23:03:31.549Z] Active request from user: id=6a3d53f454d4b3f9b2a09c68, name=SP, email=sp@xyz.com, endpoint=/api/user/profile
+[2026-06-27T23:03:31.556Z] Active request from user: id=6a3d53f454d4b3f9b2a09c68, name=SP, email=sp@xyz.com, endpoint=/api/team/my-teams
+[2026-06-27T23:03:31.570Z] Active request from user: id=6a3d53f454d4b3f9b2a09c68, name=SP, email=sp@xyz.com, endpoint=/api/user/profile
+[2026-06-27T23:03:31.597Z] getMyTeams called by user: 6a3d53f454d4b3f9b2a09c68
+[2026-06-27T23:03:31.611Z] Active request from user: id=6a3d53f454d4b3f9b2a09c68, name=SP, email=sp@xyz.com, endpoint=/api/team/my-teams
+[2026-06-27T23:03:31.625Z] Active request from user: id=6a3d53f454d4b3f9b2a09c68, name=SP, email=sp@xyz.com, endpoint=/api/project/team/6a3d4f5e54d4b3f9b2a09c66
+[2026-06-27T23:03:31.626Z] Active request from user: id=6a3d53f454d4b3f9b2a09c68, name=SP, email=sp@xyz.com, endpoint=/api/project/team/6a3ade6cb85814ce17284608
+[2026-06-27T23:03:31.658Z] Active request from user: id=6a3d53f454d4b3f9b2a09c68, name=SP, email=sp@xyz.com, endpoint=/api/project/team/6a3d4f5e54d4b3f9b2a09c66
+[2026-06-27T23:03:31.663Z] Active request from user: id=6a3d53f454d4b3f9b2a09c68, name=SP, email=sp@xyz.com, endpoint=/api/project/team/6a3ade6cb85814ce17284608
+[2026-06-27T23:03:31.678Z] Active request from user: id=6a3d53f454d4b3f9b2a09c68, name=SP, email=sp@xyz.com, endpoint=/api/projects/6a3d7f37312c8f3b1bc91a08/hackathon/notifications
+[2026-06-27T23:03:31.715Z] Active request from user: id=6a3d53f454d4b3f9b2a09c68, name=SP, email=sp@xyz.com, endpoint=/api/projects/6a3d7f37312c8f3b1bc91a08/hackathon/notifications
+[2026-06-27T23:03:46.575Z] Active request from user: id=6a3ade48b85814ce17284607, name=SP, email=sp2@gmail.com, endpoint=/api/user/profile
+[2026-06-27T23:03:46.588Z] Active request from user: id=6a3ade48b85814ce17284607, name=SP, email=sp2@gmail.com, endpoint=/api/user/profile
+[2026-06-27T23:03:46.664Z] getMyTeams called by user: 6a3ade48b85814ce17284607
+[2026-06-27T23:03:46.671Z] Active request from user: id=6a3ade48b85814ce17284607, name=SP, email=sp2@gmail.com, endpoint=/api/user/profile
+[2026-06-27T23:03:46.676Z] Active request from user: id=6a3ade48b85814ce17284607, name=SP, email=sp2@gmail.com, endpoint=/api/team/my-teams
+[2026-06-27T23:03:46.686Z] Active request from user: id=6a3ade48b85814ce17284607, name=SP, email=sp2@gmail.com, endpoint=/api/user/profile
+[2026-06-27T23:03:46.695Z] getMyTeams called by user: 6a3ade48b85814ce17284607
+[2026-06-27T23:03:46.704Z] Active request from user: id=6a3ade48b85814ce17284607, name=SP, email=sp2@gmail.com, endpoint=/api/team/my-teams
+[2026-06-27T23:03:46.747Z] Active request from user: id=6a3ade48b85814ce17284607, name=SP, email=sp2@gmail.com, endpoint=/api/project/team/6a390e011b4929bad5c6d64d
+[2026-06-27T23:03:46.754Z] Active request from user: id=6a3ade48b85814ce17284607, name=SP, email=sp2@gmail.com, endpoint=/api/project/team/6a3ade6cb85814ce17284608
+[2026-06-27T23:03:46.860Z] Active request from user: id=6a3ade48b85814ce17284607, name=SP, email=sp2@gmail.com, endpoint=/api/project/team/6a390e011b4929bad5c6d64d
+[2026-06-27T23:03:46.867Z] Active request from user: id=6a3ade48b85814ce17284607, name=SP, email=sp2@gmail.com, endpoint=/api/project/team/6a3ade6cb85814ce17284608
+[2026-06-27T23:03:47.049Z] Active request from user: id=6a3ade48b85814ce17284607, name=SP, email=sp2@gmail.com, endpoint=/api/projects/6a3d7f37312c8f3b1bc91a08/hackathon/notifications
+[2026-06-27T23:03:47.051Z] Active request from user: id=6a3ade48b85814ce17284607, name=SP, email=sp2@gmail.com, endpoint=/api/projects/6a390f1a1b4929bad5c6d652/hackathon/notifications
+[2026-06-27T23:03:47.083Z] Active request from user: id=6a3ade48b85814ce17284607, name=SP, email=sp2@gmail.com, endpoint=/api/projects/6a390f1a1b4929bad5c6d652/hackathon/notifications
+[2026-06-27T23:03:47.088Z] Active request from user: id=6a3ade48b85814ce17284607, name=SP, email=sp2@gmail.com, endpoint=/api/projects/6a3d7f37312c8f3b1bc91a08/hackathon/notifications
+[2026-06-27T23:04:01.954Z] Active request from user: id=6a3d53f454d4b3f9b2a09c68, name=SP, email=sp@xyz.com, endpoint=/api/projects/6a3d7f37312c8f3b1bc91a08/hackathon/notifications
+[2026-06-27T23:04:31.957Z] Active request from user: id=6a3d53f454d4b3f9b2a09c68, name=SP, email=sp@xyz.com, endpoint=/api/projects/6a3d7f37312c8f3b1bc91a08/hackathon/notifications
+[2026-06-27T23:05:01.968Z] Active request from user: id=6a3d53f454d4b3f9b2a09c68, name=SP, email=sp@xyz.com, endpoint=/api/projects/6a3d7f37312c8f3b1bc91a08/hackathon/notifications
+[2026-06-27T23:05:31.963Z] Active request from user: id=6a3d53f454d4b3f9b2a09c68, name=SP, email=sp@xyz.com, endpoint=/api/projects/6a3d7f37312c8f3b1bc91a08/hackathon/notifications
+[2026-06-27T23:05:58.198Z] Active request from user: id=6a405738ba14927b0d7653f0, name=Sakshi Pawar, email=sakshipawars123@gmail.com, endpoint=/api/profile
+[2026-06-27T23:06:00.037Z] Active request from user: id=6a405738ba14927b0d7653f0, name=Sakshi Pawar, email=sakshipawars123@gmail.com, endpoint=/api/user/profile
+[2026-06-27T23:06:00.049Z] Active request from user: id=6a405738ba14927b0d7653f0, name=Sakshi Pawar, email=sakshipawars123@gmail.com, endpoint=/api/user/profile
+[2026-06-27T23:06:00.099Z] getMyTeams called by user: 6a405738ba14927b0d7653f0
+[2026-06-27T23:06:00.108Z] Active request from user: id=6a405738ba14927b0d7653f0, name=Sakshi Pawar, email=sakshipawars123@gmail.com, endpoint=/api/user/profile
+[2026-06-27T23:06:00.110Z] Active request from user: id=6a405738ba14927b0d7653f0, name=Sakshi Pawar, email=sakshipawars123@gmail.com, endpoint=/api/team/my-teams
+[2026-06-27T23:06:00.114Z] Active request from user: id=6a405738ba14927b0d7653f0, name=Sakshi Pawar, email=sakshipawars123@gmail.com, endpoint=/api/user/profile
+[2026-06-27T23:06:00.118Z] getMyTeams called by user: 6a405738ba14927b0d7653f0
+[2026-06-27T23:06:00.133Z] Active request from user: id=6a405738ba14927b0d7653f0, name=Sakshi Pawar, email=sakshipawars123@gmail.com, endpoint=/api/team/my-teams
+[2026-06-27T23:06:01.961Z] Active request from user: id=6a3d53f454d4b3f9b2a09c68, name=SP, email=sp@xyz.com, endpoint=/api/projects/6a3d7f37312c8f3b1bc91a08/hackathon/notifications
+[2026-06-27T23:06:31.963Z] Active request from user: id=6a3d53f454d4b3f9b2a09c68, name=SP, email=sp@xyz.com, endpoint=/api/projects/6a3d7f37312c8f3b1bc91a08/hackathon/notifications
+[2026-06-27T23:07:01.965Z] Active request from user: id=6a3d53f454d4b3f9b2a09c68, name=SP, email=sp@xyz.com, endpoint=/api/projects/6a3d7f37312c8f3b1bc91a08/hackathon/notifications
+[2026-06-27T23:07:53.966Z] Active request from user: id=6a3d53f454d4b3f9b2a09c68, name=SP, email=sp@xyz.com, endpoint=/api/projects/6a3d7f37312c8f3b1bc91a08/hackathon/notifications
+[2026-06-27T23:08:53.957Z] Active request from user: id=6a3d53f454d4b3f9b2a09c68, name=SP, email=sp@xyz.com, endpoint=/api/projects/6a3d7f37312c8f3b1bc91a08/hackathon/notifications
+[2026-06-27T23:09:53.958Z] Active request from user: id=6a3d53f454d4b3f9b2a09c68, name=SP, email=sp@xyz.com, endpoint=/api/projects/6a3d7f37312c8f3b1bc91a08/hackathon/notifications
+[2026-06-27T23:10:36.338Z] getMyTeams called by user: 6a405738ba14927b0d7653f0
+[2026-06-27T23:10:36.344Z] Active request from user: id=6a405738ba14927b0d7653f0, name=Sakshi Pawar, email=sakshipawars123@gmail.com, endpoint=/api/user/profile
+[2026-06-27T23:10:36.353Z] Active request from user: id=6a405738ba14927b0d7653f0, name=Sakshi Pawar, email=sakshipawars123@gmail.com, endpoint=/api/team/my-teams
+[2026-06-27T23:10:36.360Z] Active request from user: id=6a405738ba14927b0d7653f0, name=Sakshi Pawar, email=sakshipawars123@gmail.com, endpoint=/api/user/profile
+[2026-06-27T23:10:36.364Z] getMyTeams called by user: 6a405738ba14927b0d7653f0
+[2026-06-27T23:10:36.376Z] Active request from user: id=6a405738ba14927b0d7653f0, name=Sakshi Pawar, email=sakshipawars123@gmail.com, endpoint=/api/team/my-teams
+[2026-06-27T23:10:43.765Z] getMyTeams called by user: 6a405738ba14927b0d7653f0
+[2026-06-27T23:10:43.777Z] Active request from user: id=6a405738ba14927b0d7653f0, name=Sakshi Pawar, email=sakshipawars123@gmail.com, endpoint=/api/team/my-teams
+[2026-06-27T23:10:43.785Z] getMyTeams called by user: 6a405738ba14927b0d7653f0
+[2026-06-27T23:10:43.804Z] Active request from user: id=6a405738ba14927b0d7653f0, name=Sakshi Pawar, email=sakshipawars123@gmail.com, endpoint=/api/team/my-teams
+[2026-06-27T23:10:50.502Z] getMyTeams called by user: 6a405738ba14927b0d7653f0
+[2026-06-27T23:10:50.511Z] Active request from user: id=6a405738ba14927b0d7653f0, name=Sakshi Pawar, email=sakshipawars123@gmail.com, endpoint=/api/user/profile
+[2026-06-27T23:10:50.515Z] Active request from user: id=6a405738ba14927b0d7653f0, name=Sakshi Pawar, email=sakshipawars123@gmail.com, endpoint=/api/team/my-teams
+[2026-06-27T23:10:50.520Z] getMyTeams called by user: 6a405738ba14927b0d7653f0
+[2026-06-27T23:10:50.525Z] Active request from user: id=6a405738ba14927b0d7653f0, name=Sakshi Pawar, email=sakshipawars123@gmail.com, endpoint=/api/user/profile
+[2026-06-27T23:10:50.533Z] Active request from user: id=6a405738ba14927b0d7653f0, name=Sakshi Pawar, email=sakshipawars123@gmail.com, endpoint=/api/team/my-teams
+[2026-06-27T23:10:53.963Z] Active request from user: id=6a3d53f454d4b3f9b2a09c68, name=SP, email=sp@xyz.com, endpoint=/api/projects/6a3d7f37312c8f3b1bc91a08/hackathon/notifications
+[2026-06-27T23:11:53.973Z] Active request from user: id=6a3d53f454d4b3f9b2a09c68, name=SP, email=sp@xyz.com, endpoint=/api/projects/6a3d7f37312c8f3b1bc91a08/hackathon/notifications
+[2026-06-27T23:12:53.974Z] Active request from user: id=6a3d53f454d4b3f9b2a09c68, name=SP, email=sp@xyz.com, endpoint=/api/projects/6a3d7f37312c8f3b1bc91a08/hackathon/notifications
+[2026-06-27T23:13:53.953Z] Active request from user: id=6a3d53f454d4b3f9b2a09c68, name=SP, email=sp@xyz.com, endpoint=/api/projects/6a3d7f37312c8f3b1bc91a08/hackathon/notifications
+[2026-06-27T23:14:53.965Z] Active request from user: id=6a3d53f454d4b3f9b2a09c68, name=SP, email=sp@xyz.com, endpoint=/api/projects/6a3d7f37312c8f3b1bc91a08/hackathon/notifications
+[2026-06-27T23:15:53.958Z] Active request from user: id=6a3d53f454d4b3f9b2a09c68, name=SP, email=sp@xyz.com, endpoint=/api/projects/6a3d7f37312c8f3b1bc91a08/hackathon/notifications
+[2026-06-27T23:16:53.974Z] Active request from user: id=6a3d53f454d4b3f9b2a09c68, name=SP, email=sp@xyz.com, endpoint=/api/projects/6a3d7f37312c8f3b1bc91a08/hackathon/notifications
+[2026-06-27T23:17:53.966Z] Active request from user: id=6a3d53f454d4b3f9b2a09c68, name=SP, email=sp@xyz.com, endpoint=/api/projects/6a3d7f37312c8f3b1bc91a08/hackathon/notifications
+[2026-06-27T23:18:53.969Z] Active request from user: id=6a3d53f454d4b3f9b2a09c68, name=SP, email=sp@xyz.com, endpoint=/api/projects/6a3d7f37312c8f3b1bc91a08/hackathon/notifications
+[2026-06-27T23:19:53.964Z] Active request from user: id=6a3d53f454d4b3f9b2a09c68, name=SP, email=sp@xyz.com, endpoint=/api/projects/6a3d7f37312c8f3b1bc91a08/hackathon/notifications
+[2026-06-27T23:20:53.971Z] Active request from user: id=6a3d53f454d4b3f9b2a09c68, name=SP, email=sp@xyz.com, endpoint=/api/projects/6a3d7f37312c8f3b1bc91a08/hackathon/notifications
+[2026-06-27T23:21:53.957Z] Active request from user: id=6a3d53f454d4b3f9b2a09c68, name=SP, email=sp@xyz.com, endpoint=/api/projects/6a3d7f37312c8f3b1bc91a08/hackathon/notifications
+[2026-06-27T23:22:53.970Z] Active request from user: id=6a3d53f454d4b3f9b2a09c68, name=SP, email=sp@xyz.com, endpoint=/api/projects/6a3d7f37312c8f3b1bc91a08/hackathon/notifications
+[2026-06-27T23:23:53.963Z] Active request from user: id=6a3d53f454d4b3f9b2a09c68, name=SP, email=sp@xyz.com, endpoint=/api/projects/6a3d7f37312c8f3b1bc91a08/hackathon/notifications
+[2026-06-27T23:24:53.969Z] Active request from user: id=6a3d53f454d4b3f9b2a09c68, name=SP, email=sp@xyz.com, endpoint=/api/projects/6a3d7f37312c8f3b1bc91a08/hackathon/notifications
+[2026-06-27T23:25:53.964Z] Active request from user: id=6a3d53f454d4b3f9b2a09c68, name=SP, email=sp@xyz.com, endpoint=/api/projects/6a3d7f37312c8f3b1bc91a08/hackathon/notifications
+[2026-06-27T23:26:53.969Z] Active request from user: id=6a3d53f454d4b3f9b2a09c68, name=SP, email=sp@xyz.com, endpoint=/api/projects/6a3d7f37312c8f3b1bc91a08/hackathon/notifications
+[2026-06-27T23:27:54.006Z] Active request from user: id=6a3d53f454d4b3f9b2a09c68, name=SP, email=sp@xyz.com, endpoint=/api/projects/6a3d7f37312c8f3b1bc91a08/hackathon/notifications
+[2026-06-27T23:28:53.977Z] Active request from user: id=6a3d53f454d4b3f9b2a09c68, name=SP, email=sp@xyz.com, endpoint=/api/projects/6a3d7f37312c8f3b1bc91a08/hackathon/notifications
+[2026-06-27T23:29:53.969Z] Active request from user: id=6a3d53f454d4b3f9b2a09c68, name=SP, email=sp@xyz.com, endpoint=/api/projects/6a3d7f37312c8f3b1bc91a08/hackathon/notifications
+[2026-06-27T23:30:39.251Z] Active request from user: id=6a3d53f454d4b3f9b2a09c68, name=SP, email=sp@xyz.com, endpoint=/api/projects/6a3d7f37312c8f3b1bc91a08/hackathon/notifications
+[2026-06-27T23:31:01.979Z] Active request from user: id=6a3d53f454d4b3f9b2a09c68, name=SP, email=sp@xyz.com, endpoint=/api/projects/6a3d7f37312c8f3b1bc91a08/hackathon/notifications
+[2026-06-27T23:31:31.974Z] Active request from user: id=6a3d53f454d4b3f9b2a09c68, name=SP, email=sp@xyz.com, endpoint=/api/projects/6a3d7f37312c8f3b1bc91a08/hackathon/notifications
+[2026-06-27T23:32:32.963Z] Active request from user: id=6a3d53f454d4b3f9b2a09c68, name=SP, email=sp@xyz.com, endpoint=/api/projects/6a3d7f37312c8f3b1bc91a08/hackathon/notifications
+[2026-06-27T23:33:33.979Z] Active request from user: id=6a3d53f454d4b3f9b2a09c68, name=SP, email=sp@xyz.com, endpoint=/api/projects/6a3d7f37312c8f3b1bc91a08/hackathon/notifications
+[2026-06-27T23:34:34.969Z] Active request from user: id=6a3d53f454d4b3f9b2a09c68, name=SP, email=sp@xyz.com, endpoint=/api/projects/6a3d7f37312c8f3b1bc91a08/hackathon/notifications
+[2026-06-27T23:35:35.956Z] Active request from user: id=6a3d53f454d4b3f9b2a09c68, name=SP, email=sp@xyz.com, endpoint=/api/projects/6a3d7f37312c8f3b1bc91a08/hackathon/notifications
+[2026-06-27T23:36:36.977Z] Active request from user: id=6a3d53f454d4b3f9b2a09c68, name=SP, email=sp@xyz.com, endpoint=/api/projects/6a3d7f37312c8f3b1bc91a08/hackathon/notifications
+[2026-06-27T23:37:37.973Z] Active request from user: id=6a3d53f454d4b3f9b2a09c68, name=SP, email=sp@xyz.com, endpoint=/api/projects/6a3d7f37312c8f3b1bc91a08/hackathon/notifications
+[2026-06-27T23:38:38.975Z] Active request from user: id=6a3d53f454d4b3f9b2a09c68, name=SP, email=sp@xyz.com, endpoint=/api/projects/6a3d7f37312c8f3b1bc91a08/hackathon/notifications
+[2026-06-27T23:39:39.978Z] Active request from user: id=6a3d53f454d4b3f9b2a09c68, name=SP, email=sp@xyz.com, endpoint=/api/projects/6a3d7f37312c8f3b1bc91a08/hackathon/notifications
+[2026-06-27T23:40:40.966Z] Active request from user: id=6a3d53f454d4b3f9b2a09c68, name=SP, email=sp@xyz.com, endpoint=/api/projects/6a3d7f37312c8f3b1bc91a08/hackathon/notifications
+[2026-06-27T23:41:41.964Z] Active request from user: id=6a3d53f454d4b3f9b2a09c68, name=SP, email=sp@xyz.com, endpoint=/api/projects/6a3d7f37312c8f3b1bc91a08/hackathon/notifications
+[2026-06-27T23:42:42.962Z] Active request from user: id=6a3d53f454d4b3f9b2a09c68, name=SP, email=sp@xyz.com, endpoint=/api/projects/6a3d7f37312c8f3b1bc91a08/hackathon/notifications
+[2026-06-27T23:43:43.962Z] Active request from user: id=6a3d53f454d4b3f9b2a09c68, name=SP, email=sp@xyz.com, endpoint=/api/projects/6a3d7f37312c8f3b1bc91a08/hackathon/notifications
+[2026-06-27T23:44:44.993Z] Active request from user: id=6a3d53f454d4b3f9b2a09c68, name=SP, email=sp@xyz.com, endpoint=/api/projects/6a3d7f37312c8f3b1bc91a08/hackathon/notifications
+[2026-06-27T23:45:45.997Z] Active request from user: id=6a3d53f454d4b3f9b2a09c68, name=SP, email=sp@xyz.com, endpoint=/api/projects/6a3d7f37312c8f3b1bc91a08/hackathon/notifications
+[2026-06-27T23:46:46.971Z] Active request from user: id=6a3d53f454d4b3f9b2a09c68, name=SP, email=sp@xyz.com, endpoint=/api/projects/6a3d7f37312c8f3b1bc91a08/hackathon/notifications
+[2026-06-27T23:47:57.292Z] Active request from user: id=6a3d53f454d4b3f9b2a09c68, name=SP, email=sp@xyz.com, endpoint=/api/projects/6a3d7f37312c8f3b1bc91a08/hackathon/notifications
+[2026-06-27T23:49:08.243Z] Active request from user: id=6a405738ba14927b0d7653f0, name=Sakshi Pawar, email=sakshipawars123@gmail.com, endpoint=/api/user/profile
+[2026-06-27T23:49:08.272Z] Active request from user: id=6a405738ba14927b0d7653f0, name=Sakshi Pawar, email=sakshipawars123@gmail.com, endpoint=/api/user/profile
+[2026-06-27T23:49:08.342Z] getMyTeams called by user: 6a405738ba14927b0d7653f0
+[2026-06-27T23:49:08.369Z] Active request from user: id=6a405738ba14927b0d7653f0, name=Sakshi Pawar, email=sakshipawars123@gmail.com, endpoint=/api/user/profile
+[2026-06-27T23:49:08.381Z] Active request from user: id=6a405738ba14927b0d7653f0, name=Sakshi Pawar, email=sakshipawars123@gmail.com, endpoint=/api/team/my-teams
+[2026-06-27T23:49:08.397Z] Active request from user: id=6a405738ba14927b0d7653f0, name=Sakshi Pawar, email=sakshipawars123@gmail.com, endpoint=/api/user/profile
+[2026-06-27T23:49:08.409Z] getMyTeams called by user: 6a405738ba14927b0d7653f0
+[2026-06-27T23:49:08.432Z] Active request from user: id=6a405738ba14927b0d7653f0, name=Sakshi Pawar, email=sakshipawars123@gmail.com, endpoint=/api/team/my-teams
+[2026-06-27T23:49:42.532Z] Active request from user: id=6a3d53f454d4b3f9b2a09c68, name=SP, email=sp@xyz.com, endpoint=/api/projects/6a3d7f37312c8f3b1bc91a08/hackathon/notifications
+[2026-06-27T23:52:17.035Z] Active request from user: id=6a405738ba14927b0d7653f0, name=Sakshi Pawar, email=sakshipawars123@gmail.com, endpoint=/api/user/profile
+[2026-06-27T23:52:17.050Z] Active request from user: id=6a405738ba14927b0d7653f0, name=Sakshi Pawar, email=sakshipawars123@gmail.com, endpoint=/api/user/profile
+[2026-06-27T23:52:17.085Z] getMyTeams called by user: 6a405738ba14927b0d7653f0
+[2026-06-27T23:52:17.095Z] Active request from user: id=6a405738ba14927b0d7653f0, name=Sakshi Pawar, email=sakshipawars123@gmail.com, endpoint=/api/user/profile
+[2026-06-27T23:52:17.105Z] Active request from user: id=6a405738ba14927b0d7653f0, name=Sakshi Pawar, email=sakshipawars123@gmail.com, endpoint=/api/team/my-teams
+[2026-06-27T23:52:17.108Z] getMyTeams called by user: 6a405738ba14927b0d7653f0
+[2026-06-27T23:52:17.116Z] Active request from user: id=6a405738ba14927b0d7653f0, name=Sakshi Pawar, email=sakshipawars123@gmail.com, endpoint=/api/user/profile
+[2026-06-27T23:52:17.119Z] Active request from user: id=6a405738ba14927b0d7653f0, name=Sakshi Pawar, email=sakshipawars123@gmail.com, endpoint=/api/team/my-teams
+[2026-06-27T23:56:51.789Z] Active request from user: id=6a3d53f454d4b3f9b2a09c68, name=SP, email=sp@xyz.com, endpoint=/api/projects/6a3d7f37312c8f3b1bc91a08/hackathon/notifications
+[2026-06-27T23:57:26.336Z] Active request from user: id=6a406350b6513dfbac176c10, name=Test User, email=testuser_antigravity@example.com, endpoint=/api/profile
+[2026-06-27T23:57:28.187Z] Active request from user: id=6a406350b6513dfbac176c10, name=Test User, email=testuser_antigravity@example.com, endpoint=/api/user/profile
+[2026-06-27T23:57:28.202Z] Active request from user: id=6a406350b6513dfbac176c10, name=Test User, email=testuser_antigravity@example.com, endpoint=/api/user/profile
+[2026-06-27T23:57:28.314Z] getMyTeams called by user: 6a406350b6513dfbac176c10
+[2026-06-27T23:57:28.321Z] Active request from user: id=6a406350b6513dfbac176c10, name=Test User, email=testuser_antigravity@example.com, endpoint=/api/user/profile
+[2026-06-27T23:57:28.326Z] Active request from user: id=6a406350b6513dfbac176c10, name=Test User, email=testuser_antigravity@example.com, endpoint=/api/team/my-teams
+[2026-06-27T23:57:28.334Z] Active request from user: id=6a406350b6513dfbac176c10, name=Test User, email=testuser_antigravity@example.com, endpoint=/api/user/profile
+[2026-06-27T23:57:28.337Z] getMyTeams called by user: 6a406350b6513dfbac176c10
+[2026-06-27T23:57:28.349Z] Active request from user: id=6a406350b6513dfbac176c10, name=Test User, email=testuser_antigravity@example.com, endpoint=/api/team/my-teams
+[2026-06-27T23:58:43.666Z] Active request from user: id=6a3d53f454d4b3f9b2a09c68, name=SP, email=sp@xyz.com, endpoint=/api/projects/6a3d7f37312c8f3b1bc91a08/hackathon/notifications
+[2026-06-27T23:59:43.965Z] Active request from user: id=6a3d53f454d4b3f9b2a09c68, name=SP, email=sp@xyz.com, endpoint=/api/projects/6a3d7f37312c8f3b1bc91a08/hackathon/notifications
+[2026-06-28T00:00:02.685Z] Active request from user: id=6a405738ba14927b0d7653f0, name=Sakshi Pawar, email=sakshipawars123@gmail.com, endpoint=/api/feedback
+[2026-06-28T00:00:15.515Z] Active request from user: id=6a405738ba14927b0d7653f0, name=Sakshi Pawar, email=sakshipawars123@gmail.com, endpoint=/api/feedback/stats
+[2026-06-28T00:00:15.629Z] Active request from user: id=6a405738ba14927b0d7653f0, name=Sakshi Pawar, email=sakshipawars123@gmail.com, endpoint=/api/feedback?limit=50&sort=-createdAt
+[2026-06-28T00:00:38.373Z] getMyTeams called by user: 6a405738ba14927b0d7653f0
+[2026-06-28T00:00:38.381Z] Active request from user: id=6a405738ba14927b0d7653f0, name=Sakshi Pawar, email=sakshipawars123@gmail.com, endpoint=/api/user/profile
+[2026-06-28T00:00:38.387Z] Active request from user: id=6a405738ba14927b0d7653f0, name=Sakshi Pawar, email=sakshipawars123@gmail.com, endpoint=/api/team/my-teams
+[2026-06-28T00:00:38.391Z] getMyTeams called by user: 6a405738ba14927b0d7653f0
+[2026-06-28T00:00:38.396Z] Active request from user: id=6a405738ba14927b0d7653f0, name=Sakshi Pawar, email=sakshipawars123@gmail.com, endpoint=/api/user/profile
+[2026-06-28T00:00:38.405Z] Active request from user: id=6a405738ba14927b0d7653f0, name=Sakshi Pawar, email=sakshipawars123@gmail.com, endpoint=/api/team/my-teams
+[2026-06-28T00:00:44.976Z] Active request from user: id=6a3d53f454d4b3f9b2a09c68, name=SP, email=sp@xyz.com, endpoint=/api/projects/6a3d7f37312c8f3b1bc91a08/hackathon/notifications
+[2026-06-28T00:01:21.721Z] Active request from user: id=6a405738ba14927b0d7653f0, name=Sakshi Pawar, email=sakshipawars123@gmail.com, endpoint=/api/user/profile
+[2026-06-28T00:01:21.731Z] Active request from user: id=6a405738ba14927b0d7653f0, name=Sakshi Pawar, email=sakshipawars123@gmail.com, endpoint=/api/user/profile
+[2026-06-28T00:01:45.956Z] Active request from user: id=6a3d53f454d4b3f9b2a09c68, name=SP, email=sp@xyz.com, endpoint=/api/projects/6a3d7f37312c8f3b1bc91a08/hackathon/notifications
+[2026-06-28T00:02:15.102Z] Active request from user: id=6a405738ba14927b0d7653f0, name=Sakshi Pawar, email=sakshipawars123@gmail.com, endpoint=/api/user/profile
+[2026-06-28T00:02:15.117Z] Active request from user: id=6a405738ba14927b0d7653f0, name=Sakshi Pawar, email=sakshipawars123@gmail.com, endpoint=/api/user/profile
+[2026-06-28T00:02:15.229Z] getMyTeams called by user: 6a405738ba14927b0d7653f0
+[2026-06-28T00:02:15.235Z] Active request from user: id=6a405738ba14927b0d7653f0, name=Sakshi Pawar, email=sakshipawars123@gmail.com, endpoint=/api/user/profile
+[2026-06-28T00:02:15.243Z] Active request from user: id=6a405738ba14927b0d7653f0, name=Sakshi Pawar, email=sakshipawars123@gmail.com, endpoint=/api/team/my-teams
+[2026-06-28T00:02:15.257Z] Active request from user: id=6a405738ba14927b0d7653f0, name=Sakshi Pawar, email=sakshipawars123@gmail.com, endpoint=/api/user/profile
+[2026-06-28T00:02:15.262Z] getMyTeams called by user: 6a405738ba14927b0d7653f0
+[2026-06-28T00:02:15.274Z] Active request from user: id=6a405738ba14927b0d7653f0, name=Sakshi Pawar, email=sakshipawars123@gmail.com, endpoint=/api/team/my-teams
+[2026-06-28T00:02:46.963Z] Active request from user: id=6a3d53f454d4b3f9b2a09c68, name=SP, email=sp@xyz.com, endpoint=/api/projects/6a3d7f37312c8f3b1bc91a08/hackathon/notifications
+[2026-06-28T00:02:47.823Z] Active request from user: id=6a405738ba14927b0d7653f0, name=Sakshi Pawar, email=sakshipawars123@gmail.com, endpoint=/api/feedback
+[2026-06-28T00:02:53.649Z] Active request from user: id=6a405738ba14927b0d7653f0, name=Sakshi Pawar, email=sakshipawars123@gmail.com, endpoint=/api/feedback/summary
+{"timestamp":"2026-06-28T00:02:57.458Z","provider":"unknown","modelName":"gemini-2.5-flash","promptVersion":"1.0.0","latencyMs":3793,"tokenUsage":{"promptTokens":366,"completionTokens":153,"totalTokens":1087},"errors":null,"retries":0,"cost":0,"fallback":false,"module":"feedback_ai_summary","duration":3793,"responseTime":3793,"endpoint":"feedback_ai_summary","fallbackCount":0,"retrievedContext":[],"intent":"unknown","conversationId":null,"projectId":null,"userId":null,"qualityScore":0,"cacheHit":false,"responseLength":0}
+[2026-06-28T00:03:21.404Z] Active request from user: id=6a405738ba14927b0d7653f0, name=Sakshi Pawar, email=sakshipawars123@gmail.com, endpoint=/api/feedback/stats
+[2026-06-28T00:03:21.413Z] Active request from user: id=6a405738ba14927b0d7653f0, name=Sakshi Pawar, email=sakshipawars123@gmail.com, endpoint=/api/feedback?limit=50&sort=-createdAt
+[2026-06-28T00:03:47.989Z] Active request from user: id=6a3d53f454d4b3f9b2a09c68, name=SP, email=sp@xyz.com, endpoint=/api/projects/6a3d7f37312c8f3b1bc91a08/hackathon/notifications
+[2026-06-28T00:04:22.089Z] Active request from user: id=6a405738ba14927b0d7653f0, name=Sakshi Pawar, email=sakshipawars123@gmail.com, endpoint=/api/feedback
+[2026-06-28T00:04:33.819Z] Active request from user: id=6a405738ba14927b0d7653f0, name=Sakshi Pawar, email=sakshipawars123@gmail.com, endpoint=/api/feedback/stats
+[2026-06-28T00:04:33.824Z] Active request from user: id=6a405738ba14927b0d7653f0, name=Sakshi Pawar, email=sakshipawars123@gmail.com, endpoint=/api/feedback?limit=50&sort=-createdAt
+[2026-06-28T00:04:43.954Z] Active request from user: id=6a405738ba14927b0d7653f0, name=Sakshi Pawar, email=sakshipawars123@gmail.com, endpoint=/api/feedback/stats
+[2026-06-28T00:04:43.960Z] Active request from user: id=6a405738ba14927b0d7653f0, name=Sakshi Pawar, email=sakshipawars123@gmail.com, endpoint=/api/feedback?limit=50&sort=-createdAt
+[2026-06-28T00:04:48.970Z] Active request from user: id=6a3d53f454d4b3f9b2a09c68, name=SP, email=sp@xyz.com, endpoint=/api/projects/6a3d7f37312c8f3b1bc91a08/hackathon/notifications
+[2026-06-28T00:05:23.074Z] Active request from user: id=6a405738ba14927b0d7653f0, name=Sakshi Pawar, email=sakshipawars123@gmail.com, endpoint=/api/feedback/6a406506b6513dfbac176c13/status
+[2026-06-28T00:05:23.117Z] Active request from user: id=6a405738ba14927b0d7653f0, name=Sakshi Pawar, email=sakshipawars123@gmail.com, endpoint=/api/feedback?limit=50&sort=-createdAt
+[2026-06-28T00:05:23.124Z] Active request from user: id=6a405738ba14927b0d7653f0, name=Sakshi Pawar, email=sakshipawars123@gmail.com, endpoint=/api/feedback/stats
+[2026-06-28T00:05:49.963Z] Active request from user: id=6a3d53f454d4b3f9b2a09c68, name=SP, email=sp@xyz.com, endpoint=/api/projects/6a3d7f37312c8f3b1bc91a08/hackathon/notifications
+[2026-06-28T00:06:50.969Z] Active request from user: id=6a3d53f454d4b3f9b2a09c68, name=SP, email=sp@xyz.com, endpoint=/api/projects/6a3d7f37312c8f3b1bc91a08/hackathon/notifications
+[2026-06-28T00:07:51.966Z] Active request from user: id=6a3d53f454d4b3f9b2a09c68, name=SP, email=sp@xyz.com, endpoint=/api/projects/6a3d7f37312c8f3b1bc91a08/hackathon/notifications
+[2026-06-28T00:08:52.982Z] Active request from user: id=6a3d53f454d4b3f9b2a09c68, name=SP, email=sp@xyz.com, endpoint=/api/projects/6a3d7f37312c8f3b1bc91a08/hackathon/notifications
+[2026-06-28T00:09:53.963Z] Active request from user: id=6a3d53f454d4b3f9b2a09c68, name=SP, email=sp@xyz.com, endpoint=/api/projects/6a3d7f37312c8f3b1bc91a08/hackathon/notifications
+[2026-06-28T00:10:53.994Z] Active request from user: id=6a3d53f454d4b3f9b2a09c68, name=SP, email=sp@xyz.com, endpoint=/api/projects/6a3d7f37312c8f3b1bc91a08/hackathon/notifications
+[2026-06-28T00:11:29.998Z] Active request from user: id=6a405738ba14927b0d7653f0, name=Sakshi Pawar, email=sakshipawars123@gmail.com, endpoint=/api/feedback/6a4064a7b6513dfbac176c12/status
+[2026-06-28T00:11:30.044Z] Active request from user: id=6a405738ba14927b0d7653f0, name=Sakshi Pawar, email=sakshipawars123@gmail.com, endpoint=/api/feedback?limit=50&sort=-createdAt
+[2026-06-28T00:11:30.048Z] Active request from user: id=6a405738ba14927b0d7653f0, name=Sakshi Pawar, email=sakshipawars123@gmail.com, endpoint=/api/feedback/stats
+[2026-06-28T00:11:53.965Z] Active request from user: id=6a3d53f454d4b3f9b2a09c68, name=SP, email=sp@xyz.com, endpoint=/api/projects/6a3d7f37312c8f3b1bc91a08/hackathon/notifications
+[2026-06-28T00:12:53.951Z] Active request from user: id=6a3d53f454d4b3f9b2a09c68, name=SP, email=sp@xyz.com, endpoint=/api/projects/6a3d7f37312c8f3b1bc91a08/hackathon/notifications
+[2026-06-28T00:13:53.975Z] Active request from user: id=6a3d53f454d4b3f9b2a09c68, name=SP, email=sp@xyz.com, endpoint=/api/projects/6a3d7f37312c8f3b1bc91a08/hackathon/notifications
+[2026-06-28T00:14:35.873Z] Active request from user: id=6a405738ba14927b0d7653f0, name=Sakshi Pawar, email=sakshipawars123@gmail.com, endpoint=/api/user/profile
+[2026-06-28T00:14:35.891Z] Active request from user: id=6a405738ba14927b0d7653f0, name=Sakshi Pawar, email=sakshipawars123@gmail.com, endpoint=/api/user/profile
+[2026-06-28T00:14:39.116Z] Active request from user: id=6a405738ba14927b0d7653f0, name=Sakshi Pawar, email=sakshipawars123@gmail.com, endpoint=/api/feedback/stats
+[2026-06-28T00:14:39.124Z] Active request from user: id=6a405738ba14927b0d7653f0, name=Sakshi Pawar, email=sakshipawars123@gmail.com, endpoint=/api/feedback?limit=50&sort=-createdAt
+[2026-06-28T00:14:45.629Z] Active request from user: id=6a405738ba14927b0d7653f0, name=Sakshi Pawar, email=sakshipawars123@gmail.com, endpoint=/api/feedback/stats
+[2026-06-28T00:14:45.635Z] Active request from user: id=6a405738ba14927b0d7653f0, name=Sakshi Pawar, email=sakshipawars123@gmail.com, endpoint=/api/feedback?limit=50&sort=-createdAt
+[2026-06-28T00:14:53.978Z] Active request from user: id=6a3d53f454d4b3f9b2a09c68, name=SP, email=sp@xyz.com, endpoint=/api/projects/6a3d7f37312c8f3b1bc91a08/hackathon/notifications
+[2026-06-28T00:14:55.262Z] getMyTeams called by user: 6a405738ba14927b0d7653f0
+[2026-06-28T00:14:55.268Z] Active request from user: id=6a405738ba14927b0d7653f0, name=Sakshi Pawar, email=sakshipawars123@gmail.com, endpoint=/api/user/profile
+[2026-06-28T00:14:55.278Z] Active request from user: id=6a405738ba14927b0d7653f0, name=Sakshi Pawar, email=sakshipawars123@gmail.com, endpoint=/api/team/my-teams
+[2026-06-28T00:14:55.280Z] getMyTeams called by user: 6a405738ba14927b0d7653f0
+[2026-06-28T00:14:55.288Z] Active request from user: id=6a405738ba14927b0d7653f0, name=Sakshi Pawar, email=sakshipawars123@gmail.com, endpoint=/api/user/profile
+[2026-06-28T00:14:55.291Z] Active request from user: id=6a405738ba14927b0d7653f0, name=Sakshi Pawar, email=sakshipawars123@gmail.com, endpoint=/api/team/my-teams
+[2026-06-28T00:15:00.303Z] Active request from user: id=6a405738ba14927b0d7653f0, name=Sakshi Pawar, email=sakshipawars123@gmail.com, endpoint=/api/feedback/stats
+[2026-06-28T00:15:00.307Z] Active request from user: id=6a405738ba14927b0d7653f0, name=Sakshi Pawar, email=sakshipawars123@gmail.com, endpoint=/api/feedback?limit=50&sort=-createdAt
+[2026-06-28T00:15:53.970Z] Active request from user: id=6a3d53f454d4b3f9b2a09c68, name=SP, email=sp@xyz.com, endpoint=/api/projects/6a3d7f37312c8f3b1bc91a08/hackathon/notifications
+[2026-06-28T00:16:53.963Z] Active request from user: id=6a3d53f454d4b3f9b2a09c68, name=SP, email=sp@xyz.com, endpoint=/api/projects/6a3d7f37312c8f3b1bc91a08/hackathon/notifications
+[2026-06-28T00:17:53.989Z] Active request from user: id=6a3d53f454d4b3f9b2a09c68, name=SP, email=sp@xyz.com, endpoint=/api/projects/6a3d7f37312c8f3b1bc91a08/hackathon/notifications
+[2026-06-28T00:18:21.624Z] Active request from user: id=6a3d53f454d4b3f9b2a09c68, name=SP, email=sp@xyz.com, endpoint=/api/projects/6a3d7f37312c8f3b1bc91a08/hackathon/notifications
+[2026-06-28T00:26:54.042Z] Active request from user: id=6a3d53f454d4b3f9b2a09c68, name=SP, email=sp@xyz.com, endpoint=/api/projects/6a3d7f37312c8f3b1bc91a08/hackathon/notifications
+[2026-06-28T00:27:19.969Z] Active request from user: id=6a405738ba14927b0d7653f0, name=Sakshi Pawar, email=sakshipawars123@gmail.com, endpoint=/api/user/profile
+[2026-06-28T00:27:19.986Z] Active request from user: id=6a405738ba14927b0d7653f0, name=Sakshi Pawar, email=sakshipawars123@gmail.com, endpoint=/api/user/profile
+[2026-06-28T00:27:24.473Z] Active request from user: id=6a405738ba14927b0d7653f0, name=Sakshi Pawar, email=sakshipawars123@gmail.com, endpoint=/api/user/profile
+[2026-06-28T00:27:24.488Z] Active request from user: id=6a405738ba14927b0d7653f0, name=Sakshi Pawar, email=sakshipawars123@gmail.com, endpoint=/api/user/profile
+[2026-06-28T00:27:33.823Z] getMyTeams called by user: 6a405738ba14927b0d7653f0
+[2026-06-28T00:27:33.832Z] Active request from user: id=6a405738ba14927b0d7653f0, name=Sakshi Pawar, email=sakshipawars123@gmail.com, endpoint=/api/user/profile
+[2026-06-28T00:27:33.839Z] Active request from user: id=6a405738ba14927b0d7653f0, name=Sakshi Pawar, email=sakshipawars123@gmail.com, endpoint=/api/team/my-teams
+[2026-06-28T00:27:33.846Z] getMyTeams called by user: 6a405738ba14927b0d7653f0
+[2026-06-28T00:27:33.857Z] Active request from user: id=6a405738ba14927b0d7653f0, name=Sakshi Pawar, email=sakshipawars123@gmail.com, endpoint=/api/user/profile
+[2026-06-28T00:27:33.860Z] Active request from user: id=6a405738ba14927b0d7653f0, name=Sakshi Pawar, email=sakshipawars123@gmail.com, endpoint=/api/team/my-teams
+[2026-06-28T00:27:46.077Z] Active request from user: id=6a405738ba14927b0d7653f0, name=Sakshi Pawar, email=sakshipawars123@gmail.com, endpoint=/api/feedback/stats
+[2026-06-28T00:27:46.190Z] Active request from user: id=6a405738ba14927b0d7653f0, name=Sakshi Pawar, email=sakshipawars123@gmail.com, endpoint=/api/feedback?limit=50&sort=-createdAt
+[2026-06-28T00:27:53.966Z] Active request from user: id=6a3d53f454d4b3f9b2a09c68, name=SP, email=sp@xyz.com, endpoint=/api/projects/6a3d7f37312c8f3b1bc91a08/hackathon/notifications
+[2026-06-28T00:28:53.976Z] Active request from user: id=6a3d53f454d4b3f9b2a09c68, name=SP, email=sp@xyz.com, endpoint=/api/projects/6a3d7f37312c8f3b1bc91a08/hackathon/notifications
+[2026-06-28T00:29:01.624Z] Active request from user: id=6a405738ba14927b0d7653f0, name=Sakshi Pawar, email=sakshipawars123@gmail.com, endpoint=/api/feedback
+[2026-06-28T00:29:11.438Z] Active request from user: id=6a405738ba14927b0d7653f0, name=Sakshi Pawar, email=sakshipawars123@gmail.com, endpoint=/api/feedback/stats
+[2026-06-28T00:29:11.447Z] Active request from user: id=6a405738ba14927b0d7653f0, name=Sakshi Pawar, email=sakshipawars123@gmail.com, endpoint=/api/feedback?limit=50&sort=-createdAt
+[2026-06-28T00:29:53.981Z] Active request from user: id=6a3d53f454d4b3f9b2a09c68, name=SP, email=sp@xyz.com, endpoint=/api/projects/6a3d7f37312c8f3b1bc91a08/hackathon/notifications
+[2026-06-28T00:30:53.964Z] Active request from user: id=6a3d53f454d4b3f9b2a09c68, name=SP, email=sp@xyz.com, endpoint=/api/projects/6a3d7f37312c8f3b1bc91a08/hackathon/notifications
+[2026-06-28T00:31:53.983Z] Active request from user: id=6a3d53f454d4b3f9b2a09c68, name=SP, email=sp@xyz.com, endpoint=/api/projects/6a3d7f37312c8f3b1bc91a08/hackathon/notifications
+[2026-06-28T00:32:53.969Z] Active request from user: id=6a3d53f454d4b3f9b2a09c68, name=SP, email=sp@xyz.com, endpoint=/api/projects/6a3d7f37312c8f3b1bc91a08/hackathon/notifications
+[2026-06-28T00:33:53.981Z] Active request from user: id=6a3d53f454d4b3f9b2a09c68, name=SP, email=sp@xyz.com, endpoint=/api/projects/6a3d7f37312c8f3b1bc91a08/hackathon/notifications
+[2026-06-28T00:34:53.970Z] Active request from user: id=6a3d53f454d4b3f9b2a09c68, name=SP, email=sp@xyz.com, endpoint=/api/projects/6a3d7f37312c8f3b1bc91a08/hackathon/notifications
+[2026-06-28T00:35:54.002Z] Active request from user: id=6a3d53f454d4b3f9b2a09c68, name=SP, email=sp@xyz.com, endpoint=/api/projects/6a3d7f37312c8f3b1bc91a08/hackathon/notifications
+[2026-06-28T00:36:53.976Z] Active request from user: id=6a3d53f454d4b3f9b2a09c68, name=SP, email=sp@xyz.com, endpoint=/api/projects/6a3d7f37312c8f3b1bc91a08/hackathon/notifications
+[2026-06-28T00:37:53.997Z] Active request from user: id=6a3d53f454d4b3f9b2a09c68, name=SP, email=sp@xyz.com, endpoint=/api/projects/6a3d7f37312c8f3b1bc91a08/hackathon/notifications
+[2026-06-28T00:38:06.361Z] Active request from user: id=6a405738ba14927b0d7653f0, name=Sakshi Pawar, email=sakshipawars123@gmail.com, endpoint=/api/feedback/stats
+[2026-06-28T00:38:06.419Z] Active request from user: id=6a405738ba14927b0d7653f0, name=Sakshi Pawar, email=sakshipawars123@gmail.com, endpoint=/api/feedback?limit=50&sort=-createdAt
+[2026-06-28T00:38:54.248Z] Active request from user: id=6a3d53f454d4b3f9b2a09c68, name=SP, email=sp@xyz.com, endpoint=/api/projects/6a3d7f37312c8f3b1bc91a08/hackathon/notifications
+[2026-06-28T00:39:55.752Z] Active request from user: id=6a3d53f454d4b3f9b2a09c68, name=SP, email=sp@xyz.com, endpoint=/api/projects/6a3d7f37312c8f3b1bc91a08/hackathon/notifications
+[2026-06-28T00:40:55.591Z] Active request from user: id=6a3d53f454d4b3f9b2a09c68, name=SP, email=sp@xyz.com, endpoint=/api/projects/6a3d7f37312c8f3b1bc91a08/hackathon/notifications
+[2026-06-28T00:41:53.979Z] Active request from user: id=6a3d53f454d4b3f9b2a09c68, name=SP, email=sp@xyz.com, endpoint=/api/projects/6a3d7f37312c8f3b1bc91a08/hackathon/notifications
+[2026-06-28T00:42:53.969Z] Active request from user: id=6a3d53f454d4b3f9b2a09c68, name=SP, email=sp@xyz.com, endpoint=/api/projects/6a3d7f37312c8f3b1bc91a08/hackathon/notifications
+[2026-06-28T00:43:53.975Z] Active request from user: id=6a3d53f454d4b3f9b2a09c68, name=SP, email=sp@xyz.com, endpoint=/api/projects/6a3d7f37312c8f3b1bc91a08/hackathon/notifications
+[2026-06-28T00:44:53.971Z] Active request from user: id=6a3d53f454d4b3f9b2a09c68, name=SP, email=sp@xyz.com, endpoint=/api/projects/6a3d7f37312c8f3b1bc91a08/hackathon/notifications
+[2026-06-28T00:45:53.992Z] Active request from user: id=6a3d53f454d4b3f9b2a09c68, name=SP, email=sp@xyz.com, endpoint=/api/projects/6a3d7f37312c8f3b1bc91a08/hackathon/notifications
+[2026-06-28T00:46:53.967Z] Active request from user: id=6a3d53f454d4b3f9b2a09c68, name=SP, email=sp@xyz.com, endpoint=/api/projects/6a3d7f37312c8f3b1bc91a08/hackathon/notifications
+[2026-06-28T00:47:53.987Z] Active request from user: id=6a3d53f454d4b3f9b2a09c68, name=SP, email=sp@xyz.com, endpoint=/api/projects/6a3d7f37312c8f3b1bc91a08/hackathon/notifications
+[2026-06-28T00:48:53.993Z] Active request from user: id=6a3d53f454d4b3f9b2a09c68, name=SP, email=sp@xyz.com, endpoint=/api/projects/6a3d7f37312c8f3b1bc91a08/hackathon/notifications
+[2026-06-28T00:49:53.972Z] Active request from user: id=6a3d53f454d4b3f9b2a09c68, name=SP, email=sp@xyz.com, endpoint=/api/projects/6a3d7f37312c8f3b1bc91a08/hackathon/notifications
+[2026-06-28T00:50:53.990Z] Active request from user: id=6a3d53f454d4b3f9b2a09c68, name=SP, email=sp@xyz.com, endpoint=/api/projects/6a3d7f37312c8f3b1bc91a08/hackathon/notifications
+[2026-06-28T00:51:54.040Z] Active request from user: id=6a3d53f454d4b3f9b2a09c68, name=SP, email=sp@xyz.com, endpoint=/api/projects/6a3d7f37312c8f3b1bc91a08/hackathon/notifications
+[2026-06-28T00:52:53.971Z] Active request from user: id=6a3d53f454d4b3f9b2a09c68, name=SP, email=sp@xyz.com, endpoint=/api/projects/6a3d7f37312c8f3b1bc91a08/hackathon/notifications
+[2026-06-28T00:53:53.987Z] Active request from user: id=6a3d53f454d4b3f9b2a09c68, name=SP, email=sp@xyz.com, endpoint=/api/projects/6a3d7f37312c8f3b1bc91a08/hackathon/notifications
+[2026-06-28T00:54:53.972Z] Active request from user: id=6a3d53f454d4b3f9b2a09c68, name=SP, email=sp@xyz.com, endpoint=/api/projects/6a3d7f37312c8f3b1bc91a08/hackathon/notifications
+[2026-06-28T00:55:53.972Z] Active request from user: id=6a3d53f454d4b3f9b2a09c68, name=SP, email=sp@xyz.com, endpoint=/api/projects/6a3d7f37312c8f3b1bc91a08/hackathon/notifications
+[2026-06-28T00:56:53.995Z] Active request from user: id=6a3d53f454d4b3f9b2a09c68, name=SP, email=sp@xyz.com, endpoint=/api/projects/6a3d7f37312c8f3b1bc91a08/hackathon/notifications
+[2026-06-28T00:57:54.101Z] Active request from user: id=6a3d53f454d4b3f9b2a09c68, name=SP, email=sp@xyz.com, endpoint=/api/projects/6a3d7f37312c8f3b1bc91a08/hackathon/notifications
+[2026-06-28T00:58:54.086Z] Active request from user: id=6a3d53f454d4b3f9b2a09c68, name=SP, email=sp@xyz.com, endpoint=/api/projects/6a3d7f37312c8f3b1bc91a08/hackathon/notifications
+[2026-06-28T00:59:54.038Z] Active request from user: id=6a3d53f454d4b3f9b2a09c68, name=SP, email=sp@xyz.com, endpoint=/api/projects/6a3d7f37312c8f3b1bc91a08/hackathon/notifications
+[2026-06-28T01:00:53.988Z] Active request from user: id=6a3d53f454d4b3f9b2a09c68, name=SP, email=sp@xyz.com, endpoint=/api/projects/6a3d7f37312c8f3b1bc91a08/hackathon/notifications
+[2026-06-28T01:01:54.043Z] Active request from user: id=6a3d53f454d4b3f9b2a09c68, name=SP, email=sp@xyz.com, endpoint=/api/projects/6a3d7f37312c8f3b1bc91a08/hackathon/notifications
+[2026-06-28T01:02:53.996Z] Active request from user: id=6a3d53f454d4b3f9b2a09c68, name=SP, email=sp@xyz.com, endpoint=/api/projects/6a3d7f37312c8f3b1bc91a08/hackathon/notifications
+[2026-06-28T01:03:53.986Z] Active request from user: id=6a3d53f454d4b3f9b2a09c68, name=SP, email=sp@xyz.com, endpoint=/api/projects/6a3d7f37312c8f3b1bc91a08/hackathon/notifications
+[2026-06-28T01:04:53.975Z] Active request from user: id=6a3d53f454d4b3f9b2a09c68, name=SP, email=sp@xyz.com, endpoint=/api/projects/6a3d7f37312c8f3b1bc91a08/hackathon/notifications
+[2026-06-28T01:05:25.992Z] getMyTeams called by user: 6a405738ba14927b0d7653f0
+[2026-06-28T01:05:26.010Z] Active request from user: id=6a405738ba14927b0d7653f0, name=Sakshi Pawar, email=sakshipawars123@gmail.com, endpoint=/api/user/profile
+[2026-06-28T01:05:26.032Z] Active request from user: id=6a405738ba14927b0d7653f0, name=Sakshi Pawar, email=sakshipawars123@gmail.com, endpoint=/api/team/my-teams
+[2026-06-28T01:05:26.041Z] getMyTeams called by user: 6a405738ba14927b0d7653f0
+[2026-06-28T01:05:26.060Z] Active request from user: id=6a405738ba14927b0d7653f0, name=Sakshi Pawar, email=sakshipawars123@gmail.com, endpoint=/api/user/profile
+[2026-06-28T01:05:26.070Z] Active request from user: id=6a405738ba14927b0d7653f0, name=Sakshi Pawar, email=sakshipawars123@gmail.com, endpoint=/api/team/my-teams
+[2026-06-28T01:05:53.971Z] Active request from user: id=6a3d53f454d4b3f9b2a09c68, name=SP, email=sp@xyz.com, endpoint=/api/projects/6a3d7f37312c8f3b1bc91a08/hackathon/notifications
+[2026-06-28T01:06:53.980Z] Active request from user: id=6a3d53f454d4b3f9b2a09c68, name=SP, email=sp@xyz.com, endpoint=/api/projects/6a3d7f37312c8f3b1bc91a08/hackathon/notifications
+[2026-06-28T01:07:53.965Z] Active request from user: id=6a3d53f454d4b3f9b2a09c68, name=SP, email=sp@xyz.com, endpoint=/api/projects/6a3d7f37312c8f3b1bc91a08/hackathon/notifications
+[2026-06-28T01:08:53.971Z] Active request from user: id=6a3d53f454d4b3f9b2a09c68, name=SP, email=sp@xyz.com, endpoint=/api/projects/6a3d7f37312c8f3b1bc91a08/hackathon/notifications
+[2026-06-28T01:09:53.961Z] Active request from user: id=6a3d53f454d4b3f9b2a09c68, name=SP, email=sp@xyz.com, endpoint=/api/projects/6a3d7f37312c8f3b1bc91a08/hackathon/notifications
+[2026-06-28T01:10:53.965Z] Active request from user: id=6a3d53f454d4b3f9b2a09c68, name=SP, email=sp@xyz.com, endpoint=/api/projects/6a3d7f37312c8f3b1bc91a08/hackathon/notifications

@@ -449,6 +449,13 @@ const Dashboard = () => {
               <User size={14} />
               <span>Edit Profile</span>
             </button>
+            <button
+              onClick={() => { navigate('/feedback'); setMobileNavOpen(false); }}
+              className="btn-secondary mt-2 w-full flex items-center justify-center gap-2 text-xs py-2 cursor-pointer text-brand-300 hover:text-white"
+            >
+              <MessageSquare size={14} />
+              <span>Give Feedback</span>
+            </button>
           </div>
 
           <div className="sidebar-menu flex flex-col gap-1 w-full border-t border-neutral-200/80 pt-4 mt-auto">

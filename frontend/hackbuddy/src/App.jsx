@@ -11,6 +11,7 @@ import JoinTeam from './pages/JoinTeam';
 import TeamDetails from './pages/TeamDetails';
 import JoinTeamByLink from './pages/JoinTeamByLink';
 import ProtectedRoute from './components/ProtectedRoute';
+import FeedbackCenter from './pages/FeedbackCenter';
 import Chat from './components/Chat';
 import { Toaster } from 'react-hot-toast';
 
@@ -88,6 +89,16 @@ function App() {
               element={
                 <ProtectedRoute>
                   <Chat />
+                </ProtectedRoute>
+              }
+            />
+
+            {/* Feedback Route */}
+            <Route
+              path="/feedback"
+              element={
+                <ProtectedRoute>
+                  <FeedbackCenter />
                 </ProtectedRoute>
               }
             />
