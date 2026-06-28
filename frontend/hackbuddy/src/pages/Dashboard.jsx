@@ -3,6 +3,7 @@ import { useNavigate, Link } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
 import { toast } from 'react-hot-toast';
 import api from '../services/api';
+import socket from '../services/socket';
 import { getMyTeams } from '../services/teamService';
 import { getProjectByTeam, getCommandCenterDashboard, getRepositoryAnalytics } from '../services/projectService';
 import {
@@ -13,7 +14,7 @@ import {
   User, MessageSquare, Award, TrendingUp, GitBranch,
   ArrowUpRight, Sparkles, ListTodo, CheckCircle2,
   PlayCircle, Code, Share2, Wrench, Shield, Plus,
-  Activity, BarChart3, Database, Eye, ExternalLink, Menu, X
+  Activity, BarChart3, Database, Eye, ExternalLink, Menu, X, Video, PhoneCall
 } from 'lucide-react';
 
 // ─── SVG Chart Helpers for Premium Dashboard ───
@@ -100,6 +101,28 @@ const Dashboard = () => {
 
   const [mobileNavOpen, setMobileNavOpen] = useState(false);
 
+  // ── Live call notification state ──────────────────────────────────────────────────
+  // liveCallAlerts: Array<{ teamId, teamName, starterName, startedAt }>
+  const [liveCallAlerts, setLiveCallAlerts] = useState([]);
+  const [dismissedCalls, setDismissedCalls] = useState(new Set());
+
+  useEffect(() => {
+    if (!socket.connected) socket.connect();
+
+    const onLiveCallUpdate = (data) => {
+      const calls = (data && data.liveCalls) || {};
+      // Only show calls from teams the user belongs to
+      const myTeamIds = new Set((teams || []).map(t => t?._id?.toString()).filter(Boolean));
+      const alerts = Object.entries(calls)
+        .filter(([teamId]) => myTeamIds.has(teamId))
+        .map(([teamId, info]) => ({ teamId, ...info }));
+      setLiveCallAlerts(alerts);
+    };
+
+    socket.on('live-call-update', onLiveCallUpdate);
+    return () => socket.off('live-call-update', onLiveCallUpdate);
+  }, [teams]);
+
   useEffect(() => {
     if (isDark) {
       document.documentElement.classList.remove('light');
@@ -132,7 +155,7 @@ const Dashboard = () => {
         setLoadingTeams(true);
         setLoadingProjects(true);
         const data = await getMyTeams();
-        setTeams(data);
+        setTeams(data || []);
         if (data && data.length > 0) {
           const projectPromises = data.map(async (t) => {
             try {
@@ -235,7 +258,8 @@ const Dashboard = () => {
     navigate('/login');
   };
 
-  const activeUser = profileData || user;
+  try {
+    const activeUser = profileData || user;
   const activeProjectsList = Object.values(projects).filter(Boolean);
   const currentProjectId = selectedProjectId || activeProjectsList[0]?._id;
 
@@ -280,10 +304,28 @@ const Dashboard = () => {
     return acc + completed;
   }, 0) || 12;
 
-  const developerScore = Math.min(98, 75 + (completedTasksCount * 1.5) + (teams.length * 2));
+  const developerScore = Math.min(98, 75 + (completedTasksCount * 1.5) + ((teams || []).length * 2));
   const aiReputation = Math.min(99, 85 + (completedTasksCount * 0.8) + (totalProjects * 1));
-  const contributionScore = Math.min(95, 70 + (completedTasksCount * 1.2) + (teams.length * 3));
+  const contributionScore = Math.min(95, 70 + (completedTasksCount * 1.2) + ((teams || []).length * 3));
   const githubConnected = activeUser?.githubId ? 'CONNECTED' : 'DISCONNECTED';
+  const activeMeetNotifs = (liveCallAlerts || [])
+    .filter(alert => alert && alert.teamId && !dismissedCalls.has(alert.teamId))
+    .map(alert => ({
+      _id: `meet_${alert.teamId}`,
+      projectName: `LIVE MEET — ${(alert.teamName || '').toUpperCase()}`,
+      message: `🎥 Call started by ${alert.starterName || 'a teammate'}. Click to join!`,
+      createdAt: alert.startedAt || new Date().toISOString(),
+      read: false,
+      isMeet: true,
+      teamId: alert.teamId
+    }));
+
+  const combinedNotifications = [
+    ...activeMeetNotifs,
+    ...dashboardNotifications
+  ];
+
+  const totalUnreadCount = unreadCount + activeMeetNotifs.length;
 
   return (
     <div className="dashboard-container">
@@ -351,9 +393,9 @@ const Dashboard = () => {
               className="p-1 bg-transparent border-0 cursor-pointer hover:bg-neutral-50 rounded-lg transition-colors relative flex items-center justify-center"
             >
               <Bell size={18} className="text-neutral-500 hover:text-neutral-800" />
-              {unreadCount > 0 && (
+              {totalUnreadCount > 0 && (
                 <span className="absolute top-0 right-0 w-3.5 h-3.5 bg-red-500 text-white text-[8px] font-bold rounded-full flex items-center justify-center border border-white">
-                  {unreadCount}
+                  {totalUnreadCount}
                 </span>
               )}
             </button>
@@ -364,18 +406,32 @@ const Dashboard = () => {
                   <h3 className="text-[10px] font-black text-neutral-800 uppercase tracking-widest flex items-center gap-1.5">
                     <Bell size={11} className="text-brand-500" /> Alerts & Notifications
                   </h3>
-                  <span className="text-[9px] font-bold bg-brand-50 px-2 py-0.5 rounded-full border border-brand-100/50 text-brand-700">
-                    {dashboardNotifications.length} Total
+                  <span className="text-[9px] font-bold bg-brand-50 px-2 py-0.5 rounded-full border border-brand-100/50 text-brand-700 font-mono">
+                    {combinedNotifications.length} Total
                   </span>
                 </div>
                 <div className="flex flex-col gap-2.5">
-                  {dashboardNotifications.length === 0 ? (
+                  {combinedNotifications.length === 0 ? (
                     <p className="text-[10px] text-neutral-400 italic text-center py-8">No recent alerts in your squads.</p>
                   ) : (
-                    dashboardNotifications.map((notif, idx) => (
-                      <div key={idx} className="p-3 rounded-xl border border-brand-200/20 text-[11px] text-left hover:shadow-2xs bg-neutral-900/30">
-                        <span className="font-extrabold text-[8px] uppercase tracking-wider text-neutral-400 block mb-0.5">{notif.projectName}</span>
-                        <span className="font-medium text-neutral-850">{notif.message}</span>
+                    combinedNotifications.map((notif, idx) => (
+                      <div
+                        key={idx}
+                        onClick={() => {
+                          if (notif.isMeet) {
+                            navigate('/chat');
+                          }
+                        }}
+                        className={`p-3 rounded-xl border border-brand-200/20 text-[11px] text-left hover:shadow-2xs bg-neutral-900/30 transition-all ${
+                          notif.isMeet ? 'cursor-pointer hover:bg-brand-500/10 border-red-500/30' : ''
+                        }`}
+                      >
+                        <span className={`font-extrabold text-[8px] uppercase tracking-wider block mb-0.5 ${
+                          notif.isMeet ? 'text-red-400' : 'text-neutral-400'
+                        }`}>
+                          {notif.projectName}
+                        </span>
+                        <span className={`font-medium ${notif.isMeet ? 'text-white' : 'text-neutral-850'}`}>{notif.message}</span>
                       </div>
                     ))
                   )}
@@ -510,6 +566,125 @@ const Dashboard = () => {
 
         {/* Main Content Area */}
         <main className="dashboard-content max-w-full lg:max-w-full">
+
+          {/* ── Live Call Notification Banners ── */}
+          {liveCallAlerts
+            .filter(alert => !dismissedCalls.has(alert.teamId))
+            .map(alert => (
+              <div
+                key={alert.teamId}
+                style={{
+                  background: 'linear-gradient(135deg, rgba(99,102,241,0.18) 0%, rgba(139,92,246,0.12) 100%)',
+                  border: '1.5px solid rgba(99,102,241,0.45)',
+                  borderRadius: 14,
+                  padding: '14px 18px',
+                  marginBottom: 16,
+                  display: 'flex',
+                  alignItems: 'center',
+                  gap: 14,
+                  boxShadow: '0 4px 32px rgba(99,102,241,0.22), 0 1px 0 rgba(255,255,255,0.06) inset',
+                  backdropFilter: 'blur(12px)',
+                  animation: 'liveCallSlideIn 0.35s cubic-bezier(0.34,1.56,0.64,1)',
+                  position: 'relative',
+                  overflow: 'hidden',
+                }}
+              >
+                {/* Shimmer accent */}
+                <div style={{
+                  position: 'absolute', left: 0, top: 0, bottom: 0,
+                  width: 4, background: 'linear-gradient(180deg,#6366f1,#a78bfa)',
+                  borderRadius: '14px 0 0 14px',
+                }} />
+
+                {/* Icon */}
+                <div style={{
+                  width: 44, height: 44, borderRadius: 12, flexShrink: 0,
+                  background: 'linear-gradient(135deg,rgba(239,68,68,0.2),rgba(239,68,68,0.1))',
+                  border: '1.5px solid rgba(239,68,68,0.35)',
+                  display: 'flex', alignItems: 'center', justifyContent: 'center',
+                  boxShadow: '0 0 16px rgba(239,68,68,0.2)',
+                  animation: 'liveCallPulse 1.6s ease-in-out infinite',
+                }}>
+                  <Video size={20} color="#f87171" />
+                </div>
+
+                {/* Text */}
+                <div style={{ flex: 1, minWidth: 0 }}>
+                  <div style={{
+                    display: 'flex', alignItems: 'center', gap: 8, marginBottom: 3,
+                  }}>
+                    <span style={{
+                      fontSize: 11, fontWeight: 800, letterSpacing: '0.08em',
+                      color: '#f87171',
+                      background: 'rgba(239,68,68,0.15)',
+                      border: '1px solid rgba(239,68,68,0.3)',
+                      borderRadius: 6, padding: '2px 8px',
+                      fontFamily: 'Inter, sans-serif',
+                    }}>● LIVE</span>
+                    <span style={{
+                      fontSize: 13, fontWeight: 700, color: '#fff',
+                      fontFamily: 'Inter, sans-serif',
+                      overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap',
+                    }}>
+                      {alert.starterName} started a Team Meet in <span style={{ color: '#a78bfa' }}>#{alert.teamName}</span>
+                    </span>
+                  </div>
+                  <div style={{
+                    fontSize: 12, color: 'rgba(255,255,255,0.45)',
+                    fontFamily: 'Inter, sans-serif',
+                  }}>
+                    Your team is on a live call — join now to collaborate in real time
+                  </div>
+                </div>
+
+                {/* Join button */}
+                <button
+                  onClick={() => navigate('/chat')}
+                  style={{
+                    display: 'flex', alignItems: 'center', gap: 7, flexShrink: 0,
+                    background: 'linear-gradient(135deg,#6366f1,#8b5cf6)',
+                    border: 'none', borderRadius: 10, padding: '9px 18px',
+                    color: '#fff', fontSize: 13, fontWeight: 700, cursor: 'pointer',
+                    boxShadow: '0 4px 20px rgba(99,102,241,0.45)',
+                    fontFamily: 'Inter, sans-serif',
+                    transition: 'all 0.18s ease', whiteSpace: 'nowrap',
+                  }}
+                  onMouseEnter={e => { e.currentTarget.style.transform = 'scale(1.04)'; e.currentTarget.style.boxShadow = '0 6px 28px rgba(99,102,241,0.6)'; }}
+                  onMouseLeave={e => { e.currentTarget.style.transform = 'scale(1)'; e.currentTarget.style.boxShadow = '0 4px 20px rgba(99,102,241,0.45)'; }}
+                >
+                  <PhoneCall size={14} />
+                  Join Meet
+                </button>
+
+                {/* Dismiss button */}
+                <button
+                  onClick={() => setDismissedCalls(prev => new Set([...prev, alert.teamId]))}
+                  style={{
+                    width: 28, height: 28, borderRadius: 8, flexShrink: 0,
+                    background: 'rgba(255,255,255,0.07)', border: '1px solid rgba(255,255,255,0.12)',
+                    display: 'flex', alignItems: 'center', justifyContent: 'center',
+                    cursor: 'pointer', color: 'rgba(255,255,255,0.5)',
+                    transition: 'all 0.15s',
+                  }}
+                  title="Dismiss"
+                >
+                  <X size={13} />
+                </button>
+              </div>
+            ))}
+
+          {/* Keyframes injected inline */}
+          <style>{`
+            @keyframes liveCallSlideIn {
+              from { opacity: 0; transform: translateY(-12px) scale(0.98); }
+              to   { opacity: 1; transform: translateY(0) scale(1); }
+            }
+            @keyframes liveCallPulse {
+              0%, 100% { box-shadow: 0 0 16px rgba(239,68,68,0.2); }
+              50%       { box-shadow: 0 0 28px rgba(239,68,68,0.45); }
+            }
+          `}</style>
+
           <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 items-start w-full">
             
             {/* Center Section (Left & Center Columns on large screens) */}
@@ -528,7 +703,7 @@ const Dashboard = () => {
                 <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 mt-3 text-left">
                   <div className="bg-neutral-900/40 p-2.5 rounded-xl border border-brand-200/10">
                     <span className="text-[8px] font-black uppercase text-neutral-400">Squads Joined</span>
-                    <div className="text-sm font-bold text-white font-mono mt-0.5">{teams.length} Teams</div>
+                    <div className="text-sm font-bold text-white font-mono mt-0.5">{(teams || []).length} Teams</div>
                   </div>
                   <div className="bg-neutral-900/40 p-2.5 rounded-xl border border-brand-200/10">
                     <span className="text-[8px] font-black uppercase text-neutral-400">Active Workspaces</span>
@@ -615,7 +790,7 @@ const Dashboard = () => {
                 </span>
                 
                 {/* Empty state: No Teams */}
-                {teams.length === 0 && (
+                {(!teams || teams.length === 0) && (
                   <div className="dashboard-card glow-blue p-8 items-center text-center justify-center gap-4 bg-neutral-900/20 border-dashed border-neutral-700">
                     <div className="w-12 h-12 rounded-full bg-brand-200/10 flex items-center justify-center border border-brand-200/20 text-[#00f0ff]">
                       <Users size={22} />
@@ -634,9 +809,9 @@ const Dashboard = () => {
                 )}
 
                 {/* Grid of Compact Project Cards & Squads without projects */}
-                {teams.length > 0 && (
+                {(teams && teams.length > 0) && (
                   <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                    {teams.map((team) => {
+                    {(teams || []).map((team) => {
                       const proj = projects[team._id];
                       
                       if (!proj) {
@@ -994,6 +1169,18 @@ const Dashboard = () => {
 
     </div>
   );
+  } catch (err) {
+    console.error("Dashboard Render Error:", err);
+    return (
+      <div style={{ color: '#ef4444', padding: '30px', background: '#0f172a', minHeight: '100vh', fontFamily: 'monospace' }}>
+        <h2 style={{ fontSize: '20px', marginBottom: '10px' }}>⚠️ Dashboard Render Crash</h2>
+        <p style={{ color: '#94a3b8' }}>Please report this stack trace:</p>
+        <pre style={{ background: '#1e293b', padding: '15px', borderRadius: '8px', overflowX: 'auto', color: '#f8fafc' }}>
+          {err.stack || err.message || err}
+        </pre>
+      </div>
+    );
+  }
 };
 
 export default Dashboard;

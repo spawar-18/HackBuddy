@@ -3,9 +3,12 @@ import { useNavigate } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
 import api from '../services/api';
 import { getMyTeams } from '../services/teamService';
+import TeamMeet from './TeamMeet';
+import socket from '../services/socket';
+
 import {
   Send, Users, MessageSquare, ArrowLeft, Hash, Circle,
-  Smile, Paperclip, MoreVertical, Search, X, ChevronDown, Zap
+  Smile, Paperclip, MoreVertical, Search, X, ChevronDown, Zap, Video
 } from 'lucide-react';
 
 // ─── Utility ───────────────────────────────────────────────────────────────────
@@ -367,6 +370,29 @@ const Chat = () => {
   const [loadingTeams, setLoadingTeams] = useState(true);
   const [showMembers, setShowMembers] = useState(true);
   const [atBottom, setAtBottom] = useState(true);
+  const [meetActive, setMeetActive] = useState(false);
+
+  // Broadcast meet-started / meet-ended via socket so Dashboard can notify
+  useEffect(() => {
+    if (!selectedTeam) return;
+    if (meetActive) {
+      if (!socket.connected) socket.connect();
+      socket.emit('meet-broadcast', {
+        type: 'started',
+        teamId: selectedTeam._id,
+        teamName: selectedTeam.teamName,
+        starterName: user?.name || 'A teammate',
+      });
+    } else {
+      if (socket.connected) {
+        socket.emit('meet-broadcast', {
+          type: 'ended',
+          teamId: selectedTeam._id,
+        });
+      }
+    }
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [meetActive]);
 
   const messagesEndRef = useRef(null);
   const messagesContainerRef = useRef(null);
@@ -610,12 +636,42 @@ const Chat = () => {
 
           {selectedTeam && (
             <div style={{ display: 'flex', alignItems: 'center', gap: 6 }}>
-              <Circle size={8} color="#22c55e" fill="#22c55e" style={{ animation: 'pulse-dot 2s ease-in-out infinite' }} />
-              <span style={{ fontSize: 12, color: 'rgba(255,255,255,0.45)', fontWeight: 500 }}>Live</span>
+              {/* Live dot — only when a meet is active */}
+              {meetActive && (
+                <>
+                  <Circle size={8} color="#ef4444" fill="#ef4444" style={{ animation: 'pulse-dot 1.2s ease-in-out infinite' }} />
+                  <span style={{ fontSize: 12, color: '#f87171', fontWeight: 700, letterSpacing: '0.04em' }}>LIVE</span>
+                </>
+              )}
+
+              {/* ── Start / Leave Meet button ── */}
+              <button
+                onClick={() => setMeetActive(v => !v)}
+                style={{
+                  marginLeft: 4, display: 'flex', alignItems: 'center', gap: 6,
+                  background: meetActive
+                    ? 'linear-gradient(135deg,rgba(239,68,68,0.25),rgba(220,38,38,0.18))'
+                    : 'linear-gradient(135deg,rgba(99,102,241,0.2),rgba(139,92,246,0.15))',
+                  border: meetActive
+                    ? '1px solid rgba(239,68,68,0.45)'
+                    : '1px solid rgba(99,102,241,0.4)',
+                  borderRadius: 8, padding: '5px 12px', cursor: 'pointer',
+                  color: meetActive ? '#f87171' : '#a78bfa',
+                  fontSize: 12, fontWeight: 700, transition: 'all 0.2s',
+                  fontFamily: 'Inter, sans-serif',
+                  boxShadow: meetActive ? '0 2px 12px rgba(239,68,68,0.25)' : '0 2px 12px rgba(99,102,241,0.25)',
+                }}
+                onMouseEnter={e => e.currentTarget.style.opacity = '0.85'}
+                onMouseLeave={e => e.currentTarget.style.opacity = '1'}
+              >
+                <Video size={13} />
+                {meetActive ? 'Leave Meet' : 'Start Meet'}
+              </button>
+
               <button
                 onClick={() => setShowMembers(v => !v)}
                 style={{
-                  marginLeft: 8, display: 'flex', alignItems: 'center', gap: 5,
+                  marginLeft: 4, display: 'flex', alignItems: 'center', gap: 5,
                   background: showMembers ? 'rgba(99,102,241,0.2)' : 'rgba(255,255,255,0.06)',
                   border: showMembers ? '1px solid rgba(99,102,241,0.4)' : '1px solid rgba(255,255,255,0.1)',
                   borderRadius: 8, padding: '5px 10px', cursor: 'pointer',
@@ -863,6 +919,16 @@ const Chat = () => {
           )}
         </div>
       </div>
+
+      {/* ── Team Meet Overlay ── */}
+      {meetActive && selectedTeam && (
+        <TeamMeet
+          teamId={selectedTeam._id}
+          teamName={selectedTeam.teamName}
+          user={user}
+          onClose={() => setMeetActive(false)}
+        />
+      )}
     </>
   );
 };

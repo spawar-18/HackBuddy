@@ -24,9 +24,11 @@ console.error = (...args) => {
   } catch (e) {}
 };
 
+const http = require('http');
 const express = require('express');
 const mongoose = require('mongoose');
 const cors = require('cors');
+const { Server: SocketIOServer } = require('socket.io');
 
 const authRoutes = require('./routes/authRoutes');
 const userRoutes = require('./routes/userRoutes');
@@ -46,7 +48,109 @@ const feedbackRoutes = require('./routes/feedbackRoutes');
 const subscriptionRoutes = require('./routes/subscriptionRoutes');
 
 const app = express();
+const httpServer = http.createServer(app);
 const port = process.env.PORT || 5000;
+
+// ─── Socket.IO — WebRTC Signaling for Team Meet ──────────────────────────────
+const io = new SocketIOServer(httpServer, {
+  cors: { origin: '*', methods: ['GET', 'POST'] },
+});
+
+// rooms: { [teamId]: Set<socketId> }
+const meetRooms = {};
+// liveCalls: { [teamId]: { teamName, starterName, startedAt } }
+const liveCalls = {};
+// peerInfo: { [socketId]: { userId, userName, userAvatar, teamId, audioOn, videoOn } }
+const peerInfo = {};
+
+io.on('connection', (socket) => {
+  // ── Join a team meet room ──────────────────────────────────────────────────
+  socket.on('join-meet-room', ({ teamId, userId, userName, userAvatar }) => {
+    socket.join(teamId);
+    if (!meetRooms[teamId]) meetRooms[teamId] = new Set();
+    meetRooms[teamId].add(socket.id);
+    peerInfo[socket.id] = { userId, userName, userAvatar, teamId, audioOn: true, videoOn: true };
+
+    // Tell the new joiner about all existing peers in the room
+    const existing = [];
+    meetRooms[teamId].forEach((id) => {
+      if (id !== socket.id && peerInfo[id]) {
+        existing.push({ socketId: id, ...peerInfo[id] });
+      }
+    });
+    socket.emit('existing-peers', existing);
+
+    // Broadcast to others that someone new joined
+    socket.to(teamId).emit('peer-joined', {
+      socketId: socket.id,
+      userId,
+      userName,
+      userAvatar,
+      audioOn: true,
+      videoOn: true,
+    });
+  });
+
+  // ── WebRTC Offer ───────────────────────────────────────────────────────────
+  socket.on('webrtc-offer', ({ targetSocketId, offer, fromSocketId }) => {
+    io.to(targetSocketId).emit('webrtc-offer', { offer, fromSocketId });
+  });
+
+  // ── WebRTC Answer ──────────────────────────────────────────────────────────
+  socket.on('webrtc-answer', ({ targetSocketId, answer, fromSocketId }) => {
+    io.to(targetSocketId).emit('webrtc-answer', { answer, fromSocketId });
+  });
+
+  // ── ICE Candidate ─────────────────────────────────────────────────────────
+  socket.on('webrtc-ice-candidate', ({ targetSocketId, candidate, fromSocketId }) => {
+    io.to(targetSocketId).emit('webrtc-ice-candidate', { candidate, fromSocketId });
+  });
+
+  // ── Media toggle (mic / camera) ───────────────────────────────────────────
+  socket.on('toggle-media', ({ audioOn, videoOn }) => {
+    if (peerInfo[socket.id]) {
+      peerInfo[socket.id].audioOn = audioOn;
+      peerInfo[socket.id].videoOn = videoOn;
+      const teamId = peerInfo[socket.id].teamId;
+      socket.to(teamId).emit('peer-media-toggle', { socketId: socket.id, audioOn, videoOn });
+    }
+  });
+
+  // ── Leave room ────────────────────────────────────────────────────────────
+  socket.on('leave-meet-room', () => {
+    handleDisconnect(socket);
+  });
+
+  // ── Dashboard notification: meet started / ended ──────────────────────────
+  // liveCalls: { [teamId]: { teamName, starterName, startedAt } }
+  socket.on('meet-broadcast', ({ type, teamId, teamName, starterName }) => {
+    if (type === 'started') {
+      liveCalls[teamId] = { teamName, starterName, startedAt: new Date().toISOString() };
+    } else if (type === 'ended') {
+      delete liveCalls[teamId];
+    }
+    // Broadcast updated live-call map to ALL connected clients
+    io.emit('live-call-update', { liveCalls });
+  });
+
+  socket.on('disconnect', () => {
+    handleDisconnect(socket);
+  });
+});
+
+function handleDisconnect(socket) {
+  const info = peerInfo[socket.id];
+  if (!info) return;
+  const { teamId } = info;
+  if (meetRooms[teamId]) {
+    meetRooms[teamId].delete(socket.id);
+    if (meetRooms[teamId].size === 0) delete meetRooms[teamId];
+  }
+  delete peerInfo[socket.id];
+  socket.to(teamId).emit('peer-left', { socketId: socket.id });
+  socket.leave(teamId);
+}
+// ─────────────────────────────────────────────────────────────────────────────
 
 // Middleware
 app.use(cors());
@@ -98,7 +202,7 @@ mongoose.connect(mongoUri)
     console.warn('WARNING: Could not connect to MongoDB Atlas. Falling back to In-Memory Database for local testing.');
   })
   .finally(() => {
-    app.listen(port, () => {
+    httpServer.listen(port, () => {
       console.log(`Server is running on port ${port}`);
     });
   });
