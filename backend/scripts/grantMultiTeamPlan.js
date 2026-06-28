@@ -1,7 +1,7 @@
 require('dotenv').config({ path: require('path').join(__dirname, '../.env') });
 const mongoose = require('mongoose');
 
-const EMAILS = ['sakshipawars123@gmail.com', 'aryasankhe1@gmail.com'];
+const EMAILS = ['aryasankhe1@student.sfit.ac.in'];
 const PLAN = 'TEAM';
 
 mongoose.connect(process.env.MONGO_URI || process.env.MONGODB_URI).then(async () => {
