@@ -12,8 +12,7 @@ import {
   disconnectGitHubRepository,
   getRepositoryAnalytics,
   manualSyncRepository,
-  triggerGitHubAIAnalysis,
-  getProjectRealityCheck
+  triggerGitHubAIAnalysis
 } from '../services/projectService';
 import UpgradeGate from './UpgradeGate';
 
@@ -244,12 +243,10 @@ const LanguageBar = ({ languages }) => {
 
 const GitHubPanel = ({ projectId, isOwner, initialTab }) => {
   const [analytics, setAnalytics] = useState(null);
-  const [realityCheck, setRealityCheck] = useState(null);
   const [loading, setLoading] = useState(true);
-  const [blocked, setBlocked] = useState(false); // PRO_REQUIRED gate
+  const [blocked, setBlocked] = useState(false);
   const [syncLoading, setSyncLoading] = useState(false);
   const [analysisLoading, setAnalysisLoading] = useState(false);
-  const [realityLoading, setRealityLoading] = useState(false);
   const [disconnectLoading, setDisconnectLoading] = useState(false);
   const [activeTab, setActiveTab] = useState('overview');
   const [showConnectForm, setShowConnectForm] = useState(false);
@@ -279,27 +276,9 @@ const GitHubPanel = ({ projectId, isOwner, initialTab }) => {
     }
   }, [projectId]);
 
-  const fetchRealityCheck = useCallback(async () => {
-    try {
-      setRealityLoading(true);
-      const res = await getProjectRealityCheck(projectId);
-      setRealityCheck(res);
-    } catch (err) {
-      console.error('Reality check error:', err);
-    } finally {
-      setRealityLoading(false);
-    }
-  }, [projectId]);
-
   useEffect(() => {
     fetchAnalytics();
   }, [fetchAnalytics]);
-
-  useEffect(() => {
-    if (analytics?.connected && activeTab === 'reality') {
-      fetchRealityCheck();
-    }
-  }, [activeTab, analytics?.connected]);
 
   const handleManualSync = async () => {
     try {
@@ -460,8 +439,7 @@ const GitHubPanel = ({ projectId, isOwner, initialTab }) => {
     { id: 'overview', label: 'Overview', icon: BarChart3 },
     { id: 'commits', label: 'Commits', icon: GitCommitHorizontal },
     { id: 'contributors', label: 'Contributors', icon: Users },
-    { id: 'ai', label: 'AI Analysis', icon: Sparkles },
-    { id: 'reality', label: 'Reality Check', icon: Eye }
+    { id: 'ai', label: 'AI Analysis', icon: Sparkles }
   ];
 
   return (
@@ -877,7 +855,7 @@ const GitHubPanel = ({ projectId, isOwner, initialTab }) => {
           <div className="flex flex-col gap-5 animate-slide-up">
             <div className="flex items-center justify-between">
               <div>
-                <div className="text-xs font-bold text-neutral-800">AI Repository Analysis</div>
+                <div className="text-xs font-bold text-neutral-800">AI Repository Intelligence</div>
                 {a.aiAnalysisGeneratedAt && (
                   <div className="text-[9px] mt-0.5 text-neutral-500">
                     Generated: {new Date(a.aiAnalysisGeneratedAt).toLocaleString()}
@@ -888,8 +866,7 @@ const GitHubPanel = ({ projectId, isOwner, initialTab }) => {
                 id="github-ai-analyze-btn"
                 onClick={handleAIAnalysis}
                 disabled={analysisLoading}
-                className="flex items-center gap-1.5 px-3 py-1.5 bg-gradient-to-r from-brand-600 to-purple-600 text-white text-xs font-bold rounded-xl cursor-pointer hover:opacity-90 transition-opacity shadow-sm border"
-                style={{ borderColor: 'var(--color-neutral-200)' }}
+                className="flex items-center gap-1.5 px-3 py-1.5 bg-gradient-to-r from-indigo-600 to-purple-600 text-white text-xs font-bold rounded-xl cursor-pointer hover:opacity-90 transition-opacity shadow-sm"
               >
                 {analysisLoading ? <RefreshCw size={12} className="animate-spin text-white" /> : <Sparkles size={12} className="text-white" />}
                 <span className="text-white">{aiAnalysis ? 'Re-Analyze' : 'Run Analysis'}</span>
@@ -905,120 +882,139 @@ const GitHubPanel = ({ projectId, isOwner, initialTab }) => {
                 <div>
                   <div className="text-xs font-bold text-neutral-800">No AI Analysis Yet</div>
                   <div className="text-[11px] mt-1 max-w-xs text-neutral-500">
-                    Run the AI analysis to get repository insights, detect inactive members, and compare planned vs actual work.
+                    Run the AI analysis to get deep repository insights, detect risks, and compare planned vs actual work.
                   </div>
                 </div>
               </div>
             ) : (
               <div className="flex flex-col gap-4">
-                {/* Health + Status */}
-                <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+
+                {/* Health + Status + Strongest Contributor */}
+                <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
                   <div 
-                    className="p-4 border rounded-xl"
+                    className="p-4 border rounded-xl flex flex-col justify-between"
                     style={{ backgroundColor: 'var(--color-neutral-100)', borderColor: 'var(--color-neutral-200)' }}
                   >
                     <div className="text-[9px] font-black uppercase tracking-widest block mb-2 text-neutral-500">Repository Health</div>
                     <HealthBadge status={aiAnalysis.repositoryHealth} />
                   </div>
                   <div 
-                    className="p-4 border rounded-xl"
+                    className="p-4 border rounded-xl flex flex-col justify-between"
                     style={{ backgroundColor: 'var(--color-neutral-100)', borderColor: 'var(--color-neutral-200)' }}
                   >
                     <div className="text-[9px] font-black uppercase tracking-widest block mb-2 text-neutral-500">Development Status</div>
-                    <div className="text-xs font-semibold text-neutral-800">{aiAnalysis.developmentStatus}</div>
+                    <div className="text-xs font-black text-neutral-800">{aiAnalysis.developmentStatus || '—'}</div>
+                  </div>
+                  <div 
+                    className="p-4 border rounded-xl flex flex-col justify-between"
+                    style={{ backgroundColor: 'var(--color-neutral-100)', borderColor: 'var(--color-neutral-200)' }}
+                  >
+                    <div className="text-[9px] font-black uppercase tracking-widest block mb-2 text-neutral-500">Strongest Contributor</div>
+                    <div className="text-xs font-black" style={{ color: 'var(--color-brand-300)' }}>{aiAnalysis.strongestContributor || 'None Detected'}</div>
                   </div>
                 </div>
 
-                {/* Component status trio */}
-                <div className="grid grid-cols-3 gap-2">
-                  {[
-                    { icon: BookOpen, label: 'Documentation', value: aiAnalysis.documentationStatus, iconColor: '#60a5fa' },
-                    { icon: TestTube, label: 'Testing', value: aiAnalysis.testingStatus, iconColor: '#34d399' },
-                    { icon: Rocket, label: 'Deployment', value: aiAnalysis.deploymentStatus, iconColor: '#fb923c' }
-                  ].map(({ icon: Icon, label, value, iconColor }) => (
-                    <div 
-                      key={label} 
-                      className="p-3 border rounded-xl flex flex-col gap-1.5"
-                      style={{ backgroundColor: 'var(--color-neutral-100)', borderColor: 'var(--color-neutral-200)' }}
-                    >
-                      <div className="flex items-center gap-1 text-neutral-500">
-                        <Icon size={12} style={{ color: iconColor }} />
-                        <div className="text-[8px] font-black uppercase tracking-widest text-neutral-500">{label}</div>
-                      </div>
-                      <div className="text-[10px] font-semibold leading-snug text-neutral-800">{value || '—'}</div>
-                    </div>
-                  ))}
-                </div>
-
-                {/* Inactive members */}
-                {aiAnalysis.inactiveMembers?.length > 0 && (
+                {/* Executive Summary */}
+                {aiAnalysis.executiveSummary && (
                   <div 
                     className="p-4 border rounded-xl"
-                    style={{ backgroundColor: 'rgba(245, 158, 11, 0.05)', borderColor: 'rgba(245, 158, 11, 0.2)' }}
+                    style={{ backgroundColor: 'var(--color-neutral-100)', borderColor: 'var(--color-neutral-200)' }}
                   >
-                    <div className="text-[9px] font-black uppercase tracking-widest mb-2 flex items-center gap-1.5 text-amber-600">
-                      <AlertTriangle size={11} className="text-amber-500" /> Inactive Members
+                    <div className="text-[9px] font-black uppercase tracking-widest mb-2 flex items-center gap-1.5 text-neutral-500">
+                      <Sparkles size={11} className="text-brand-300" /> Executive Summary
                     </div>
-                    <div className="flex flex-wrap gap-2">
-                      {aiAnalysis.inactiveMembers.map(m => (
-                        <div 
-                          key={m} 
-                          className="px-2.5 py-1 text-xs rounded-full border font-semibold"
-                          style={{
-                            backgroundColor: 'rgba(245, 158, 11, 0.08)',
-                            borderColor: 'rgba(245, 158, 11, 0.3)',
-                            color: '#d97706'
-                          }}
-                        >
-                          {m}
-                        </div>
-                      ))}
-                    </div>
+                    <div className="text-xs leading-relaxed text-neutral-800">{aiAnalysis.executiveSummary}</div>
                   </div>
                 )}
 
-                {/* Missing components */}
-                {aiAnalysis.missingComponents?.length > 0 && (
+                {/* Repository Summary */}
+                {aiAnalysis.repositorySummary && (
+                  <div 
+                    className="p-4 border rounded-xl"
+                    style={{ backgroundColor: 'var(--color-neutral-100)', borderColor: 'var(--color-neutral-200)' }}
+                  >
+                    <div className="text-[9px] font-black uppercase tracking-widest mb-2 flex items-center gap-1.5 text-neutral-500">
+                      <BookOpen size={11} className="text-blue-500" /> Repository Summary
+                    </div>
+                    <div className="text-xs leading-relaxed text-neutral-800">{aiAnalysis.repositorySummary}</div>
+                  </div>
+                )}
+
+                {/* Top Risks */}
+                {aiAnalysis.topRisks?.length > 0 && (
                   <div 
                     className="p-4 border rounded-xl"
                     style={{ backgroundColor: 'rgba(239, 68, 68, 0.05)', borderColor: 'rgba(239, 68, 68, 0.2)' }}
                   >
                     <div className="text-[9px] font-black uppercase tracking-widest mb-2 flex items-center gap-1.5 text-red-500">
-                      <XCircle size={11} className="text-red-500" /> Missing Components
+                      <AlertTriangle size={11} className="text-red-500" /> Top Risks Detected
                     </div>
                     <ul className="flex flex-col gap-1.5">
-                      {aiAnalysis.missingComponents.map((c, i) => (
-                        <li key={i} className="flex items-start gap-2 text-xs text-red-500">
-                          <XCircle size={11} className="shrink-0 mt-0.5 text-red-500" />
-                          <div>{c}</div>
+                      {aiAnalysis.topRisks.map((risk, idx) => (
+                        <li key={idx} className="flex items-start gap-2 text-xs text-red-600 leading-normal">
+                          <span className="w-1.5 h-1.5 rounded-full bg-red-500 shrink-0 mt-1.5"></span>
+                          <div>{risk}</div>
                         </li>
                       ))}
                     </ul>
                   </div>
                 )}
 
-                {/* Warnings */}
-                {aiAnalysis.repositoryWarnings?.length > 0 && (
+                {/* Repository Bottlenecks */}
+                {aiAnalysis.repositoryBottlenecks?.length > 0 && (
                   <div 
                     className="p-4 border rounded-xl"
                     style={{ backgroundColor: 'rgba(245, 158, 11, 0.05)', borderColor: 'rgba(245, 158, 11, 0.2)' }}
                   >
                     <div className="text-[9px] font-black uppercase tracking-widest mb-2 flex items-center gap-1.5 text-amber-600">
-                      <AlertTriangle size={11} className="text-amber-500" /> Warnings
+                      <AlertTriangle size={11} className="text-amber-500" /> Repository Bottlenecks
                     </div>
                     <ul className="flex flex-col gap-1.5">
-                      {aiAnalysis.repositoryWarnings.map((w, i) => (
-                        <li key={i} className="flex items-start gap-2 text-xs text-amber-600">
-                          <AlertTriangle size={11} className="shrink-0 mt-0.5 text-amber-500" />
-                          <div>{w}</div>
+                      {aiAnalysis.repositoryBottlenecks.map((b, idx) => (
+                        <li key={idx} className="flex items-start gap-2 text-xs text-amber-700 leading-normal">
+                          <span className="w-1.5 h-1.5 rounded-full bg-amber-500 shrink-0 mt-1.5"></span>
+                          <div>{b}</div>
                         </li>
                       ))}
                     </ul>
                   </div>
                 )}
 
-                {/* Recommendations */}
-                {aiAnalysis.recommendations?.length > 0 && (
+                {/* Next Recommended Action */}
+                {aiAnalysis.nextRecommendedAction && (
+                  <div 
+                    className="p-4 border rounded-xl"
+                    style={{ backgroundColor: 'rgba(16, 185, 129, 0.05)', borderColor: 'rgba(16, 185, 129, 0.2)' }}
+                  >
+                    <div className="text-[9px] font-black uppercase tracking-widest mb-2 flex items-center gap-1.5 text-emerald-600">
+                      <Rocket size={11} className="text-emerald-500" /> Next Recommended Action
+                    </div>
+                    <div className="text-xs font-semibold leading-relaxed text-emerald-800">{aiAnalysis.nextRecommendedAction}</div>
+                  </div>
+                )}
+
+                {/* Improvement Suggestions */}
+                {aiAnalysis.improvementSuggestions?.length > 0 && (
+                  <div 
+                    className="p-4 border rounded-xl"
+                    style={{ backgroundColor: 'var(--color-brand-100)', borderColor: 'var(--color-neutral-200)' }}
+                  >
+                    <div className="text-[9px] font-black uppercase tracking-widest mb-3 flex items-center gap-1.5 text-brand-300">
+                      <Zap size={11} className="text-brand-300" /> Improvement Suggestions
+                    </div>
+                    <ul className="flex flex-col gap-2">
+                      {aiAnalysis.improvementSuggestions.map((s, idx) => (
+                        <li key={idx} className="flex items-start gap-2 text-xs leading-snug text-neutral-800">
+                          <Zap size={11} className="shrink-0 mt-0.5 text-brand-500" />
+                          <div>{s}</div>
+                        </li>
+                      ))}
+                    </ul>
+                  </div>
+                )}
+
+                {/* Fallback: legacy recommendations */}
+                {!aiAnalysis.improvementSuggestions?.length && aiAnalysis.recommendations?.length > 0 && (
                   <div 
                     className="p-4 border rounded-xl"
                     style={{ backgroundColor: 'var(--color-brand-100)', borderColor: 'var(--color-neutral-200)' }}
@@ -1037,132 +1033,11 @@ const GitHubPanel = ({ projectId, isOwner, initialTab }) => {
                   </div>
                 )}
 
-                {/* Reasoning */}
-                {aiAnalysis.reasoning && (
-                  <div 
-                    className="p-4 border rounded-xl"
-                    style={{ backgroundColor: 'var(--color-neutral-100)', borderColor: 'var(--color-neutral-200)' }}
-                  >
-                    <div className="text-[9px] font-black uppercase tracking-widest mb-2 flex items-center gap-1.5 text-neutral-500">
-                      <Sparkles size={11} className="text-brand-300" /> AI Reasoning
-                    </div>
-                    <div className="text-xs leading-relaxed text-neutral-800">{aiAnalysis.reasoning}</div>
-                  </div>
-                )}
               </div>
             )}
           </div>
         )}
 
-        {/* ── REALITY CHECK TAB ── */}
-        {activeTab === 'reality' && (
-          <div className="flex flex-col gap-4 animate-slide-up">
-            <div className="flex items-center justify-between">
-              <div>
-                <div className="text-xs font-bold text-neutral-800">Project Reality Check</div>
-                <div className="text-[9px] mt-0.5 text-neutral-500">Comparing Task Plan vs actual GitHub commit activity</div>
-              </div>
-              <button
-                onClick={fetchRealityCheck}
-                disabled={realityLoading}
-                className="flex items-center gap-1.5 px-3 py-1.5 bg-neutral-200 hover:bg-neutral-300 text-neutral-800 text-xs font-bold rounded-xl cursor-pointer transition-colors border border-neutral-300"
-              >
-                <RefreshCw size={12} className={realityLoading ? 'animate-spin text-neutral-800' : 'text-neutral-800'} />
-                <span className="text-neutral-800">Refresh</span>
-              </button>
-            </div>
-
-            {realityLoading ? (
-              <div className="flex justify-center py-12">
-                <RefreshCw size={24} className="animate-spin text-brand-500" />
-              </div>
-            ) : !realityCheck || !realityCheck.realityChecks ? (
-              <div className="text-center py-10 text-xs text-neutral-500">
-                No task plan found. Generate a task plan to enable Reality Check.
-              </div>
-            ) : (
-              <>
-                {/* Summary row */}
-                <div className="grid grid-cols-3 sm:grid-cols-6 gap-2">
-                  {[
-                    { label: 'Verified', value: realityCheck.summary?.verified || 0, bg: 'rgba(16, 185, 129, 0.08)', border: 'rgba(16, 185, 129, 0.25)', textClass: 'text-emerald-500' },
-                    { label: 'Warnings', value: realityCheck.summary?.warnings || 0, bg: 'rgba(245, 158, 11, 0.08)', border: 'rgba(245, 158, 11, 0.25)', textClass: 'text-amber-500' },
-                    { label: 'Active', value: realityCheck.summary?.active || 0, bg: 'rgba(59, 130, 246, 0.08)', border: 'rgba(59, 130, 246, 0.25)', textClass: 'text-blue-500' },
-                    { label: 'No Activity', value: realityCheck.summary?.noActivity || 0, bg: 'rgba(249, 115, 22, 0.08)', border: 'rgba(249, 115, 22, 0.25)', textClass: 'text-orange-500' },
-                    { label: 'Ahead', value: realityCheck.summary?.ahead || 0, bg: 'rgba(168, 85, 247, 0.08)', border: 'rgba(168, 85, 247, 0.25)', textClass: 'text-purple-500' },
-                    { label: 'Not Started', value: realityCheck.summary?.notStarted || 0, bg: 'rgba(156, 163, 175, 0.08)', border: 'rgba(156, 163, 175, 0.25)', textClass: 'text-neutral-500' }
-                  ].map(({ label, value, bg, border, textClass }) => (
-                    <div 
-                      key={label} 
-                      className={`p-2.5 rounded-xl border flex flex-col items-center justify-center text-center gap-1 ${textClass}`}
-                      style={{
-                        backgroundColor: bg,
-                        borderColor: border
-                      }}
-                    >
-                      <div className="text-lg font-extrabold font-mono leading-none">{value}</div>
-                      <div className="text-[8px] font-bold uppercase tracking-widest opacity-85">{label}</div>
-                    </div>
-                  ))}
-                </div>
-
-                {/* Task list */}
-                <div 
-                  className="flex flex-col gap-0 border rounded-xl overflow-hidden divide-y"
-                  style={{ borderColor: 'var(--color-neutral-200)', divideColor: 'var(--color-neutral-200)' }}
-                >
-                  {realityCheck.realityChecks.map((item, i) => {
-                    const isWarning = item.verdict === 'Warning';
-                    return (
-                      <div 
-                        key={i} 
-                        className="flex items-start gap-3 p-3.5 transition-colors hover:bg-neutral-100/5"
-                        style={{
-                          backgroundColor: isWarning ? 'rgba(245, 158, 11, 0.04)' : 'transparent'
-                        }}
-                      >
-                        <div className="flex flex-col gap-1 flex-1 min-w-0">
-                          <div className="flex items-center gap-2 flex-wrap">
-                            <VerdictBadge verdict={item.verdict} />
-                            <div className="text-[10px] font-semibold text-neutral-500">{item.member}</div>
-                            <div 
-                              className="text-[9px] px-1.5 py-0.5 rounded border"
-                              style={{
-                                backgroundColor: 'rgba(255, 255, 255, 0.05)',
-                                borderColor: 'var(--color-neutral-200)',
-                                color: 'var(--color-neutral-600)'
-                              }}
-                            >
-                              {item.taskStatus}
-                            </div>
-                          </div>
-                          <div className="text-xs font-semibold mt-0.5 leading-snug text-neutral-800">{item.task}</div>
-                          <div className="text-[10px] mt-0.5 text-neutral-500">{item.message}</div>
-                        </div>
-                        {item.relatedCommitCount > 0 && (
-                          <div 
-                            className="text-[9px] font-bold px-2 py-0.5 rounded-full border shrink-0 mt-1"
-                            style={{
-                              backgroundColor: 'var(--color-brand-100)',
-                              borderColor: 'var(--color-neutral-200)',
-                              color: 'var(--color-brand-300)'
-                            }}
-                          >
-                            {item.relatedCommitCount} commit{item.relatedCommitCount > 1 ? 's' : ''}
-                          </div>
-                        )}
-                      </div>
-                    );
-                  })}
-                </div>
-
-                <div className="text-[9px] font-medium text-center text-neutral-500">
-                  Last synced: {realityCheck.lastSyncedAt ? new Date(realityCheck.lastSyncedAt).toLocaleString() : 'Never'}
-                </div>
-              </>
-            )}
-          </div>
-        )}
 
       </div>
     </div>

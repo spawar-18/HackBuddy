@@ -178,6 +178,39 @@ const HackathonCommandCenter = ({ projectId, onBack }) => {
     return () => clearInterval(interval);
   }, [config?.endTime]);
 
+  // Extend timeline by X hours
+  const handleExtendTimeline = async (hours) => {
+    if (!config) return;
+    try {
+      setSaveLoading(true);
+      const currentEnd = new Date(config.endTime || new Date());
+      const newEnd = new Date(currentEnd.getTime() + hours * 60 * 60 * 1000);
+      
+      const updatedData = {
+        hackathonName: config.hackathonName || 'Hackathon',
+        startTime: config.startTime ? formatDateTimeLocal(config.startTime) : formatDateTimeLocal(new Date()),
+        endTime: formatDateTimeLocal(newEnd),
+        codeFreezeTime: config.codeFreezeTime ? formatDateTimeLocal(config.codeFreezeTime) : '',
+        presentationTime: config.presentationTime ? formatDateTimeLocal(config.presentationTime) : '',
+        submissionTime: config.submissionTime ? formatDateTimeLocal(config.submissionTime) : '',
+        timezone: config.timezone || 'UTC'
+      };
+
+      const res = await saveHackathonConfig(projectId, updatedData);
+      if (res.success) {
+        toast.success(`Timeline extended by ${hours} hours!`);
+        setConfig(res.config);
+        setFormData(updatedData);
+        fetchData();
+      }
+    } catch (err) {
+      console.error(err);
+      toast.error(err.response?.data?.message || 'Failed to extend timeline');
+    } finally {
+      setSaveLoading(false);
+    }
+  };
+
   // Save Configuration Submit Handler
   const handleSaveConfig = async (e) => {
     e.preventDefault();
@@ -427,6 +460,19 @@ const HackathonCommandCenter = ({ projectId, onBack }) => {
                       onChange={(e) => setFormData({ ...formData, endTime: e.target.value })}
                       required
                     />
+                    <div className="flex gap-1.5 mt-1.5">
+                      <button
+                        type="button"
+                        onClick={() => {
+                          const base = formData.startTime ? new Date(formData.startTime) : new Date();
+                          const future = new Date(base.getTime() + 12 * 60 * 60 * 1000);
+                          setFormData(prev => ({ ...prev, endTime: formatDateTimeLocal(future) }));
+                        }}
+                        className="px-2 py-1 text-[9px] font-bold bg-neutral-200 hover:bg-neutral-300 text-neutral-700 rounded transition-all cursor-pointer"
+                      >
+                        +12 Hours from Start
+                      </button>
+                    </div>
                   </div>
                 </div>
 
@@ -629,6 +675,19 @@ const HackathonCommandCenter = ({ projectId, onBack }) => {
                 onChange={(e) => setFormData({ ...formData, endTime: e.target.value })}
                 required
               />
+              <div className="flex gap-1.5 mt-1.5">
+                <button
+                  type="button"
+                  onClick={() => {
+                    const base = formData.endTime ? new Date(formData.endTime) : new Date();
+                    const future = new Date(base.getTime() + 12 * 60 * 60 * 1000);
+                    setFormData(prev => ({ ...prev, endTime: formatDateTimeLocal(future) }));
+                  }}
+                  className="px-2 py-1 text-[9px] font-bold bg-brand-50 hover:bg-brand-100 text-brand-700 rounded border border-brand-200 transition-all cursor-pointer"
+                >
+                  +12 Hours to End Time
+                </button>
+              </div>
             </div>
 
             <div className="form-group">
@@ -734,72 +793,175 @@ const HackathonCommandCenter = ({ projectId, onBack }) => {
         <div className="grid grid-cols-1 lg:grid-cols-12 gap-6 items-start w-full">
         
         {/* LEFT COLUMN (8 cols): Ticking HUD Clock, Progress, Team Workloads, Timelines */}
-        <div className="lg:col-span-8 flex flex-col gap-6 w-full">
+        <div className="lg:col-span-8 flex flex-col gap-6 w-full text-left">
           
           {/* Ticking Clock HUD Widget */}
           <div className="glass bg-neutral-950 border border-neutral-900 p-6 rounded-2xl text-white relative overflow-hidden shadow-md">
             <div className="absolute inset-0 opacity-[0.02]" style={{ backgroundImage: 'radial-gradient(circle, white 1px, transparent 1px)', backgroundSize: '16px 16px' }}></div>
             <div className="absolute -top-16 -right-16 w-40 h-40 bg-brand-500/10 rounded-full blur-3xl"></div>
             
-            <div className="relative z-10 flex flex-col sm:flex-row justify-between items-center gap-6">
-              <div>
-                <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-[9px] font-black uppercase tracking-widest bg-orange-950/45 border border-orange-500/30 text-orange-400">
-                  <Clock size={11} className="animate-pulse" /> Time Remaining Before Deadline
-                </span>
-                <p className="text-[10px] text-neutral-450 mt-2.5 uppercase tracking-widest font-mono">
-                  Ends: {new Date(config.endTime).toLocaleString([], { hour: '2-digit', minute: '2-digit', month: 'short', day: 'numeric' })} ({config.timezone})
-                </p>
-              </div>
-
-              {/* HUD countdown displays */}
-              <div className="flex gap-2">
-                {[
-                  { value: countdown.days, label: 'Days' },
-                  { value: countdown.hours, label: 'Hours' },
-                  { value: countdown.minutes, label: 'Mins' },
-                  { value: countdown.seconds, label: 'Secs' }
-                ].map((unit, idx) => (
-                  <div key={idx} className="flex flex-col items-center bg-neutral-900/60 border border-neutral-800 rounded-xl px-3 py-2 w-16 text-center shadow-3xs">
-                    <span className="text-xl font-extrabold font-mono leading-none tracking-tight text-white">{String(unit.value).padStart(2, '0')}</span>
-                    <span className="text-[8px] font-bold text-neutral-500 uppercase tracking-widest mt-1.5">{unit.label}</span>
+            {countdown.isCompleted ? (
+              <div className="relative z-10 flex flex-col sm:flex-row justify-between items-center w-full gap-4">
+                <div className="text-left">
+                  <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-[9px] font-black uppercase tracking-widest bg-rose-950/45 border border-rose-500/30 text-rose-450">
+                    <AlertCircle size={11} className="animate-pulse" /> Status: Finished
+                  </span>
+                  <h3 className="text-base font-extrabold mt-2.5">The Hackathon Has Ended!</h3>
+                  <p className="text-[11px] text-neutral-400 mt-1">Timeline completed on {new Date(config.endTime).toLocaleString([], { hour: '2-digit', minute: '2-digit', month: 'short', day: 'numeric' })}.</p>
+                </div>
+                {dashboard?.isOwner && (
+                  <div className="flex gap-2">
+                    <button
+                      type="button"
+                      onClick={() => handleExtendTimeline(12)}
+                      className="flex items-center gap-1.5 px-4 py-2.5 rounded-xl text-xs font-bold text-white bg-indigo-650 hover:bg-indigo-700 shadow-md cursor-pointer border-0 transition-all hover:scale-102 active:scale-98"
+                    >
+                      <Clock size={13} />
+                      <span>Extend 12 Hours</span>
+                    </button>
+                    <button
+                      type="button"
+                      onClick={() => {
+                        setShowSettings(true);
+                        window.scrollTo({ top: 0, behavior: 'smooth' });
+                      }}
+                      className="flex items-center gap-1.5 px-4 py-2.5 rounded-xl text-xs font-bold text-white bg-gradient-to-r from-orange-500 to-red-500 hover:from-orange-600 hover:to-red-650 shadow-md cursor-pointer border-0 transition-all hover:scale-102 active:scale-98"
+                    >
+                      <RefreshCw size={13} className="animate-spin" style={{ animationDuration: '3s' }} />
+                      <span>Start New Timeline</span>
+                    </button>
                   </div>
-                ))}
+                )}
+              </div>
+            ) : (
+              <div className="relative z-10 flex flex-col sm:flex-row justify-between items-center gap-6">
+                <div>
+                  <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-[9px] font-black uppercase tracking-widest bg-orange-950/45 border border-orange-500/30 text-orange-400">
+                    <Clock size={11} className="animate-pulse" /> Time Remaining Before Deadline
+                  </span>
+                  <p className="text-[10px] text-neutral-450 mt-2.5 uppercase tracking-widest font-mono">
+                    Ends: {new Date(config.endTime).toLocaleString([], { hour: '2-digit', minute: '2-digit', month: 'short', day: 'numeric' })} ({config.timezone})
+                  </p>
+                </div>
+
+                {/* HUD countdown displays */}
+                <div className="flex gap-2">
+                  {[
+                    { value: countdown.days, label: 'Days' },
+                    { value: countdown.hours, label: 'Hours' },
+                    { value: countdown.minutes, label: 'Mins' },
+                    { value: countdown.seconds, label: 'Secs' }
+                  ].map((unit, idx) => (
+                    <div key={idx} className="flex flex-col items-center bg-neutral-900/60 border border-neutral-800 rounded-xl px-3 py-2 w-16 text-center shadow-3xs">
+                      <span className="text-xl font-extrabold font-mono leading-none tracking-tight text-white">{String(unit.value).padStart(2, '0')}</span>
+                      <span className="text-[8px] font-bold text-neutral-500 uppercase tracking-widest mt-1.5">{unit.label}</span>
+                    </div>
+                  ))}
+                </div>
+              </div>
+            )}
+          </div>
+
+          {/* AI Recommendation of the Day Banner */}
+          <div className="glass bg-gradient-to-r from-purple-950/80 to-indigo-950/80 p-4.5 rounded-2xl border border-purple-900 text-white relative overflow-hidden shadow-md">
+            <div className="absolute inset-0 opacity-[0.02]" style={{ backgroundImage: 'radial-gradient(circle, white 1px, transparent 1px)', backgroundSize: '16px 16px' }}></div>
+            <div className="relative z-10 flex gap-4 items-start">
+              <div className="w-9 h-9 bg-purple-500/20 text-purple-300 rounded-xl flex items-center justify-center shrink-0 border border-purple-500/35">
+                <Sparkles size={16} className="animate-pulse" />
+              </div>
+              <div className="flex-1">
+                <span className="text-[8px] font-black text-purple-300 uppercase tracking-widest">AI Recommendation of the Day</span>
+                <h4 className="text-xs font-extrabold mt-1 text-white leading-normal">
+                  Prioritize {dashboard?.highestPriorityFeature || 'Core MVP'} implementation.
+                </h4>
+                <p className="text-[11px] text-neutral-300 mt-1.5 leading-normal">
+                  Our decision model detects this feature as the critical path item. Finishing this stack segment will unlock the remaining database controllers and deployment pipelines.
+                </p>
+                <div className="flex items-center gap-3.5 mt-3 border-t border-purple-800/60 pt-2 text-[10px] font-mono text-purple-350">
+                  <span>Velocity Trend: <strong className="text-white">{dashboard?.productivityTrend || 'Stable'}</strong></span>
+                  <span>Burndown Speed: <strong className="text-white">{dashboard?.burndownVelocity || 0} tasks/hr</strong></span>
+                </div>
               </div>
             </div>
           </div>
 
-          {/* Active smart Alerts Feed */}
-          {dashboard?.alerts && dashboard.alerts.length > 0 && (
-            <div className="glass bg-white border border-brand-100 p-5 rounded-2xl flex flex-col gap-3 shadow-xs">
-              <h3 className="text-xs font-black text-neutral-700 uppercase tracking-widest flex items-center gap-2 border-b border-neutral-100 pb-2.5">
-                <ShieldAlert size={14} className="text-red-500 animate-pulse" /> Active Smart Alerts
-              </h3>
-              <div className="flex flex-col gap-2">
-                {dashboard.alerts.map((alert, idx) => {
-                  const isCrit = alert.priority === 'Critical' || alert.priority === 'High';
+          {/* Smart Alert Logs Dashboard (Redesigned M2) */}
+          <div className="glass bg-white border border-brand-100 p-5 rounded-2xl flex flex-col gap-4.5 shadow-xs">
+            <h3 className="text-xs font-black text-neutral-800 uppercase tracking-widest flex items-center gap-2 border-b border-neutral-100 pb-2.5">
+              <ShieldAlert size={14} className="text-red-500 animate-pulse" /> Smart Alert Engine Logs
+            </h3>
+            
+            <div className="flex flex-col gap-3">
+              {(!dashboard?.alerts || dashboard.alerts.length === 0) ? (
+                <div className="flex flex-col items-center justify-center py-6 text-center text-neutral-400 gap-2">
+                  <CheckCircle size={22} className="text-emerald-500" />
+                  <span className="text-xs font-bold text-neutral-500">System Clear: All alert risks resolved!</span>
+                </div>
+              ) : (
+                dashboard.alerts.map((alert, idx) => {
+                  const isCrit = alert.severity === 'Critical' || alert.severity === 'Warning';
                   return (
-                    <div key={idx} className={`p-3 rounded-xl border text-xs leading-relaxed flex items-start gap-2.5 ${
-                      isCrit ? 'bg-red-50/50 border-red-200 text-red-800' : 'bg-amber-50/50 border-amber-200 text-amber-800'
+                    <div key={idx} className={`p-4 rounded-xl border flex flex-col gap-3 text-xs leading-relaxed transition-all shadow-3xs ${
+                      alert.severity === 'Critical' ? 'bg-red-50/40 border-red-200 text-red-900' :
+                      alert.severity === 'Warning' ? 'bg-amber-50/40 border-amber-200 text-amber-900' :
+                      alert.severity === 'Success' ? 'bg-emerald-50/40 border-emerald-250 text-emerald-900' :
+                      'bg-indigo-50/30 border-indigo-150 text-indigo-900'
                     }`}>
-                      <AlertTriangle size={14} className={`shrink-0 mt-0.5 ${isCrit ? 'text-red-500 animate-bounce' : 'text-amber-500'}`} />
-                      <div className="flex-1 flex justify-between items-start gap-2">
-                        <span className="font-semibold">{alert.message}</span>
-                        {alert.timestamp && (
-                          <span className={`text-[8px] font-mono font-bold shrink-0 px-1.5 py-0.5 rounded-sm border ${
-                            isCrit 
-                              ? 'bg-red-500/10 border-red-500/20 text-red-400 animate-pulse' 
-                              : 'bg-amber-500/10 border-amber-500/20 text-amber-500'
-                          }`}>
-                            {new Date(alert.timestamp).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
-                          </span>
-                        )}
+                      {/* Header */}
+                      <div className="flex justify-between items-start gap-3">
+                        <div className="flex items-start gap-2">
+                          <AlertTriangle size={15} className={`shrink-0 mt-0.5 ${isCrit ? 'text-red-500 animate-pulse' : 'text-indigo-500'}`} />
+                          <div className="flex flex-col text-left">
+                            <span className="font-extrabold text-neutral-900 leading-snug">{alert.title || alert.message}</span>
+                            <span className="text-[9px] text-neutral-450 mt-0.5">Category: {alert.category || 'General'}</span>
+                          </div>
+                        </div>
+                        <span className={`text-[8px] font-mono font-bold shrink-0 px-2 py-0.5 rounded-md border ${
+                          alert.severity === 'Critical' ? 'bg-red-500/10 border-red-500/20 text-red-500' :
+                          alert.severity === 'Warning' ? 'bg-amber-500/10 border-amber-500/20 text-amber-600' :
+                          'bg-indigo-500/10 border-indigo-500/20 text-indigo-600'
+                        }`}>
+                          {alert.severity}
+                        </span>
+                      </div>
+
+                      {/* Evidence & Details */}
+                      <div className="grid grid-cols-1 md:grid-cols-2 gap-3 text-neutral-700 bg-white/40 p-2.5 rounded-xl border border-neutral-100/50">
+                        <div className="flex flex-col text-left">
+                          <span className="text-[8px] font-bold text-neutral-400 uppercase">Reason</span>
+                          <span className="mt-0.5">{alert.reason || 'Calculated from time progression & task dependency'}</span>
+                        </div>
+                        <div className="flex flex-col text-left">
+                          <span className="text-[8px] font-bold text-neutral-400 uppercase">Evidence</span>
+                          <span className="mt-0.5 font-mono">{alert.evidence || 'N/A'}</span>
+                        </div>
+                        <div className="flex flex-col text-left">
+                          <span className="text-[8px] font-bold text-neutral-400 uppercase">Affected Feature</span>
+                          <span className="mt-0.5 font-semibold text-neutral-800">{alert.affectedFeature || 'Core MVP'}</span>
+                        </div>
+                        <div className="flex flex-col text-left">
+                          <span className="text-[8px] font-bold text-neutral-400 uppercase">Affected Teammate</span>
+                          <span className="mt-0.5 font-semibold text-neutral-800">{alert.affectedTeamMember || 'All Members'}</span>
+                        </div>
+                      </div>
+
+                      {/* Suggested Action */}
+                      <div className="flex flex-col md:flex-row md:justify-between gap-2 border-t border-neutral-250/20 pt-2.5 text-left">
+                        <div className="flex flex-col">
+                          <span className="text-[8px] font-bold text-neutral-400 uppercase">Suggested Action</span>
+                          <span className="mt-0.5 text-neutral-850 font-semibold">{alert.suggestedAction || 'Resolve blockers immediately.'}</span>
+                        </div>
+                        <div className="flex flex-col shrink-0">
+                          <span className="text-[8px] font-bold text-neutral-400 uppercase">Expected Impact</span>
+                          <span className="mt-0.5 text-emerald-700 font-semibold">{alert.expectedImpact || 'Optimize milestone delivery.'}</span>
+                        </div>
                       </div>
                     </div>
                   );
-                })}
-              </div>
+                })
+              )}
             </div>
-          )}
+          </div>
 
           {/* Progress Analytics Circle + Metrics */}
           <div className="glass bg-white border border-brand-100 p-5 rounded-2xl flex flex-col gap-4 shadow-xs">
@@ -812,25 +974,8 @@ const HackathonCommandCenter = ({ projectId, onBack }) => {
               <div className="flex flex-col items-center justify-center p-4 bg-neutral-50/30 border border-neutral-150 rounded-xl md:col-span-1 shadow-3xs">
                 <div className="relative w-24 h-24 flex items-center justify-center shrink-0">
                   <svg viewBox="0 0 36 36" className="w-full h-full transform -rotate-90">
-                    <circle
-                      cx="18"
-                      cy="18"
-                      r="16"
-                      strokeWidth="2.5"
-                      stroke="rgba(0, 240, 255, 0.08)"
-                      fill="none"
-                    />
-                    <circle
-                      cx="18"
-                      cy="18"
-                      r="16"
-                      strokeWidth="2.8"
-                      strokeDasharray={`${progressMetrics.completionPercentage}, 100`}
-                      strokeLinecap="round"
-                      stroke="#3b82f6"
-                      fill="none"
-                      className="transition-all duration-1000 ease-out shadow-sm"
-                    />
+                    <circle cx="18" cy="18" r="16" strokeWidth="2.5" stroke="rgba(0, 240, 255, 0.08)" fill="none" />
+                    <circle cx="18" cy="18" r="16" strokeWidth="2.8" strokeDasharray={`${progressMetrics.completionPercentage}, 100`} strokeLinecap="round" stroke="#3b82f6" fill="none" className="transition-all duration-1000 ease-out" />
                   </svg>
                   <div className="absolute flex flex-col items-center justify-center leading-none">
                     <span className="text-lg font-black text-neutral-900 font-mono tracking-tighter">{progressMetrics.completionPercentage}%</span>
@@ -910,32 +1055,42 @@ const HackathonCommandCenter = ({ projectId, onBack }) => {
             </div>
           )}
 
-          {/* Timeline Feed */}
+          {/* AI Decision Timeline Feed */}
           {dashboard?.timeline && dashboard.timeline.length > 0 && (
             <div className="glass bg-white border border-brand-100 p-5 rounded-2xl flex flex-col gap-4 shadow-xs">
               <h3 className="text-xs font-black text-neutral-705 uppercase tracking-widest flex items-center gap-1.5 border-b border-neutral-100 pb-2.5">
-                <CalendarDays size={14} className="text-brand-500" /> Productivity Timeline
+                <CalendarDays size={14} className="text-brand-500" /> Chronological AI Timeline
               </h3>
               
               <div className="relative pl-3 flex flex-col gap-4">
                 <div className="absolute left-[9px] top-1.5 bottom-1.5 w-[2px] bg-neutral-150"></div>
                 
-                {dashboard.timeline.slice(0, 5).map((event, idx) => (
+                {dashboard.timeline.slice(0, 8).map((event, idx) => (
                   <div key={idx} className="flex gap-4 relative items-start group">
                     <div className={`w-5 h-5 rounded-full flex items-center justify-center shrink-0 z-10 shadow-2xs group-hover:scale-110 transition-transform ${
                       event.type === 'Success' ? 'bg-emerald-500 border border-emerald-600 text-white' :
-                      event.type === 'Milestone' ? 'bg-purple-500 border border-purple-650 text-white' :
-                      event.type === 'Info' ? 'bg-blue-500 border border-blue-650 text-white' :
+                      event.type === 'Milestone' ? 'bg-purple-500 border border-purple-655 text-white' :
+                      event.type === 'Info' ? 'bg-blue-500 border border-blue-655 text-white' :
+                      event.type === 'Alert' ? 'bg-red-500 border border-red-655 text-white' :
                       'bg-neutral-500 border border-neutral-600 text-white'
                     }`}>
                       {event.type === 'Success' && <Check size={10} strokeWidth={3} />}
                       {event.type === 'Milestone' && <Award size={10} />}
                       {event.type === 'Info' && <Info size={10} />}
-                      {event.type !== 'Success' && event.type !== 'Milestone' && event.type !== 'Info' && <Clock size={10} />}
+                      {event.type === 'Alert' && <AlertCircle size={10} />}
+                      {event.type !== 'Success' && event.type !== 'Milestone' && event.type !== 'Info' && event.type !== 'Alert' && <Clock size={10} />}
                     </div>
                     
-                    <div className="flex-1 flex flex-col md:flex-row justify-between items-start md:items-center gap-1 min-h-[20px] pt-0.5">
-                      <span className="text-xs font-semibold text-neutral-700 leading-normal">{event.event}</span>
+                    <div className="flex-1 flex flex-col md:flex-row justify-between items-start md:items-center gap-2 min-h-[20px] pt-0.5">
+                      <div className="flex flex-col text-left">
+                        <span className="text-xs font-semibold text-neutral-850 leading-normal">{event.event}</span>
+                        {event.healthImpact && (
+                          <div className="flex items-center gap-2 mt-0.5 text-[9px] font-mono font-bold text-neutral-450">
+                            <span>Health: <strong className="text-emerald-600">{event.healthImpact}</strong></span>
+                            <span>Risk: <strong className="text-red-500">{event.riskImpact}</strong></span>
+                          </div>
+                        )}
+                      </div>
                       <span className="text-[9px] font-bold text-neutral-400 font-mono shrink-0">
                         {new Date(event.time).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
                       </span>
@@ -949,7 +1104,7 @@ const HackathonCommandCenter = ({ projectId, onBack }) => {
         </div>
 
         {/* RIGHT COLUMN (4 cols): AI Recommendation Report Panel */}
-        <div className="lg:col-span-4 flex flex-col gap-6 w-full">
+        <div className="lg:col-span-4 flex flex-col gap-6 w-full text-left">
           
           {/* Executive AI Report card */}
           <div className="glass bg-gradient-to-b from-neutral-50/40 to-white rounded-2xl p-5 border border-brand-100/60 flex flex-col gap-4 shadow-xs relative overflow-hidden">
@@ -958,7 +1113,7 @@ const HackathonCommandCenter = ({ projectId, onBack }) => {
             <div className="flex items-center justify-between border-b border-neutral-150 pb-3">
               <div className="flex items-center gap-2">
                 <Sparkles size={16} className="text-purple-600 animate-pulse" />
-                <h3 className="text-xs font-black text-neutral-800 uppercase tracking-widest">AI Command Report</h3>
+                <h3 className="text-xs font-black text-neutral-800 uppercase tracking-widest">Executive AI Report</h3>
               </div>
               
               <button 
@@ -968,121 +1123,121 @@ const HackathonCommandCenter = ({ projectId, onBack }) => {
                 className="px-2.5 py-1.5 border border-purple-200 bg-purple-50/20 text-purple-700 hover:bg-purple-50/50 rounded-xl cursor-pointer hover:border-purple-305 transition-all text-[10px] font-extrabold flex items-center justify-center gap-1"
               >
                 {analysisLoading ? <RefreshCw className="animate-spin text-purple-600" size={11} /> : <RefreshCw size={11} />}
-                <span>Refresh AI</span>
+                <span>Regenerate Report</span>
               </button>
             </div>
 
             {analysisLoading ? (
               <div className="flex flex-col items-center justify-center py-20 text-neutral-400 gap-2">
                 <RefreshCw className="animate-spin text-purple-600" size={24} />
-                <span className="text-xs font-semibold text-neutral-500">Regenerating engineering assessment...</span>
+                <span className="text-xs font-semibold text-neutral-500">Regenerating engineering report...</span>
               </div>
             ) : aiReport ? (
-              <div className="flex flex-col gap-4">
+              <div className="flex flex-col gap-5 text-neutral-800 max-h-[85vh] overflow-y-auto pr-1">
                 
-                {/* Status displays */}
-                <div className="grid grid-cols-2 gap-2 text-center text-xs">
-                  <div className={`p-3 rounded-2xl border flex flex-col gap-1 items-center justify-center ${getOverallStatusColor(aiReport.overallStatus)}`}>
-                    <span className="text-[8px] font-black text-neutral-450 uppercase tracking-wider">TEAM STATUS</span>
-                    <span className="font-black leading-none mt-1 text-xs tracking-tight">{aiReport.overallStatus}</span>
-                  </div>
-                  
-                  <div className={`p-3 rounded-2xl border flex flex-col gap-1 items-center justify-center bg-neutral-50/50 border-neutral-200 ${getRiskLevelColor(aiReport.riskLevel)}`}>
-                    <span className="text-[8px] font-black text-neutral-450 uppercase tracking-wider">RISK LEVEL</span>
-                    <span className="font-black leading-none mt-1 text-xs tracking-tight">{aiReport.riskLevel}</span>
+                {/* 1. Executive Summary */}
+                <div className="flex flex-col gap-1 border-b border-neutral-100 pb-3">
+                  <span className="text-[8px] font-black text-purple-600 uppercase tracking-widest">Executive Summary</span>
+                  <p className="text-[11px] leading-relaxed text-neutral-700 mt-1 font-semibold">{aiReport.executiveReport?.executiveSummary || aiReport.completionPrediction}</p>
+                </div>
+
+                {/* 2. Overall Project Health */}
+                <div className="flex flex-col gap-1 border-b border-neutral-100 pb-3">
+                  <span className="text-[8px] font-black text-purple-600 uppercase tracking-widest">Overall Project Health</span>
+                  <p className="text-[11px] leading-relaxed text-neutral-700 mt-1">{aiReport.executiveReport?.overallProjectHealth || aiReport.reasoning}</p>
+                </div>
+
+                {/* 3. Project Overview */}
+                <div className="flex flex-col gap-1 border-b border-neutral-100 pb-3">
+                  <span className="text-[8px] font-black text-purple-600 uppercase tracking-widest">Project Scope Overview</span>
+                  <p className="text-[11px] leading-relaxed text-neutral-700 mt-1">{aiReport.executiveReport?.projectOverview || `Features to build: ${config.hackathonName}`}</p>
+                </div>
+
+                {/* 4. Feature Analysis */}
+                <div className="flex flex-col gap-1 border-b border-neutral-100 pb-3">
+                  <span className="text-[8px] font-black text-purple-600 uppercase tracking-widest">Feature Analysis</span>
+                  <p className="text-[11px] leading-relaxed text-neutral-750 font-mono mt-1 white-space-pre-line">{aiReport.executiveReport?.featureAnalysis || aiReport.currentFocus?.join('\n')}</p>
+                </div>
+
+                {/* 5. Task Analysis */}
+                <div className="flex flex-col gap-1 border-b border-neutral-100 pb-3">
+                  <span className="text-[8px] font-black text-purple-600 uppercase tracking-widest">Task Analytics Breakdown</span>
+                  <p className="text-[11px] leading-relaxed text-neutral-700 mt-1 font-mono">{aiReport.executiveReport?.taskAnalysis || 'Calculating task metadata...'}</p>
+                </div>
+
+                {/* 6. Team Analysis */}
+                <div className="flex flex-col gap-1 border-b border-neutral-100 pb-3">
+                  <span className="text-[8px] font-black text-purple-600 uppercase tracking-widest">Team Workload Analysis</span>
+                  <p className="text-[11px] leading-relaxed text-neutral-700 mt-1 font-mono white-space-pre-line">{aiReport.executiveReport?.teamAnalysis || 'Squad analysis not generated.'}</p>
+                </div>
+
+                {/* 7. GitHub Intelligence */}
+                <div className="flex flex-col gap-1 border-b border-neutral-100 pb-3">
+                  <span className="text-[8px] font-black text-purple-600 uppercase tracking-widest">GitHub Repository Intelligence</span>
+                  <p className="text-[11px] leading-relaxed text-neutral-700 mt-1">{aiReport.executiveReport?.gitHubIntelligence || 'Hook GitHub integrations under the Git panel to monitor branch code releases.'}</p>
+                </div>
+
+                {/* 8. Marketplace Activity */}
+                <div className="flex flex-col gap-1 border-b border-neutral-100 pb-3">
+                  <span className="text-[8px] font-black text-purple-600 uppercase tracking-widest">Marketplace Activity Log</span>
+                  <p className="text-[11px] leading-relaxed text-neutral-700 mt-1 font-mono">{aiReport.executiveReport?.marketplaceActivity || 'No active marketplace trades.'}</p>
+                </div>
+
+                {/* 9. Collaboration Analysis */}
+                <div className="flex flex-col gap-1 border-b border-neutral-100 pb-3">
+                  <span className="text-[8px] font-black text-purple-600 uppercase tracking-widest">Collaboration Dynamics</span>
+                  <p className="text-[11px] leading-relaxed text-neutral-700 mt-1">{aiReport.executiveReport?.collaborationAnalysis || 'Review collaboration setups under the task swap request board.'}</p>
+                </div>
+
+                {/* 10. Risk Assessment */}
+                <div className="flex flex-col gap-1 border-b border-neutral-100 pb-3">
+                  <span className="text-[8px] font-black text-purple-600 uppercase tracking-widest">Deep Risk Assessment</span>
+                  <p className="text-[11px] leading-relaxed text-red-700 mt-1 white-space-pre-line">{aiReport.executiveReport?.riskAssessment || aiReport.scopeReductionSuggestions?.join('\n') || 'All systems operating within acceptable risk limits.'}</p>
+                </div>
+
+                {/* 11. Productivity & Timeline Analysis */}
+                <div className="flex flex-col gap-1 border-b border-neutral-100 pb-3">
+                  <span className="text-[8px] font-black text-purple-600 uppercase tracking-widest">Productivity & Timeline Forecast</span>
+                  <p className="text-[11px] leading-relaxed text-neutral-700 mt-1">{aiReport.executiveReport?.productivityAnalysis || ''} {aiReport.executiveReport?.timelineAnalysis || ''}</p>
+                </div>
+
+                {/* 12. Deployment, Testing, and Judge Readiness */}
+                <div className="flex flex-col gap-1.5 border-b border-neutral-100 pb-3 text-neutral-800">
+                  <span className="text-[8px] font-black text-purple-600 uppercase tracking-widest">Readiness Assessments</span>
+                  <div className="grid grid-cols-1 gap-2 mt-1">
+                    <div className="bg-neutral-50/50 p-2 rounded-xl border border-neutral-200">
+                      <span className="text-[7px] font-bold text-neutral-450 uppercase">Deployment Readiness</span>
+                      <p className="text-[10.5px] leading-normal font-semibold text-neutral-805 mt-0.5">{aiReport.executiveReport?.deploymentReadiness || 'Not evaluated.'}</p>
+                    </div>
+                    <div className="bg-neutral-50/50 p-2 rounded-xl border border-neutral-200">
+                      <span className="text-[7px] font-bold text-neutral-450 uppercase">Testing Readiness</span>
+                      <p className="text-[10.5px] leading-normal font-semibold text-neutral-805 mt-0.5">{aiReport.executiveReport?.testingReadiness || 'Not evaluated.'}</p>
+                    </div>
+                    <div className="bg-neutral-50/50 p-2 rounded-xl border border-neutral-200">
+                      <span className="text-[7px] font-bold text-neutral-450 uppercase">Judge Pitch Readiness</span>
+                      <p className="text-[10.5px] leading-normal font-semibold text-neutral-805 mt-0.5">{aiReport.executiveReport?.judgeReadiness || 'Not evaluated.'}</p>
+                    </div>
                   </div>
                 </div>
 
-                {/* Prediction summary */}
-                <div className="p-3 bg-brand-50/15 border border-brand-100 rounded-xl text-xs flex gap-2.5 items-start shadow-3xs">
-                  <Info size={14} className="text-brand-600 shrink-0 mt-0.5" />
-                  <div className="flex flex-col">
-                    <span className="text-[8px] font-bold text-neutral-450 uppercase tracking-widest">COMPLETION PREDICTION</span>
-                    <span className="font-semibold text-neutral-800 mt-1 leading-normal">{aiReport.completionPrediction}</span>
-                  </div>
+                {/* 13. Completion Forecast */}
+                <div className="flex flex-col gap-1 border-b border-neutral-100 pb-3">
+                  <span className="text-[8px] font-black text-purple-600 uppercase tracking-widest">Burndown Completion Forecast</span>
+                  <p className="text-[11px] leading-relaxed text-neutral-700 mt-1 font-semibold">{aiReport.executiveReport?.completionForecast || 'Loading burndown predictions...'}</p>
                 </div>
 
-                {/* Focus list */}
-                {aiReport.currentFocus && aiReport.currentFocus.length > 0 && (
-                  <div className="flex flex-col gap-2">
-                    <span className="text-[9px] font-black text-neutral-400 uppercase tracking-widest">CURRENT FOCUS</span>
-                    <div className="flex flex-col gap-1.5">
-                      {aiReport.currentFocus.map((f, idx) => (
-                        <div key={idx} className="flex items-start gap-2.5 text-xs text-neutral-700 bg-neutral-50/40 p-2.5 rounded-xl border border-neutral-150/40 hover:border-neutral-200 transition-colors shadow-3xs">
-                          <CheckCircle size={12} className="text-brand-500 shrink-0 mt-0.5" />
-                          <span>{f}</span>
-                        </div>
-                      ))}
-                    </div>
-                  </div>
-                )}
-
-                {/* Execution Strategy */}
-                {aiReport.executionStrategy && aiReport.executionStrategy.length > 0 && (
-                  <div className="flex flex-col gap-2">
-                    <span className="text-[9px] font-black text-neutral-400 uppercase tracking-widest">TIME-BASED EXECUTION STRATEGY</span>
-                    <div className="flex flex-col gap-1.5">
-                      {aiReport.executionStrategy.map((step, idx) => (
-                        <div key={idx} className="flex items-start gap-2.5 text-xs text-neutral-700 bg-neutral-50/40 p-2.5 rounded-xl border border-neutral-150/40 hover:border-neutral-200 transition-colors shadow-3xs">
-                          <span className="font-extrabold text-brand-500 text-[10px] bg-brand-50 border border-brand-100 rounded-md w-5 h-5 flex items-center justify-center shrink-0">
-                            {idx + 1}
-                          </span>
-                          <span className="leading-relaxed">{step}</span>
-                        </div>
-                      ))}
-                    </div>
-                  </div>
-                )}
-
-                {/* Scope Guardian Section */}
-                <div className="flex flex-col gap-2 bg-neutral-50/30 border border-neutral-200 rounded-2xl p-4 shadow-3xs">
-                  <div className="flex items-center gap-1.5">
-                    <ShieldAlert size={14} className="text-purple-650" />
-                    <span className="text-[9px] font-black text-neutral-600 uppercase tracking-widest">AI Scope Guardian</span>
-                  </div>
-                  
-                  {aiReport.tasksToPostpone && aiReport.tasksToPostpone.length > 0 ? (
-                    <div className="flex flex-col gap-3 mt-2">
-                      <div className="flex flex-col gap-1.5">
-                        <span className="text-[8px] font-bold text-red-500 uppercase tracking-widest">POSTPONE (SCOPE CUT)</span>
-                        {aiReport.tasksToPostpone.map((p, idx) => (
-                          <div key={idx} className="flex items-start gap-2 text-xs text-red-700 bg-red-50/20 px-2.5 py-1.5 rounded-xl border border-red-100">
-                            <Ban size={11} className="shrink-0 mt-0.5 text-red-500" />
-                            <span>{p}</span>
-                          </div>
-                        ))}
+                {/* 14. Recommendations List */}
+                <div className="flex flex-col gap-2">
+                  <span className="text-[8px] font-black text-purple-600 uppercase tracking-widest">Explainable AI Recommendations</span>
+                  <div className="flex flex-col gap-1.5">
+                    {(aiReport.executiveReport?.recommendations || aiReport.judgePreparationTips || []).map((rec, idx) => (
+                      <div key={idx} className="flex items-start gap-2 text-[11px] text-neutral-700 bg-neutral-50/30 p-2.5 rounded-xl border border-neutral-150/40">
+                        <ArrowUpRight size={12} className="shrink-0 mt-0.5 text-purple-600" />
+                        <span>{rec}</span>
                       </div>
-                      
-                      <div className="flex flex-col gap-1 border-t border-neutral-200/60 pt-2.5">
-                        <span className="text-[8px] font-bold text-neutral-400 uppercase tracking-widest">Scope Reasoning</span>
-                        <p className="text-[11px] text-neutral-500 leading-relaxed italic">{aiReport.reasoning}</p>
-                      </div>
-                    </div>
-                  ) : (
-                    <p className="text-[11px] text-emerald-700 font-semibold mt-2 leading-relaxed bg-emerald-50/30 p-3 border border-emerald-100 rounded-xl flex items-start gap-2">
-                      <CheckCircle size={13} className="shrink-0 mt-0.5" />
-                      <span>Time margins are solid. Scope Guardian is not suggesting any feature cuts. Stick to the roadmap!</span>
-                    </p>
-                  )}
-                </div>
-                {/* Pitch Advice */}
-                {aiReport.judgePreparationTips && aiReport.judgePreparationTips.length > 0 && (
-                  <div className="flex flex-col gap-2 bg-neutral-100 border border-neutral-200 rounded-2xl p-4 relative overflow-hidden shadow-sm">
-                    <div className="absolute inset-0 opacity-[0.025]" style={{ backgroundImage: 'radial-gradient(circle, white 1px, transparent 1px)', backgroundSize: '16px 16px' }}></div>
-                    <div className="flex items-center gap-1.5 relative z-10 mb-1">
-                      <Award size={14} className="text-orange-500 animate-pulse" />
-                      <span className="text-[9px] font-black text-orange-500 uppercase tracking-widest">JUDGE DAY PITCH ADVICE</span>
-                    </div>
-                    <div className="flex flex-col gap-2 relative z-10">
-                      {aiReport.judgePreparationTips.map((tip, idx) => (
-                        <div key={idx} className="flex items-start gap-2.5 text-[11px] leading-relaxed">
-                          <ArrowUpRight size={12} className="shrink-0 mt-0.5 text-orange-500" />
-                          <span className="text-neutral-800">{tip}</span>
-                        </div>
-                      ))}
-                    </div>
+                    ))}
                   </div>
-                )}
+                </div>
 
               </div>
             ) : (

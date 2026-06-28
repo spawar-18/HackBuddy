@@ -87,10 +87,13 @@ Evaluate proposed technologies against team skills, learning curve, performance,
 Generate consensus score, alternatives, trade-offs, confidence levels, and negotiation suggestions.
 Provide a mechanism for leader override if needed.`,
 
-      analyzeHackathonCommandCenter: `You are the centralized AI Hackathon Command Center (the "Hackathon Brain").
-Continuously analyze repository commits, task plan progress, GitHub issues/PRs, timer countdown, and deployment status.
-Produce a comprehensive health report.
-Identify critical alerts, scope adjustments, next best tasks, burndown velocity, productivity trends, and readiness scores (Judge, Deployment, Demo, Testing).`,
+      analyzeHackathonCommandCenter: `You are the Principal AI Project Manager and Central Intelligence System of HackBuddy.
+Analyze the complete project context including progress, features, tasks, team skills, workloads, GitHub commits/issues/PRs, marketplace requests, and remaining timeline.
+Generate:
+1. An explainable AI dashboard with overall status and readiness scores.
+2. Smart alert logs with title, evidence, severity, affected items, confidence score, and expected benefits.
+3. Chronological AI timeline events describing recent decisions and progress.
+4. An executive AI Command Report with deep analytical sections based purely on real evidence. Never generate placeholders or fake data.`,
 
       analyzeGitHubRepository: `You are the HackBuddy GitHub Repository Intelligence Analyzer.
 Analyze file trees, commits, pull requests, issues, README, package.json dependencies, and branches.
@@ -357,7 +360,7 @@ JSON Schema:
       analyzeHackathonCommandCenter: `Context:
 \${projectContext}
 
-JSON Schema:
+Ensure you output ONLY JSON matching this schema:
 {
   "overallStatus": "On Track" | "Needs Attention" | "Critical",
   "riskLevel": "Low" | "Medium" | "High",
@@ -373,13 +376,6 @@ JSON Schema:
   "winningProbability": number (0-100),
   "riskScore": number (0-100),
   "completionProbability": number (0-100),
-  "alerts": [
-    {
-      "severity": "Warning" | "Critical" | "Info",
-      "message": "string",
-      "category": "Task" | "Git" | "Timeline" | "Collaboration"
-    }
-  ],
   "dynamicScopeCutSuggestions": ["string"],
   "nextBestTask": {
     "task": "string",
@@ -387,12 +383,56 @@ JSON Schema:
     "reason": "string"
   },
   "productivityTrend": "Rising" | "Stable" | "Declining",
-  "burndownVelocity": number (tasks per hour),
+  "burndownVelocity": number,
   "readinessScores": {
     "judge": number,
     "deployment": number,
     "demo": number,
     "testing": number
+  },
+  "alerts": [
+    {
+      "title": "string",
+      "severity": "Critical" | "Warning" | "Recommendation" | "Information" | "Success" | "Achievement" | "Prediction",
+      "message": "string",
+      "category": "Task" | "Git" | "Timeline" | "Collaboration",
+      "reason": "string",
+      "evidence": "string",
+      "affectedFeature": "string",
+      "affectedTeamMember": "string",
+      "confidenceScore": number,
+      "suggestedAction": "string",
+      "expectedImpact": "string",
+      "timestamp": "string"
+    }
+  ],
+  "timeline": [
+    {
+      "time": "string",
+      "event": "string",
+      "type": "Success" | "Milestone" | "Info" | "Alert" | "Decision",
+      "healthImpact": "string",
+      "riskImpact": "string"
+    }
+  ],
+  "executiveReport": {
+    "executiveSummary": "string",
+    "projectOverview": "string",
+    "featureAnalysis": "string",
+    "taskAnalysis": "string",
+    "teamAnalysis": "string",
+    "gitHubIntelligence": "string",
+    "marketplaceActivity": "string",
+    "collaborationAnalysis": "string",
+    "riskAssessment": "string",
+    "productivityAnalysis": "string",
+    "timelineAnalysis": "string",
+    "deploymentReadiness": "string",
+    "testingReadiness": "string",
+    "judgeReadiness": "string",
+    "overallProjectHealth": "string",
+    "completionForecast": "string",
+    "recommendations": ["string"]
   }
 }`,
 

@@ -153,7 +153,7 @@ const compileProjectContext = ({
   context += '--- 6. TASK MARKETPLACE ACTIVITY ---\n';
   if (marketplaceRequests && marketplaceRequests.length > 0) {
     marketplaceRequests.forEach(req => {
-      context += `- [${req.status}] ${req.requestType} for task: "${req.taskName}" requested by ${req.userId?.name || 'Unknown'}\n`;
+      context += `- [${req.status}] ${req.requestType} for task: "${req.taskName || req.taskId}" requested by ${req.requestedBy || 'Unknown'}\n`;
     });
   } else {
     context += `No marketplace requests active.\n`;
@@ -281,7 +281,7 @@ const buildContext = async (projectId, bypassCache = false) => {
     Project.findById(projectId),
     HackathonConfig.findOne({ projectId }),
     GitHubRepository.findOne({ projectId }),
-    TaskMarketplaceRequest.find({ projectId }).populate('userId', 'name'),
+    TaskMarketplaceRequest.find({ projectId }),
     ConversationMemory.findOne({ projectId })
   ]);
 

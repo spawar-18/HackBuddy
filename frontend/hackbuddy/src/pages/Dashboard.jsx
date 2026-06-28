@@ -720,56 +720,8 @@ const Dashboard = () => {
                   </div>
                 </div>
 
-                {/* AI Recommendations List */}
-                <div className="mt-4 flex flex-col gap-2.5 text-left border-t border-brand-200/10 pt-3.5">
-                  <div className="flex items-center gap-1.5">
-                    <Sparkles size={13} className="text-brand-400 animate-pulse" />
-                    <span className="text-[9px] font-black uppercase tracking-wider text-brand-400">AI Telemetry Advice</span>
-                  </div>
-                  <div className="flex flex-col gap-2">
-                    {activeProjectsList.length > 0 ? (
-                      <>
-                        <div className="flex items-start gap-2 text-xs">
-                          <span className="w-1.5 h-1.5 rounded-full bg-[#00f0ff] shrink-0 mt-1.5"></span>
-                          <p className="text-neutral-350 leading-relaxed">
-                            Continue <b className="text-[#00f0ff]">{activeProjectsList[0]?.projectName}</b>. Deployment should begin within 3 hours.
-                          </p>
-                        </div>
-                        {activeProjectsList[1] && (
-                          <div className="flex items-start gap-2 text-xs">
-                            <span className="w-1.5 h-1.5 rounded-full bg-amber-400 shrink-0 mt-1.5"></span>
-                            <p className="text-neutral-350 leading-relaxed">
-                              <b className="text-amber-400">{activeProjectsList[1]?.projectName}</b> has no commits in the last 8 hours.
-                            </p>
-                          </div>
-                        )}
-                        {activeProjectsList[2] && (
-                          <div className="flex items-start gap-2 text-xs">
-                            <span className="w-1.5 h-1.5 rounded-full bg-red-400 shrink-0 mt-1.5"></span>
-                            <p className="text-neutral-350 leading-relaxed">
-                              <b className="text-[#ef4444]">{activeProjectsList[2]?.projectName}</b> has blocked tasks.
-                            </p>
-                          </div>
-                        )}
-                      </>
-                    ) : (
-                      <div className="text-xs text-neutral-500 italic">No project recommendations available. Link a team project to begin.</div>
-                    )}
-                  </div>
-                </div>
 
-                <div className="mt-4 flex gap-2">
-                  <button
-                    onClick={() => {
-                      if (currentProjectId) navigate(`/workspace/${currentProjectId}`, { state: { activeTab: 'chat' } });
-                      else toast.error('Create a project to open the assistant.');
-                    }}
-                    className="btn-primary text-xs py-1.5 px-3 flex items-center gap-1.5"
-                  >
-                    <MessageSquare size={13} />
-                    <span>Open AI Assistant</span>
-                  </button>
-                </div>
+
               </div>
 
               {/* Personal Summary KPIs */}

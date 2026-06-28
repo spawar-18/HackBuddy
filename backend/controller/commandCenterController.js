@@ -5,6 +5,7 @@ const HackathonConfig = require('../models/HackathonConfig');
 const Notification = require('../models/Notification');
 const TaskMarketplaceRequest = require('../models/TaskMarketplaceRequest');
 const { analyzeHackathonCommandCenterWithAI } = require('../services/aiService');
+const DecisionEngine = require('../services/ai/DecisionEngine');
 
 // Helper to compare user IDs
 const isSameUser = (id1, id2) => {
@@ -239,234 +240,24 @@ exports.getCommandCenterDashboard = async (req, res) => {
       return res.status(403).json({ success: false, message: 'Access denied: You are not a member of this team' });
     }
 
-    // 1. Fetch Hackathon Config
-    let config = await HackathonConfig.findOne({ projectId });
-    if (!config) {
+    const data = await DecisionEngine.getDashboardData(projectId);
+    if (!data.configured) {
       return res.status(200).json({ success: true, configured: false, message: 'Hackathon is not configured yet.' });
     }
-
-    // Automatically check and transition status
-    const now = new Date();
-    let statusChanged = false;
-    if (config.status !== 'Completed' && config.status !== 'Cancelled') {
-      if (now >= config.endTime) {
-        config.status = 'Completed';
-        statusChanged = true;
-      } else if (now >= config.startTime && config.status === 'Upcoming') {
-        config.status = 'Running';
-        statusChanged = true;
-      }
-      if (statusChanged) {
-        await config.save();
-      }
-    }
-
-    // Calculate time remaining in ms
-    const diffMs = config.endTime - now;
-    const timeRemainingSeconds = Math.max(0, Math.floor(diffMs / 1000));
-    
-    // Time remaining string representation
-    let timeRemainingStr = '0 hours left';
-    if (timeRemainingSeconds > 0) {
-      const hoursLeft = Math.floor(timeRemainingSeconds / 3600);
-      const minutesLeft = Math.floor((timeRemainingSeconds % 3600) / 60);
-      timeRemainingStr = hoursLeft > 0 ? `${hoursLeft} hours, ${minutesLeft} minutes left` : `${minutesLeft} minutes left`;
-    }
-
-    // 2. Task metrics calculations
-    let completedTasks = 0;
-    let totalTasks = 0;
-    let inProgressTasks = 0;
-    let pendingTasks = 0;
-    let blockedTasks = 0;
-
-    let criticalTasksTotal = 0;
-    let criticalTasksCompleted = 0;
-
-    const memberProgress = [];
-    const teamWorkloads = {};
-
-    // Initializing member workloads
-    team.members.forEach(m => {
-      teamWorkloads[m.name] = { total: 0, completed: 0, pending: 0, blocked: 0 };
-    });
-
-    const timelineEvents = [];
-
-    // Analyze task assignments
-    if (project.taskPlan && project.taskPlan.assignments) {
-      const assignments = project.taskPlan.assignments;
-      const criticalSet = new Set(project.taskPlan.criticalTasks || []);
-
-      assignments.forEach(assign => {
-        const mName = assign.member;
-        if (!teamWorkloads[mName]) {
-          teamWorkloads[mName] = { total: 0, completed: 0, pending: 0, blocked: 0 };
-        }
-
-        (assign.assignedTasks || []).forEach(t => {
-          totalTasks++;
-          teamWorkloads[mName].total++;
-
-          const isCritical = criticalSet.has(t.task);
-          if (isCritical) criticalTasksTotal++;
-
-          if (t.status === 'Completed') {
-            completedTasks++;
-            teamWorkloads[mName].completed++;
-            if (isCritical) criticalTasksCompleted++;
-
-            // Create timeline event from completed tasks
-            timelineEvents.push({
-              time: t.updatedAt || project.taskPlanGeneratedAt || new Date(),
-              event: `✅ Task Completed: "${t.task}" by ${mName}`,
-              type: 'Success'
-            });
-          } else if (t.status === 'In Progress') {
-            inProgressTasks++;
-            teamWorkloads[mName].pending++;
-          } else if (t.status === 'Blocked') {
-            blockedTasks++;
-            teamWorkloads[mName].blocked++;
-            teamWorkloads[mName].pending++;
-          } else {
-            pendingTasks++;
-            teamWorkloads[mName].pending++;
-          }
-        });
-      });
-    }
-
-    // Populate team progress array
-    Object.entries(teamWorkloads).forEach(([mName, metrics]) => {
-      memberProgress.push({
-        member: mName,
-        ...metrics
-      });
-    });
-
-    const completionPercentage = totalTasks > 0 ? Math.round((completedTasks / totalTasks) * 100) : 0;
-
-    // 3. Smart time-aware alerts generator
-    const alerts = [];
-    const hoursRemaining = timeRemainingSeconds / 3600;
-
-    if (config.status === 'Running') {
-      if (hoursRemaining <= 1) {
-        alerts.push({ message: '🚨 1 Hour Remaining: Code freeze recommended immediately. Clean up presentation and dry-run slides!', priority: 'Critical', timestamp: new Date() });
-      } else if (hoursRemaining <= 3) {
-        alerts.push({ message: '🚨 3 Hours Remaining: Stop feature development! Focus purely on staging deployments and presentation structure.', priority: 'Critical', timestamp: new Date() });
-      } else if (hoursRemaining <= 6) {
-        alerts.push({ message: '⚠️ 6 Hours Remaining: Lock your feature scope. Stop adding Nice-to-Have tools, focus on testing.', priority: 'High', timestamp: new Date() });
-      } else if (hoursRemaining <= 12) {
-        alerts.push({ message: '⚠️ 12 Hours Remaining: Deployment should begin soon to identify host container / database binding issues early.', priority: 'High', timestamp: new Date() });
-      } else if (hoursRemaining <= 24) {
-        alerts.push({ message: '💡 24 Hours Remaining: Midpoint check-in. Review pending Critical path tasks and reallocate workloads.', priority: 'Medium', timestamp: new Date() });
-      }
-    }
-
-    // Smart Alerts from task metrics
-    if (criticalTasksTotal - criticalTasksCompleted > 0 && hoursRemaining <= 12) {
-      alerts.push({ message: `⚠️ There are still ${criticalTasksTotal - criticalTasksCompleted} critical path tasks pending with 12h or less remaining!`, priority: 'High', timestamp: new Date() });
-    }
-
-    // Blocked tasks alerts
-    if (blockedTasks > 0) {
-      alerts.push({ message: `🚫 Stalled progress: ${blockedTasks} tasks are currently marked as "Blocked". Resolve immediately!`, priority: 'High', timestamp: new Date() });
-    }
-
-    // Check workload balance
-    let overloadedMember = null;
-    let minLoad = 999;
-    let maxLoad = 0;
-    memberProgress.forEach(mp => {
-      const load = mp.pending;
-      if (load > maxLoad) {
-        maxLoad = load;
-        overloadedMember = mp.member;
-      }
-      if (load < minLoad) minLoad = load;
-    });
-
-    let teamHealth = 'Balanced';
-    if (maxLoad - minLoad > 5) {
-      teamHealth = 'High Risk';
-      alerts.push({ message: `⚠️ Workload Imbalance: ${overloadedMember} is carrying an overloaded task load (${maxLoad} pending) compared to others.`, priority: 'High', timestamp: new Date() });
-    } else if (maxLoad - minLoad > 3) {
-      teamHealth = 'Moderately Balanced';
-    }
-
-    // Fetch marketplace requests
-    const marketplaceActivity = await TaskMarketplaceRequest.find({ projectId });
 
     // Fetch in-app notifications
     const recentNotifications = await Notification.find({ projectId })
       .sort({ createdAt: -1 })
       .limit(10);
 
-    // Build timeline events
-    timelineEvents.push({
-      time: config.startTime,
-      event: `🚀 Hackathon Started: "${config.hackathonName}" is live!`,
-      type: 'Info'
-    });
-    
-    if (config.codeFreezeTime) {
-      timelineEvents.push({
-        time: config.codeFreezeTime,
-        event: `❄️ Code Freeze Deadline`,
-        type: 'Milestone'
-      });
-    }
-    if (config.submissionTime) {
-      timelineEvents.push({
-        time: config.submissionTime,
-        event: `📤 Final Submission Deadline`,
-        type: 'Milestone'
-      });
-    }
-
-    // Sort timeline events chronologically
-    const sortedTimeline = timelineEvents
-      .map(e => ({ ...e, time: new Date(e.time) }))
-      .sort((a, b) => b.time - a.time); // Latest first for dashboard timeline display
-
-    // Check if there is an existing AI Command Center report (stored on the project)
-    const existingAiReport = project.commandCenterReport || null;
+    const isOwner = isSameUser(project.createdBy, req.user.id) || isSameUser(team.createdBy, req.user.id);
 
     res.status(200).json({
-      success: true,
-      configured: true,
-      config,
-      timeRemainingSeconds,
-      timeRemainingStr,
-      progress: {
-        totalTasks,
-        completedTasks,
-        inProgressTasks,
-        pendingTasks,
-        blockedTasks,
-        completionPercentage,
-        criticalTasksTotal,
-        criticalTasksCompleted
-      },
-      teamHealth,
-      memberProgress,
-      alerts,
-      marketplaceActivity: marketplaceActivity.map(req => ({
-        _id: req._id,
-        member: req.userId?.name || 'Unknown',
-        task: req.taskName,
-        requestType: req.requestType,
-        status: req.status,
-        createdAt: req.createdAt
-      })),
+      ...data,
       notifications: recentNotifications,
-      timeline: sortedTimeline,
-      aiAnalysis: existingAiReport,
-      isOwner: isSameUser(project.createdBy, req.user.id) || isSameUser(team.createdBy, req.user.id)
+      aiAnalysis: project.commandCenterReport || data.executiveReport,
+      isOwner
     });
-
   } catch (error) {
     console.error('getCommandCenterDashboard error:', error);
     res.status(500).json({ success: false, message: error.message || 'Server error loading Command Center' });
@@ -544,15 +335,16 @@ exports.triggerCommandCenterAnalysis = async (req, res) => {
       return res.status(502).json({ success: false, message: 'AI Analysis timeout or failed. Try again.' });
     }
 
-    // Save/cache analysis report directly on the project document (avoids TechStackAnalysis schema conflicts)
+    // Save/cache analysis report directly on the project document
     try {
       project.commandCenterReport = aiReport;
       project.commandCenterReportGeneratedAt = new Date();
       project.markModified('commandCenterReport');
       await project.save();
+      // Clear decision engine cache to reload fresh dashboard state
+      DecisionEngine.clearCache(projectId);
     } catch (saveErr) {
       console.error('Warning: Could not persist Command Center report to project:', saveErr.message);
-      // Non-fatal: still return the report to the user
     }
 
     // Create an in-app notification

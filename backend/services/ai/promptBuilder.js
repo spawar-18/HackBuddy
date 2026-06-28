@@ -233,7 +233,8 @@ const buildGitHubRepoPrompt = (context) => {
     tree = [],
     readmeContent = '',
     packageJsonContent = '',
-    entrypointCodeContents = []
+    entrypointCodeContents = [],
+    intelligence
   } = context;
 
   const formattedTree = tree
@@ -258,7 +259,56 @@ const buildGitHubRepoPrompt = (context) => {
     .map(a => `- Member: ${a.member}\n  Assigned Tasks: ${(a.assignedTasks || []).map(t => `[${t.status}] ${t.task}`).join(', ')}`)
     .join('\n') || 'No tasks assigned';
 
+  const formattedIntelligence = intelligence ? `
+8. REPOSITORY INTELLIGENCE EVALUATION:
+- Overall Health Score: ${intelligence.healthScore} (Status: ${intelligence.healthStatus})
+- Health Score Breakdown:
+  * Commit Frequency Score: ${intelligence.healthBreakdown?.commitFrequency?.score}/${intelligence.healthBreakdown?.commitFrequency?.max} (${intelligence.healthBreakdown?.commitFrequency?.details})
+  * Pull Request Activity Score: ${intelligence.healthBreakdown?.pullRequestActivity?.score}/${intelligence.healthBreakdown?.pullRequestActivity?.max} (${intelligence.healthBreakdown?.pullRequestActivity?.details})
+  * Merge Success Rate Score: ${intelligence.healthBreakdown?.mergeSuccessRate?.score}/${intelligence.healthBreakdown?.mergeSuccessRate?.max} (${intelligence.healthBreakdown?.mergeSuccessRate?.details})
+  * Open Issues Score: ${intelligence.healthBreakdown?.openIssues?.score}/${intelligence.healthBreakdown?.openIssues?.max} (${intelligence.healthBreakdown?.openIssues?.details})
+  * Branch Hygiene Score: ${intelligence.healthBreakdown?.branchHygiene?.score}/${intelligence.healthBreakdown?.branchHygiene?.max} (${intelligence.healthBreakdown?.branchHygiene?.details})
+  * Code Review Activity Score: ${intelligence.healthBreakdown?.codeReviewActivity?.score}/${intelligence.healthBreakdown?.codeReviewActivity?.max} (${intelligence.healthBreakdown?.codeReviewActivity?.details})
+  * Active Contributors Score: ${intelligence.healthBreakdown?.activeContributors?.score}/${intelligence.healthBreakdown?.activeContributors?.max} (${intelligence.healthBreakdown?.activeContributors?.details})
+  * Recent Activity Score: ${intelligence.healthBreakdown?.recentActivity?.score}/${intelligence.healthBreakdown?.recentActivity?.max} (${intelligence.healthBreakdown?.recentActivity?.details})
+
+- Team Consistency Score: ${intelligence.teamConsistencyScore}/100 (Claimed progress vs actual git contributions)
+
+- Contributor Intelligence Map:
+${(intelligence.contributorIntelligence || []).map(c => `  * Developer: ${c.name} | Verdict: ${c.verdict} | Commits: ${c.commits} | PRs: ${c.openPRs} open / ${c.mergedPRs} merged | Inactive Days: ${c.inactiveDays} | Assigned/Completed Tasks: ${c.assignedTasksCount}/${c.completedTasksCount} | Verdict Summary: "${c.comparisonSummary}"`).join('\n')}
+
+- Feature vs GitHub Reality Check:
+${(intelligence.featureRealityCheck || []).map(f => `  * Feature: "${f.featureName}" | Verdict: ${f.verdict} | Progress: ${f.progressPercent}% | Matching Commits: ${f.commitCount} | Verdict Summary: "${f.reasoning}"`).join('\n')}
+
+- Commit Analysis:
+  * Pattern: ${intelligence.commitIntelligence?.commitPattern}
+  * Daily Average: ${intelligence.commitIntelligence?.commitsPerActiveDay} commits/day
+  * Avg Commit Message Size: ${intelligence.commitIntelligence?.averageCommitSizeChars} characters
+  * Max Inactivity Period: ${intelligence.commitIntelligence?.inactivePeriodHours} hours
+
+- Branch Analysis:
+  * Branches Tracked: ${intelligence.branchIntelligence?.totalBranches}
+  * Active Branches: ${(intelligence.branchIntelligence?.activeBranches || []).join(', ')}
+  * Stale Branches: ${(intelligence.branchIntelligence?.staleBranches || []).join(', ')}
+
+- PR Analysis:
+  * Open PRs: ${intelligence.pullRequestAnalysis?.openPRCount} | Merged PRs: ${intelligence.pullRequestAnalysis?.mergedPRCount} | Closed/Rejected PRs: ${intelligence.pullRequestAnalysis?.rejectedPRCount}
+  * Average Merge Time: ${intelligence.pullRequestAnalysis?.avgMergeTimeHours} hours
+  * Pending Reviews: ${intelligence.pullRequestAnalysis?.pendingReviewsCount}
+  * PR Bottlenecks: ${(intelligence.pullRequestAnalysis?.bottlenecks || []).join('; ')}
+
+- Issue Analysis:
+  * Open Issues: ${intelligence.issueAnalysis?.openIssues} | Resolved: ${intelligence.issueAnalysis?.resolvedIssues}
+  * Critical/High-Priority Issues Count: ${intelligence.issueAnalysis?.criticalIssuesCount}
+  * Stale/Old Issues Count (open >3 days): ${intelligence.issueAnalysis?.staleIssuesCount}
+
+- Risk Detection Alerts:
+${(intelligence.riskDetections || []).map(r => `  * [${r.severity}] ${r.type}: ${r.message}`).join('\n') || '  * No risks detected.'}
+` : 'No pre-calculated repository intelligence data available.';
+
   const promptText = `Perform GitHub Repository Intelligence scan.
+  
+You MUST analyze the following real, pre-calculated repository intelligence details and return a complete executive assessment. Ensure all statements are strictly backed by the metrics provided.
 
 INPUTS:
 1. PROJECT DESCRIPTION:
@@ -288,7 +338,9 @@ ${packageJsonContent || 'package.json not detected'}
 ${readmeContent || 'README.md not detected or empty'}
 
 7. KEY ENTRYPOINT CODE SNIPPETS:
-${formattedCodeSnippets}`;
+${formattedCodeSnippets}
+
+${formattedIntelligence}`;
 
   return {
     contents: promptText,

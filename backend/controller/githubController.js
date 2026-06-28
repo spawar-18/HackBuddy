@@ -19,7 +19,8 @@ const {
   buildCommitSummary,
   generateRepositoryAlerts,
   hasDeploymentConfig,
-  hasTestFiles
+  hasTestFiles,
+  calculateRepositoryIntelligence
 } = require('../services/repoHealthService');
 const { analyzeGitHubRepositoryWithAI } = require('../services/aiService');
 const Notification = require('../models/Notification');
@@ -215,20 +216,21 @@ exports.getRepositoryAnalytics = async (req, res) => {
     }
 
     const cachedData = repoDoc.cachedData || {};
+    const HackathonConfig = require('../models/HackathonConfig');
+    const config = await HackathonConfig.findOne({ projectId });
 
-    // Compute health
-    const { score: healthScore, status: healthStatus, indicators: healthIndicators } =
-      calculateRepositoryHealth(cachedData);
+    // Compute Advanced Repository Intelligence
+    const intelligence = calculateRepositoryIntelligence(project, cachedData, config);
 
     // Update health on document
-    repoDoc.healthScore = healthScore;
-    repoDoc.healthStatus = healthStatus;
+    repoDoc.healthScore = intelligence.healthScore;
+    repoDoc.healthStatus = intelligence.healthStatus;
     await repoDoc.save();
 
-    // Build rich data summaries
+    // Build legacy data summaries for backward compatibility
     const commitSummary = buildCommitSummary(cachedData.commits);
     const contributorActivity = buildContributorActivity(cachedData.contributors, cachedData.commits);
-    const repositoryAlerts = generateRepositoryAlerts(cachedData, healthIndicators);
+    const repositoryAlerts = intelligence.riskDetections.map(r => ({ message: r.message, severity: r.severity }));
 
     const openPRs = (cachedData.pullRequests || []).filter(p => p.state === 'open');
     const closedPRs = (cachedData.pullRequests || []).filter(p => p.state === 'closed');
@@ -243,6 +245,18 @@ exports.getRepositoryAnalytics = async (req, res) => {
       url: c.html_url || null
     }));
 
+    // Compute legacy healthIndicators for frontend dashboard widgets
+    const healthIndicators = {
+      commitActivity: intelligence.healthBreakdown?.commitFrequency?.details || '',
+      branchActivity: (cachedData.branches || []).length > 1 ? 'Feature branching' : 'Single branch only',
+      issueStatus: intelligence.healthBreakdown?.openIssues?.details || '',
+      pullRequestStatus: intelligence.healthBreakdown?.pullRequestActivity?.details || '',
+      readme: cachedData.hasReadme ? 'README present' : 'README missing',
+      testing: hasTestFiles(cachedData.tree) ? 'Tests found' : 'No tests detected',
+      deployment: hasDeploymentConfig(cachedData.tree) ? 'Deployment config found' : 'No deployment config',
+      cicd: (cachedData.workflows || []).length > 0 ? 'Workflows active' : 'No CI/CD workflows'
+    };
+
     return res.status(200).json({
       success: true,
       connected: true,
@@ -256,9 +270,10 @@ exports.getRepositoryAnalytics = async (req, res) => {
       connectedAt: repoDoc.connectedAt,
       lastSyncedAt: repoDoc.lastSyncedAt,
 
-      // Health
-      healthScore,
-      healthStatus,
+      // Advanced Intelligence
+      intelligence,
+      healthScore: intelligence.healthScore,
+      healthStatus: intelligence.healthStatus,
       healthIndicators,
 
       // Statistics

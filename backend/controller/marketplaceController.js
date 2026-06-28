@@ -51,9 +51,14 @@ const appendMarketplaceActivity = (project, activity) => {
   project.taskPlan.marketplace.history.push(entry);
 };
 
+const DecisionEngine = require('../services/ai/DecisionEngine');
+
 const invalidateCommandCenter = (project) => {
   project.commandCenterReport = null;
   project.commandCenterReportGeneratedAt = null;
+  if (project._id) {
+    DecisionEngine.clearCache(project._id.toString());
+  }
 };
 
 const createTargetedNotification = async ({ projectId, team, targetUser, message, actorId }) => {

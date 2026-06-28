@@ -152,7 +152,27 @@ class ResponseValidator {
           nextBestTask: { task: '', assignedTo: '', reason: '' },
           productivityTrend: 'Stable',
           burndownVelocity: 0,
-          readinessScores: { judge: 50, deployment: 50, demo: 50, testing: 50 }
+          readinessScores: { judge: 50, deployment: 50, demo: 50, testing: 50 },
+          timeline: [],
+          executiveReport: {
+            executiveSummary: '',
+            projectOverview: '',
+            featureAnalysis: '',
+            taskAnalysis: '',
+            teamAnalysis: '',
+            gitHubIntelligence: '',
+            marketplaceActivity: '',
+            collaborationAnalysis: '',
+            riskAssessment: '',
+            productivityAnalysis: '',
+            timelineAnalysis: '',
+            deploymentReadiness: '',
+            testingReadiness: '',
+            judgeReadiness: '',
+            overallProjectHealth: '',
+            completionForecast: '',
+            recommendations: []
+          }
         }
       },
       analyzeGitHubRepository: {

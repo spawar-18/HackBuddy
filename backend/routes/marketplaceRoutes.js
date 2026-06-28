@@ -17,7 +17,6 @@ const {
 router.post('/tasks/request-reassignment', authMiddleware, requireTeam, requestReassignment);
 router.post('/tasks/request-swap', authMiddleware, requireTeam, requestSwap);
 router.post('/tasks/request-collaborator', authMiddleware, requireTeam, requestCollaborator);
-router.post('/tasks/request-help', authMiddleware, requireTeam, requestHelp);
 router.post('/tasks/claim-task', authMiddleware, requireTeam, claimTask);
 
 router.get('/projects/:projectId/marketplace', authMiddleware, requireTeam, getMarketplace);

@@ -1,4 +1,5 @@
 const Project = require('../models/Project');
+const DecisionEngine = require('../services/ai/DecisionEngine');
 const Team = require('../models/Team');
 const { generateTaskPlanWithAI } = require('../services/aiService');
 const {
@@ -121,6 +122,7 @@ exports.generateTaskPlan = async (req, res) => {
     project.taskPlan = taskPlanData;
     project.taskPlanGeneratedAt = new Date();
     await project.save();
+    DecisionEngine.clearCache(projectId);
 
     res.status(200).json({
       success: true,
@@ -199,6 +201,7 @@ exports.regenerateTaskPlan = async (req, res) => {
     project.taskPlan = taskPlanData;
     project.taskPlanGeneratedAt = new Date();
     await project.save();
+    DecisionEngine.clearCache(projectId);
 
     res.status(200).json({
       success: true,
@@ -311,6 +314,7 @@ exports.updateTaskStatus = async (req, res) => {
     project.markModified('taskPlan');
     project.markModified('commandCenterReport');
     await project.save();
+    DecisionEngine.clearCache(projectId);
 
     res.status(200).json({
       success: true,

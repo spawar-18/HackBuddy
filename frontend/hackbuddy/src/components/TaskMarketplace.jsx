@@ -386,13 +386,7 @@ const TaskMarketplace = ({ projectId, teamId, onRefreshProject }) => {
     );
   };
 
-  const filteredMyTasks = useMemo(() => {
-    return myTasks.filter(task => {
-      const featureOk = filterFeature === 'All' || task.featureName === filterFeature || task.epic === filterFeature;
-      const statusOk = filterStatus === 'All' || task.status === filterStatus || task.marketplaceStatus === filterStatus;
-      return featureOk && statusOk;
-    });
-  }, [myTasks, filterFeature, filterStatus]);
+  const filteredMyTasks = myTasks;
 
   const pendingRequestsCount = useMemo(() => {
     return marketplaceData.requests.filter(r => r.status === 'Pending').length;
@@ -445,7 +439,7 @@ const TaskMarketplace = ({ projectId, teamId, onRefreshProject }) => {
             </div>
             <h2 className="text-xl md:text-2xl font-extrabold tracking-tight text-neutral-800">Collaborative Task Marketplace</h2>
             <p className="text-xs text-neutral-500 mt-1 max-w-[650px] leading-relaxed">
-              Negotiate tasks with teammates, claim open work items, swap assignments, and request assistance. 
+              Negotiate tasks with teammates, claim open work items, and swap assignments. 
               The AI Technical Manager evaluates all requests, with final approvals determined by the Squad Leader.
             </p>
           </div>
@@ -526,33 +520,8 @@ const TaskMarketplace = ({ projectId, teamId, onRefreshProject }) => {
           <div className="flex flex-col md:flex-row md:justify-between md:items-center gap-3">
             <div>
               <h3 className="text-xs font-bold text-neutral-500 uppercase tracking-wider">My Assigned Tasks</h3>
-              <p className="text-xs text-neutral-400 mt-0.5">Manage, reassign, swap, or request help for your tasks</p>
             </div>
-            <div className="flex flex-wrap items-center gap-2">
-              <select
-                value={filterFeature}
-                onChange={(e) => setFilterFeature(e.target.value)}
-                className="input-field text-xs py-2 pr-8"
-              >
-                <option value="All">All Features</option>
-                {(marketplaceData.filters?.features || []).map(feature => (
-                  <option key={feature} value={feature}>{feature}</option>
-                ))}
-              </select>
-              <select
-                value={filterStatus}
-                onChange={(e) => setFilterStatus(e.target.value)}
-                className="input-field text-xs py-2 pr-8"
-              >
-                <option value="All">All Status</option>
-                {['Not Started', 'In Progress', 'Blocked', 'Completed', 'Locked', 'HelpRequested', 'CollaborationRequested'].map(status => (
-                  <option key={status} value={status}>{status}</option>
-                ))}
-              </select>
-              <span className="text-[10px] font-bold px-2 py-1 bg-indigo-55/60 text-indigo-700 rounded-md border border-indigo-100 font-mono">
-                {filteredMyTasks.length} Shown
-              </span>
-            </div>
+
           </div>
 
           {filteredMyTasks.length === 0 ? (
@@ -607,18 +576,7 @@ const TaskMarketplace = ({ projectId, teamId, onRefreshProject }) => {
                         </div>
                       )}
 
-                      {task.acceptanceCriteria?.length > 0 && (
-                        <div className="bg-emerald-50/30 border border-emerald-100 rounded-xl p-3">
-                          <span className="text-[9px] font-black text-emerald-700 uppercase tracking-wider">Acceptance Criteria</span>
-                          <ul className="mt-1.5 flex flex-col gap-1">
-                            {task.acceptanceCriteria.slice(0, 3).map((item, itemIdx) => (
-                              <li key={itemIdx} className="text-[10px] text-emerald-800 leading-normal flex gap-1.5">
-                                <Check size={10} className="shrink-0 mt-0.5" /> {item}
-                              </li>
-                            ))}
-                          </ul>
-                        </div>
-                      )}
+
 
                       <div className="flex flex-wrap gap-2 text-[10px] text-neutral-405 font-bold uppercase tracking-wider mt-1 border-t border-neutral-100 pt-3">
                         <span>Task Status: <strong className={taskStatus === 'Completed' ? 'text-emerald-600' : taskStatus === 'In Progress' ? 'text-amber-600' : 'text-neutral-500'}>{taskStatus}</strong></span>
@@ -633,7 +591,7 @@ const TaskMarketplace = ({ projectId, teamId, onRefreshProject }) => {
                     </div>
 
                     {isLocked ? (
-                      <div className="grid grid-cols-2 md:grid-cols-4 gap-2 mt-2 border-t border-neutral-100 pt-3">
+                      <div className="grid grid-cols-3 gap-2 mt-2 border-t border-neutral-100 pt-3">
                         <button
                           type="button"
                           onClick={() => openRequestModal('reassign', task)}
@@ -657,14 +615,6 @@ const TaskMarketplace = ({ projectId, teamId, onRefreshProject }) => {
                         >
                           <UserPlus size={11} />
                           Add Collab
-                        </button>
-                        <button
-                          type="button"
-                          onClick={() => openRequestModal('help', task)}
-                          className="flex items-center justify-center gap-1.5 py-2 px-2 rounded-lg bg-rose-50 hover:bg-rose-100 text-rose-700 text-[10px] font-bold border border-rose-200 hover:border-rose-300 cursor-pointer transition-all duration-200"
-                        >
-                          <HelpCircle size={11} />
-                          Need Help
                         </button>
                       </div>
                     ) : (
