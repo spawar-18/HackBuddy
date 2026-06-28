@@ -73,7 +73,7 @@ const CreateTeam = () => {
             <>
               <div className="team-header">
                 <div className="icon-box">
-                  <Users size={22} className="text-neutral-700" />
+                  <Users size={22} />
                 </div>
                 <div>
                   <h1 className="team-title">Create a New Team</h1>
@@ -129,7 +129,7 @@ const CreateTeam = () => {
                 </div>
                 <div>
                   <h1 className="team-title">Team Created!</h1>
-                  <p className="team-subtitle">Your crew <strong className="text-neutral-900 font-bold">{createdTeam.team.teamName}</strong> is online.</p>
+                  <p className="team-subtitle">Your crew <strong className="font-bold" style={{color:'var(--text-heading)'}}>{createdTeam.team.teamName}</strong> is online.</p>
                 </div>
               </div>
 
@@ -141,11 +141,7 @@ const CreateTeam = () => {
                     <span className="code-val font-mono">{createdTeam.inviteCode}</span>
                     <button
                       onClick={() => copyToClipboard(createdTeam.inviteCode, 'code')}
-                      className={`inline-flex items-center gap-1.5 px-3 py-1.5 border rounded-lg text-xs font-semibold cursor-pointer transition-all duration-200 ${
-                        copiedCode
-                          ? 'border-emerald-300 bg-emerald-50 text-emerald-800'
-                          : 'border-neutral-200 bg-white hover:bg-neutral-50 text-neutral-600 hover:text-neutral-900'
-                      }`}
+                      className="btn-secondary text-xs py-1.5 px-3"
                     >
                       {copiedCode ? <><Check size={13} />Copied</> : <><Copy size={13} />Copy</>}
                     </button>
@@ -156,16 +152,12 @@ const CreateTeam = () => {
                 <div className="input-group">
                   <span className="input-label">SHAREABLE INVITE LINK</span>
                   <div className="code-box">
-                    <span className="link-val text-xs text-neutral-500 overflow-hidden text-ellipsis whitespace-nowrap max-w-[240px]" title={createdTeam.inviteLink}>
+                    <span className="link-val text-xs overflow-hidden text-ellipsis whitespace-nowrap max-w-[240px]" title={createdTeam.inviteLink} style={{color:'var(--text-muted)'}}>
                       {createdTeam.inviteLink}
                     </span>
                     <button
                       onClick={() => copyToClipboard(createdTeam.inviteLink, 'link')}
-                      className={`inline-flex items-center gap-1.5 px-3 py-1.5 border rounded-lg text-xs font-semibold cursor-pointer transition-all duration-200 ${
-                        copiedLink
-                          ? 'border-emerald-300 bg-emerald-50 text-emerald-800'
-                          : 'border-neutral-200 bg-white hover:bg-neutral-50 text-neutral-600 hover:text-neutral-900'
-                      }`}
+                      className="btn-secondary text-xs py-1.5 px-3"
                     >
                       {copiedLink ? <><Check size={13} />Copied</> : <><Copy size={13} />Copy</>}
                     </button>

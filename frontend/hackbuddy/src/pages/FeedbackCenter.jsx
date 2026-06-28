@@ -421,26 +421,26 @@ const FeedbackCenter = () => {
 
   // ─── Card Styles ───
   const cardStyle = {
-    background: 'linear-gradient(135deg, rgba(2,4,15,0.95) 0%, rgba(5,10,36,0.9) 100%)',
-    border: '1px solid rgba(0, 240, 255, 0.1)',
+    background: 'var(--bg-card)',
+    border: '1px solid var(--border-color)',
     borderRadius: '16px',
     backdropFilter: 'blur(12px)'
   };
 
   const glowBorderStyle = {
     ...cardStyle,
-    boxShadow: '0 0 20px rgba(0, 240, 255, 0.04), inset 0 1px 0 rgba(0, 240, 255, 0.06)'
+    boxShadow: 'var(--shadow-card)'
   };
 
   return (
-    <div className="min-h-screen" style={{ background: '#02040f' }}>
+    <div className="min-h-screen" style={{ background: 'var(--bg-app)' }}>
       {/* ─── Header ─── */}
       <div
         className="sticky top-0 z-50 px-6 py-4"
         style={{
-          background: 'rgba(2, 4, 15, 0.85)',
+          background: 'var(--bg-sidebar)',
           backdropFilter: 'blur(16px)',
-          borderBottom: '1px solid rgba(0, 240, 255, 0.08)'
+          borderBottom: '1px solid var(--border-color)'
         }}
       >
         <div className="max-w-6xl mx-auto flex items-center justify-between">
@@ -449,9 +449,9 @@ const FeedbackCenter = () => {
               onClick={() => navigate('/dashboard')}
               className="p-2 rounded-lg transition-all duration-200 hover:scale-105"
               style={{
-                background: 'rgba(0, 240, 255, 0.06)',
-                border: '1px solid rgba(0, 240, 255, 0.12)',
-                color: '#00f0ff'
+                background: 'var(--tab-active-bg)',
+                border: '1px solid var(--border-color)',
+                color: 'var(--text-accent)'
               }}
             >
               <ArrowLeft size={18} />
@@ -460,21 +460,19 @@ const FeedbackCenter = () => {
               <h1
                 className="text-xl font-bold tracking-tight"
                 style={{
-                  background: 'linear-gradient(135deg, #00f0ff, #a78bfa)',
-                  WebkitBackgroundClip: 'text',
-                  WebkitTextFillColor: 'transparent'
+                  color: 'var(--text-heading)'
                 }}
               >
                 Feedback Center
               </h1>
-              <p className="text-xs font-mono" style={{ color: 'rgba(0, 240, 255, 0.5)' }}>
+              <p className="text-xs font-mono" style={{ color: 'var(--text-muted)' }}>
                 Help us build a better HackBuddy
               </p>
             </div>
           </div>
 
           {/* Tab Navigation */}
-          <div className="flex gap-1 p-1 rounded-xl" style={{ background: 'rgba(0, 240, 255, 0.04)', border: '1px solid rgba(0, 240, 255, 0.08)' }}>
+          <div className="flex gap-1 p-1 rounded-xl" style={{ background: 'var(--bg-input)', border: '1px solid var(--border-color)' }}>
             {tabs.map(tab => {
               const Icon = tab.icon;
               const isActive = activeTab === tab.id;
@@ -484,13 +482,13 @@ const FeedbackCenter = () => {
                   onClick={() => setActiveTab(tab.id)}
                   className="flex items-center gap-2 px-4 py-2 rounded-lg text-sm font-medium transition-all duration-300"
                   style={{
-                    background: isActive ? 'rgba(0, 240, 255, 0.1)' : 'transparent',
-                    color: isActive ? '#ffffff' : 'rgba(0, 240, 255, 0.5)',
-                    border: isActive ? '1px solid rgba(0, 240, 255, 0.2)' : '1px solid transparent',
-                    boxShadow: isActive ? '0 0 12px rgba(0, 240, 255, 0.08)' : 'none'
+                    background: isActive ? 'var(--tab-active-bg)' : 'transparent',
+                    color: isActive ? 'var(--text-heading)' : 'var(--text-muted)',
+                    border: isActive ? '1px solid var(--border-color)' : '1px solid transparent',
+                    boxShadow: isActive ? 'var(--shadow-glow)' : 'none'
                   }}
                 >
-                  <Icon size={16} style={{ color: isActive ? '#00f0ff' : 'rgba(0, 240, 255, 0.4)' }} />
+                  <Icon size={16} style={{ color: isActive ? 'var(--text-accent)' : 'var(--text-muted)' }} />
                   {tab.label}
                 </button>
               );
@@ -511,15 +509,15 @@ const FeedbackCenter = () => {
                 <div
                   className="inline-flex items-center justify-center w-14 h-14 rounded-2xl mb-4"
                   style={{
-                    background: 'linear-gradient(135deg, rgba(0,240,255,0.15), rgba(167,139,250,0.15))',
-                    border: '1px solid rgba(0,240,255,0.15)',
-                    boxShadow: '0 0 24px rgba(0,240,255,0.08)'
+                    background: 'var(--tab-active-bg)',
+                    border: '1px solid var(--border-color)',
+                    boxShadow: 'var(--shadow-glow)'
                   }}
                 >
-                  <MessageSquare size={24} style={{ color: '#00f0ff' }} />
+                  <MessageSquare size={24} style={{ color: 'var(--text-accent)' }} />
                 </div>
-                <h2 className="text-lg font-bold text-white mb-1">Share Your Feedback</h2>
-                <p className="text-sm font-mono" style={{ color: 'rgba(0,240,255,0.5)' }}>
+                <h2 className="text-lg font-bold mb-1" style={{color:'var(--text-heading)'}}>Share Your Feedback</h2>
+                <p className="text-sm font-mono" style={{ color: 'var(--text-muted)' }}>
                   Your voice shapes the future of HackBuddy
                 </p>
               </div>
@@ -527,7 +525,7 @@ const FeedbackCenter = () => {
               <form onSubmit={handleSubmit} className="space-y-6">
                 {/* Feature Selector */}
                 <div>
-                  <label className="block text-xs font-mono uppercase tracking-wider mb-2" style={{ color: 'rgba(0,240,255,0.6)' }}>
+                  <label className="block text-xs font-mono uppercase tracking-wider mb-2" style={{ color: 'var(--text-muted)' }}>
                     Feature
                   </label>
                   <div className="relative" ref={dropdownRef}>
@@ -536,22 +534,22 @@ const FeedbackCenter = () => {
                       onClick={() => setFeatureDropdownOpen(!featureDropdownOpen)}
                       className="w-full flex items-center justify-between px-4 py-3 rounded-xl text-sm transition-all duration-200"
                       style={{
-                        background: 'rgba(0,240,255,0.04)',
-                        border: '1px solid rgba(0,240,255,0.12)',
-                        color: formData.featureName ? '#ffffff' : 'rgba(0,240,255,0.4)'
+                        background: 'var(--bg-input)',
+                        border: '1px solid var(--border-color)',
+                        color: formData.featureName ? 'var(--text-heading)' : 'var(--text-muted)'
                       }}
                     >
                       <span>{formData.featureName || 'Select a feature...'}</span>
-                      <ChevronDown size={16} style={{ color: 'rgba(0,240,255,0.4)', transform: featureDropdownOpen ? 'rotate(180deg)' : 'none', transition: 'transform 0.2s' }} />
+                      <ChevronDown size={16} style={{ color: 'var(--text-muted)', transform: featureDropdownOpen ? 'rotate(180deg)' : 'none', transition: 'transform 0.2s' }} />
                     </button>
                     {featureDropdownOpen && (
                       <div
                         className="absolute top-full left-0 right-0 mt-2 py-2 rounded-xl z-50 max-h-60 overflow-y-auto"
                         style={{
-                          background: 'rgba(5,10,36,0.98)',
-                          border: '1px solid rgba(0,240,255,0.15)',
+                          background: 'var(--bg-elevated)',
+                          border: '1px solid var(--border-color)',
                           backdropFilter: 'blur(20px)',
-                          boxShadow: '0 8px 32px rgba(0,0,0,0.5)'
+                          boxShadow: 'var(--shadow-card-hover)'
                         }}
                       >
                         {FEATURES.map(feature => (
@@ -564,11 +562,11 @@ const FeedbackCenter = () => {
                             }}
                             className="w-full text-left px-4 py-2.5 text-sm transition-all duration-150"
                             style={{
-                              color: formData.featureName === feature ? '#00f0ff' : 'rgba(255,255,255,0.7)',
-                              background: formData.featureName === feature ? 'rgba(0,240,255,0.08)' : 'transparent'
+                              color: formData.featureName === feature ? 'var(--text-accent)' : 'var(--text-body)',
+                              background: formData.featureName === feature ? 'var(--tab-active-bg)' : 'transparent'
                             }}
-                            onMouseEnter={e => e.target.style.background = 'rgba(0,240,255,0.06)'}
-                            onMouseLeave={e => e.target.style.background = formData.featureName === feature ? 'rgba(0,240,255,0.08)' : 'transparent'}
+                            onMouseEnter={e => e.target.style.background = 'var(--tab-active-bg)'}
+                            onMouseLeave={e => e.target.style.background = formData.featureName === feature ? 'var(--tab-active-bg)' : 'transparent'}
                           >
                             {feature}
                           </button>
@@ -580,7 +578,7 @@ const FeedbackCenter = () => {
 
                 {/* Rating */}
                 <div>
-                  <label className="block text-xs font-mono uppercase tracking-wider mb-3" style={{ color: 'rgba(0,240,255,0.6)' }}>
+                  <label className="block text-xs font-mono uppercase tracking-wider mb-3" style={{ color: 'var(--text-muted)' }}>
                     Rating
                   </label>
                   <StarRating rating={formData.rating} setRating={(r) => setFormData(prev => ({ ...prev, rating: r }))} />
@@ -588,7 +586,7 @@ const FeedbackCenter = () => {
 
                 {/* Category */}
                 <div>
-                  <label className="block text-xs font-mono uppercase tracking-wider mb-3" style={{ color: 'rgba(0,240,255,0.6)' }}>
+                  <label className="block text-xs font-mono uppercase tracking-wider mb-3" style={{ color: 'var(--text-muted)' }}>
                     Category
                   </label>
                   <div className="grid grid-cols-2 sm:grid-cols-3 gap-2">
@@ -602,9 +600,9 @@ const FeedbackCenter = () => {
                           onClick={() => setFormData(prev => ({ ...prev, category: cat.value }))}
                           className="flex items-center gap-2 px-3 py-2.5 rounded-xl text-xs font-medium transition-all duration-200"
                           style={{
-                            background: isSelected ? `${cat.color}18` : 'rgba(0,240,255,0.03)',
-                            border: `1px solid ${isSelected ? `${cat.color}40` : 'rgba(0,240,255,0.08)'}`,
-                            color: isSelected ? cat.color : 'rgba(255,255,255,0.5)',
+                            background: isSelected ? `${cat.color}18` : 'var(--bg-input)',
+                            border: `1px solid ${isSelected ? `${cat.color}40` : 'var(--border-color)'}`,
+                            color: isSelected ? cat.color : 'var(--text-muted)',
                             boxShadow: isSelected ? `0 0 12px ${cat.color}15` : 'none'
                           }}
                         >
@@ -618,7 +616,7 @@ const FeedbackCenter = () => {
 
                 {/* Comment */}
                 <div>
-                  <label className="block text-xs font-mono uppercase tracking-wider mb-2" style={{ color: 'rgba(0,240,255,0.6)' }}>
+                  <label className="block text-xs font-mono uppercase tracking-wider mb-2" style={{ color: 'var(--text-muted)' }}>
                     Your Feedback
                   </label>
                   <textarea
@@ -629,15 +627,15 @@ const FeedbackCenter = () => {
                     maxLength={2000}
                     className="w-full px-4 py-3 rounded-xl text-sm resize-none transition-all duration-200 focus:outline-none"
                     style={{
-                      background: 'rgba(0,240,255,0.04)',
-                      border: '1px solid rgba(0,240,255,0.12)',
-                      color: '#ffffff',
-                      caretColor: '#00f0ff'
+                      background: 'var(--bg-input)',
+                      border: '1px solid var(--border-color)',
+                      color: 'var(--text-heading)',
+                      caretColor: 'var(--text-accent)'
                     }}
-                    onFocus={e => e.target.style.borderColor = 'rgba(0,240,255,0.3)'}
-                    onBlur={e => e.target.style.borderColor = 'rgba(0,240,255,0.12)'}
+                    onFocus={e => e.target.style.borderColor = 'var(--border-focus)'}
+                    onBlur={e => e.target.style.borderColor = 'var(--border-color)'}
                   />
-                  <div className="text-right text-[10px] font-mono mt-1" style={{ color: 'rgba(0,240,255,0.3)' }}>
+                  <div className="text-right text-[10px] font-mono mt-1" style={{ color: 'var(--text-muted)' }}>
                     {formData.comment.length}/2000
                   </div>
                 </div>
@@ -646,13 +644,7 @@ const FeedbackCenter = () => {
                 <button
                   type="submit"
                   disabled={submitting}
-                  className="w-full flex items-center justify-center gap-2 px-6 py-3.5 rounded-xl font-semibold text-sm transition-all duration-300 hover:scale-[1.02] active:scale-[0.98] disabled:opacity-50 disabled:cursor-not-allowed"
-                  style={{
-                    background: 'linear-gradient(135deg, rgba(0,240,255,0.2), rgba(167,139,250,0.2))',
-                    border: '1px solid rgba(0,240,255,0.25)',
-                    color: '#ffffff',
-                    boxShadow: '0 0 20px rgba(0,240,255,0.1)'
-                  }}
+                  className="w-full flex items-center justify-center gap-2 px-6 py-3.5 rounded-xl font-semibold text-sm transition-all duration-300 hover:scale-[1.02] active:scale-[0.98] disabled:opacity-50 disabled:cursor-not-allowed btn-primary"
                 >
                   {submitting ? (
                     <>
@@ -720,7 +712,7 @@ const FeedbackCenter = () => {
                   <div className="p-5" style={glowBorderStyle}>
                     <div className="flex items-center gap-2 mb-3">
                       <Award size={16} style={{ color: '#fbbf24' }} />
-                      <span className="text-xs font-mono uppercase tracking-wider" style={{ color: 'rgba(0,240,255,0.6)' }}>
+                      <span className="text-xs font-mono uppercase tracking-wider" style={{ color: 'var(--text-muted)' }}>
                         Overall Satisfaction
                       </span>
                     </div>
@@ -728,7 +720,7 @@ const FeedbackCenter = () => {
                       <span className="text-4xl font-black font-mono" style={{ color: '#fbbf24', textShadow: '0 0 12px rgba(251,191,36,0.4)' }}>
                         {aiSummary.overallSatisfaction || 'N/A'}
                       </span>
-                      <span className="text-sm font-mono mb-1" style={{ color: 'rgba(251,191,36,0.5)' }}>/5</span>
+                      <span className="text-sm font-mono mb-1" style={{ color: 'var(--text-muted)' }}>/5</span>
                     </div>
                     <StarRating rating={Math.round(aiSummary.overallSatisfaction || 0)} interactive={false} size={18} />
                   </div>
@@ -736,22 +728,22 @@ const FeedbackCenter = () => {
                   {/* Total Analyzed */}
                   <div className="p-5" style={glowBorderStyle}>
                     <div className="flex items-center gap-2 mb-3">
-                      <Activity size={16} style={{ color: '#00f0ff' }} />
-                      <span className="text-xs font-mono uppercase tracking-wider" style={{ color: 'rgba(0,240,255,0.6)' }}>
+                      <Activity size={16} style={{ color: 'var(--text-accent)' }} />
+                      <span className="text-xs font-mono uppercase tracking-wider" style={{ color: 'var(--text-muted)' }}>
                         Total Analyzed
                       </span>
                     </div>
-                    <span className="text-4xl font-black font-mono" style={{ color: '#00f0ff', textShadow: '0 0 12px rgba(0,240,255,0.4)' }}>
+                    <span className="text-4xl font-black font-mono" style={{ color: 'var(--text-accent)' }}>
                       {aiSummary.totalAnalyzed || 0}
                     </span>
-                    <p className="text-xs font-mono mt-1" style={{ color: 'rgba(0,240,255,0.4)' }}>feedback entries</p>
+                    <p className="text-xs font-mono mt-1" style={{ color: 'var(--text-muted)' }}>feedback entries</p>
                   </div>
 
                   {/* Sentiment */}
                   <div className="p-5" style={glowBorderStyle}>
                     <div className="flex items-center gap-2 mb-3">
                       <PieChart size={16} style={{ color: '#34d399' }} />
-                      <span className="text-xs font-mono uppercase tracking-wider" style={{ color: 'rgba(0,240,255,0.6)' }}>
+                      <span className="text-xs font-mono uppercase tracking-wider" style={{ color: 'var(--text-muted)' }}>
                         Sentiment
                       </span>
                     </div>
@@ -767,7 +759,7 @@ const FeedbackCenter = () => {
                 <div className="p-6" style={glowBorderStyle}>
                   <div className="flex items-center gap-2 mb-5">
                     <TrendingUp size={18} style={{ color: '#34d399' }} />
-                    <h3 className="text-base font-bold text-white">Top Requested Features</h3>
+                    <h3 className="text-base font-bold" style={{color:'var(--text-heading)'}}>Top Requested Features</h3>
                   </div>
                   {aiSummary.topRequestedFeatures?.length > 0 ? (
                     <div className="space-y-3">
@@ -776,28 +768,27 @@ const FeedbackCenter = () => {
                           key={i}
                           className="flex items-start gap-4 p-4 rounded-xl transition-all duration-200"
                           style={{
-                            background: 'rgba(52,211,153,0.04)',
-                            border: '1px solid rgba(52,211,153,0.1)'
+                            background: 'var(--bg-elevated)',
+                            border: '1px solid var(--border-color)'
                           }}
                         >
                           <div
                             className="shrink-0 w-8 h-8 rounded-lg flex items-center justify-center text-sm font-black font-mono"
                             style={{
-                              background: 'rgba(52,211,153,0.15)',
-                              color: '#34d399',
-                              textShadow: '0 0 8px rgba(52,211,153,0.5)'
+                              background: 'var(--tab-active-bg)',
+                              color: 'var(--text-accent)'
                             }}
                           >
                             #{i + 1}
                           </div>
                           <div className="flex-1 min-w-0">
                             <div className="flex items-center gap-2 mb-1">
-                              <span className="font-semibold text-white text-sm">{feat.feature}</span>
-                              <span className="text-[10px] font-mono px-2 py-0.5 rounded-full" style={{ background: 'rgba(52,211,153,0.1)', color: '#34d399' }}>
+                              <span className="font-semibold text-sm" style={{color:'var(--text-heading)'}}>{feat.feature}</span>
+                              <span className="text-[10px] font-mono px-2 py-0.5 rounded-full" style={{ background: 'var(--tab-active-bg)', color: 'var(--text-accent)' }}>
                                 {feat.requestCount} requests
                               </span>
                             </div>
-                            <p className="text-xs" style={{ color: 'rgba(255,255,255,0.5)' }}>{feat.description}</p>
+                            <p className="text-xs" style={{ color: 'var(--text-body)' }}>{feat.description}</p>
                           </div>
                         </div>
                       ))}
@@ -811,7 +802,7 @@ const FeedbackCenter = () => {
                 <div className="p-6" style={glowBorderStyle}>
                   <div className="flex items-center gap-2 mb-5">
                     <AlertTriangle size={18} style={{ color: '#f87171' }} />
-                    <h3 className="text-base font-bold text-white">Common Complaints</h3>
+                    <h3 className="text-base font-bold" style={{color:'var(--text-heading)'}}>Common Complaints</h3>
                   </div>
                   {aiSummary.commonComplaints?.length > 0 ? (
                     <div className="space-y-3">
@@ -822,28 +813,28 @@ const FeedbackCenter = () => {
                           <div
                             key={i}
                             className="flex items-start gap-4 p-4 rounded-xl"
-                            style={{
-                              background: 'rgba(248,113,113,0.03)',
-                              border: '1px solid rgba(248,113,113,0.1)'
-                            }}
-                          >
-                            <div
-                              className="shrink-0 w-2 h-2 rounded-full mt-2"
-                              style={{ background: sevColor, boxShadow: `0 0 8px ${sevColor}` }}
-                            />
-                            <div className="flex-1 min-w-0">
-                              <div className="flex items-center gap-2 mb-1">
-                                <span className="font-semibold text-white text-sm">{complaint.issue}</span>
-                                <span className="text-[10px] font-mono px-2 py-0.5 rounded-full" style={{ background: `${sevColor}18`, color: sevColor }}>
-                                  {complaint.severity}
-                                </span>
-                                <span className="text-[10px] font-mono" style={{ color: 'rgba(255,255,255,0.3)' }}>
-                                  {complaint.mentionCount} mentions
-                                </span>
-                              </div>
-                              <p className="text-xs" style={{ color: 'rgba(255,255,255,0.5)' }}>{complaint.description}</p>
+                          style={{
+                            background: 'var(--bg-elevated)',
+                            border: '1px solid var(--border-color)'
+                          }}
+                        >
+                          <div
+                            className="shrink-0 w-2 h-2 rounded-full mt-2"
+                            style={{ background: sevColor, boxShadow: `0 0 8px ${sevColor}` }}
+                          />
+                          <div className="flex-1 min-w-0">
+                            <div className="flex items-center gap-2 mb-1">
+                              <span className="font-semibold text-sm" style={{color:'var(--text-heading)'}}>{complaint.issue}</span>
+                              <span className="text-[10px] font-mono px-2 py-0.5 rounded-full" style={{ background: `${sevColor}18`, color: sevColor }}>
+                                {complaint.severity}
+                              </span>
+                              <span className="text-[10px] font-mono" style={{ color: 'var(--text-muted)' }}>
+                                {complaint.mentionCount} mentions
+                              </span>
                             </div>
+                            <p className="text-xs" style={{ color: 'var(--text-body)' }}>{complaint.description}</p>
                           </div>
+                        </div>
                         );
                       })}
                     </div>
@@ -858,7 +849,7 @@ const FeedbackCenter = () => {
                   <div className="p-6" style={glowBorderStyle}>
                     <div className="flex items-center gap-2 mb-4">
                       <Target size={16} style={{ color: '#60a5fa' }} />
-                      <h3 className="text-sm font-bold text-white uppercase tracking-wider">Key Themes</h3>
+                      <h3 className="text-sm font-bold uppercase tracking-wider" style={{color:'var(--text-heading)'}}>Key Themes</h3>
                     </div>
                     <div className="flex flex-wrap gap-2">
                       {(aiSummary.keyThemes || []).map((theme, i) => (
@@ -866,9 +857,9 @@ const FeedbackCenter = () => {
                           key={i}
                           className="px-3 py-1.5 rounded-lg text-xs font-mono"
                           style={{
-                            background: 'rgba(96,165,250,0.08)',
-                            border: '1px solid rgba(96,165,250,0.15)',
-                            color: '#60a5fa'
+                            background: 'var(--tab-active-bg)',
+                            border: '1px solid var(--border-color)',
+                            color: 'var(--text-accent)'
                           }}
                         >
                           {theme}
@@ -881,7 +872,7 @@ const FeedbackCenter = () => {
                   <div className="p-6" style={glowBorderStyle}>
                     <div className="flex items-center gap-2 mb-4">
                       <Zap size={16} style={{ color: '#fbbf24' }} />
-                      <h3 className="text-sm font-bold text-white uppercase tracking-wider">Recommendations</h3>
+                      <h3 className="text-sm font-bold uppercase tracking-wider" style={{color:'var(--text-heading)'}}>Recommendations</h3>
                     </div>
                     <div className="space-y-2">
                       {(aiSummary.recommendations || []).map((rec, i) => {
@@ -895,7 +886,7 @@ const FeedbackCenter = () => {
                             >
                               {rec.priority}
                             </span>
-                            <span className="text-xs" style={{ color: 'rgba(255,255,255,0.7)' }}>{rec.action}</span>
+                            <span className="text-xs" style={{ color: 'var(--text-body)' }}>{rec.action}</span>
                           </div>
                         );
                       })}
@@ -908,8 +899,8 @@ const FeedbackCenter = () => {
             {/* Empty State */}
             {!aiSummary && !loadingSummary && (
               <div className="text-center py-16">
-                <Sparkles size={48} style={{ color: 'rgba(167,139,250,0.3)', margin: '0 auto 16px' }} />
-                <p className="text-sm" style={{ color: 'rgba(0,240,255,0.4)' }}>
+                <Sparkles size={48} style={{ color: 'var(--text-muted)', margin: '0 auto 16px', opacity: 0.5 }} />
+                <p className="text-sm" style={{ color: 'var(--text-muted)' }}>
                   Click the button above to generate an AI-powered analysis of all feedback
                 </p>
               </div>
@@ -931,23 +922,23 @@ const FeedbackCenter = () => {
                   {/* Total Feedback */}
                   <div className="p-5" style={glowBorderStyle}>
                     <div className="flex items-center gap-2 mb-2">
-                      <MessageSquare size={14} style={{ color: '#00f0ff' }} />
-                      <span className="text-[10px] font-mono uppercase tracking-wider" style={{ color: 'rgba(0,240,255,0.5)' }}>Total Feedback</span>
+                      <MessageSquare size={14} style={{ color: 'var(--text-accent)' }} />
+                      <span className="text-[10px] font-mono uppercase tracking-wider" style={{ color: 'var(--text-muted)' }}>Total Feedback</span>
                     </div>
-                    <span className="text-3xl font-black font-mono text-white">{stats.totalCount}</span>
+                    <span className="text-3xl font-black font-mono" style={{color:'var(--text-heading)'}}>{stats.totalCount}</span>
                   </div>
 
                   {/* Avg Rating */}
                   <div className="p-5" style={glowBorderStyle}>
                     <div className="flex items-center gap-2 mb-2">
                       <Star size={14} style={{ color: '#fbbf24' }} />
-                      <span className="text-[10px] font-mono uppercase tracking-wider" style={{ color: 'rgba(0,240,255,0.5)' }}>Avg Rating</span>
+                      <span className="text-[10px] font-mono uppercase tracking-wider" style={{ color: 'var(--text-muted)' }}>Avg Rating</span>
                     </div>
                     <div className="flex items-end gap-1">
                       <span className="text-3xl font-black font-mono" style={{ color: '#fbbf24' }}>
                         {(stats.avgRating || 0).toFixed(1)}
                       </span>
-                      <span className="text-sm font-mono mb-1" style={{ color: 'rgba(251,191,36,0.4)' }}>/5</span>
+                      <span className="text-sm font-mono mb-1" style={{ color: 'var(--text-muted)' }}>/5</span>
                     </div>
                   </div>
 
@@ -955,7 +946,7 @@ const FeedbackCenter = () => {
                   <div className="p-5" style={glowBorderStyle}>
                     <div className="flex items-center gap-2 mb-2">
                       <CheckCircle2 size={14} style={{ color: '#34d399' }} />
-                      <span className="text-[10px] font-mono uppercase tracking-wider" style={{ color: 'rgba(0,240,255,0.5)' }}>Implemented</span>
+                      <span className="text-[10px] font-mono uppercase tracking-wider" style={{ color: 'var(--text-muted)' }}>Implemented</span>
                     </div>
                     <span className="text-3xl font-black font-mono" style={{ color: '#34d399' }}>
                       {stats.implementedFeedback?.length || 0}
@@ -966,7 +957,7 @@ const FeedbackCenter = () => {
                   <div className="p-5" style={glowBorderStyle}>
                     <div className="flex items-center gap-2 mb-2">
                       <BarChart3 size={14} style={{ color: '#a78bfa' }} />
-                      <span className="text-[10px] font-mono uppercase tracking-wider" style={{ color: 'rgba(0,240,255,0.5)' }}>Categories</span>
+                      <span className="text-[10px] font-mono uppercase tracking-wider" style={{ color: 'var(--text-muted)' }}>Categories</span>
                     </div>
                     <span className="text-3xl font-black font-mono" style={{ color: '#a78bfa' }}>
                       {stats.categoryDistribution?.length || 0}
@@ -978,8 +969,8 @@ const FeedbackCenter = () => {
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                   {/* Rating Distribution */}
                   <div className="p-6" style={glowBorderStyle}>
-                    <h3 className="flex items-center gap-2 text-sm font-bold text-white mb-6">
-                      <BarChart3 size={16} style={{ color: '#00f0ff' }} />
+                    <h3 className="flex items-center gap-2 text-sm font-bold mb-6" style={{color:'var(--text-heading)'}}>
+                      <BarChart3 size={16} style={{ color: 'var(--text-accent)' }} />
                       Rating Distribution
                     </h3>
                     <div className="flex justify-center">
@@ -996,7 +987,7 @@ const FeedbackCenter = () => {
 
                   {/* Category Distribution */}
                   <div className="p-6" style={glowBorderStyle}>
-                    <h3 className="flex items-center gap-2 text-sm font-bold text-white mb-6">
+                    <h3 className="flex items-center gap-2 text-sm font-bold mb-6" style={{color:'var(--text-heading)'}}>
                       <PieChart size={16} style={{ color: '#a78bfa' }} />
                       By Category
                     </h3>
@@ -1012,10 +1003,10 @@ const FeedbackCenter = () => {
                         {(stats.categoryDistribution || []).map(c => (
                           <div key={c.category} className="flex items-center gap-2">
                             <div className="w-2.5 h-2.5 rounded-full" style={{ background: CATEGORY_COLORS[c.category] || '#60a5fa' }} />
-                            <span className="text-[11px] font-mono" style={{ color: 'rgba(255,255,255,0.6)' }}>
+                            <span className="text-[11px] font-mono" style={{ color: 'var(--text-body)' }}>
                               {CATEGORIES.find(cat => cat.value === c.category)?.label || c.category}
                             </span>
-                            <span className="text-[10px] font-mono font-bold" style={{ color: 'rgba(255,255,255,0.3)' }}>
+                            <span className="text-[10px] font-mono font-bold" style={{ color: 'var(--text-muted)' }}>
                               ({c.count})
                             </span>
                           </div>
@@ -1027,7 +1018,7 @@ const FeedbackCenter = () => {
 
                 {/* Feature Ratings */}
                 <div className="p-6" style={glowBorderStyle}>
-                  <h3 className="flex items-center gap-2 text-sm font-bold text-white mb-5">
+                  <h3 className="flex items-center gap-2 text-sm font-bold mb-5" style={{color:'var(--text-heading)'}}>
                     <Star size={16} style={{ color: '#fbbf24' }} />
                     Average Rating per Feature
                   </h3>
@@ -1037,25 +1028,24 @@ const FeedbackCenter = () => {
                         const pct = (feat.avgRating / 5) * 100;
                         return (
                           <div key={i} className="flex items-center gap-4">
-                            <span className="w-40 shrink-0 text-xs font-mono truncate" style={{ color: 'rgba(255,255,255,0.7)' }}>
+                            <span className="w-40 shrink-0 text-xs font-mono truncate" style={{ color: 'var(--text-body)' }}>
                               {feat.feature}
                             </span>
-                            <div className="flex-1 h-2.5 rounded-full overflow-hidden" style={{ background: 'rgba(0,240,255,0.06)' }}>
+                            <div className="flex-1 h-2.5 rounded-full overflow-hidden" style={{ background: 'var(--bg-input)', border: '1px solid var(--border-color)' }}>
                               <div
                                 className="h-full rounded-full transition-all duration-700"
                                 style={{
                                   width: `${pct}%`,
-                                  background: pct >= 80 ? 'linear-gradient(90deg, #34d399, #00f0ff)' :
+                                  background: pct >= 80 ? 'linear-gradient(90deg, #34d399, var(--text-accent))' :
                                              pct >= 60 ? 'linear-gradient(90deg, #fbbf24, #fb923c)' :
-                                             'linear-gradient(90deg, #f87171, #fb923c)',
-                                  boxShadow: `0 0 6px ${pct >= 80 ? '#34d399' : pct >= 60 ? '#fbbf24' : '#f87171'}40`
+                                             'linear-gradient(90deg, #f87171, #fb923c)'
                                 }}
                               />
                             </div>
                             <span className="w-12 text-right text-xs font-mono font-bold" style={{ color: '#fbbf24' }}>
                               {feat.avgRating}
                             </span>
-                            <span className="w-12 text-right text-[10px] font-mono" style={{ color: 'rgba(0,240,255,0.4)' }}>
+                            <span className="w-12 text-right text-[10px] font-mono" style={{ color: 'var(--text-muted)' }}>
                               ({feat.count})
                             </span>
                           </div>
@@ -1063,7 +1053,7 @@ const FeedbackCenter = () => {
                       })}
                     </div>
                   ) : (
-                    <p className="text-sm" style={{ color: 'rgba(0,240,255,0.4)' }}>No feature ratings yet.</p>
+                    <p className="text-sm" style={{ color: 'var(--text-muted)' }}>No feature ratings yet.</p>
                   )}
                 </div>
 
@@ -1072,7 +1062,7 @@ const FeedbackCenter = () => {
                 {/* Recent Feedback Timeline */}
                 <div className="p-6" style={glowBorderStyle}>
                   <div className="flex items-center justify-between mb-5">
-                    <h3 className="flex items-center gap-2 text-sm font-bold text-white">
+                    <h3 className="flex items-center gap-2 text-sm font-bold" style={{color:'var(--text-heading)'}}>
                       <Clock size={16} style={{ color: '#60a5fa' }} />
                       Recent Feedback
                     </h3>
@@ -1080,9 +1070,9 @@ const FeedbackCenter = () => {
                       onClick={() => { loadStats(); loadAllFeedback(); }}
                       className="flex items-center gap-1 text-[10px] font-mono px-3 py-1.5 rounded-lg transition-all duration-200"
                       style={{
-                        background: 'rgba(0,240,255,0.06)',
-                        border: '1px solid rgba(0,240,255,0.12)',
-                        color: '#00f0ff'
+                        background: 'var(--tab-active-bg)',
+                        border: '1px solid var(--border-color)',
+                        color: 'var(--text-accent)'
                       }}
                     >
                       <RefreshCw size={10} /> Refresh
@@ -1105,8 +1095,8 @@ const FeedbackCenter = () => {
                             key={fb._id || i}
                             className="flex items-start gap-3 p-4 rounded-xl transition-all duration-200"
                             style={{
-                              background: 'rgba(0,240,255,0.02)',
-                              border: '1px solid rgba(0,240,255,0.06)'
+                              background: 'var(--bg-elevated)',
+                              border: '1px solid var(--border-color)'
                             }}
                           >
                             {/* Category Icon */}
@@ -1123,7 +1113,7 @@ const FeedbackCenter = () => {
                             {/* Content */}
                             <div className="flex-1 min-w-0">
                               <div className="flex items-center gap-2 mb-1 flex-wrap">
-                                <span className="text-sm font-semibold text-white">{fb.featureName}</span>
+                                <span className="text-sm font-semibold" style={{color:'var(--text-heading)'}}>{fb.featureName}</span>
                                 <StarRating rating={fb.rating} interactive={false} size={11} />
                                 <span
                                   className="inline-flex items-center gap-1 text-[9px] font-mono px-2 py-0.5 rounded-full"
@@ -1133,11 +1123,11 @@ const FeedbackCenter = () => {
                                   {statusCfg.label}
                                 </span>
                               </div>
-                              <p className="text-xs mb-1.5 line-clamp-2" style={{ color: 'rgba(255,255,255,0.5)' }}>
+                              <p className="text-xs mb-1.5 line-clamp-2" style={{ color: 'var(--text-body)' }}>
                                 {fb.comment}
                               </p>
                               <div className="flex items-center gap-3">
-                                <span className="text-[10px] font-mono" style={{ color: 'rgba(0,240,255,0.3)' }}>
+                                <span className="text-[10px] font-mono" style={{ color: 'var(--text-muted)' }}>
                                   {fb.userId?.name || 'Anonymous'} · {new Date(fb.createdAt).toLocaleDateString()}
                                 </span>
                               </div>
@@ -1148,8 +1138,8 @@ const FeedbackCenter = () => {
                     </div>
                   ) : (
                     <div className="text-center py-8">
-                      <MessageSquare size={32} style={{ color: 'rgba(0,240,255,0.2)', margin: '0 auto 8px' }} />
-                      <p className="text-xs" style={{ color: 'rgba(0,240,255,0.4)' }}>
+                      <MessageSquare size={32} style={{ color: 'var(--text-muted)', margin: '0 auto 8px', opacity: 0.5 }} />
+                      <p className="text-xs" style={{ color: 'var(--text-muted)' }}>
                         No feedback submitted yet. Be the first!
                       </p>
                     </div>

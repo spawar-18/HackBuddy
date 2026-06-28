@@ -247,16 +247,16 @@ const Profile = () => {
       )}
 
       {/* Styled Layout Styles */}
-      <div className="min-h-screen bg-neutral-50 flex items-center justify-center py-10 px-4">
-      <div className="w-full max-w-4xl bg-white border border-neutral-200 rounded-xl p-6 md:p-8 shadow-xs flex flex-col gap-6 animate-slide-up">
+      <div className="min-h-screen flex items-center justify-center py-10 px-4" style={{background:'var(--bg-app)'}}>
+      <div className="w-full max-w-4xl rounded-xl p-6 md:p-8 flex flex-col gap-6 animate-slide-up" style={{background:'var(--bg-card)',border:'1px solid var(--border-color)',boxShadow:'var(--shadow-card)'}}>
         {/* Header Block */}
-        <div className="flex flex-col sm:flex-row justify-between items-start gap-4 border-b border-neutral-100 pb-5">
+        <div className="flex flex-col sm:flex-row justify-between items-start gap-4 pb-5" style={{borderBottom:'1px solid var(--border-color)'}}>
           <div>
-            <h1 className="text-xl font-bold text-neutral-900 flex items-center gap-2.5">
-              <Terminal size={22} className="text-brand-500" />
+            <h1 className="text-xl font-bold flex items-center gap-2.5" style={{color:'var(--text-heading)'}}>
+              <Terminal size={22} style={{color:'var(--text-accent)'}} />
               {user?.profileCompleted ? 'Edit Skills Configuration' : 'Mission Profile Configuration'}
             </h1>
-            <p className="text-xs text-neutral-500 mt-1">
+            <p className="text-xs mt-1" style={{color:'var(--text-muted)'}}>
               {user?.profileCompleted 
                 ? 'Update your system core nodes and technical skills directory.'
                 : 'Establish your system core nodes. Pre-register your technical skills directory.'}
@@ -278,23 +278,25 @@ const Profile = () => {
         </div>
 
         {/* Resume AI Autopilot Section */}
-        <div className="bg-neutral-50/50 border border-neutral-200/80 rounded-xl p-5 md:p-6 flex flex-col gap-4">
-          <div className="text-xs font-bold text-neutral-500 tracking-wider uppercase flex items-center gap-2">
-            <Cpu size={16} className="text-brand-500" />
+        <div className="rounded-xl p-5 md:p-6 flex flex-col gap-4" style={{background:'var(--bg-elevated)',border:'1px solid var(--border-color)'}}>
+          <div className="text-xs font-bold tracking-wider uppercase flex items-center gap-2" style={{color:'var(--text-muted)'}}>
+            <Cpu size={16} style={{color:'var(--text-accent)'}} />
             <span>AI Skills Autopilot (Resume Upload)</span>
           </div>
-          <p className="text-xs text-neutral-500">
+          <p className="text-xs" style={{color:'var(--text-muted)'}}>
             Fast track your setup! Upload your PDF resume, and our AI Agent will extract and configure your developer skills node automatically.
           </p>
 
           <div 
-            className={`border-2 border-dashed rounded-xl p-8 flex flex-col items-center justify-center text-center cursor-pointer transition-all duration-200 ${
-              dragActive 
-                ? 'border-brand-500 bg-brand-50/20' 
-                : selectedFile 
-                  ? 'border-emerald-300 bg-emerald-50/20' 
-                  : 'border-neutral-200 bg-white hover:bg-neutral-50/40'
-            }`}
+            className="border-2 border-dashed rounded-xl p-8 flex flex-col items-center justify-center text-center cursor-pointer transition-all duration-200"
+            style={{
+              borderColor: dragActive ? 'var(--border-focus)'
+                : selectedFile ? 'var(--color-success)'
+                : 'var(--border-color)',
+              background: dragActive ? 'var(--tab-active-bg)'
+                : selectedFile ? 'rgba(16,185,129,0.05)'
+                : 'var(--bg-input)'
+            }}
             onDragEnter={handleDrag}
             onDragOver={handleDrag}
             onDragLeave={handleDrag}
@@ -302,9 +304,9 @@ const Profile = () => {
           >
             {selectedFile ? (
               <div className="flex flex-col items-center">
-                <Terminal size={32} className="text-brand-500 mb-2" />
-                <span className="text-sm font-semibold text-neutral-900 break-all">{selectedFile.name}</span>
-                <span className="text-xs text-neutral-400 mt-0.5">({(selectedFile.size / (1024 * 1024)).toFixed(2)} MB)</span>
+                <Terminal size={32} className="mb-2" style={{color:'var(--text-accent)'}} />
+                <span className="text-sm font-semibold break-all" style={{color:'var(--text-heading)'}}>{selectedFile.name}</span>
+                <span className="text-xs mt-0.5" style={{color:'var(--text-muted)'}}>({(selectedFile.size / (1024 * 1024)).toFixed(2)} MB)</span>
                 
                 <div className="flex gap-2 mt-4">
                   <button 
@@ -334,9 +336,9 @@ const Profile = () => {
               </div>
             ) : (
               <label htmlFor="resume-file-input" className="w-full flex flex-col items-center cursor-pointer">
-                <UploadCloud size={32} className="text-neutral-400 mb-2 hover:text-brand-500 transition-colors" />
-                <span className="text-sm font-semibold text-neutral-800">Drag & Drop Resume PDF</span>
-                <span className="text-xs text-neutral-400 mt-0.5">or click to browse local files (max 5MB)</span>
+                <UploadCloud size={32} className="mb-2 transition-colors" style={{color:'var(--text-muted)'}} />
+                <span className="text-sm font-semibold" style={{color:'var(--text-heading)'}}>Drag & Drop Resume PDF</span>
+                <span className="text-xs mt-0.5" style={{color:'var(--text-muted)'}}>or click to browse local files (max 5MB)</span>
                 <input 
                   type="file" 
                   id="resume-file-input" 
@@ -350,24 +352,24 @@ const Profile = () => {
 
           {extracting && (
             <div className="flex flex-col gap-1.5 mt-2">
-              <div className="h-1.5 bg-neutral-200 rounded-full overflow-hidden">
-                <div className="h-full bg-emerald-500 rounded-full transition-all duration-200" style={{ width: `${uploadProgress}%` }}></div>
+              <div className="h-1.5 rounded-full overflow-hidden" style={{background:'var(--bg-elevated)'}}>
+                <div className="h-full rounded-full transition-all duration-200" style={{ width: `${uploadProgress}%`, background:'var(--color-success)' }}></div>
               </div>
-              <span className="text-xs text-neutral-500 font-medium">{extractionProgress}</span>
+              <span className="text-xs font-medium" style={{color:'var(--text-muted)'}}>{extractionProgress}</span>
             </div>
           )}
         </div>
 
         {/* Categories Section */}
         <div className="flex flex-col gap-3">
-          <div className="text-xs font-bold text-neutral-500 tracking-wider uppercase">
+          <div className="text-xs font-bold tracking-wider uppercase" style={{color:'var(--text-muted)'}}>
             <span>1. Predefined Skills Library</span>
           </div>
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
             {Object.keys(predefinedSkills).map(category => (
-              <div key={category} className="bg-white border border-neutral-200 rounded-xl p-4 flex flex-col gap-3 shadow-2xs">
-                <div className="flex items-center gap-2 text-xs font-bold text-neutral-800 border-b border-neutral-100 pb-2">
-                  <span className="text-brand-500">{categoryDetails[category].icon}</span>
+              <div key={category} className="rounded-xl p-4 flex flex-col gap-3" style={{background:'var(--bg-elevated)',border:'1px solid var(--border-color)',boxShadow:'var(--shadow-card)'}}>
+                <div className="flex items-center gap-2 text-xs font-bold pb-2" style={{color:'var(--text-heading)',borderBottom:'1px solid var(--border-color)'}}>
+                  <span style={{color:'var(--text-accent)'}}>{categoryDetails[category].icon}</span>
                   <span>{categoryDetails[category].label}</span>
                 </div>
                 <div className="flex flex-wrap gap-1.5">
@@ -378,11 +380,17 @@ const Profile = () => {
                         key={skill}
                         type="button"
                         onClick={() => handleToggleSkill(skill)}
-                        className={`px-2.5 py-1 text-xs rounded-lg border font-medium transition-all cursor-pointer ${
-                          isSelected 
-                            ? 'bg-brand-500 border-brand-500 text-white font-semibold shadow-xs' 
-                            : 'bg-neutral-50 border-neutral-200 text-neutral-600 hover:border-neutral-300 hover:text-neutral-800'
-                        }`}
+                        className="px-2.5 py-1 text-xs rounded-lg border font-medium transition-all cursor-pointer"
+                        style={isSelected ? {
+                          background: 'var(--btn-primary-bg)',
+                          borderColor: 'var(--btn-primary-border)',
+                          color: '#ffffff',
+                          fontWeight: 600
+                        } : {
+                          background: 'var(--bg-input)',
+                          borderColor: 'var(--border-color)',
+                          color: 'var(--text-body)'
+                        }}
                       >
                         {skill}
                       </button>
@@ -396,10 +404,10 @@ const Profile = () => {
 
         {/* Custom Skill Section */}
         <div className="flex flex-col gap-3">
-          <div className="text-xs font-bold text-neutral-500 tracking-wider uppercase">
+          <div className="text-xs font-bold tracking-wider uppercase" style={{color:'var(--text-muted)'}}>
             <span>2. Custom Skills Expansion</span>
           </div>
-          <p className="text-xs text-neutral-500">
+          <p className="text-xs" style={{color:'var(--text-muted)'}}>
             Inject custom capabilities and tech stacks not registered in the default database index.
           </p>
           <form onSubmit={handleAddCustomSkill} className="flex gap-2 w-full max-w-md mt-1">
@@ -420,20 +428,20 @@ const Profile = () => {
 
         {/* Selected Skills Inventory */}
         <div className="flex flex-col gap-3">
-          <div className="text-xs font-bold text-neutral-500 tracking-wider uppercase">
+          <div className="text-xs font-bold tracking-wider uppercase" style={{color:'var(--text-muted)'}}>
             <span>3. Current Skill Inventory ({selectedSkills.length})</span>
           </div>
-          <div className="bg-neutral-50 border border-neutral-200 rounded-xl p-5 flex flex-col gap-3">
+          <div className="rounded-xl p-5 flex flex-col gap-3" style={{background:'var(--bg-elevated)',border:'1px solid var(--border-color)'}}>
             {selectedSkills.length === 0 ? (
-              <div className="text-xs text-neutral-400 italic text-center py-4">
+              <div className="text-xs italic text-center py-4" style={{color:'var(--text-muted)'}}>
                 No active skills loaded. Toggle options in Category Panels or inject Custom Nodes above.
               </div>
             ) : (
               <div className="flex flex-wrap gap-2">
                 {selectedSkills.map(skill => (
-                  <div key={skill} className="inline-flex items-center gap-1.5 px-3 py-1 bg-brand-50 border border-brand-100 text-brand-700 text-xs font-semibold rounded-lg hover:border-brand-200 transition-all">
+                  <div key={skill} className="inline-flex items-center gap-1.5 px-3 py-1 text-xs font-semibold rounded-lg transition-all" style={{background:'var(--tab-active-bg)',border:'1px solid var(--border-color)',color:'var(--text-accent)'}}>
                     <span>{skill}</span>
-                    <button type="button" onClick={() => handleRemoveSkill(skill)} aria-label={`Remove ${skill}`} className="p-0.5 text-brand-500 hover:text-red-600 transition-colors cursor-pointer">
+                    <button type="button" onClick={() => handleRemoveSkill(skill)} aria-label={`Remove ${skill}`} className="p-0.5 cursor-pointer transition-colors" style={{color:'var(--text-muted)'}}>
                       <X size={12} />
                     </button>
                   </div>
@@ -444,7 +452,7 @@ const Profile = () => {
         </div>
 
         {/* Footer Actions */}
-        <div className="flex justify-end gap-3 border-t border-neutral-100 pt-5 mt-2">
+        <div className="flex justify-end gap-3 pt-5 mt-2" style={{borderTop:'1px solid var(--border-color)'}}>
           <button 
             type="button" 
             className="btn-primary px-6 py-2.5 shadow-sm" 

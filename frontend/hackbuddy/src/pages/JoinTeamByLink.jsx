@@ -61,22 +61,22 @@ const JoinTeamByLink = () => {
   }, [user, loading, inviteCode, navigate]);
 
   return (
-    <div className="flex min-h-screen w-full items-center justify-center p-4 bg-neutral-50">
-      <div className="w-full max-w-[460px] bg-white border border-neutral-200 rounded-xl p-6 md:p-8 shadow-xs flex flex-col items-center text-center gap-5 animate-slide-up">
-        <div className="w-14 h-14 bg-brand-50 text-brand-600 rounded-lg flex items-center justify-center mb-1">
+    <div className="flex min-h-screen w-full items-center justify-center p-4" style={{background:'var(--bg-app)'}}>
+      <div className="w-full max-w-[460px] rounded-xl p-6 md:p-8 flex flex-col items-center text-center gap-5 animate-slide-up" style={{background:'var(--bg-card)',border:'1px solid var(--border-color)',boxShadow:'var(--shadow-card)'}}>
+        <div className="w-14 h-14 rounded-lg flex items-center justify-center mb-1" style={{background:'var(--tab-active-bg)',color:'var(--text-accent)',border:'1px solid var(--border-color)'}}>
           <Users size={28} />
         </div>
         <div>
-          <h2 className="text-lg font-bold text-neutral-900 tracking-tight">HackBuddy Invitation</h2>
-          <p className="text-xs text-neutral-500 mt-1">
+          <h2 className="text-lg font-bold tracking-tight" style={{color:'var(--text-heading)'}}>HackBuddy Invitation</h2>
+          <p className="text-xs mt-1" style={{color:'var(--text-muted)'}}>
             Processing invitation code 
-            <span className="font-mono font-bold text-brand-600 bg-brand-50 border border-brand-100 px-1.5 py-0.5 rounded text-xs ml-1">{inviteCode}</span>
+            <span className="font-mono font-bold px-1.5 py-0.5 rounded text-xs ml-1" style={{background:'var(--tab-active-bg)',border:'1px solid var(--border-color)',color:'var(--text-accent)'}}>{inviteCode}</span>
           </p>
         </div>
         
         {status && (
-          <div className="flex items-center justify-center gap-2 text-sm text-neutral-600 font-semibold mt-2">
-            <RefreshCw className="text-brand-500 animate-spin" size={16} />
+          <div className="flex items-center justify-center gap-2 text-sm font-semibold mt-2" style={{color:'var(--text-body)'}}>
+            <RefreshCw className="animate-spin" size={16} style={{color:'var(--text-accent)'}} />
             <span>{status}</span>
           </div>
         )}

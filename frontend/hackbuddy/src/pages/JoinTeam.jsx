@@ -53,7 +53,7 @@ const JoinTeam = () => {
 
         <div className="team-header">
           <div className="icon-box">
-            <UserPlus size={22} className="text-neutral-700" />
+            <UserPlus size={22} />
           </div>
           <div>
             <h1 className="team-title">Join a Team</h1>

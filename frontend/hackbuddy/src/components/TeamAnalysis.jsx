@@ -99,15 +99,15 @@ const TeamAnalysis = ({ teamId }) => {
   };
 
   return (
-    <div className="details-card team-analysis-card">
-      <div className="flex items-center justify-between border-b border-neutral-100 pb-3">
+    <div className="card p-6 flex flex-col gap-5">
+      <div className="flex items-center justify-between pb-3" style={{borderBottom:'1px solid var(--border-color)'}}>
         <div className="flex items-center gap-3">
-          <div className="w-10 h-10 bg-brand-50 text-brand-600 rounded-lg flex items-center justify-center shrink-0">
+          <div className="icon-box w-10 h-10 rounded-lg flex items-center justify-center shrink-0">
             <Brain size={20} />
           </div>
           <div>
-            <h2 className="text-xs font-bold text-neutral-500 tracking-wider uppercase">AI Team Analysis</h2>
-            <p className="text-xs text-neutral-400 mt-0.5">Skill gaps & recommended roles report</p>
+            <h2 className="text-xs font-bold tracking-wider uppercase" style={{color:'var(--text-muted)'}}>AI Team Analysis</h2>
+            <p className="text-xs mt-0.5" style={{color:'var(--text-muted)'}}>Skill gaps & recommended roles report</p>
           </div>
         </div>
       </div>
@@ -126,24 +126,24 @@ const TeamAnalysis = ({ teamId }) => {
       {/* Loading State / Action Loading / Empty State / Results */}
       {loading ? (
         <div className="flex flex-col items-center text-center py-8 px-4 gap-4 w-full">
-          <div className="w-12 h-12 bg-brand-50 text-brand-600 rounded-full flex items-center justify-center shadow-xs">
+          <div className="w-12 h-12 rounded-full flex items-center justify-center shadow-xs" style={{background:'var(--tab-active-bg)',color:'var(--text-accent)'}}>
             <RefreshCw className="animate-spin" size={24} />
           </div>
           <div>
-            <h3 className="text-sm font-semibold text-neutral-900">Checking Analysis...</h3>
-            <p className="text-xs text-neutral-400 mt-1 max-w-[280px] mx-auto leading-relaxed">
+            <h3 className="text-sm font-semibold" style={{color:'var(--text-heading)'}}>Checking Analysis...</h3>
+            <p className="text-xs mt-1 max-w-[280px] mx-auto leading-relaxed" style={{color:'var(--text-muted)'}}>
               Checking for cached team assessment reports.
             </p>
           </div>
         </div>
       ) : actionLoading ? (
         <div className="flex flex-col items-center text-center py-8 px-4 gap-4 w-full animate-pulse">
-          <div className="w-12 h-12 bg-brand-50 text-brand-600 rounded-full flex items-center justify-center shadow-xs">
+          <div className="w-12 h-12 rounded-full flex items-center justify-center shadow-xs" style={{background:'var(--tab-active-bg)',color:'var(--text-accent)'}}>
             <RefreshCw className="animate-spin" size={24} />
           </div>
           <div>
-            <h3 className="text-sm font-semibold text-neutral-900">{loadingText}</h3>
-            <p className="text-xs text-neutral-400 mt-1 max-w-[280px] mx-auto leading-relaxed">
+            <h3 className="text-sm font-semibold" style={{color:'var(--text-heading)'}}>{loadingText}</h3>
+            <p className="text-xs mt-1 max-w-[280px] mx-auto leading-relaxed" style={{color:'var(--text-muted)'}}>
               AI Copilot is executing skill assessment mapping. Please hold on.
             </p>
           </div>
@@ -154,12 +154,12 @@ const TeamAnalysis = ({ teamId }) => {
         </div>
       ) : !analysis ? (
         <div className="flex flex-col items-center text-center py-8 px-4 gap-4 w-full">
-          <div className="w-12 h-12 bg-brand-50 text-brand-600 rounded-full flex items-center justify-center shadow-xs">
+          <div className="w-12 h-12 rounded-full flex items-center justify-center shadow-xs" style={{background:'var(--tab-active-bg)',color:'var(--text-accent)'}}>
             <Sparkles size={22} />
           </div>
           <div>
-            <h3 className="text-sm font-semibold text-neutral-900">Generate Skill Assessment</h3>
-            <p className="text-xs text-neutral-400 mt-1 max-w-[300px] mx-auto leading-relaxed">
+            <h3 className="text-sm font-semibold" style={{color:'var(--text-heading)'}}>Generate Skill Assessment</h3>
+            <p className="text-xs mt-1 max-w-[300px] mx-auto leading-relaxed" style={{color:'var(--text-muted)'}}>
               Analyze your squad's technical profile to receive role recommendation mappings and success strategies.
             </p>
           </div>
@@ -175,56 +175,56 @@ const TeamAnalysis = ({ teamId }) => {
       ) : (
         <div className="flex flex-col gap-4 animate-slide-up">
           {/* 1. Readiness Score */}
-          <div className="bg-neutral-50 border border-neutral-200 rounded-xl p-4 flex flex-col gap-2">
+          <div className="rounded-xl p-4 flex flex-col gap-2" style={{background:'var(--bg-input)',border:'1px solid var(--border-color)'}}>
             <div className="flex justify-between items-center">
-              <span className="text-xs font-bold text-neutral-500 tracking-wider uppercase flex items-center gap-1.5">
-                <Gauge size={14} className="text-brand-500" />
+              <span className="text-xs font-bold tracking-wider uppercase flex items-center gap-1.5" style={{color:'var(--text-muted)'}}>
+                <Gauge size={14} style={{color:'var(--text-accent)'}} />
                 Team Readiness Score
               </span>
-              <span className="text-xs font-bold text-brand-700 font-mono">{analysis.readinessScore} / 10</span>
+              <span className="text-xs font-bold font-mono" style={{color:'var(--text-accent)'}}>{analysis.readinessScore} / 10</span>
             </div>
-            <div className="h-2 bg-neutral-200 rounded-full overflow-hidden">
+            <div className="h-2 rounded-full overflow-hidden" style={{background:'var(--bg-elevated)',border:'1px solid var(--border-color)'}}>
               <div 
-                className="h-full bg-brand-500 rounded-full transition-all duration-500" 
-                style={{ width: `${Math.min(Math.max(analysis.readinessScore * 10, 0), 100)}%` }}
+                className="h-full rounded-full transition-all duration-500" 
+                style={{ width: `${Math.min(Math.max(analysis.readinessScore * 10, 0), 100)}%`, background:'var(--text-accent)' }}
               />
             </div>
           </div>
 
           {/* 2. Strengths and Skill Gaps */}
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-            <div className="bg-white border border-neutral-200 rounded-xl p-4 flex flex-col gap-3">
-              <h3 className="text-xs font-bold text-emerald-700 tracking-wider uppercase flex items-center gap-1.5 border-b border-neutral-100 pb-2">
+            <div className="rounded-xl p-4 flex flex-col gap-3" style={{background:'var(--bg-input)',border:'1px solid var(--border-color)'}}>
+              <h3 className="text-xs font-bold tracking-wider uppercase flex items-center gap-1.5 pb-2" style={{color:'var(--color-success)',borderBottom:'1px solid var(--border-color)'}}>
                 <CheckCircle size={14} />
                 Team Strengths
               </h3>
               <ul className="flex flex-col gap-2 text-xs">
                 {analysis.strengths && analysis.strengths.map((str, idx) => (
-                  <li key={idx} className="flex items-start gap-1.5 text-neutral-600 leading-relaxed">
-                    <span className="text-emerald-500 font-bold">✓</span>
+                  <li key={idx} className="flex items-start gap-1.5 leading-relaxed" style={{color:'var(--text-body)'}}>
+                    <span className="font-bold" style={{color:'var(--color-success)'}}>✓</span>
                     <span>{str}</span>
                   </li>
                 ))}
                 {(!analysis.strengths || analysis.strengths.length === 0) && (
-                  <li className="text-neutral-400 italic">No notable strengths detected.</li>
+                  <li className="italic" style={{color:'var(--text-muted)'}}>No notable strengths detected.</li>
                 )}
               </ul>
             </div>
 
-            <div className="bg-white border border-neutral-200 rounded-xl p-4 flex flex-col gap-3">
-              <h3 className="text-xs font-bold text-red-700 tracking-wider uppercase flex items-center gap-1.5 border-b border-neutral-100 pb-2">
+            <div className="rounded-xl p-4 flex flex-col gap-3" style={{background:'var(--bg-input)',border:'1px solid var(--border-color)'}}>
+              <h3 className="text-xs font-bold tracking-wider uppercase flex items-center gap-1.5 pb-2" style={{color:'var(--color-error)',borderBottom:'1px solid var(--border-color)'}}>
                 <AlertTriangle size={14} />
                 Skill Gaps
               </h3>
               <ul className="flex flex-col gap-2 text-xs">
                 {analysis.skillGaps && analysis.skillGaps.map((gap, idx) => (
-                  <li key={idx} className="flex items-start gap-1.5 text-neutral-600 leading-relaxed">
-                    <span className="text-red-500 font-bold">⚠</span>
+                  <li key={idx} className="flex items-start gap-1.5 leading-relaxed" style={{color:'var(--text-body)'}}>
+                    <span className="font-bold" style={{color:'var(--color-error)'}}>⚠</span>
                     <span>{gap}</span>
                   </li>
                 ))}
                 {(!analysis.skillGaps || analysis.skillGaps.length === 0) && (
-                  <li className="text-neutral-400 italic">No major skill gaps identified.</li>
+                  <li className="italic" style={{color:'var(--text-muted)'}}>No major skill gaps identified.</li>
                 )}
               </ul>
             </div>
@@ -235,11 +235,11 @@ const TeamAnalysis = ({ teamId }) => {
             <span className="input-label">Recommended Roles</span>
             <div className="flex flex-col gap-2">
               {analysis.recommendedRoles && analysis.recommendedRoles.map((roleObj, idx) => (
-                <div key={idx} className="flex items-center justify-between p-3 bg-neutral-50 border border-neutral-200 rounded-xl">
-                  <span className="text-xs font-bold text-neutral-800">{roleObj.member}</span>
+                <div key={idx} className="flex items-center justify-between p-3 rounded-xl" style={{background:'var(--bg-input)',border:'1px solid var(--border-color)'}}>
+                  <span className="text-xs font-bold" style={{color:'var(--text-heading)'}}>{roleObj.member}</span>
                   <div className="flex items-center gap-1.5">
-                    <ArrowRight size={12} className="text-neutral-400" />
-                    <span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-[9px] font-bold bg-emerald-50 border border-emerald-100 text-emerald-700 uppercase tracking-wider">{roleObj.role}</span>
+                    <ArrowRight size={12} style={{color:'var(--text-muted)'}} />
+                    <span className="status-badge badge-active">{roleObj.role}</span>
                   </div>
                 </div>
               ))}
@@ -247,7 +247,7 @@ const TeamAnalysis = ({ teamId }) => {
           </div>
 
           {/* Metadata section */}
-          <div className="border-t border-neutral-100 pt-4 flex flex-col gap-2 text-[10px] text-neutral-400 font-semibold uppercase tracking-wider">
+          <div className="pt-4 flex flex-col gap-2 text-[10px] font-semibold uppercase tracking-wider" style={{borderTop:'1px solid var(--border-color)',color:'var(--text-muted)'}}>
             <div className="flex items-center gap-1.5">
               <Clock size={12} />
               <span>Generated on: {formatTimestamp(analysisGeneratedAt)}</span>

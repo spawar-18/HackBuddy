@@ -160,16 +160,18 @@ const Pricing = () => {
   };
 
   return (
-    <div className="min-h-screen" style={{ background: 'linear-gradient(135deg, #020817 0%, #0a0f1e 60%, #020817 100%)' }}>
+    <div className="pricing-page-container pb-16">
       {/* Ambient Glow */}
-      <div className="absolute top-0 left-1/2 -translate-x-1/2 w-96 h-96 rounded-full opacity-20 blur-3xl pointer-events-none"
-        style={{ background: 'radial-gradient(circle, #00f0ff 0%, transparent 70%)' }} />
+      <div className="absolute top-0 left-1/2 -translate-x-1/2 w-96 h-96 rounded-full opacity-20 blur-3xl pointer-events-none ambient-glow" />
 
       {/* Header */}
       <div className="relative z-10 max-w-6xl mx-auto px-6 pt-10 pb-0">
         <button
           onClick={() => navigate('/dashboard')}
-          className="flex items-center gap-2 text-sm text-neutral-400 hover:text-white transition-colors bg-transparent border-0 cursor-pointer mb-8"
+          className="flex items-center gap-2 text-sm bg-transparent border-0 cursor-pointer mb-8 transition-colors"
+          style={{color:'var(--text-muted)'}}
+          onMouseEnter={e=>e.currentTarget.style.color='var(--text-heading)'}
+          onMouseLeave={e=>e.currentTarget.style.color='var(--text-muted)'}
         >
           <ArrowLeft size={16} />
           Back to Dashboard
@@ -179,11 +181,11 @@ const Pricing = () => {
           <span className="inline-block text-xs font-bold uppercase tracking-widest text-brand-300 bg-brand-300/10 border border-brand-300/20 px-3 py-1 rounded-full mb-4">
             Pricing
           </span>
-          <h1 className="text-4xl sm:text-5xl font-black text-white tracking-tight">
+          <h1 className="text-4xl sm:text-5xl font-black tracking-tight" style={{color:'var(--text-heading)'}}>
             Start Free.<br />
-            <span style={{ color: '#00f0ff' }}>Scale when you're ready.</span>
+            <span style={{ color: 'var(--text-accent)' }}>Scale when you're ready.</span>
           </h1>
-          <p className="mt-4 text-neutral-400 text-base max-w-xl mx-auto">
+          <p className="mt-4 text-base max-w-xl mx-auto" style={{color:'var(--text-muted)'}}>
             Every new user gets two free teams with full AI access — no credit card required. Upgrade when you need more.
           </p>
         </div>
@@ -230,10 +232,10 @@ const Pricing = () => {
                     {plan.name}
                   </div>
                   <div className="flex items-end gap-1">
-                    <span className="text-4xl font-black text-white">{plan.price}</span>
-                    {plan.period && <span className="text-sm text-neutral-500 mb-1">{plan.period}</span>}
+                    <span className="text-4xl font-black" style={{color:'var(--text-heading)'}}>{plan.price}</span>
+                    {plan.period && <span className="text-sm mb-1" style={{color:'var(--text-muted)'}}>{plan.period}</span>}
                   </div>
-                  <p className="text-xs text-neutral-500 mt-1">{plan.tagline}</p>
+                  <p className="text-xs mt-1" style={{color:'var(--text-muted)'}}>{plan.tagline}</p>
                 </div>
 
                 {/* Divider */}
@@ -242,7 +244,7 @@ const Pricing = () => {
                 {/* Features */}
                 <ul className="flex flex-col gap-2.5 flex-1">
                   {plan.features.map(({ icon: Icon, text }) => (
-                    <li key={text} className="flex items-start gap-2.5 text-xs text-neutral-300">
+                    <li key={text} className="flex items-start gap-2.5 text-xs" style={{color:'var(--text-body)'}}>
                       <CheckCircle size={13} className="shrink-0 mt-0.5" style={{ color: plan.color }} />
                       <span>{text}</span>
                     </li>
@@ -269,13 +271,13 @@ const Pricing = () => {
 
         {/* Feature Comparison Table */}
         <div className="mb-16">
-          <h2 className="text-xl font-black text-white text-center mb-6">Full Feature Comparison</h2>
-          <div className="rounded-2xl border border-neutral-800 overflow-hidden">
+          <h2 className="text-xl font-black text-center mb-6" style={{color:'var(--text-heading)'}}>Full Feature Comparison</h2>
+          <div className="rounded-2xl pricing-table-container overflow-hidden">
             <table className="w-full text-sm">
               <thead>
-                <tr className="border-b border-neutral-800" style={{ background: 'rgba(255,255,255,0.02)' }}>
-                  <th className="text-left px-6 py-3 text-neutral-500 font-bold uppercase text-xs tracking-wider">Feature</th>
-                  <th className="text-center px-4 py-3 text-neutral-500 font-bold uppercase text-xs tracking-wider">Free</th>
+                <tr className="pricing-table-row" style={{background:'var(--bg-elevated)'}}>
+                  <th className="text-left px-6 py-3 font-bold uppercase text-xs tracking-wider" style={{color:'var(--text-muted)'}}>Feature</th>
+                  <th className="text-center px-4 py-3 font-bold uppercase text-xs tracking-wider" style={{color:'var(--text-muted)'}}>Free</th>
                   <th className="text-center px-4 py-3 font-bold uppercase text-xs tracking-wider" style={{ color: '#00f0ff' }}>Pro</th>
                   <th className="text-center px-4 py-3 font-bold uppercase text-xs tracking-wider" style={{ color: '#a855f7' }}>Team</th>
                 </tr>
@@ -295,16 +297,16 @@ const Pricing = () => {
                   ['Task Swapping', false, false, true],
                   ['Collaboration Requests', false, false, true]
                 ].map(([feature, free, pro, team], i) => (
-                  <tr key={feature} className={`border-b border-neutral-800/50 ${i % 2 === 0 ? '' : 'bg-white/1'}`}>
-                    <td className="px-6 py-3 text-neutral-300 text-xs font-medium">{feature}</td>
+                  <tr key={feature} className="pricing-table-row" style={{background: i % 2 !== 0 ? 'var(--bg-elevated)' : 'transparent'}}>
+                    <td className="px-6 py-3 text-xs font-medium" style={{color:'var(--text-body)'}}>{feature}</td>
                     {[free, pro, team].map((val, j) => (
                       <td key={j} className="px-4 py-3 text-center">
                         {val === true ? (
-                          <CheckCircle size={15} className="mx-auto text-emerald-400" />
+                          <CheckCircle size={15} className="mx-auto" style={{color:'var(--color-success)'}} />
                         ) : val === false ? (
-                          <span className="text-neutral-700 text-lg leading-none">—</span>
+                          <span className="text-lg leading-none" style={{color:'var(--text-muted)'}}>—</span>
                         ) : (
-                          <span className="text-xs font-bold text-neutral-300">{val}</span>
+                          <span className="text-xs font-bold" style={{color:'var(--text-body)'}}>{val}</span>
                         )}
                       </td>
                     ))}
@@ -317,23 +319,22 @@ const Pricing = () => {
 
         {/* FAQ */}
         <div className="mb-16 max-w-2xl mx-auto">
-          <h2 className="text-xl font-black text-white text-center mb-6">Frequently Asked Questions</h2>
+          <h2 className="text-xl font-black text-center mb-6" style={{color:'var(--text-heading)'}}>Frequently Asked Questions</h2>
           <div className="flex flex-col gap-3">
             {FAQ.map((item, i) => (
               <div
                 key={i}
-                className="rounded-xl border border-neutral-800 overflow-hidden"
-                style={{ background: 'rgba(255,255,255,0.02)' }}
+                className="rounded-xl pricing-faq-item overflow-hidden"
               >
                 <button
                   onClick={() => setOpenFaq(openFaq === i ? null : i)}
                   className="w-full text-left px-5 py-4 flex justify-between items-center bg-transparent border-0 cursor-pointer"
                 >
-                  <span className="text-sm font-semibold text-white">{item.q}</span>
-                  <span className="text-neutral-500 text-lg">{openFaq === i ? '−' : '+'}</span>
+                  <span className="text-sm font-semibold" style={{color:'var(--text-heading)'}}>{item.q}</span>
+                  <span className="text-lg" style={{color:'var(--text-muted)'}}>{openFaq === i ? '−' : '+'}</span>
                 </button>
                 {openFaq === i && (
-                  <div className="px-5 pb-4 text-xs text-neutral-400 leading-relaxed border-t border-neutral-800">
+                  <div className="px-5 pb-4 text-xs leading-relaxed" style={{borderTop:'1px solid var(--border-color)',color:'var(--text-muted)',marginTop:'0'}}>
                     {item.a}
                   </div>
                 )}

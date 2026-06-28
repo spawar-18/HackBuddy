@@ -303,7 +303,7 @@ const TeamDetails = () => {
   }
 
   return (
-    <div className="min-h-screen bg-neutral-50 py-8 px-4 sm:px-6">
+    <div className="min-h-screen py-8 px-4 sm:px-6" style={{ background: 'var(--bg-app)' }}>
       <div className="max-w-[1280px] mx-auto flex flex-col gap-5">
         {/* Back Button */}
         <button
@@ -318,17 +318,17 @@ const TeamDetails = () => {
           {/* Left Panel: Team Info, Settings & Members (1 Column) */}
           <div className="lg:col-span-1 flex flex-col gap-6">
             {/* Team Profile Card */}
-            <div className="bg-white border border-neutral-200 rounded-xl p-6 shadow-xs flex flex-col gap-5">
-              <div className="flex items-center gap-3 border-b border-neutral-100 pb-3">
-                <div className="w-10 h-10 bg-brand-50 text-brand-600 rounded-lg flex items-center justify-center shrink-0">
+            <div className="card p-6 flex flex-col gap-5">
+              <div className="flex items-center gap-3 pb-3" style={{borderBottom:'1px solid var(--border-color)'}}>
+                <div className="icon-box w-10 h-10 rounded-lg flex items-center justify-center shrink-0">
                   <Users size={20} />
                 </div>
-                <h2 className="text-xs font-bold text-neutral-505 tracking-wider uppercase">Team Profile</h2>
+                <h2 className="text-xs font-bold tracking-wider uppercase" style={{color:'var(--text-muted)'}}>Team Profile</h2>
               </div>
 
               <div>
-                <h1 className="text-xl font-extrabold text-neutral-900 tracking-tight">{team.teamName}</h1>
-                <p className="text-xs text-neutral-500 mt-1.5 leading-relaxed">{team.description || 'No description provided for this team.'}</p>
+                <h1 className="text-xl font-extrabold tracking-tight" style={{color:'var(--text-heading)'}}>{team.teamName}</h1>
+                <p className="text-xs mt-1.5 leading-relaxed" style={{color:'var(--text-muted)'}}>{team.description || 'No description provided for this team.'}</p>
               </div>
 
               <button
@@ -342,40 +342,46 @@ const TeamDetails = () => {
               <div className="flex flex-col gap-4">
                 {/* Invite Code */}
                 <div className="flex flex-col gap-1.5">
-                  <span className="input-label">INVITE CODE</span>
-                  <div className="flex items-center justify-between p-3 bg-neutral-50 border border-neutral-200 rounded-lg font-mono text-sm">
-                    <span className="code-val font-bold text-neutral-900 tracking-wider">{team.inviteCode}</span>
+                  <span className="input-label">Invite Code</span>
+                  <div className="flex items-center justify-between p-3 rounded-lg font-mono text-sm" style={{background:'var(--bg-input)',border:'1px solid var(--border-color)'}}>
+                    <span className="code-val font-bold tracking-wider" style={{color:'var(--text-heading)'}}>{team.inviteCode}</span>
                     <button
                       onClick={() => copyToClipboard(team.inviteCode, 'code')}
-                      className="p-1 hover:bg-neutral-200 rounded text-neutral-400 hover:text-neutral-700 cursor-pointer transition-colors"
+                      className="p-1 rounded cursor-pointer transition-colors"
+                      style={{background:'transparent',border:'none',color:'var(--text-muted)'}}
+                      onMouseEnter={e=>e.currentTarget.style.color='var(--text-heading)'}
+                      onMouseLeave={e=>e.currentTarget.style.color='var(--text-muted)'}
                       title="Copy Invite Code"
                     >
-                      {copiedCode ? <Check size={14} className="text-emerald-600" /> : <Copy size={14} />}
+                      {copiedCode ? <Check size={14} style={{color:'var(--color-success)'}} /> : <Copy size={14} />}
                     </button>
                   </div>
                 </div>
 
                 {/* Invite Link */}
                 <div className="flex flex-col gap-1.5">
-                  <span className="input-label">SHAREABLE INVITE LINK</span>
-                  <div className="flex items-center justify-between p-3 bg-neutral-50 border border-neutral-200 rounded-lg font-mono text-sm">
-                    <span className="text-xs text-neutral-500 overflow-hidden text-ellipsis whitespace-nowrap max-w-[190px]" title={team.inviteLink}>
+                  <span className="input-label">Shareable Invite Link</span>
+                  <div className="flex items-center justify-between p-3 rounded-lg font-mono text-sm" style={{background:'var(--bg-input)',border:'1px solid var(--border-color)'}}>
+                    <span className="text-xs overflow-hidden text-ellipsis whitespace-nowrap max-w-[190px]" title={team.inviteLink} style={{color:'var(--text-muted)'}}>
                       {team.inviteLink}
                     </span>
                     <button
                       onClick={() => copyToClipboard(team.inviteLink, 'link')}
-                      className="p-1 hover:bg-neutral-200 rounded text-neutral-400 hover:text-neutral-700 cursor-pointer transition-colors"
+                      className="p-1 rounded cursor-pointer transition-colors"
+                      style={{background:'transparent',border:'none',color:'var(--text-muted)'}}
+                      onMouseEnter={e=>e.currentTarget.style.color='var(--text-heading)'}
+                      onMouseLeave={e=>e.currentTarget.style.color='var(--text-muted)'}
                       title="Copy Invite Link"
                     >
-                      {copiedLink ? <Check size={14} className="text-emerald-600" /> : <Copy size={14} />}
+                      {copiedLink ? <Check size={14} style={{color:'var(--color-success)'}} /> : <Copy size={14} />}
                     </button>
                   </div>
                 </div>
 
                 {/* Created By */}
-                <div className="flex items-center justify-between border-t border-neutral-100 pt-4 text-xs font-semibold text-neutral-500">
+                <div className="flex items-center justify-between pt-4 text-xs font-semibold" style={{borderTop:'1px solid var(--border-color)',color:'var(--text-muted)'}}>
                   <span>Squad Leader:</span>
-                  <span className="flex items-center gap-1 text-brand-600">
+                  <span className="flex items-center gap-1" style={{color:'var(--text-accent)'}}>
                     <Shield size={12} />
                     {team.createdBy?.name || 'Unknown'}
                   </span>
@@ -384,12 +390,12 @@ const TeamDetails = () => {
             </div>
 
             {/* Team Settings Section */}
-            <div className="bg-white border border-neutral-200 rounded-xl p-6 shadow-xs flex flex-col gap-5">
-              <div className="flex items-center gap-3 border-b border-neutral-100 pb-3">
-                <div className="w-10 h-10 bg-brand-50 text-brand-600 rounded-lg flex items-center justify-center shrink-0">
+            <div className="card p-6 flex flex-col gap-5">
+              <div className="flex items-center gap-3 pb-3" style={{borderBottom:'1px solid var(--border-color)'}}>
+                <div className="icon-box w-10 h-10 rounded-lg flex items-center justify-center shrink-0">
                   <Shield size={20} />
                 </div>
-                <h2 className="text-xs font-bold text-neutral-500 tracking-wider uppercase">Team Settings</h2>
+                <h2 className="text-xs font-bold tracking-wider uppercase" style={{color:'var(--text-muted)'}}>Team Settings</h2>
               </div>
 
               {isOwner ? (
@@ -403,14 +409,16 @@ const TeamDetails = () => {
                         return (
                           <div 
                             key={member._id} 
-                            className="flex justify-between items-center px-3 py-2 bg-neutral-50 border border-neutral-200 rounded-lg"
+                            className="flex justify-between items-center px-3 py-2 rounded-lg"
+                            style={{background:'var(--bg-input)',border:'1px solid var(--border-color)'}}
                           >
-                            <span className="text-xs font-bold text-neutral-800">
+                            <span className="text-xs font-bold" style={{color:'var(--text-heading)'}}>
                               {member.name} {isMemberCreator && '(Owner)'}
                             </span>
                             {!isMemberCreator && (
                               <button
-                                className="px-2.5 py-1 text-[11px] font-semibold text-red-600 bg-red-50 hover:bg-red-100 border border-red-200 hover:border-red-300 rounded-md transition-colors cursor-pointer disabled:opacity-50"
+                                className="px-2.5 py-1 text-[11px] font-semibold text-red-650 bg-transparent border-0 cursor-pointer hover:underline"
+                                style={{color:'var(--color-error)'}}
                                 onClick={() => triggerRemoveMember(member)}
                                 disabled={loadingAction}
                               >
@@ -423,17 +431,18 @@ const TeamDetails = () => {
                     </div>
                   </div>
 
-                  <hr className="border-neutral-100" />
+                  <hr style={{borderColor:'var(--border-color)'}} />
 
                   {/* Transfer Ownership */}
                   <div className="flex flex-col gap-2">
                     <span className="input-label">Transfer Ownership</span>
-                    <p className="text-xs text-neutral-400 leading-normal">
+                    <p className="text-xs leading-normal" style={{color:'var(--text-muted)'}}>
                       Select a team member to transfer ownership to. You will lose owner privileges.
                     </p>
                     <div className="flex gap-2">
                       <select 
                         className="input-field text-xs py-2 pr-8"
+                        style={{background:'var(--bg-input)',color:'var(--text-heading)'}}
                         value={newOwnerId}
                         onChange={(e) => setNewOwnerId(e.target.value)}
                         disabled={loadingAction}
@@ -442,7 +451,7 @@ const TeamDetails = () => {
                         {team.members && team.members
                           .filter(m => m._id !== user?._id)
                           .map(m => (
-                            <option key={m._id} value={m._id}>{m.name}</option>
+                            <option key={m._id} value={m._id} style={{background:'var(--bg-card)'}}>{m.name}</option>
                           ))
                         }
                       </select>
@@ -456,15 +465,15 @@ const TeamDetails = () => {
                     </div>
                   </div>
 
-                  <hr className="border-neutral-100" />
+                  <hr style={{borderColor:'var(--border-color)'}} />
 
                   {/* Danger Zone */}
-                  <div className="border border-red-200 rounded-xl bg-red-50/40 p-4 flex flex-col gap-2.5">
-                    <h3 className="text-xs font-bold text-red-700 tracking-wider uppercase flex items-center gap-1.5">
+                  <div className="rounded-xl p-4 flex flex-col gap-2.5" style={{border:'1px solid var(--color-error)',background:'rgba(239,68,68,0.05)'}}>
+                    <h3 className="text-xs font-bold tracking-wider uppercase flex items-center gap-1.5" style={{color:'var(--color-error)'}}>
                       <AlertTriangle size={14} />
                       Danger Zone
                     </h3>
-                    <p className="text-xs text-red-600/80 leading-normal">
+                    <p className="text-xs leading-normal" style={{color:'var(--text-body)'}}>
                       This action is permanent. All team records and projects will be permanently expunged.
                     </p>
                     <button
@@ -478,7 +487,7 @@ const TeamDetails = () => {
                 </div>
               ) : (
                 <div className="flex flex-col gap-4">
-                  <p className="text-xs text-neutral-500 leading-relaxed">
+                  <p className="text-xs leading-relaxed" style={{color:'var(--text-body)'}}>
                     You are currently a team member. You can choose to leave this team workspace at any time.
                   </p>
                   <button
@@ -493,13 +502,13 @@ const TeamDetails = () => {
             </div>
 
             {/* Squad Members Directory Card */}
-            <div className="bg-white border border-neutral-200 rounded-xl p-6 shadow-xs flex flex-col gap-5">
-              <div className="flex items-center justify-between border-b border-neutral-100 pb-3">
+            <div className="card p-6 flex flex-col gap-5">
+              <div className="flex items-center justify-between pb-3" style={{borderBottom:'1px solid var(--border-color)'}}>
                 <div className="flex items-center gap-3">
-                  <div className="w-10 h-10 bg-emerald-50 text-emerald-600 rounded-lg flex items-center justify-center shrink-0">
+                  <div className="icon-box w-10 h-10 rounded-lg flex items-center justify-center shrink-0">
                     <Users size={20} />
                   </div>
-                  <h2 className="text-xs font-bold text-neutral-500 tracking-wider uppercase">
+                  <h2 className="text-xs font-bold tracking-wider uppercase" style={{color:'var(--text-muted)'}}>
                     Squad Members ({team.members?.length || 0})
                   </h2>
                 </div>
@@ -511,28 +520,29 @@ const TeamDetails = () => {
                   const isCreator = team.createdBy?._id === member._id || team.createdBy === member._id;
                   
                   return (
-                    <div key={member._id} className="border border-neutral-200 rounded-xl p-4 bg-neutral-50/50 flex flex-col gap-3.5 hover:border-neutral-300 transition-all duration-200">
+                    <div key={member._id} className="rounded-xl p-4 flex flex-col gap-3.5 hover:scale-[1.01] transition-all duration-200" style={{background:'var(--bg-elevated)',border:'1px solid var(--border-color)'}}>
                       <div className="flex items-center justify-between w-full">
                         <div className="flex items-center gap-3">
                           {member.avatar ? (
                             <img 
                               src={member.avatar} 
                               alt={member.name} 
-                              className="w-10 h-10 rounded-full border border-neutral-200 object-cover shrink-0"
+                              className="w-10 h-10 rounded-full object-cover shrink-0"
+                              style={{border:'1.5px solid var(--border-color)'}}
                             />
                           ) : (
-                            <div className="w-10 h-10 rounded-full bg-brand-50 border border-brand-100 text-brand-700 flex items-center justify-center font-bold text-sm shrink-0">
+                            <div className="avatar-fallback w-10 h-10 rounded-full flex items-center justify-center font-bold text-sm shrink-0" style={{background:'var(--btn-primary-bg)',color:'#fff'}}>
                               {member.name ? member.name.charAt(0).toUpperCase() : 'U'}
                             </div>
                           )}
                           <div>
-                            <div className="text-sm font-semibold text-neutral-900 flex items-center gap-2">
+                            <div className="text-sm font-semibold flex items-center gap-2" style={{color:'var(--text-heading)'}}>
                               {member.name}
                               {isCreator && (
-                                <span className="inline-flex items-center px-2 py-0.5 rounded-full text-[9px] font-bold bg-brand-50 border border-brand-100 text-brand-700 uppercase tracking-wider">Lead</span>
+                                <span className="status-badge badge-active text-[9px]">Lead</span>
                               )}
                             </div>
-                            <div className="text-xs text-neutral-450 flex items-center gap-1.5 mt-0.5">
+                            <div className="text-xs flex items-center gap-1.5 mt-0.5" style={{color:'var(--text-muted)'}}>
                               <Mail size={12} />
                               {member.email}
                             </div>
@@ -542,7 +552,8 @@ const TeamDetails = () => {
                         {/* If current user is owner and this member is not the owner/creator */}
                         {isOwner && !isCreator && (
                           <button
-                            className="px-2.5 py-1.5 text-[11px] font-semibold text-red-600 bg-red-50 hover:bg-red-100 border border-red-200 hover:border-red-300 rounded-md transition-colors cursor-pointer disabled:opacity-50"
+                            className="px-2.5 py-1 text-[11px] font-semibold text-red-650 bg-transparent border-0 cursor-pointer hover:underline"
+                            style={{color:'var(--color-error)'}}
                             onClick={() => triggerRemoveMember(member)}
                             disabled={loadingAction}
                             title={`Remove ${member.name}`}
@@ -553,20 +564,20 @@ const TeamDetails = () => {
                       </div>
 
                       {/* Member Skills */}
-                      <div className="border-t border-neutral-200/60 pt-3">
-                        <span className="text-[10px] font-bold text-neutral-400 tracking-wider uppercase flex items-center gap-1 mb-2">
+                      <div className="pt-3" style={{borderTop:'1px solid var(--border-color)'}}>
+                        <span className="text-[10px] font-bold tracking-wider uppercase flex items-center gap-1 mb-2" style={{color:'var(--text-muted)'}}>
                           <Code size={11} />
                           Skills Stack
                         </span>
                         <div className="flex flex-wrap gap-1.5">
                           {member.skills && member.skills.length > 0 ? (
                             member.skills.map((skill, sIdx) => (
-                              <span key={sIdx} className="px-2 py-0.5 text-[11px] font-medium bg-white border border-neutral-200 hover:border-neutral-300 hover:text-neutral-800 text-neutral-500 rounded-lg transition-colors cursor-default">
+                              <span key={sIdx} className="px-2 py-0.5 text-[11px] font-medium rounded-lg cursor-default transition-all" style={{background:'var(--bg-input)',border:'1px solid var(--border-color)',color:'var(--text-body)'}}>
                                 {skill}
                               </span>
                             ))
                           ) : (
-                            <span className="text-xs text-neutral-400 italic">
+                            <span className="text-xs italic" style={{color:'var(--text-muted)'}}>
                               No skills registered on profile yet.
                             </span>
                           )}

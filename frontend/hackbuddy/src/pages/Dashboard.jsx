@@ -348,20 +348,20 @@ const Dashboard = () => {
           >
             {mobileNavOpen ? <X size={16} /> : <Menu size={16} />}
           </button>
-          <div className="w-8 h-8 rounded-lg bg-neutral-950 text-white flex items-center justify-center text-sm font-bold shadow-xs">H</div>
-          <span className="font-extrabold text-lg tracking-tight font-sans text-neutral-900">
-            Hack<span className="text-brand-500">Buddy</span>
+          <div className="w-8 h-8 rounded-lg bg-brand-900 text-white flex items-center justify-center text-sm font-bold shadow-sm border border-brand-200" style={{background:'var(--btn-primary-bg)'}}>H</div>
+          <span className="font-extrabold text-lg tracking-tight font-sans" style={{color:'var(--text-heading)'}}>
+            Hack<span className="text-brand-300">Buddy</span>
           </span>
           <span className="status-badge badge-active ml-2.5 text-[10px] hidden sm:flex items-center gap-1">
-            <span className="status-pulse bg-emerald-500"></span>
+            <span className="status-pulse" style={{background:'#10b981'}}></span>
             PERSONAL CONSOLE
           </span>
         </div>
 
         {/* Current Project Selector Dropdown */}
         {activeProjectsList.length > 0 && (
-          <div className="flex items-center gap-2 bg-neutral-100 border border-neutral-200 px-3 py-1.5 rounded-xl shadow-2xs">
-            <span className="text-[10px] font-bold text-neutral-450 uppercase tracking-widest hidden sm:inline">Active Workspace:</span>
+          <div className="workspace-selector flex items-center gap-2 px-3 py-1.5 rounded-lg" style={{background:'var(--bg-elevated)',border:'1px solid var(--border-color)'}}>
+            <span className="text-[10px] font-bold uppercase tracking-widest hidden sm:inline" style={{color:'var(--text-muted)'}}>Workspace:</span>
             <select
               value={currentProjectId || ''}
               onChange={(e) => {
@@ -369,10 +369,10 @@ const Dashboard = () => {
                 setSelectedProjectId(projId);
                 navigate(`/workspace/${projId}`);
               }}
-              className="bg-transparent border-0 text-xs font-bold text-neutral-600 focus:outline-hidden cursor-pointer p-0"
+              style={{background:'transparent',border:'none',fontSize:'0.75rem',fontWeight:700,color:'var(--text-heading)',cursor:'pointer',outline:'none',padding:0}}
             >
               {activeProjectsList.map(proj => (
-                <option key={proj._id} value={proj._id} className="bg-neutral-100 text-neutral-600">{proj.projectName}</option>
+                <option key={proj._id} value={proj._id} style={{background:'var(--bg-elevated)',color:'var(--text-heading)'}}>{proj.projectName}</option>
               ))}
             </select>
           </div>
@@ -390,9 +390,9 @@ const Dashboard = () => {
                   handleMarkAllAsRead();
                 }
               }}
-              className="p-1 bg-transparent border-0 cursor-pointer hover:bg-neutral-50 rounded-lg transition-colors relative flex items-center justify-center"
+              className="p-1.5 bg-transparent border-0 cursor-pointer rounded-lg transition-colors relative flex items-center justify-center" style={{color:'var(--text-muted)'}}
             >
-              <Bell size={18} className="text-neutral-500 hover:text-neutral-800" />
+              <Bell size={18} />
               {totalUnreadCount > 0 && (
                 <span className="absolute top-0 right-0 w-3.5 h-3.5 bg-red-500 text-white text-[8px] font-bold rounded-full flex items-center justify-center border border-white">
                   {totalUnreadCount}
@@ -401,37 +401,34 @@ const Dashboard = () => {
             </button>
 
             {showNotifications && (
-              <div className="absolute right-0 mt-3 w-80 bg-white/95 backdrop-blur-md border border-brand-100 rounded-2xl shadow-xl z-50 p-4 max-h-96 overflow-y-auto animate-slide-up flex flex-col gap-3">
-                <div className="flex justify-between items-center border-b border-neutral-100 pb-2.5">
-                  <h3 className="text-[10px] font-black text-neutral-800 uppercase tracking-widest flex items-center gap-1.5">
-                    <Bell size={11} className="text-brand-500" /> Alerts & Notifications
+              <div className="notification-dropdown absolute right-0 mt-3 w-80 rounded-xl shadow-2xl z-50 p-4 max-h-96 overflow-y-auto animate-slide-up flex flex-col gap-3" style={{background:'var(--bg-card)',border:'1px solid var(--border-color)',backdropFilter:'blur(16px)'}}>
+                <div className="flex justify-between items-center pb-2.5" style={{borderBottom:'1px solid var(--border-color)'}}>
+                  <h3 className="text-[10px] font-black uppercase tracking-widest flex items-center gap-1.5" style={{color:'var(--text-heading)'}}>
+                    <Bell size={11} style={{color:'var(--text-accent)'}} /> Notifications
                   </h3>
-                  <span className="text-[9px] font-bold bg-brand-50 px-2 py-0.5 rounded-full border border-brand-100/50 text-brand-700 font-mono">
+                  <span className="text-[9px] font-bold px-2 py-0.5 rounded-full font-mono status-badge badge-neutral">
                     {combinedNotifications.length} Total
                   </span>
                 </div>
-                <div className="flex flex-col gap-2.5">
+                <div className="flex flex-col gap-2">
                   {combinedNotifications.length === 0 ? (
-                    <p className="text-[10px] text-neutral-400 italic text-center py-8">No recent alerts in your squads.</p>
+                    <p className="text-[10px] italic text-center py-8" style={{color:'var(--text-muted)'}}>No recent alerts in your squads.</p>
                   ) : (
                     combinedNotifications.map((notif, idx) => (
                       <div
                         key={idx}
-                        onClick={() => {
-                          if (notif.isMeet) {
-                            navigate('/chat');
-                          }
+                        onClick={() => { if (notif.isMeet) navigate('/chat'); }}
+                        className="notification-item p-2.5 rounded-lg text-[11px] text-left transition-all"
+                        style={{
+                          background: notif.isMeet ? 'rgba(239,68,68,0.06)' : 'var(--bg-elevated)',
+                          border: `1px solid ${notif.isMeet ? 'rgba(239,68,68,0.25)' : 'var(--border-color)'}`,
+                          cursor: notif.isMeet ? 'pointer' : 'default'
                         }}
-                        className={`p-3 rounded-xl border border-brand-200/20 text-[11px] text-left hover:shadow-2xs bg-neutral-900/30 transition-all ${
-                          notif.isMeet ? 'cursor-pointer hover:bg-brand-500/10 border-red-500/30' : ''
-                        }`}
                       >
-                        <span className={`font-extrabold text-[8px] uppercase tracking-wider block mb-0.5 ${
-                          notif.isMeet ? 'text-red-400' : 'text-neutral-400'
-                        }`}>
+                        <span className="font-extrabold text-[8px] uppercase tracking-wider block mb-0.5" style={{color: notif.isMeet ? '#ef4444' : 'var(--text-muted)'}}>
                           {notif.projectName}
                         </span>
-                        <span className={`font-medium ${notif.isMeet ? 'text-white' : 'text-neutral-850'}`}>{notif.message}</span>
+                        <span style={{color:'var(--text-body)',fontWeight:500}}>{notif.message}</span>
                       </div>
                     ))
                   )}
@@ -440,24 +437,27 @@ const Dashboard = () => {
             )}
           </div>
 
-          <Settings size={18} className="text-neutral-500 hover:text-neutral-800 cursor-pointer transition-colors" onClick={() => navigate('/profile')} />
+          <button className="p-1.5 rounded-lg bg-transparent border-0 cursor-pointer transition-colors flex items-center justify-center" style={{color:'var(--text-muted)'}} onClick={() => navigate('/profile')} aria-label="Settings">
+            <Settings size={17} />
+          </button>
 
           <button
             onClick={() => setIsDark(prev => !prev)}
-            className="p-1.5 rounded-lg bg-transparent border-0 cursor-pointer hover:bg-neutral-100/10 transition-colors flex items-center justify-center"
+            className="p-1.5 rounded-lg bg-transparent border-0 cursor-pointer transition-colors flex items-center justify-center"
+            aria-label="Toggle theme"
           >
-            {isDark ? <Sun size={17} className="text-yellow-400" /> : <Moon size={17} className="text-neutral-500" />}
+            {isDark ? <Sun size={17} style={{color:'#facc15'}} /> : <Moon size={17} style={{color:'var(--text-muted)'}} />}
           </button>
 
-          <div className="flex items-center gap-2 border-l border-neutral-200 pl-4 h-6">
+          <div className="flex items-center gap-2 pl-3 h-6" style={{borderLeft:'1px solid var(--border-color)'}}>
             {activeUser?.avatar ? (
-              <img src={activeUser.avatar} alt="Avatar" className="w-7 h-7 rounded-full border border-neutral-200 object-cover" />
+              <img src={activeUser.avatar} alt="Avatar" className="w-7 h-7 rounded-full object-cover" style={{border:'1.5px solid var(--border-color-hover)'}} />
             ) : (
-              <div className="w-7 h-7 rounded-full bg-neutral-950 text-white flex items-center justify-center text-xs font-bold shadow-xs">
+              <div className="avatar-fallback w-7 h-7 rounded-full flex items-center justify-center text-xs font-bold" style={{background:'var(--btn-primary-bg)',color:'#fff'}}>
                 {activeUser?.name?.charAt(0).toUpperCase() || 'U'}
               </div>
             )}
-            <span className="text-xs font-semibold text-neutral-800 hidden lg:block">{activeUser?.name}</span>
+            <span className="text-xs font-semibold hidden lg:block" style={{color:'var(--text-heading)'}}>{activeUser?.name}</span>
           </div>
         </div>
       </header>
@@ -514,51 +514,50 @@ const Dashboard = () => {
             </button>
           </div>
 
-          <div className="sidebar-menu flex flex-col gap-1 w-full border-t border-neutral-200/80 pt-4 mt-auto">
+          <div className="sidebar-menu flex flex-col gap-1 w-full pt-3 mt-auto" style={{borderTop:'1px solid var(--border-color)'}}>
 
             {/* Subscription Status Widget */}
-            <div className="rounded-xl border border-brand-200/50 bg-neutral-50/30 p-3 mb-3 text-left">
-              {/* Plan badge */}
+            <div className="subscription-widget rounded-xl p-3 mb-3 text-left" style={{background:'var(--tab-active-bg)',border:'1px solid var(--border-color-hover)'}}>
               <div className="flex items-center justify-between mb-2">
                 <span className="text-[9px] font-black uppercase tracking-widest"
                   style={{
                     color: subscription?.plan === 'TEAM' ? '#a855f7'
-                         : subscription?.plan === 'PRO'  ? '#00f0ff'
-                         : '#6b7280'
+                         : subscription?.plan === 'PRO'  ? 'var(--text-accent)'
+                         : 'var(--text-muted)'
                   }}>
-                  {subscription?.plan === 'TEAM' ? '🚀 Team Workspace'
-                   : subscription?.plan === 'PRO'  ? '⭐ Pro Workspace'
-                   : '🆓 Free Workspace'}
+                  {subscription?.plan === 'TEAM' ? '🚀 Team'
+                   : subscription?.plan === 'PRO'  ? '⭐ Pro'
+                   : '🆓 Free'}
                 </span>
-                <span className="text-[8px] font-bold px-1.5 py-0.5 rounded-full bg-emerald-500/10 text-emerald-400 border border-emerald-500/20">
+                <span className="status-badge badge-active" style={{fontSize:'0.6rem'}}>
                   {subscription?.status || 'active'}
                 </span>
               </div>
 
-              {/* Team usage */}
-              <p className="text-[9px] text-neutral-400 leading-tight">
-                Teams: <span className="font-bold text-neutral-200">
+              <p className="text-[9px] leading-tight" style={{color:'var(--text-muted)'}}>
+                Teams: <span className="font-bold" style={{color:'var(--text-heading)'}}>
                   {limits?.teamsOwned ?? teams.length} / {limits?.maxTeams === 'Unlimited' || subscription?.plan !== 'FREE' ? 'Unlimited' : 2}
                 </span>
               </p>
 
               <button
                 onClick={() => navigate('/pricing')}
-                className="mt-2.5 w-full text-[9px] font-bold py-1.5 rounded-md btn-primary"
+                className="mt-2 w-full text-[9px] font-bold py-1.5 rounded-md btn-primary"
               >
-                {subscription?.plan === 'FREE' ? 'Upgrade Workspace ⭐' : 'Manage Billing'}
+                {subscription?.plan === 'FREE' ? 'Upgrade ⭐' : 'Manage Billing'}
               </button>
             </div>
 
             <a href="#docs" className="menu-item">
-              <BookOpen size={16} />
+              <BookOpen size={15} />
               <span>Documentation</span>
             </a>
             <button
               onClick={handleLogout}
-              className="menu-item w-full bg-transparent border-0 cursor-pointer text-left flex items-center gap-3 py-2 text-neutral-600 hover:text-neutral-900"
+              className="menu-item w-full"
+              style={{color:'var(--color-error)'}}
             >
-              <LogOut size={16} />
+              <LogOut size={15} />
               <span>Log Out</span>
             </button>
           </div>
@@ -691,33 +690,25 @@ const Dashboard = () => {
             <div className="lg:col-span-2 flex flex-col gap-6 w-full">
               
               {/* AI Personal Assistant Banner */}
-              <div className="dashboard-card glow-blue border-l-4 border-l-[#00f0ff] p-5">
-                <div className="flex justify-between items-start border-b border-brand-200/20 pb-3">
-                    <h2 className="text-base font-extrabold text-white">
-                      {(() => {
-                        const hour = new Date().getHours();
-                        if (hour < 12) return 'Good Morning';
-                        if (hour < 17) return 'Good Afternoon';
-                        return 'Good Evening';
-                      })()}, {activeUser?.name || 'Sahil'}.
-                    </h2>
-                  <span className="text-[8px] font-extrabold px-1.5 py-0.5 rounded bg-brand-200/10 text-brand-400 border border-brand-200/20 font-mono">
-                    ONLINE
-                  </span>
+              <div className="dashboard-card glow-blue p-5" style={{borderLeft:'3px solid var(--text-accent)'}}>
+                <div className="flex justify-between items-start pb-3" style={{borderBottom:'1px solid var(--border-color)'}}>
+                  <h2 className="text-base font-extrabold" style={{color:'var(--text-heading)'}}>
+                    {(() => {
+                      const hour = new Date().getHours();
+                      if (hour < 12) return 'Good Morning';
+                      if (hour < 17) return 'Good Afternoon';
+                      return 'Good Evening';
+                    })()}, {activeUser?.name || 'Developer'}.
+                  </h2>
+                  <span className="status-badge badge-active" style={{fontSize:'0.6rem',fontFamily:'var(--font-mono)'}}>ONLINE</span>
                 </div>
-                <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 mt-3 text-left">
-                  <div className="bg-neutral-900/40 p-2.5 rounded-xl border border-brand-200/10">
-                    <span className="text-[8px] font-black uppercase text-neutral-400">Squads Joined</span>
-                    <div className="text-sm font-bold text-white font-mono mt-0.5">{(teams || []).length} Teams</div>
-                  </div>
-                  <div className="bg-neutral-900/40 p-2.5 rounded-xl border border-brand-200/10">
-                    <span className="text-[8px] font-black uppercase text-neutral-400">Active Workspaces</span>
-                    <div className="text-sm font-bold text-white font-mono mt-0.5">{totalProjects} Projects</div>
-                  </div>
-                  <div className="bg-neutral-900/40 p-2.5 rounded-xl border border-brand-200/10">
-                    <span className="text-[8px] font-black uppercase text-neutral-400">Milestone Events</span>
-                    <div className="text-sm font-bold text-white font-mono mt-0.5">{runningHackathons} Running</div>
-                  </div>
+                <div className="grid grid-cols-1 sm:grid-cols-3 gap-3 mt-3 text-left">
+                  {[{label:'Squads Joined',val:`${(teams||[]).length} Teams`},{label:'Active Workspaces',val:`${totalProjects} Projects`},{label:'Milestone Events',val:`${runningHackathons} Running`}].map(item=>(
+                    <div key={item.label} className="kpi-bg p-2.5 rounded-xl" style={{background:'var(--bg-elevated)',border:'1px solid var(--border-color)'}}>
+                      <span className="text-[8px] font-black uppercase" style={{color:'var(--text-muted)'}}>{item.label}</span>
+                      <div className="text-sm font-bold font-mono mt-0.5" style={{color:'var(--text-heading)'}}>{item.val}</div>
+                    </div>
+                  ))}
                 </div>
 
 
@@ -727,34 +718,34 @@ const Dashboard = () => {
               {/* Personal Summary KPIs */}
               <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 w-full">
                 {[
-                  { label: 'Projects', val: totalProjects, sub: 'Workspaces', color: 'border-l-brand-400' },
-                  { label: 'Running Hackathons', val: runningHackathons, sub: 'Milestone Events', color: 'border-l-orange-500' },
-                  { label: 'Tasks Due Today', val: tasksDueTodayCount, sub: 'Assignments', color: 'border-l-rose-500' }
+                  { label: 'Projects', val: totalProjects, sub: 'Workspaces', accent:'var(--text-accent)' },
+                  { label: 'Running Hackathons', val: runningHackathons, sub: 'Milestone Events', accent:'#f59e0b' },
+                  { label: 'Tasks Active', val: tasksDueTodayCount, sub: 'Assignments', accent:'#ef4444' }
                 ].map(k => (
-                  <div key={k.label} className={`dashboard-card glow-blue flex-col items-start gap-1 p-3.5 border-l-4 ${k.color} text-left`}>
-                    <span className="text-[8px] font-black uppercase text-neutral-400 leading-none">{k.label}</span>
-                    <div className="text-lg font-black text-white font-mono mt-1 leading-none">{k.val}</div>
-                    <span className="text-[8px] text-neutral-500 font-semibold font-mono leading-none mt-1">{k.sub}</span>
+                  <div key={k.label} className="dashboard-card glow-blue p-3.5 text-left" style={{borderLeft:`3px solid ${k.accent}`}}>
+                    <span className="text-[8px] font-black uppercase leading-none" style={{color:'var(--text-muted)'}}>{k.label}</span>
+                    <div className="text-xl font-black font-mono mt-1 leading-none" style={{color:'var(--text-heading)'}}>{k.val}</div>
+                    <span className="text-[8px] font-semibold font-mono leading-none mt-1" style={{color:'var(--text-muted)'}}>{k.sub}</span>
                   </div>
                 ))}
               </div>
 
               {/* My Projects Overview */}
               <div className="flex flex-col gap-3 text-left">
-                <span className="text-[10px] font-black uppercase tracking-widest text-[#00f0ff] flex items-center gap-2">
-                  <FolderGit2 size={14} className="text-[#00f0ff]" />
+                <span className="text-[10px] font-black uppercase tracking-widest flex items-center gap-2" style={{color:'var(--text-accent)'}}>
+                  <FolderGit2 size={14} />
                   <span>My Projects Overview</span>
                 </span>
                 
                 {/* Empty state: No Teams */}
                 {(!teams || teams.length === 0) && (
-                  <div className="dashboard-card glow-blue p-8 items-center text-center justify-center gap-4 bg-neutral-900/20 border-dashed border-neutral-700">
-                    <div className="w-12 h-12 rounded-full bg-brand-200/10 flex items-center justify-center border border-brand-200/20 text-[#00f0ff]">
+                  <div className="dashboard-card p-8 flex flex-col items-center text-center gap-4" style={{borderStyle:'dashed'}}>
+                    <div className="w-12 h-12 rounded-full flex items-center justify-center" style={{background:'var(--tab-active-bg)',border:'1px solid var(--border-color)',color:'var(--text-accent)'}}>
                       <Users size={22} />
                     </div>
                     <div>
-                      <h3 className="text-sm font-bold text-white">No active squads found</h3>
-                      <p className="text-xs text-neutral-400 mt-1 max-w-sm mx-auto leading-relaxed">
+                      <h3 className="text-sm font-bold" style={{color:'var(--text-heading)'}}>No active squads yet</h3>
+                      <p className="text-xs mt-1 max-w-sm mx-auto leading-relaxed" style={{color:'var(--text-muted)'}}>
                         Join or create a team workspace to sync projects, split deliverables, and review feasibility metrics.
                       </p>
                     </div>
@@ -775,29 +766,27 @@ const Dashboard = () => {
                         return (
                           <div
                             key={team._id}
-                            className="dashboard-card glow-blue p-4 flex flex-col justify-between border-t-2 border-t-amber-500/50 hover:-translate-y-1 transition-all"
+                            className="dashboard-card glow-blue p-4 flex flex-col justify-between hover:-translate-y-1 transition-all" style={{borderTop:'2px solid #f59e0b'}}
                           >
                             <div className="flex justify-between items-start gap-3">
                               <div className="min-w-0">
-                                <h3 className="text-xs font-extrabold text-white truncate font-mono">{team.teamName}</h3>
-                                <span className="text-[9px] text-amber-500 font-bold uppercase block mt-0.5">No Project Setup</span>
+                                <h3 className="text-xs font-extrabold truncate font-mono" style={{color:'var(--text-heading)'}}>{team.teamName}</h3>
+                                <span className="text-[9px] font-bold uppercase block mt-0.5" style={{color:'#f59e0b'}}>No Project Setup</span>
                               </div>
-                              <div className="w-8 h-8 rounded-full bg-amber-500/10 flex items-center justify-center border border-amber-500/20 text-amber-400 font-mono text-xs font-bold">
-                                ?
-                              </div>
+                              <div className="w-8 h-8 rounded-full flex items-center justify-center font-mono text-xs font-bold" style={{background:'rgba(245,158,11,0.1)',border:'1px solid rgba(245,158,11,0.25)',color:'#f59e0b'}}>?</div>
                             </div>
 
-                            <p className="text-xs text-neutral-400 mt-2 leading-relaxed">
-                              This squad has been created, but no project profile has been initialized yet. Setup the project profile to unlock AI Command Center.
+                            <p className="text-xs mt-2 leading-relaxed" style={{color:'var(--text-muted)'}}>
+                              Squad created but no project profile yet. Set up the project profile to unlock AI Command Center.
                             </p>
 
-                            {/* Footer Actions */}
-                            <div className="flex justify-end items-center border-t border-brand-200/10 pt-3 mt-4">
+                            <div className="flex justify-end items-center pt-3 mt-4" style={{borderTop:'1px solid var(--border-color)'}}>
                               <button
                                 onClick={() => navigate(`/team/${team._id}`)}
-                                className="text-[9px] font-bold bg-amber-500 hover:bg-amber-400 text-neutral-950 px-3 py-1.5 rounded-md border border-amber-500 transition-all cursor-pointer uppercase tracking-wider font-mono shadow-2xs"
+                                className="text-[9px] font-bold px-3 py-1.5 rounded-md cursor-pointer uppercase tracking-wider font-mono transition-all"
+                                style={{background:'#f59e0b',color:'#0f172a',border:'1px solid #f59e0b'}}
                               >
-                                Setup Project Profile
+                                Setup Project
                               </button>
                             </div>
                           </div>
@@ -823,59 +812,53 @@ const Dashboard = () => {
                       return (
                         <div
                           key={proj._id}
-                          className="dashboard-card glow-blue p-4 flex flex-col justify-between border-t-2 border-t-[#00f0ff] hover:-translate-y-1 transition-all"
+                          className="dashboard-card glow-blue p-4 flex flex-col justify-between hover:-translate-y-1 transition-all"
+                          style={{borderTop:'2px solid var(--text-accent)'}}
                         >
                           <div className="flex justify-between items-start gap-3">
                             <div className="min-w-0">
-                              <h3 className="text-xs font-extrabold text-white truncate font-mono">{proj.projectName}</h3>
-                              <span className="text-[9px] text-neutral-450 uppercase font-semibold block mt-0.5">Team: {team.teamName}</span>
+                              <h3 className="text-xs font-extrabold truncate font-mono" style={{color:'var(--text-heading)'}}>{proj.projectName}</h3>
+                              <span className="text-[9px] uppercase font-semibold block mt-0.5" style={{color:'var(--text-muted)'}}>Team: {team.teamName}</span>
                             </div>
-                            <CircularProgress percentage={progressPercent} size={38} strokeWidth={3} color="#00f0ff" />
+                            <CircularProgress percentage={progressPercent} size={38} strokeWidth={3} color="var(--text-accent)" />
                           </div>
 
-                          {/* Progress slider bar */}
                           <div className="flex flex-col gap-1 mt-3">
-                            <div className="flex justify-between text-[8px] text-neutral-400 font-bold uppercase">
-                              <span>Milestone Progress</span>
-                              <span className="font-mono text-white">{progressPercent}%</span>
+                            <div className="flex justify-between text-[8px] font-bold uppercase" style={{color:'var(--text-muted)'}}>
+                              <span>Progress</span>
+                              <span className="font-mono" style={{color:'var(--text-heading)'}}>{progressPercent}%</span>
                             </div>
-                            <div className="h-1.5 bg-neutral-900 rounded-full overflow-hidden p-[1px] border border-brand-200/10">
-                              <div className="h-full bg-[#00f0ff] rounded-full" style={{ width: `${progressPercent}%` }}></div>
+                            <div className="h-1.5 rounded-full overflow-hidden" style={{background:'var(--bg-elevated)',border:'1px solid var(--border-color)'}}>
+                              <div className="h-full rounded-full" style={{width:`${progressPercent}%`,background:'var(--text-accent)'}}></div>
                             </div>
                           </div>
 
-                          {/* Badges rows */}
                           <div className="flex flex-wrap gap-1.5 mt-3">
-                            <span className={`text-[8px] font-bold px-1.5 py-0.5 rounded-md border font-mono ${
-                              proj.status === 'Completed' ? 'bg-emerald-500/15 border-emerald-500/30 text-emerald-400' :
-                              proj.status === 'In Progress' ? 'bg-blue-500/15 border-blue-500/30 text-blue-400' :
-                              'bg-amber-500/15 border-amber-500/30 text-amber-400'
-                            }`}>
+                            <span className={`status-badge ${
+                              proj.status === 'Completed' ? 'badge-active' :
+                              proj.status === 'In Progress' ? 'badge-info' : 'badge-warning'
+                            } font-mono`} style={{fontSize:'0.6rem'}}>
                               {proj.status}
                             </span>
-                            
-                            <span className="text-[8px] font-bold px-1.5 py-0.5 rounded-md border border-purple-500/20 bg-purple-500/10 text-purple-400 font-mono">
+                            <span className="status-badge badge-neutral font-mono" style={{fontSize:'0.6rem'}}>
                               Health: {Math.round(feasibility * 10)}%
                             </span>
-
                             {proj.track && (
-                              <span className="text-[8px] font-bold px-1.5 py-0.5 rounded-md border border-orange-500/20 bg-orange-500/10 text-orange-400 font-mono">
-                                Track: {proj.track}
-                              </span>
+                              <span className="status-badge badge-warning font-mono" style={{fontSize:'0.6rem'}}>Track: {proj.track}</span>
                             )}
                           </div>
 
-                          {/* Footer Actions */}
-                          <div className="flex justify-between items-center border-t border-brand-200/10 pt-3 mt-3">
+                          <div className="flex justify-between items-center pt-3 mt-3" style={{borderTop:'1px solid var(--border-color)'}}>
                             <button
                               onClick={() => setActiveReviewProj(proj)}
-                              className="text-[9px] font-bold hover:underline text-[#00f0ff] bg-transparent border-0 cursor-pointer flex items-center gap-0.5 uppercase"
+                              className="text-[9px] font-bold cursor-pointer flex items-center gap-0.5 uppercase bg-transparent border-0 transition-all"
+                              style={{color:'var(--text-accent)'}}
                             >
-                              Quick AI Review <ArrowUpRight size={10} />
+                              Quick Review <ArrowUpRight size={10} />
                             </button>
                             <button
                               onClick={() => navigate(`/workspace/${proj._id}`)}
-                              className="text-[9px] font-bold bg-[#0077ff] text-white hover:bg-[#00f0ff] hover:text-[#02040f] px-2.5 py-1 rounded-md border border-[#00f0ff] transition-all cursor-pointer uppercase tracking-wider font-mono shadow-2xs"
+                              className="btn-primary text-[9px] py-1 px-2.5 uppercase tracking-wide font-mono"
                             >
                               Workspace
                             </button>
@@ -889,32 +872,27 @@ const Dashboard = () => {
 
               {/* Recent Activity Log */}
               <div className="flex flex-col gap-3 text-left">
-                <span className="text-[10px] font-black uppercase tracking-widest text-[#00f0ff] flex items-center gap-2">
-                  <Activity size={14} className="text-[#00f0ff] animate-pulse" />
-                  <span>Recent Activity log</span>
+                <span className="text-[10px] font-black uppercase tracking-widest flex items-center gap-2" style={{color:'var(--text-accent)'}}>
+                  <Activity size={13} style={{animation:'pulse 2s infinite'}} />
+                  <span>Recent Activity</span>
                 </span>
-                <div className="dashboard-card glow-blue p-4 flex flex-col gap-3 max-h-60 overflow-y-auto w-full">
+                <div className="dashboard-card p-4 flex flex-col gap-2.5 max-h-60 overflow-y-auto w-full">
                   {dashboardNotifications.length === 0 ? (
-                    <div className="text-xs text-neutral-500 italic py-6 text-center">No recent commit, marketplace, or AI activities found.</div>
+                    <div className="text-xs italic py-6 text-center" style={{color:'var(--text-muted)'}}>No recent commit, marketplace, or AI activities found.</div>
                   ) : (
                     dashboardNotifications.slice(0, 8).map((notif, idx) => {
                       const isCommit = notif.message.toLowerCase().includes('commit') || notif.message.toLowerCase().includes('repo');
                       const isMarket = notif.message.toLowerCase().includes('swap') || notif.message.toLowerCase().includes('claim');
+                      const badgeClass = isCommit ? 'badge-info' : isMarket ? 'badge-active' : 'badge-warning';
                       const badgeText = isCommit ? 'GitHub' : isMarket ? 'Marketplace' : 'AI Alert';
-                      const badgeColor = isCommit ? 'bg-indigo-500/10 text-indigo-400 border-indigo-500/20' :
-                                         isMarket ? 'bg-emerald-500/10 text-emerald-400 border-emerald-500/20' :
-                                         'bg-orange-500/10 text-orange-400 border-orange-500/20';
-
                       return (
-                        <div key={idx} className="flex justify-between items-center text-xs border-b border-brand-200/5 pb-2">
+                        <div key={idx} className="flex justify-between items-center text-xs pb-2" style={{borderBottom:'1px solid var(--border-color)'}}>
                           <div className="flex items-center gap-2.5 min-w-0">
-                            <span className={`text-[8px] font-bold px-1.5 py-0.5 rounded border ${badgeColor} font-mono shrink-0`}>
-                              {badgeText}
-                            </span>
-                            <span className="text-neutral-350 truncate">{notif.message}</span>
+                            <span className={`status-badge ${badgeClass} font-mono shrink-0`} style={{fontSize:'0.6rem'}}>{badgeText}</span>
+                            <span className="truncate" style={{color:'var(--text-body)'}}>{notif.message}</span>
                           </div>
-                          <span className="text-[8px] text-neutral-500 font-mono shrink-0 ml-2">
-                            {notif.createdAt ? new Date(notif.createdAt).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }) : 'Just now'}
+                          <span className="text-[8px] font-mono shrink-0 ml-2" style={{color:'var(--text-muted)'}}>
+                            {notif.createdAt ? new Date(notif.createdAt).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }) : 'Now'}
                           </span>
                         </div>
                       );
@@ -927,118 +905,82 @@ const Dashboard = () => {
 
             {/* Right Column: Upgraded Developer Profile */}
             <div className="lg:col-span-1 flex flex-col gap-6 w-full text-left">
-              <div className="dashboard-card glow-blue flex flex-col justify-between border-t-2 border-t-brand-300 p-5 h-full">
+              <div className="dashboard-card glow-blue flex flex-col justify-between p-5" style={{borderTop:'2px solid var(--text-accent)'}}>
                 <div className="flex flex-col gap-4">
-                  <div className="flex justify-between items-center pb-2 border-b border-brand-200/30">
+                  <div className="flex justify-between items-center pb-2.5" style={{borderBottom:'1px solid var(--border-color)'}}>
                     <div className="flex items-center gap-2">
-                      <UserCheck size={16} className="text-brand-300" />
-                      <div className="text-[11px] font-black tracking-widest uppercase font-mono text-neutral-800">OPERATIVE PROFILE</div>
+                      <UserCheck size={15} style={{color:'var(--text-accent)'}} />
+                      <span className="text-[10px] font-black tracking-widest uppercase font-mono" style={{color:'var(--text-heading)'}}>Dev Profile</span>
                     </div>
-                    <div className="text-[8px] font-extrabold px-1.5 py-0.5 rounded-sm bg-emerald-500/15 text-emerald-400 border border-emerald-500/30 font-mono flex items-center gap-1">
-                      <span className="w-1.5 h-1.5 rounded-full bg-emerald-400 animate-pulse"></span>
-                      VERIFIED
-                    </div>
+                    <span className="status-badge badge-active" style={{fontSize:'0.6rem',fontFamily:'var(--font-mono)'}}>
+                      <span className="status-pulse" style={{background:'#10b981'}}></span> VERIFIED
+                    </span>
                   </div>
 
-                  <div className="flex items-center gap-3 bg-brand-100 p-3 rounded-xl border border-brand-200">
+                  <div className="flex items-center gap-3 p-3 rounded-xl" style={{background:'var(--bg-elevated)',border:'1px solid var(--border-color)'}}>
                     {activeUser?.avatar ? (
-                      <img src={activeUser.avatar} alt="Avatar" className="w-10 h-10 rounded-full border border-brand-300 object-cover" />
+                      <img src={activeUser.avatar} alt="Avatar" className="w-10 h-10 rounded-full object-cover" style={{border:'1.5px solid var(--border-color-hover)'}} />
                     ) : (
-                      <div className="w-10 h-10 rounded-full bg-neutral-950 text-white flex items-center justify-center text-sm font-extrabold shadow-sm border border-brand-300 font-mono">
+                      <div className="avatar-fallback w-10 h-10 rounded-full flex items-center justify-center text-sm font-extrabold font-mono" style={{background:'var(--btn-primary-bg)',color:'#fff'}}>
                         {activeUser?.name?.charAt(0).toUpperCase() || 'U'}
                       </div>
                     )}
                     <div className="flex-1 min-w-0">
-                      <div className="font-extrabold text-xs truncate font-mono text-neutral-800">{activeUser?.name}</div>
-                      <div className="text-[8px] font-mono mt-0.5 truncate uppercase text-neutral-500">ROLE: SQUAD LEAD</div>
+                      <div className="font-extrabold text-xs truncate font-mono" style={{color:'var(--text-heading)'}}>{activeUser?.name}</div>
+                      <div className="text-[8px] font-mono mt-0.5 truncate uppercase" style={{color:'var(--text-muted)'}}>SQUAD LEAD</div>
                     </div>
                   </div>
 
-                  {/* Dynamic Presentation metrics with mini progress bars */}
-                  <div className="flex flex-col gap-4 text-xs">
-                    
-                    {/* Developer Score */}
-                    <div className="flex flex-col gap-1">
-                      <div className="flex justify-between font-bold text-[10px]">
-                        <span className="text-neutral-400 uppercase">Developer Score</span>
-                        <span className="font-mono text-neutral-800">{developerScore.toFixed(0)}/100</span>
+                  <div className="flex flex-col gap-3 text-xs">
+                    {[
+                      {label:'Developer Score', val:developerScore, color:'var(--text-accent)'},
+                      {label:'AI Reputation', val:aiReputation, color:'#a855f7'},
+                      {label:'Contribution', val:contributionScore, color:'#10b981'},
+                    ].map(m => (
+                      <div key={m.label} className="flex flex-col gap-1">
+                        <div className="flex justify-between font-bold text-[10px]">
+                          <span style={{color:'var(--text-muted)'}}>{m.label}</span>
+                          <span className="font-mono" style={{color:'var(--text-heading)'}}>{m.val.toFixed(0)}%</span>
+                        </div>
+                        <div className="h-1.5 rounded-full overflow-hidden" style={{background:'var(--bg-elevated)',border:'1px solid var(--border-color)'}}>
+                          <div className="h-full rounded-full transition-all duration-700" style={{width:`${m.val}%`,background:m.color}}></div>
+                        </div>
                       </div>
-                      <div className="h-1.5 bg-neutral-200 rounded-full overflow-hidden p-[1px] border border-brand-200/10">
-                        <div className="h-full bg-brand-300 rounded-full" style={{ width: `${developerScore}%` }}></div>
-                      </div>
+                    ))}
+
+                    <div className="grid grid-cols-2 gap-2 pt-2" style={{borderTop:'1px solid var(--border-color)'}}>
+                      {[
+                        {k:'Squads', v:teams.length},
+                        {k:'Projects', v:totalProjects},
+                        {k:'Tasks Done', v:completedTasksCount},
+                        {k:'GitHub', v:githubConnected, special: activeUser?.githubId ? 'success' : 'muted'},
+                      ].map(item => (
+                        <div key={item.k} className="flex justify-between text-[10px] pb-1" style={{borderBottom:'1px solid var(--border-color)'}}>
+                          <span className="font-bold uppercase" style={{color:'var(--text-muted)'}}>{item.k}</span>
+                          <span className="font-mono font-bold" style={{color: item.special === 'success' ? 'var(--color-success)' : 'var(--text-heading)'}}>{item.v}</span>
+                        </div>
+                      ))}
                     </div>
 
-                    {/* AI Reputation */}
-                    <div className="flex flex-col gap-1">
-                      <div className="flex justify-between font-bold text-[10px]">
-                        <span className="text-neutral-400 uppercase">AI Reputation Index</span>
-                        <span className="font-mono text-neutral-800">{aiReputation.toFixed(0)}%</span>
-                      </div>
-                      <div className="h-1.5 bg-neutral-200 rounded-full overflow-hidden p-[1px] border border-brand-200/10">
-                        <div className="h-full bg-purple-500 rounded-full" style={{ width: `${aiReputation}%` }}></div>
-                      </div>
-                    </div>
-
-                    {/* Contribution Score */}
-                    <div className="flex flex-col gap-1">
-                      <div className="flex justify-between font-bold text-[10px]">
-                        <span className="text-neutral-400 uppercase">Contribution Score</span>
-                        <span className="font-mono text-neutral-800">{contributionScore.toFixed(0)}%</span>
-                      </div>
-                      <div className="h-1.5 bg-neutral-200 rounded-full overflow-hidden p-[1px] border border-brand-200/10">
-                        <div className="h-full bg-emerald-500 rounded-full" style={{ width: `${contributionScore}%` }}></div>
-                      </div>
-                    </div>
-
-                    {/* Simple Stats grid */}
-                    <div className="grid grid-cols-2 gap-3 border-t border-brand-200/10 pt-3 text-[10px]">
-                      <div className="flex justify-between border-b border-brand-200/5 pb-1">
-                        <span className="text-neutral-500 font-bold uppercase">Squads</span>
-                        <span className="font-mono text-neutral-800 font-bold">{teams.length}</span>
-                      </div>
-                      <div className="flex justify-between border-b border-brand-200/5 pb-1">
-                        <span className="text-neutral-500 font-bold uppercase">Projects</span>
-                        <span className="font-mono text-neutral-800 font-bold">{totalProjects}</span>
-                      </div>
-                      <div className="flex justify-between border-b border-brand-200/5 pb-1">
-                        <span className="text-neutral-500 font-bold uppercase">Tasks Done</span>
-                        <span className="font-mono text-neutral-800 font-bold">{completedTasksCount}</span>
-                      </div>
-                      <div className="flex justify-between border-b border-brand-200/5 pb-1">
-                        <span className="text-neutral-500 font-bold uppercase">Git Connect</span>
-                        <span className={`font-mono font-bold ${activeUser?.githubId ? 'text-emerald-400' : 'text-neutral-500'}`}>{githubConnected}</span>
-                      </div>
-                    </div>
-
-                    {/* Verified Skills tags */}
-                    <div className="flex flex-col gap-1.5 border-t border-brand-200/10 pt-3">
-                      <span className="text-[9px] font-black uppercase text-neutral-400">Verified Skills Stack</span>
+                    <div className="flex flex-col gap-1.5 pt-2" style={{borderTop:'1px solid var(--border-color)'}}>
+                      <span className="text-[9px] font-black uppercase" style={{color:'var(--text-muted)'}}>Skills Stack</span>
                       <div className="flex flex-wrap gap-1.5">
-                        {activeUser?.skills?.length > 0 ? (
-                          activeUser.skills.map((skill, i) => (
-                            <span key={i} className="px-2 py-0.5 text-[9px] font-bold border border-brand-200/25 bg-brand-200/10 text-brand-400 rounded">
-                              {skill}
-                            </span>
-                          ))
-                        ) : (
-                          ['React', 'NodeJS', 'Express', 'MongoDB', 'AI Agents'].map((skill, i) => (
-                            <span key={i} className="px-2 py-0.5 text-[9px] font-bold border border-brand-200/25 bg-brand-200/10 text-brand-400 rounded">
-                              {skill}
-                            </span>
-                          ))
-                        )}
+                        {(activeUser?.skills?.length > 0 ? activeUser.skills : ['React','Node.js','Express','MongoDB']).map((skill, i) => (
+                          <span key={i} className="px-2 py-0.5 text-[9px] font-bold rounded" style={{border:'1px solid var(--border-color)',background:'var(--tab-active-bg)',color:'var(--text-accent)'}}>
+                            {skill}
+                          </span>
+                        ))}
                       </div>
                     </div>
-
                   </div>
                 </div>
 
                 <button
                   onClick={() => navigate('/profile')}
-                  className="btn-secondary text-xs w-full py-2.5 flex items-center justify-center gap-1.5 mt-4"
+                  className="btn-secondary text-xs w-full py-2 flex items-center justify-center gap-1.5 mt-4"
                 >
                   <Settings size={13} />
-                  <span>Modify Dev Profile</span>
+                  Edit Profile
                 </button>
               </div>
             </div>
@@ -1049,51 +991,52 @@ const Dashboard = () => {
 
       {/* Quick AI Review Modal Overlay */}
       {activeReviewProj && (
-        <div className="fixed inset-0 bg-neutral-950/80 backdrop-blur-xs flex items-center justify-center z-50 p-4">
-          <div className="bg-neutral-100 border border-neutral-300 rounded-2xl shadow-2xl p-6 max-w-lg w-full flex flex-col gap-4 animate-slide-up relative text-left">
+        <div className="modal-backdrop-blur fixed inset-0 flex items-center justify-center z-50 p-4">
+          <div className="animate-slide-up relative text-left w-full max-w-lg flex flex-col gap-4 p-6 rounded-xl" style={{background:'var(--bg-card)',border:'1px solid var(--border-color)',boxShadow:'0 24px 64px rgba(0,0,0,0.5)'}}>
             
             <button
               onClick={() => setActiveReviewProj(null)}
-              className="absolute top-4 right-4 bg-transparent border-0 text-neutral-400 hover:text-neutral-800 font-extrabold text-sm cursor-pointer"
+              className="absolute top-4 right-4 bg-transparent border-0 cursor-pointer text-lg font-bold transition-colors"
+              style={{color:'var(--text-muted)'}}
+              aria-label="Close"
             >
               ✕
             </button>
 
             <div>
-              <span className="text-[9px] font-black tracking-widest text-neutral-600 font-mono">QUICK AI PITCH VERDICT</span>
-              <h2 className="text-lg font-black text-neutral-800 mt-0.5">{activeReviewProj.projectName}</h2>
+              <span className="text-[9px] font-black tracking-widest font-mono" style={{color:'var(--text-muted)'}}>QUICK AI PITCH VERDICT</span>
+              <h2 className="text-lg font-black mt-0.5" style={{color:'var(--text-heading)'}}>{activeReviewProj.projectName}</h2>
             </div>
 
-            <div className="grid grid-cols-2 gap-4 bg-brand-100 p-3 rounded-xl border border-brand-200">
+            <div className="grid grid-cols-2 gap-4 p-3 rounded-xl" style={{background:'var(--bg-elevated)',border:'1px solid var(--border-color)'}}>
               <div className="flex flex-col gap-0.5">
-                <span className="text-[8px] text-neutral-500 uppercase font-bold">Feasibility Rating</span>
-                <span className="text-base font-black text-neutral-800 font-mono">{activeReviewProj.projectReview?.feasibilityScore || '8.5'}/10</span>
+                <span className="text-[8px] uppercase font-bold" style={{color:'var(--text-muted)'}}>Feasibility Rating</span>
+                <span className="text-base font-black font-mono" style={{color:'var(--text-heading)'}}>{activeReviewProj.projectReview?.feasibilityScore || '8.5'}/10</span>
               </div>
               <div className="flex flex-col gap-0.5">
-                <span className="text-[8px] text-neutral-500 uppercase font-bold">Consensus Stack</span>
-                <span className="text-xs font-bold text-neutral-600 font-mono truncate">
+                <span className="text-[8px] uppercase font-bold" style={{color:'var(--text-muted)'}}>Tech Stack</span>
+                <span className="text-xs font-bold font-mono truncate" style={{color:'var(--text-body)'}}>
                   {activeReviewProj.finalTechStack?.frontend || 'React'} • {activeReviewProj.finalTechStack?.backend || 'Express'}
                 </span>
               </div>
             </div>
 
-            {/* Alignment and Risks */}
             <div className="flex flex-col gap-3">
               <div className="flex flex-col gap-1">
-                <span className="text-[8px] text-neutral-450 uppercase font-bold">Alignment Statement:</span>
-                <p className="text-xs text-neutral-350 leading-relaxed italic">
+                <span className="text-[8px] uppercase font-bold" style={{color:'var(--text-muted)'}}>Alignment:</span>
+                <p className="text-xs leading-relaxed italic" style={{color:'var(--text-body)'}}>
                   "{activeReviewProj.projectReview?.problemSolutionAlignment || 'Problem statement aligns nicely with the prototype design.'}"
                 </p>
               </div>
 
               {activeReviewProj.projectReview?.projectRisks?.length > 0 && (
-                <div className="flex flex-col gap-1 border-t border-brand-200/5 pt-2">
-                  <span className="text-[8px] text-neutral-450 uppercase font-bold">Identified Feasibility Risks:</span>
+                <div className="flex flex-col gap-1 pt-2" style={{borderTop:'1px solid var(--border-color)'}}>
+                  <span className="text-[8px] uppercase font-bold" style={{color:'var(--text-muted)'}}>Identified Risks:</span>
                   <div className="flex flex-col gap-1 text-[11px]">
                     {activeReviewProj.projectReview.projectRisks.slice(0, 3).map((r, i) => (
-                      <div key={i} className="flex gap-1.5 items-start text-rose-350 leading-tight">
-                        <AlertTriangle size={12} className="shrink-0 mt-0.5 text-rose-500" />
-                        <span>{r}</span>
+                      <div key={i} className="flex gap-1.5 items-start leading-tight" style={{color:'var(--color-error)'}}>
+                        <AlertTriangle size={12} className="shrink-0 mt-0.5" />
+                        <span style={{color:'var(--text-body)'}}>{r}</span>
                       </div>
                     ))}
                   </div>
@@ -1101,23 +1044,9 @@ const Dashboard = () => {
               )}
             </div>
 
-            <div className="flex justify-end gap-2 border-t border-brand-200/10 pt-4 mt-2">
-              <button
-                onClick={() => setActiveReviewProj(null)}
-                className="btn-secondary text-xs py-1.5 px-3"
-              >
-                Close
-              </button>
-              <button
-                onClick={() => {
-                  const id = activeReviewProj._id;
-                  setActiveReviewProj(null);
-                  navigate(`/workspace/${id}`);
-                }}
-                className="btn-primary text-xs py-1.5 px-3"
-              >
-                Open Project Workspace
-              </button>
+            <div className="flex justify-end gap-2 pt-4" style={{borderTop:'1px solid var(--border-color)'}}>
+              <button onClick={() => setActiveReviewProj(null)} className="btn-secondary text-xs py-1.5 px-4">Close</button>
+              <button onClick={() => { const id=activeReviewProj._id; setActiveReviewProj(null); navigate(`/workspace/${id}`); }} className="btn-primary text-xs py-1.5 px-4">Open Workspace</button>
             </div>
 
           </div>
