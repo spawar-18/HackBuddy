@@ -15,6 +15,7 @@ import {
   triggerGitHubAIAnalysis,
   getProjectRealityCheck
 } from '../services/projectService';
+import UpgradeGate from './UpgradeGate';
 
 // ─── Sub-components ───────────────────────────────────────────────────────────
 
@@ -245,6 +246,7 @@ const GitHubPanel = ({ projectId, isOwner, initialTab }) => {
   const [analytics, setAnalytics] = useState(null);
   const [realityCheck, setRealityCheck] = useState(null);
   const [loading, setLoading] = useState(true);
+  const [blocked, setBlocked] = useState(false); // PRO_REQUIRED gate
   const [syncLoading, setSyncLoading] = useState(false);
   const [analysisLoading, setAnalysisLoading] = useState(false);
   const [realityLoading, setRealityLoading] = useState(false);
@@ -266,8 +268,12 @@ const GitHubPanel = ({ projectId, isOwner, initialTab }) => {
       setAnalytics(res);
       if (res.connected) setShowConnectForm(false);
     } catch (err) {
-      console.error('GitHub analytics error:', err);
-      if (!quiet) toast.error('Failed to load GitHub analytics');
+      if (err?.response?.status === 403) {
+        setBlocked(true);
+      } else {
+        console.error('GitHub analytics error:', err);
+        if (!quiet) toast.error('Failed to load GitHub analytics');
+      }
     } finally {
       if (!quiet) setLoading(false);
     }
@@ -347,6 +353,18 @@ const GitHubPanel = ({ projectId, isOwner, initialTab }) => {
       >
         <RefreshCw size={28} className="animate-spin text-brand-500" />
         <div className="text-xs font-semibold text-neutral-500">Loading GitHub analytics...</div>
+      </div>
+    );
+  }
+
+  if (blocked) {
+    return (
+      <div className="border rounded-2xl shadow-xs" style={{ backgroundColor: 'var(--color-neutral-100)', borderColor: 'var(--color-neutral-200)' }}>
+        <UpgradeGate
+          feature="GitHub Intelligence"
+          requiredPlan="PRO"
+          description="GitHub Intelligence is a Pro feature. Connect your repository and unlock AI-powered commit analytics, health scoring, and reality checks."
+        />
       </div>
     );
   }

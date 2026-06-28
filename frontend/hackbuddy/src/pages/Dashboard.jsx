@@ -693,9 +693,14 @@ const Dashboard = () => {
               {/* AI Personal Assistant Banner */}
               <div className="dashboard-card glow-blue border-l-4 border-l-[#00f0ff] p-5">
                 <div className="flex justify-between items-start border-b border-brand-200/20 pb-3">
-                  <div className="flex flex-col gap-0.5 text-left">
-                    <h2 className="text-base font-extrabold text-white">Good Evening, {activeUser?.name || 'Sahil'}.</h2>
-                  </div>
+                    <h2 className="text-base font-extrabold text-white">
+                      {(() => {
+                        const hour = new Date().getHours();
+                        if (hour < 12) return 'Good Morning';
+                        if (hour < 17) return 'Good Afternoon';
+                        return 'Good Evening';
+                      })()}, {activeUser?.name || 'Sahil'}.
+                    </h2>
                   <span className="text-[8px] font-extrabold px-1.5 py-0.5 rounded bg-brand-200/10 text-brand-400 border border-brand-200/20 font-mono">
                     ONLINE
                   </span>

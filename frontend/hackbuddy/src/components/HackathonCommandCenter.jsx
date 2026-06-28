@@ -15,11 +15,13 @@ import {
 } from 'lucide-react';
 import { toast } from 'react-hot-toast';
 import GitHubPanel from './GitHubPanel';
+import UpgradeGate from './UpgradeGate';
 
 const HackathonCommandCenter = ({ projectId, onBack }) => {
   const [config, setConfig] = useState(null);
   const [dashboard, setDashboard] = useState(null);
   const [loading, setLoading] = useState(true);
+  const [blocked, setBlocked] = useState(false); // PRO_REQUIRED gate
   const [saveLoading, setSaveLoading] = useState(false);
   const [analysisLoading, setAnalysisLoading] = useState(false);
   const [showSettings, setShowSettings] = useState(false);
@@ -85,8 +87,12 @@ const HackathonCommandCenter = ({ projectId, onBack }) => {
         }
       }
     } catch (err) {
-      console.error('Error fetching command center data:', err);
-      toast.error('Failed to load Command Center details');
+      if (err?.response?.status === 403) {
+        setBlocked(true);
+      } else {
+        console.error('Error fetching command center data:', err);
+        toast.error('Failed to load Command Center details');
+      }
     } finally {
       if (!showQuietly) setLoading(false);
     }
@@ -315,6 +321,18 @@ const HackathonCommandCenter = ({ projectId, onBack }) => {
       <div className="flex flex-col justify-center items-center py-20 text-slate-400 gap-3 bg-white border border-brand-100 rounded-2xl shadow-xs">
         <RefreshCw className="animate-spin text-brand-500" size={32} />
         <span className="text-xs font-semibold tracking-wide text-neutral-500">Assembling Hackathon Command Center...</span>
+      </div>
+    );
+  }
+
+  if (blocked) {
+    return (
+      <div className="bg-white border border-neutral-200 rounded-2xl shadow-xs">
+        <UpgradeGate
+          feature="AI Command Center"
+          requiredPlan="PRO"
+          description="The AI Command Center is a Pro feature. Upgrade to get live hackathon HUD, smart alerts, milestone tracking, and AI-driven diagnostics."
+        />
       </div>
     );
   }

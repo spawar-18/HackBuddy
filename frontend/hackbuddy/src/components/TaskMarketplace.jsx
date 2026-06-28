@@ -17,6 +17,7 @@ import {
   rejectMarketplaceRequest
 } from '../services/projectService';
 import { getTeamDetails } from '../services/teamService';
+import UpgradeGate from './UpgradeGate';
 
 const TaskMarketplace = ({ projectId, teamId, onRefreshProject }) => {
   const { user } = useAuth();
@@ -35,6 +36,7 @@ const TaskMarketplace = ({ projectId, teamId, onRefreshProject }) => {
   });
   const [team, setTeam] = useState(null);
   const [loading, setLoading] = useState(true);
+  const [blocked, setBlocked] = useState(false); // TEAM_PLAN_REQUIRED gate
   
   // Loading states for actions
   const [actionLoading, setActionLoading] = useState(false);
@@ -77,8 +79,12 @@ const TaskMarketplace = ({ projectId, teamId, onRefreshProject }) => {
       }
       setTeam(resTeam);
     } catch (err) {
-      console.error('Error fetching marketplace details:', err);
-      toast.error('Failed to load marketplace information.');
+      if (err?.response?.status === 403) {
+        setBlocked(true);
+      } else {
+        console.error('Error fetching marketplace details:', err);
+        toast.error('Failed to load marketplace information.');
+      }
     } finally {
       if (showLoading) setLoading(false);
     }
@@ -397,6 +403,18 @@ const TaskMarketplace = ({ projectId, teamId, onRefreshProject }) => {
       <div className="flex flex-col items-center justify-center py-20 gap-3 text-neutral-500 bg-white border border-neutral-200 rounded-2xl p-6 shadow-xs">
         <RefreshCw className="animate-spin text-indigo-600" size={32} />
         <span className="text-xs font-semibold uppercase tracking-wider text-neutral-400">Loading Marketplace...</span>
+      </div>
+    );
+  }
+
+  if (blocked) {
+    return (
+      <div className="bg-white border border-neutral-200 rounded-2xl shadow-xs">
+        <UpgradeGate
+          feature="Task Marketplace"
+          requiredPlan="TEAM"
+          description="The Task Marketplace is a Team plan feature. Upgrade to enable cross-team task swaps, collaborator requests, and AI-evaluated claim management."
+        />
       </div>
     );
   }

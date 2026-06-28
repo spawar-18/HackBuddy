@@ -148,10 +148,17 @@ const ProjectWorkspace = () => {
           });
           setProjects(pMap);
           
-          // Load CommandCenter config
-          const ccRes = await getCommandCenterDashboard(projectId);
-          if (ccRes.success) {
-            setCommandCenterData(ccRes);
+          // Load CommandCenter config (PRO/TEAM only — silently skip for FREE users)
+          try {
+            const ccRes = await getCommandCenterDashboard(projectId);
+            if (ccRes.success) {
+              setCommandCenterData(ccRes);
+            }
+          } catch (ccErr) {
+            // Free users will get 403 — that's expected, just skip
+            if (ccErr?.response?.status !== 403) {
+              console.error('Error loading command center data:', ccErr);
+            }
           }
         }
       } catch (err) {

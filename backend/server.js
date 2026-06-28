@@ -206,3 +206,4 @@ mongoose.connect(mongoUri)
       console.log(`Server is running on port ${port}`);
     });
   });
+// Nodemon restart trigger after socket.io installation

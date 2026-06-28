@@ -1,43 +1,23 @@
 [AIProviderManager] Registered provider: GLMProvider (zai-org/GLM-4.7-Flash)
 [AIProviderManager] Registered provider: DeepSeekProvider (deepseek-ai/DeepSeek-V4-Flash)
 [AIProviderManager] Registered provider: GeminiProvider (gemini-2.0-flash)
-[ERROR] (node:11596) Warning: Setting the NODE_TLS_REJECT_UNAUTHORIZED environment variable to '0' makes TLS connections and HTTPS requests insecure by disabling certificate verification.
+[ERROR] (node:34760) Warning: Setting the NODE_TLS_REJECT_UNAUTHORIZED environment variable to '0' makes TLS connections and HTTPS requests insecure by disabling certificate verification.
 (Use `node --trace-warnings ...` to show where the warning was created)
 Successfully connected to MongoDB Atlas
 Server is running on port 5000
-[ERROR] subscriptionController.getStatus error: {}
-[ERROR] subscriptionController.getStatus error: {}
-[ERROR] subscriptionController.getStatus error: {}
-[DEBUG] getMyTeams called by user: 6a408a9f86831fbf776e23a7
-[DEBUG] getMyTeams found teams: []
-[DEBUG] getMyTeams called by user: 6a408a9f86831fbf776e23a7
-[DEBUG] getMyTeams found teams: []
-[DEBUG] getMyTeams called by user: 6a408a9f86831fbf776e23a7
-[DEBUG] getMyTeams found teams: []
-[DEBUG] getMyTeams called by user: 6a408a9f86831fbf776e23a7
-[DEBUG] getMyTeams found teams: []
-[ERROR] subscriptionController.getStatus error: {}
-[DEBUG] getMyTeams called by user: 6a405738ba14927b0d7653f0
-[DEBUG] getMyTeams found teams: [{"id":"6a3ade6cb85814ce17284608","name":"Vibers"}]
-[DEBUG] getMyTeams called by user: 6a405738ba14927b0d7653f0
-[DEBUG] getMyTeams found teams: [{"id":"6a3ade6cb85814ce17284608","name":"Vibers"}]
-[DEBUG] getMyTeams called by user: 6a405738ba14927b0d7653f0
-[DEBUG] getMyTeams found teams: [{"id":"6a3ade6cb85814ce17284608","name":"Vibers"}]
-[DEBUG] getMyTeams called by user: 6a405738ba14927b0d7653f0
-[DEBUG] getMyTeams found teams: [{"id":"6a3ade6cb85814ce17284608","name":"Vibers"}]
-[DEBUG] getMyTeams called by user: 6a405738ba14927b0d7653f0
-[DEBUG] getMyTeams found teams: [{"id":"6a3ade6cb85814ce17284608","name":"Vibers"}]
-[DEBUG] getMyTeams called by user: 6a405738ba14927b0d7653f0
-[DEBUG] getMyTeams found teams: [{"id":"6a3ade6cb85814ce17284608","name":"Vibers"}]
-[DEBUG] getMyTeams called by user: 6a405738ba14927b0d7653f0
-[DEBUG] getMyTeams found teams: [{"id":"6a3ade6cb85814ce17284608","name":"Vibers"},{"id":"6a408b3d86831fbf776e23ac","name":"team3"}]
-[DEBUG] getMyTeams called by user: 6a405738ba14927b0d7653f0
-[DEBUG] getMyTeams found teams: [{"id":"6a3ade6cb85814ce17284608","name":"Vibers"},{"id":"6a408b3d86831fbf776e23ac","name":"team3"}]
-[DEBUG] getMyTeams called by user: 6a405738ba14927b0d7653f0
-[DEBUG] getMyTeams found teams: [{"id":"6a3ade6cb85814ce17284608","name":"Vibers"},{"id":"6a408b3d86831fbf776e23ac","name":"team3"},{"id":"6a408b5386831fbf776e23ad","name":"quad"}]
-[DEBUG] getMyTeams called by user: 6a405738ba14927b0d7653f0
-[DEBUG] getMyTeams found teams: [{"id":"6a3ade6cb85814ce17284608","name":"Vibers"},{"id":"6a408b3d86831fbf776e23ac","name":"team3"},{"id":"6a408b5386831fbf776e23ad","name":"quad"}]
-[DEBUG] getMyTeams called by user: 6a405738ba14927b0d7653f0
-[DEBUG] getMyTeams found teams: [{"id":"6a3ade6cb85814ce17284608","name":"Vibers"},{"id":"6a408b3d86831fbf776e23ac","name":"team3"},{"id":"6a408b5386831fbf776e23ad","name":"quad"}]
-[DEBUG] getMyTeams called by user: 6a405738ba14927b0d7653f0
-[DEBUG] getMyTeams found teams: [{"id":"6a3ade6cb85814ce17284608","name":"Vibers"},{"id":"6a408b3d86831fbf776e23ac","name":"team3"},{"id":"6a408b5386831fbf776e23ad","name":"quad"}]
+[DEBUG] getMyTeams called by user: 6a265746b1a1c29afedf3e69
+[DEBUG] getMyTeams found teams: [{"id":"6a390e011b4929bad5c6d64d","name":"Vibecoders"},{"id":"6a3925fe5d71e86ea882c3cb","name":"BugSolvers"},{"id":"6a3ad641c0b9fc7aa496a90f","name":"bugcrushers"},{"id":"6a3ad6dfee899979c52f7816","name":"CodeSmashers"},{"id":"6a3ade6cb85814ce17284608","name":"Vibers"},{"id":"6a3d4f5e54d4b3f9b2a09c66","name":"Code Wariors"},{"id":"6a3e82ccdb89e25ff2175940","name":"VibeCOders"}]
+[DEBUG] getMyTeams called by user: 6a265746b1a1c29afedf3e69
+[DEBUG] getMyTeams found teams: [{"id":"6a390e011b4929bad5c6d64d","name":"Vibecoders"},{"id":"6a3925fe5d71e86ea882c3cb","name":"BugSolvers"},{"id":"6a3ad641c0b9fc7aa496a90f","name":"bugcrushers"},{"id":"6a3ad6dfee899979c52f7816","name":"CodeSmashers"},{"id":"6a3ade6cb85814ce17284608","name":"Vibers"},{"id":"6a3d4f5e54d4b3f9b2a09c66","name":"Code Wariors"},{"id":"6a3e82ccdb89e25ff2175940","name":"VibeCOders"}]
+[DEBUG] getMyTeams called by user: 6a265746b1a1c29afedf3e69
+[DEBUG] getMyTeams found teams: [{"id":"6a390e011b4929bad5c6d64d","name":"Vibecoders"},{"id":"6a3925fe5d71e86ea882c3cb","name":"BugSolvers"},{"id":"6a3ad641c0b9fc7aa496a90f","name":"bugcrushers"},{"id":"6a3ad6dfee899979c52f7816","name":"CodeSmashers"},{"id":"6a3ade6cb85814ce17284608","name":"Vibers"},{"id":"6a3d4f5e54d4b3f9b2a09c66","name":"Code Wariors"},{"id":"6a3e82ccdb89e25ff2175940","name":"VibeCOders"}]
+[DEBUG] getMyTeams called by user: 6a265746b1a1c29afedf3e69
+[DEBUG] getMyTeams found teams: [{"id":"6a390e011b4929bad5c6d64d","name":"Vibecoders"},{"id":"6a3925fe5d71e86ea882c3cb","name":"BugSolvers"},{"id":"6a3ad641c0b9fc7aa496a90f","name":"bugcrushers"},{"id":"6a3ad6dfee899979c52f7816","name":"CodeSmashers"},{"id":"6a3ade6cb85814ce17284608","name":"Vibers"},{"id":"6a3d4f5e54d4b3f9b2a09c66","name":"Code Wariors"},{"id":"6a3e82ccdb89e25ff2175940","name":"VibeCOders"}]
+[DEBUG] getMyTeams called by user: 6a265746b1a1c29afedf3e69
+[DEBUG] getMyTeams found teams: [{"id":"6a390e011b4929bad5c6d64d","name":"Vibecoders"},{"id":"6a3925fe5d71e86ea882c3cb","name":"BugSolvers"},{"id":"6a3ad641c0b9fc7aa496a90f","name":"bugcrushers"},{"id":"6a3ad6dfee899979c52f7816","name":"CodeSmashers"},{"id":"6a3ade6cb85814ce17284608","name":"Vibers"},{"id":"6a3d4f5e54d4b3f9b2a09c66","name":"Code Wariors"},{"id":"6a3e82ccdb89e25ff2175940","name":"VibeCOders"}]
+[DEBUG] getMyTeams called by user: 6a265746b1a1c29afedf3e69
+[DEBUG] getMyTeams found teams: [{"id":"6a390e011b4929bad5c6d64d","name":"Vibecoders"},{"id":"6a3925fe5d71e86ea882c3cb","name":"BugSolvers"},{"id":"6a3ad641c0b9fc7aa496a90f","name":"bugcrushers"},{"id":"6a3ad6dfee899979c52f7816","name":"CodeSmashers"},{"id":"6a3ade6cb85814ce17284608","name":"Vibers"},{"id":"6a3d4f5e54d4b3f9b2a09c66","name":"Code Wariors"},{"id":"6a3e82ccdb89e25ff2175940","name":"VibeCOders"}]
+[DEBUG] getMyTeams called by user: 6a265746b1a1c29afedf3e69
+[DEBUG] getMyTeams found teams: [{"id":"6a390e011b4929bad5c6d64d","name":"Vibecoders"},{"id":"6a3925fe5d71e86ea882c3cb","name":"BugSolvers"},{"id":"6a3ad641c0b9fc7aa496a90f","name":"bugcrushers"},{"id":"6a3ad6dfee899979c52f7816","name":"CodeSmashers"},{"id":"6a3ade6cb85814ce17284608","name":"Vibers"},{"id":"6a3d4f5e54d4b3f9b2a09c66","name":"Code Wariors"},{"id":"6a3e82ccdb89e25ff2175940","name":"VibeCOders"}]
+[DEBUG] getMyTeams called by user: 6a265746b1a1c29afedf3e69
+[DEBUG] getMyTeams found teams: [{"id":"6a390e011b4929bad5c6d64d","name":"Vibecoders"},{"id":"6a3925fe5d71e86ea882c3cb","name":"BugSolvers"},{"id":"6a3ad641c0b9fc7aa496a90f","name":"bugcrushers"},{"id":"6a3ad6dfee899979c52f7816","name":"CodeSmashers"},{"id":"6a3ade6cb85814ce17284608","name":"Vibers"},{"id":"6a3d4f5e54d4b3f9b2a09c66","name":"Code Wariors"},{"id":"6a3e82ccdb89e25ff2175940","name":"VibeCOders"}]

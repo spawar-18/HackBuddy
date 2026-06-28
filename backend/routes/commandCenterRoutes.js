@@ -11,13 +11,16 @@ const {
   markNotificationsAsRead
 } = require('../controller/commandCenterController');
 
-// All command center endpoints require PRO or TEAM subscription
+// PRO/TEAM required: AI Command Center features
 router.post('/config', authMiddleware, requirePro, saveHackathonConfig);
 router.get('/config', authMiddleware, requirePro, getHackathonConfig);
 router.get('/dashboard', authMiddleware, requirePro, getCommandCenterDashboard);
 router.post('/analyze', authMiddleware, requirePro, triggerCommandCenterAnalysis);
-router.get('/notifications', authMiddleware, requirePro, getInAppNotifications);
-router.post('/notifications/read', authMiddleware, requirePro, markNotificationsAsRead);
+
+// Available to all authenticated users: in-app notifications
+router.get('/notifications', authMiddleware, getInAppNotifications);
+router.post('/notifications/read', authMiddleware, markNotificationsAsRead);
 
 module.exports = router;
+
 
